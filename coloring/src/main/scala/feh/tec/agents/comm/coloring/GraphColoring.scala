@@ -10,10 +10,20 @@ import akka.actor.{ActorSystem, Props, ActorRef, Actor}
 import akka.util.Timeout
 import akka.pattern._
 import scala.concurrent.ExecutionContext
-import feh.tec.comm.util.Graph
 import ColoringGraph._
 import feh.tec.agents.comm.coloring.ColoringOverseer._
-import feh.tec.agents.comm.coloring.ColoringExpression.{Fallback, Accept}
+import feh.tec.agents.comm.coloring.ColoringExpression.Fallback
+import feh.tec.agents.visualisation.util.Graph
+import feh.dsl.swing.AppFrameControl
+import scala.util.Random
+import feh.dsl.graphviz._
+import feh.dsl.graphviz.OutFormat.Svg
+import feh.dsl.graphviz.Prog.{Neato, Sfdp, Fdp, Dot}
+import scala.Some
+import feh.tec.agents.visualisation.util.Graph.Node
+import feh.tec.agents.comm.coloring.ColoringOverseer.GetColor
+import feh.tec.agents.comm.coloring.ColoringExpression.Accept
+import feh.tec.agents.comm.coloring.ColoringOverseer.SetColor
 
 class ColoringEnvironment(val colors: Set[Color], envGraph: ColoringGraph) {
   env =>
@@ -60,7 +70,7 @@ object ColoringGraph{
   }
 }
 
-case class ColoringGraph(override val nodes: Set[Node]) extends Graph(nodes)
+case class ColoringGraph(override val name: String, override val nodes: Set[ColoringGraph.Node]) extends Graph[Option[Color]](null, null)
 
 class ColoringLanguage extends NegotiatingLanguage{
   type Expr = ColoringExpression
@@ -93,7 +103,7 @@ import ColoringExpression._
 
 class ColoringAgentController extends CommAgentController[ColoringLanguage, ColoringEnvironment, ColoringAgent]
 
-class ColoringAgent(val node: Node,
+class ColoringAgent(val node: ColoringGraph.Node,
                     val envRef: ColoringEnvironmentRef,
                     val controller: ColoringAgentController)
   extends Agent.Communicating[ColoringLanguage, ColoringEnvironment] with Actor
@@ -162,8 +172,158 @@ class GraphColoring(colors: Set[Color], envGraph: ColoringGraph)(implicit system
 
   val agentController = new ColoringAgentController
 
-  def agentProps(node: Node) = Props(classOf[ColoringAgent], node, buildRef(node.id), agentController)
-  def createAgent(node: Node) = system.actorOf(agentProps(node))
+  def agentProps(node: ColoringGraph.Node) = Props(classOf[ColoringAgent], node, buildRef(node.id), agentController)
+  def createAgent(node: ColoringGraph.Node) = system.actorOf(agentProps(node))
 
   val agents = envGraph.nodes.map(createAgent)
+}
+
+trait GraphColoringVisualisation extends AppFrameControl{
+  protected def initialGraph: ColoringGraph
+
+  def update(id: UUID, color: Option[Color])
+}
+
+
+trait GraphGenerator{
+  def generate(name: String, nodes: Set[String], edges: Set[(String, String)]): ColoringGraph
+  def generate(name: String, nNodes: Int, edge: (UUID, UUID) => Boolean): ColoringGraph
+  def generate(name: String, nNodes: Int, edge: Random => Boolean): ColoringGraph
+}
+
+class GraphGeneratorImpl extends GraphGenerator{
+  def generate(name: String, nodes: Set[String], edges: Set[(String, String)]): ColoringGraph = ???
+
+  def generate(name: String, nNodes: Int, edge: (UUID, UUID) => Boolean): ColoringGraph = ???
+
+  def generate(name: String, nNodes: Int, edge: (Random) => Boolean): ColoringGraph = {
+    val nodesIds = for(_ <- 1 to nNodes) yield UUID.randomUUID()
+    val nodes = for {
+      id <- nodesIds
+      neigh = nodesIds.filter(e => e != id && edge(Random))
+    } yield Node[Option[Color]](id, None, neigh.toSet)
+    ColoringGraph(name, nodes.toSet)
+  }
+}
+
+trait ColoringVisualisationBase extends GraphvizExec{
+  def nNodes: Int
+  def edgeProb: InUnitInterval
+  
+  val generator = new GraphGeneratorImpl
+  val gr = generator.generate("coloring", nNodes, _.nextDouble() < edgeProb.d)
+
+  class NameGenerator(forbidden: Set[String]){
+    protected var next = "a"
+
+    private def incr(str: String) = {
+      def inner(str: List[Char]): List[Char] = str match{
+        case 'Z' :: tail => 'Z' :: inner(tail)
+        case 'z' :: tail => 'A' :: tail
+        case az :: tail if 'a' <= az && az < 'z' || 'A' <= az && az < 'Z' => (az.toInt + 1).toChar :: tail
+      }
+
+      if(str.distinct == "Z") "a" * (str.length + 1)
+      else inner(str.toList.reverse).reverse.mkString
+    }
+
+    def nextName: String = {
+      val r = next
+      next = incr(next)
+      r
+    }
+  }
+
+  val nameGen = new NameGenerator(Set())
+
+  
+}
+
+class TestDotDsl(_defaultIndent: Int) extends DotDslImpl(_defaultIndent){
+  trait DotWriterTest extends DotWriter{
+    def noEdgesChaining(edges: Seq[Edge]): Seq[AnyEdge] = edges.toList
+
+    def printNoChaining[R](r: => R): R = chain.doWith(false)(r)
+    protected val chain = new ScopedState[Boolean](true)
+
+    override def chainEdges(edges: Seq[Edge]) =
+      if(chain.get) super.chainEdges(edges) else noEdgesChaining(edges)
+  }
+
+  override val write = new DotWriter with DotWriterTest{
+    def defaultIndent = _defaultIndent
+  }
+}
+
+object TestDotGraphColoringVisualisationApp extends ColoringVisualisationBase with App{
+  def nNodes = 50
+  def edgeProb = .1
+
+  val dotDsl = new TestDotDsl(4)
+  import dotDsl._
+  import Attributes._
+
+  val nodes = gr.nodes.zipMap(_ => nameGen.nextName).map{
+    case (node, name) => node.id -> dotDsl.Node(name, Set(
+      Label(node.name.getOrElse(name)), Tooltip(node.id.toString)
+    ))
+  }.toMap
+  val edges = gr.edges.map{
+    edge => nodes(edge._1) -> nodes(edge._2)
+  }
+
+  println(s"edges = $edges")
+
+  val dot = Root("svgGraph",
+    nodes.values.toSeq ++ edges
+  )
+
+  implicit val format = Svg
+  implicit val prog = Dot
+
+  writeAndExec("svg-graph-coloring-visualisation.dot", dot.value)
+  writeAndExec("svg-graph-coloring-visualisation-control.dot", write.printNoChaining(dot.value))
+
+}
+
+class GenericGraphColoringVisualisation[Dsl <: GraphvizDsl](
+                                          val nNodes: Int,
+                                          val edgeProb: InUnitInterval,
+                                          val dsl: Dsl)
+  extends ColoringVisualisationBase
+{
+  import dsl._
+  import Attributes._
+
+  val nodes = gr.nodes.zipMap(_ => nameGen.nextName).map{
+    case (node, name) => node.id -> dsl.Node(name, Set(
+      Label(node.name.getOrElse(name)), Tooltip(node.id.toString)
+    ))
+  }.toMap
+
+  val edges = gr.edges.map{
+    edge => Edge(nodes(edge._1), nodes(edge._2))
+  }
+
+  val root = Root(gr.name, nodes.values.toSeq ++ edges)
+  
+  def print = root.value
+}
+
+object GraphColoringVisualisationApp extends App {
+  val dir = "tmp/"
+  val name = "graph-coloring"
+  val progs = Dot :: Fdp :: Sfdp :: Neato :: Nil
+  val outFormat = Svg
+
+  val vis = new GenericGraphColoringVisualisation(30, .1, FdpDsl.indent._4)
+  import vis._
+
+  file(Path(dir + name)) withOutputStream File.write.utf8(vis.print)
+
+  progs.foreach{
+    pr =>
+      execGraphviz(dir + name: Path, name + "-" + pr.command)(outFormat, pr)
+  }
+
 }

@@ -61,7 +61,12 @@ object  Build extends sbt.Build {
     lazy val grappa = "att.grappa" % "grappa" % "1.2"
 
     object feh{
-      lazy val util = "feh" %% "util" % "1.0"
+      lazy val util = "feh" %% "util" % "1.0.1"
+
+      object dsl{
+        lazy val swing = "feh.dsl" %% "swing" % "1.0"
+        lazy val graphviz = "feh.dsl" %% "graphviz" % "0.1"
+      }
     }
   }
 
@@ -74,17 +79,15 @@ object  Build extends sbt.Build {
       name := "agent-comm"
     }
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(commutil, comm, svg, coloring)
+   .aggregate(comm, svg, coloring)
 
   lazy val comm = Project(
     id = "comm",
     base = file("comm"),
     settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(
-        akka
-      )
+      libraryDependencies ++= Seq(akka, feh.util)
     )
-  ) dependsOn commutil
+  )
 
   lazy val svg = Project(
     id = "svg",
@@ -92,24 +95,18 @@ object  Build extends sbt.Build {
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
         svgSalamander,
-        grappa
+        feh.util
       ),
       resolvers += Snapshot.eulergui
     )
-  ) dependsOn commutil
-
-  lazy val commutil = Project(
-    id = "commutil",
-    base = file("commutil"),
-    settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(feh.util)
-      )
   )
 
   lazy val coloring = Project(
     id = "coloring",
     base = file("coloring"),
-    settings = buildSettings
+    settings = buildSettings ++ Seq(
+      libraryDependencies ++= Seq(feh.dsl.swing, feh.dsl.graphviz)
+    )
   ) dependsOn(comm, svg)
 
 }
