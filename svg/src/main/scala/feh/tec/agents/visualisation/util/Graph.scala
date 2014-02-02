@@ -17,7 +17,8 @@ abstract class Graph[T](val name: String, val nodes: Set[Node[T]]){
   def apply(id: UUID) = get(id).get
   def get(id: UUID) = nodes.find(_.id == id)
 
-  def neighbouringNodes(n: Node[T]) =
+  def neighbouringNodes(of: UUID): Option[Set[Node[T]]] = byId(of).map(neighbouringNodes)
+  def neighbouringNodes(n: Node[T]): Set[Node[T]] =
     n.neighbours.map(id => nodes.find(_.id == id)
       .getOrThrow(s"Incorrect connection: $n with id=$id - no node with such id exists"))
 
@@ -27,4 +28,7 @@ abstract class Graph[T](val name: String, val nodes: Set[Node[T]]){
         case (u1, u2) => u1 == id && u2 == n.id || u2 == id && u1 == n.id
       })).map(n.id ->)
   }.toSet
+  
+  def byId(id: UUID) = nodes.find(_.id == id)
+  def getById(id: UUID) = byId(id).get
 }

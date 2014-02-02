@@ -36,7 +36,7 @@ object BatikTest extends App with FileUtils{
 
   val b = List.newBuilder[Node]
   val attrs = m.getAttributes
-  for(i <- 0 to attrs.getLength) Option(attrs.item(i)) foreach (b +=)
+  for(i <- 0 until attrs.getLength) b += attrs.item(i)
   val an = b.result()
   println("an = " + an)
   println("m attrs: " + an.map(attr => attr.getNodeName + "=" + attr.getNodeValue).mkString(", "))

@@ -4,7 +4,7 @@ import feh.util._
 import org.w3c.dom.svg.{SVGElement, SVGDocument}
 import feh.tec.agents.visualisation.SvgCanvas
 import java.util.UUID
-import feh.tec.agents.comm.coloring.{GraphGeneratorImpl, ColoringGraph, GraphColoringVisualisation}
+import feh.tec.agents.comm.coloring._
 import scala.swing._
 import feh.dsl.swing.{SwingFrameAppCreation, SwingAppFrame}
 import java.awt.Color
@@ -17,9 +17,12 @@ import org.w3c.dom.{NodeList, Node}
 import org.apache.batik.swing.svg.JSVGComponent
 import org.apache.batik.swing.JSVGCanvas
 import scala.swing.GridBagPanel.Fill
-import akka.actor.{ActorSystem, Actor}
+import akka.actor.{ActorRef, Props, ActorSystem, Actor}
 import feh.tec.agents.coloring.visual.ColorUpdateActor.SetColor
 import scala.concurrent.duration._
+import feh.tec.agents.coloring.util.Name
+import feh.tec.agents.coloring.visual.ColorUpdateActor.SetColor
+import akka.util.Timeout
 
 class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement]) 
   extends MainFrame with SwingAppFrame with SwingFrameAppCreation.Frame9PositionsLayoutBuilder
@@ -96,9 +99,9 @@ class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement])
   implicit class NodeAttrsWrapper(node: Node){
     def attrs = Option(node.getAttributes).map{
       a =>
-        (for(i <- 0 to a.getLength) yield Option(a.item(i)) map {
+        (for(i <- 0 until a.getLength) yield a.item(i) |> {
           node => node.getNodeName -> node.getNodeValue
-        }).flatten.toMap
+        }).toMap
     } getOrElse Map()
   }
 
@@ -117,7 +120,7 @@ class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement])
   implicit class NodeListWrapper(nl: NodeList){
     def toList = {
       val b = List.newBuilder[Node]
-      for(i <- 0 to nl.getLength) Option(nl) foreach (l => b += l.item(i))
+      for(i <- 0 until nl.getLength) b += nl.item(i)
       b.result()
     }
   }
@@ -145,43 +148,28 @@ object ColorUpdateActor{
 }
 
 trait GraphColoringApplication extends GraphColoringVisualisation{
-  protected def getFactory: ColoringGraph => GraphvizGraphFactory with SvgLoader
-
   implicit def prog: Prog
 
-  class SvgBuilder(gr: ColoringGraph){
-    protected  val factory = getFactory(gr)
-    protected val fn = "GraphColoringApplication"
-    factory.writeToFile(factory.Path(fn))
-    val doc = factory.load(factory.Path(fn))
-    val names = factory.naming
+  class SvgBuilder(factory: GraphvizGraphFactory with SvgLoader, filename: String){
+//    protected  val factory = getFactory(gr)
+    factory.writeToFile(factory.Path(filename))
+    val doc = factory.load(factory.Path(filename))
+    def names = factory.reverseNaming
   }
 
-  private val svgB = new SvgBuilder(graph)
-  val doc = svgB.doc
-  val elements = svgB.names.mapValues{
+  protected def factory: GraphvizGraphFactory with SvgLoader
+  def dotFilename = "GraphColoringApplication.dot"
+  private lazy val svgB = new SvgBuilder(factory, dotFilename)
+  lazy val doc = svgB.doc
+  lazy val elementByUUID = svgB.names.mapValues{
     name => svgB.doc.getElementById(name).asInstanceOf[SVGElement]
   }
 
-  println("elements = " + elements)
+  println("elements = " + elementByUUID)
 
-  protected val vis = new BatikVisualization(doc, elements)
+  protected lazy val vis = new BatikVisualization(doc, elementByUUID)
 
-  import vis.NodeAttrsWrapper
-
-
-//  vis.elements.event.mouseOver(id => {
-//    println("Z")
-//    update(id, Some(Color.red))
-//    println("attrs = " + elements(id).attrs)
-//  })
-//  vis.elements.event.mouseOut(id => {
-//    println("A")
-//    println("attrs = " + elements(id).attrs)
-//    update(id, None)
-//  })
-
-  def update(id: UUID, color: Option[Color]) = vis.updateColor(elements(id), color)
+  def update(id: UUID, color: Option[Color]) = vis.updateColor(elementByUUID(id), color)
 
   def start() = vis.start()
   def stop() = vis.stop()
@@ -193,25 +181,50 @@ class ColorUpdateActor(app: GraphColoringApplication) extends Actor{
   }
 }
 
+class BatikColoringOverseer(id: UUID, env: ColoringEnvironment, updater: ActorRef) extends ColoringOverseer(id, env){
+  override def receive: Actor.Receive = {
+    case SetColor(nodeId, color) =>
+      env.setColor(nodeId, color)
+      updater ! ColorUpdateActor.SetColor(nodeId, color)
+  }
+}
+
 object GraphColoringApp extends GraphColoringApplication with App{
   implicit def prog = Dot
 
-  protected lazy val graph = generator.generate("coloring", 30, _.nextDouble() < .1)
-//  println(graph)
+  lazy val nNodes = 30
 
-  protected def getFactory = gr => new GenericGraphvizFactory(DotDsl.indent._4, gr) with SvgLoader
+  protected lazy val graph = generator.generate("coloring", nNodes, _.nextDouble() < .1)
   protected def generator = new GraphGeneratorImpl
-
-  val ids = elements.keys.toList
+  protected lazy val factory = new GenericGraphvizFactory(DotDsl.indent._4, graph) with SvgLoader
+  import factory._
+  lazy val ids = elementByUUID.keys.toList
 
   implicit val system = ActorSystem.create()
-  import system._
-
-  scheduler.schedule(1 second, 1 second){
-    update(ids.randomChoice, Some(Color.blue))
+  implicit val timeout: Timeout = 1 second span
+  lazy val colors = Set(Color.red, Color.blue, Color.green)
+  lazy val updaterRef = system.actorOf(Props(classOf[ColorUpdateActor], this))
+  lazy val env = new GraphColoring(colors, graph){
+    override def overseerProps = Props(classOf[BatikColoringOverseer], overseerId, env, updaterRef)
   }
 
-  vis.size = 800 -> 800
+  def getNeighbours(of: UUID) = graph.neighbouringNodes(of).get.map(n => reverseNaming(n.id))
+
+  def createAgent = env.createAgent(reverseNaming, getNeighbours) _
+
+  lazy val agentRefs = ids.map(createAgent)
+
+//  scheduler.schedule(1 second, 1 second){
+//    update(ids.randomChoice, Some(Color.blue))
+//  }
+
+  override def start() = {
+    agentRefs.foreach(ColoringAgent.start)
+    vis.size = 800 -> 800
+    super.start()
+  }
+
   start()
+
 }
 

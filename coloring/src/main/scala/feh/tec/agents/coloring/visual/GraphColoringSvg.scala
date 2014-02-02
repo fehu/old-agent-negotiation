@@ -9,6 +9,7 @@ import org.apache.batik.dom.svg.SAXSVGDocumentFactory
 import org.apache.batik.util.XMLResourceDescriptor
 import java.io.StringReader
 import java.util.UUID
+import feh.tec.agents.coloring.util.{Name, NameGenerator}
 
 case class GraphvizGraphGen(nNodes: Int, edgeProb: InUnitInterval) {
   lazy val generator = new GraphGeneratorImpl
@@ -18,33 +19,13 @@ case class GraphvizGraphGen(nNodes: Int, edgeProb: InUnitInterval) {
 trait GraphvizGraphFactory extends GraphvizExec{
   def gr: ColoringGraph  
 
-  class NameGenerator(forbidden: Set[String]){
-    protected var next = "a"
-
-    private def incr(str: String) = {
-      def inner(str: List[Char]): List[Char] = str match{
-        case 'Z' :: tail => 'Z' :: inner(tail)
-        case 'z' :: tail => 'A' :: tail
-        case az :: tail if 'a' <= az && az < 'z' || 'A' <= az && az < 'Z' => (az.toInt + 1).toChar :: tail
-      }
-
-      if(str.distinct == "Z") "a" * (str.length + 1)
-      else inner(str.toList.reverse).reverse.mkString
-    }
-
-    def nextName: String = {
-      val r = next
-      next = incr(next)
-      r
-    }
-  }
-
   val nameGen = new NameGenerator(Set())
 
   def writeToFile(path: Path) = file(path) withOutputStream File.write.utf8(print)
 
   def print: String
-  def naming: Map[UUID, String]
+  def reverseNaming: Map[UUID, Name]
+  def naming: Map[Name, UUID] = reverseNaming.map(_.swap)
 }
 
 class GenericGraphvizFactory[Dsl <: GraphvizDsl](val dsl: Dsl, val gr: ColoringGraph) extends GraphvizGraphFactory{
@@ -55,8 +36,7 @@ class GenericGraphvizFactory[Dsl <: GraphvizDsl](val dsl: Dsl, val gr: ColoringG
     case (node, name) => node.id -> dsl.Node(name, Set(
       Label(node.name.getOrElse(name)),
       Id(name),
-      Tooltip(node.id.toString),
-      Fill, Color(java.awt.Color.white)
+      Tooltip(node.id.toString)
     ))
   }.toMap
 
@@ -66,8 +46,12 @@ class GenericGraphvizFactory[Dsl <: GraphvizDsl](val dsl: Dsl, val gr: ColoringG
 
   val root = Root(gr.name, nodes.values.toSeq ++ edges)
 
+  val uuidByName = nodes.map{
+    case (id, dsl.Node(name, _)) => Name(name) -> id
+  }
+
   def print = root.value
-  def naming = nodes.mapValues(_.name)
+  def reverseNaming = nodes.mapValues(n => Name(n.name))
 }
 
 class GenericAutoGraphvizFactory[Dsl <: GraphvizDsl](val nNodes: Int,
