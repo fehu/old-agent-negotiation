@@ -197,9 +197,9 @@ object GraphColoringApp extends GraphColoringApplication with App{
   protected lazy val graph = generator.generate("coloring", nNodes, _.nextDouble() < .1)
   protected def generator = new GraphGeneratorImpl
   protected lazy val factory = new GenericGraphvizFactory(DotDsl.indent._4, graph) with SvgLoader
-  import factory._
   lazy val ids = elementByUUID.keys.toList
-
+  implicit def reverseNaming = factory.reverseNaming
+  
   implicit val system = ActorSystem.create()
   implicit val timeout: Timeout = 1 second span
   lazy val colors = Set(Color.red, Color.blue, Color.green)
@@ -224,6 +224,7 @@ object GraphColoringApp extends GraphColoringApplication with App{
     super.start()
   }
 
+  AgentReport.default.enabled = true
   start()
 
 }

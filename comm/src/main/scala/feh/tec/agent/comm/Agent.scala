@@ -22,8 +22,18 @@ object Agent{
 
     type EnvRef <: EnvironmentRef[Env]
 
-    type RespondArg = (Lang#Expr, EnvRef)
-    def respond: RespondArg => Option[Lang#Expr]
+    object Response{
+      def apply(tellSender: Lang#Expr = null.asInstanceOf[Lang#Expr],
+                tellAll: Lang#Expr = null.asInstanceOf[Lang#Expr],
+                affectEnvironment: EnvRef => Unit = null): Response =
+        Response(Option(tellSender), Option(tellAll), Option(affectEnvironment))
+    }
+
+    case class Response protected (tellSender: Option[Lang#Expr],
+                                   tellAll: Option[Lang#Expr],
+                                   affectEnvironment: Option[EnvRef => Unit])
+
+    def respond: Lang#Expr => Response
 
     def envRef: EnvRef
     def controller: CommAgentController[Lang, Env, _]
@@ -33,7 +43,11 @@ object Agent{
     def receive: Actor.Receive = {
       case expr if isLangExpr(expr) => {
         println(s"Lang#Expr $expr")
-        respond((expr.asInstanceOf[Lang#Expr], envRef)) map (sender !)
+
+        val Response(resp, all, affect) = respond(expr.asInstanceOf[Lang#Expr])
+        resp foreach (sender !)
+        all foreach controller.tellAll
+        affect foreach (_(envRef))
       }
     }
   }
@@ -54,12 +68,13 @@ object Agent{
     def id(ref: ActorRef): Ag#Id = refs(ref)
 
     def tell(id: Ag#Id, msg: Lang#Expr)(implicit sender: ActorRef): ActorRef = ref(id) $$ (_.tell(msg, sender))
+    def tellAll(msg: Lang#Expr)(implicit sender: ActorRef)
   }
 
 }
 
 trait Language{
-  type Expr
+  type Expr <: AnyRef
 }
 
 trait NegotiatingLanguage extends Language{
