@@ -24,4 +24,6 @@ class NameGenerator(forbidden: Set[String]){
 object Name{
   implicit def nameToStringWrapper(n: Name) = n.name
 }
-case class Name(name: String)
+case class Name(name: String){
+  override def toString = name
+}

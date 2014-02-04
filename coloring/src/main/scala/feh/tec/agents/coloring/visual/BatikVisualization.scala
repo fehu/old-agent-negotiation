@@ -9,20 +9,16 @@ import scala.swing._
 import feh.dsl.swing.{SwingFrameAppCreation, SwingAppFrame}
 import java.awt.Color
 import org.w3c.dom.events.{Event, EventListener, EventTarget}
-import feh.dsl.graphviz.{Prog, DotDsl}
+import feh.dsl.graphviz.{FdpDsl, Prog, DotDsl}
 import scala.swing.Swing._
-import feh.dsl.graphviz.Prog.Dot
-import org.apache.batik.dom.svg.{SVGOMAElement, SVGOMGElement}
+import feh.dsl.graphviz.Prog._
 import org.w3c.dom.{NodeList, Node}
 import org.apache.batik.swing.svg.JSVGComponent
-import org.apache.batik.swing.JSVGCanvas
 import scala.swing.GridBagPanel.Fill
 import akka.actor.{ActorRef, Props, ActorSystem, Actor}
-import feh.tec.agents.coloring.visual.ColorUpdateActor.SetColor
 import scala.concurrent.duration._
-import feh.tec.agents.coloring.util.Name
-import feh.tec.agents.coloring.visual.ColorUpdateActor.SetColor
 import akka.util.Timeout
+import feh.tec.agents.comm.coloring.ColoringOverseer.SetColor
 
 class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement]) 
   extends MainFrame with SwingAppFrame with SwingFrameAppCreation.Frame9PositionsLayoutBuilder
@@ -145,6 +141,14 @@ class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement])
 
 object ColorUpdateActor{
   case class SetColor(id: UUID, color: Option[Color])
+
+  class TheActor(app: GraphColoringApplication) extends Actor{
+    def receive = {
+      case SetColor(id, colorOpt) => app.update(id, colorOpt)
+    }
+  }
+  def actor(app: GraphColoringApplication)(implicit system: ActorSystem) =
+    system.actorOf(Props(classOf[TheActor], app), "ColorUpdateActor")
 }
 
 trait GraphColoringApplication extends GraphColoringVisualisation{
@@ -175,53 +179,53 @@ trait GraphColoringApplication extends GraphColoringVisualisation{
   def stop() = vis.stop()
 }
 
-class ColorUpdateActor(app: GraphColoringApplication) extends Actor{
-  def receive = {
-    case SetColor(id, colorOpt) => app.update(id, colorOpt)
+
+
+object BatikColoringOverseer{
+  class BatikOverseerActor(env: ColoringEnvironment, updater: ActorRef) extends ColoringOverseer.OverseerActor(env){
+    override def receive: Actor.Receive = PartialFunction[Any, Unit]{
+      case SetColor(nodeId, color) =>
+        env.setColor(nodeId, color)
+        updater ! ColorUpdateActor.SetColor(nodeId, color)
+    } orElse super.receive
+
   }
 }
 
-class BatikColoringOverseer(id: UUID, env: ColoringEnvironment, updater: ActorRef) extends ColoringOverseer(id, env){
-  override def receive: Actor.Receive = {
-    case SetColor(nodeId, color) =>
-      env.setColor(nodeId, color)
-      updater ! ColorUpdateActor.SetColor(nodeId, color)
-  }
+class BatikColoringOverseer(env: ColoringEnvironment, updater: ActorRef)(implicit system: ActorSystem) extends ColoringOverseer(env){
+  override protected def props = Props(classOf[BatikColoringOverseer.BatikOverseerActor], env, updater)
 }
 
 object GraphColoringApp extends GraphColoringApplication with App{
-  implicit def prog = Dot
+  implicit def prog = Fdp
 
   lazy val nNodes = 30
+  lazy val agentActivePhaseDelay = 200 millis span
 
   protected lazy val graph = generator.generate("coloring", nNodes, _.nextDouble() < .1)
   protected def generator = new GraphGeneratorImpl
-  protected lazy val factory = new GenericGraphvizFactory(DotDsl.indent._4, graph) with SvgLoader
+  protected lazy val factory = new GenericGraphvizFactory(FdpDsl.indent._4, graph) with SvgLoader
   lazy val ids = elementByUUID.keys.toList
   implicit def reverseNaming = factory.reverseNaming
   
   implicit val system = ActorSystem.create()
   implicit val timeout: Timeout = 1 second span
   lazy val colors = Set(Color.red, Color.blue, Color.green)
-  lazy val updaterRef = system.actorOf(Props(classOf[ColorUpdateActor], this))
-  lazy val env = new GraphColoring(colors, graph){
-    override def overseerProps = Props(classOf[BatikColoringOverseer], overseerId, env, updaterRef)
+  lazy val updaterRef = ColorUpdateActor.actor(this)
+  lazy val env = new GraphColoring(colors, graph, agentActivePhaseDelay, system.scheduler){
+    override protected def buildOverseer = new BatikColoringOverseer(env, updaterRef)
   }
 
   def getNeighbours(of: UUID) = graph.neighbouringNodes(of).get.map(n => reverseNaming(n.id))
 
-  def createAgent = env.createAgent(reverseNaming, getNeighbours) _
+  def createAgent = env.createAgent(reverseNaming, getNeighbours, env.buildRef) _
 
-  lazy val agentRefs = ids.map(createAgent)
-
-//  scheduler.schedule(1 second, 1 second){
-//    update(ids.randomChoice, Some(Color.blue))
-//  }
+  lazy val agents = ids.map(createAgent(_, agentActivePhaseDelay))
 
   override def start() = {
-    agentRefs.foreach(ColoringAgent.start)
-    vis.size = 800 -> 800
+    agents.map(_.actor).foreach(ColoringAgent.start)
     super.start()
+    vis.size = 800 -> 800
   }
 
   AgentReport.default.enabled = true
