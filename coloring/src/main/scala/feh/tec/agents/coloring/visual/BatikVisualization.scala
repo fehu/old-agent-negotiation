@@ -9,18 +9,23 @@ import scala.swing._
 import feh.dsl.swing.{SwingFrameAppCreation, SwingAppFrame}
 import java.awt.Color
 import org.w3c.dom.events.{Event, EventListener, EventTarget}
-import feh.dsl.graphviz.{FdpDsl, Prog, DotDsl}
+import feh.dsl.graphviz.{FdpDsl, Prog}
 import scala.swing.Swing._
 import feh.dsl.graphviz.Prog._
 import org.w3c.dom.{NodeList, Node}
 import org.apache.batik.swing.svg.JSVGComponent
 import scala.swing.GridBagPanel.Fill
-import akka.actor.{ActorRef, Props, ActorSystem, Actor}
+import akka.actor.ActorSystem
 import scala.concurrent.duration._
 import akka.util.Timeout
-import feh.tec.agents.comm.coloring.ColoringOverseer.SetColor
+import scala.xml.{Xhtml, NodeSeq}
+import feh.tec.agents.comm.coloring.OneTryColoring.{StateInfo, GetStateInfo}
+import scala.concurrent.{ExecutionContext, Future}
+import feh.tec.agents.coloring.util.Name
 
-class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement]) 
+class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement],
+                         mouseOverMsg: Option[UUID] => String, extractNodeInfo: Option[UUID] => Future[NodeSeq])
+                        (implicit execContext: ExecutionContext)
   extends MainFrame with SwingAppFrame with SwingFrameAppCreation.Frame9PositionsLayoutBuilder
 {
   val canvas = new SvgCanvas()
@@ -41,8 +46,6 @@ class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement])
   }
 
   def stop() = close()
-
-  protected var uuidAbove = Option.empty[UUID]
 
   elems.withFilter(_._2 != null).foreach{
     case (id, elem) =>
@@ -83,13 +86,19 @@ class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement])
   }
 
   val idText = monitorFor(_selectedId).asTextField
+    .extract(mouseOverMsg compose Option.apply)
     .affect(_.preferredSize = 100 -> 20, _.horizontalAlignment = Alignment.Center)
     .layout(_.fill = Fill.Both)
 
+  val nodeInfo = monitorFor(_selectedId).text
+    .extractFuture(extractNodeInfo andThen (_.map(Xhtml.toXhtml)) compose Option.apply)
+    .affect(_.preferredSize = 100 -> 500)
+    .layout(_.fill = Fill.Both, _.weightx = 1.0/3, _.weighty = .5)
 
   val layout = List(
     place(canvas, "canvas").transform(_.addLayout(_.weightx = 1, _.weighty = .9, _.fill = Fill.Both)) in theCenter,
-    place(idText, "idText") to theNorth of "canvas"
+    place(idText, "idText") to theNorth of "canvas",
+    place(scrollable()(nodeInfo, "info")) to theWest of "canvas"
   )
 
   implicit class NodeAttrsWrapper(node: Node){
@@ -103,9 +112,10 @@ class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement])
 
   def updating[R](f: => R): R = {
     val r = f
-    canvas.getUpdateManager.getUpdateRunnableQueue.invokeLater(Runnable{
+    val um = canvas.getUpdateManager
+//    um.getUpdateRunnableQueue.invokeLater(Runnable{ // todo
       canvas setDocument doc
-    })
+//    })
     r
   }
 
@@ -125,8 +135,8 @@ class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement])
     findElementGrandChildren(el).withFilter(e => e.getNodeName == "ellipse" || e.getNodeName == "polygon") map {
       node =>
         updating{
-          println("color= " + color)
-          color.map(c => node.setAttributeNS(null, "fill", c.hexRGB))
+//          println("color= " + color)
+          color.map(c => node.setAttributeNS(null, "fill", feh.util.color.names get c getOrElse c.hexRGB))
 //            .getOrElse( node.setAttributeNS(null, "fill", defaultColor.hexRGB) )
             .getOrElse( node.removeAttributeNS(null, "fill") )
         }
@@ -135,30 +145,17 @@ class BatikVisualization(val doc: SVGDocument, val elems: Map[UUID, SVGElement])
   enableOpts()
   canvas.setSVGDocument(doc)
   canvas.setDocumentState(JSVGComponent.ALWAYS_DYNAMIC)
-
-  println("dyn = " + canvas.isDynamic)
 }
 
-object ColorUpdateActor{
-  case class SetColor(id: UUID, color: Option[Color])
 
-  class TheActor(app: GraphColoringApplication) extends Actor{
-    def receive = {
-      case SetColor(id, colorOpt) => app.update(id, colorOpt)
-    }
-  }
-  def actor(app: GraphColoringApplication)(implicit system: ActorSystem) =
-    system.actorOf(Props(classOf[TheActor], app), "ColorUpdateActor")
-}
-
-trait GraphColoringApplication extends GraphColoringVisualisation{
+trait GraphvizGraphColoringApplication extends GraphColoringVisualisation{
   implicit def prog: Prog
+  implicit def execContext: ExecutionContext
 
   class SvgBuilder(factory: GraphvizGraphFactory with SvgLoader, filename: String){
-//    protected  val factory = getFactory(gr)
     factory.writeToFile(factory.Path(filename))
     val doc = factory.load(factory.Path(filename))
-    def names = factory.reverseNaming
+    def names = factory.naming
   }
 
   protected def factory: GraphvizGraphFactory with SvgLoader
@@ -169,63 +166,94 @@ trait GraphColoringApplication extends GraphColoringVisualisation{
     name => svgB.doc.getElementById(name).asInstanceOf[SVGElement]
   }
 
+  def env: GraphColoring
+
   println("elements = " + elementByUUID)
 
-  protected lazy val vis = new BatikVisualization(doc, elementByUUID)
+  def nodeBasicInfo(idOpt: Option[UUID]) = idOpt map {
+    id =>
+      val name = factory.naming(id)
+      val neighbours = graph.neighbouringNodes(id).map(factory naming _.id)
+      s"$name($id), neighbours: ${neighbours.mkString(", ")}"
+  } getOrElse ""
+
+  def nodeUpdateResponseTimeout: Timeout = 10 millis span
+
+  def nodeAgentInfo(idOpt: Option[UUID]): Future[NodeSeq] = idOpt map {
+    id => env.agentController.askAny(svgB.names(id), GetStateInfo)(nodeUpdateResponseTimeout) map {
+      case StateInfo(name, isActive, color, tries, proposal, acceptance, freeColors, neighboursColors) =>
+        val (accepted, pending) = acceptance.span(_._2)
+        <html>
+          <table>
+            <tr><td>name</td><td>{name.name}</td></tr>
+            <tr><td>isActive</td><td>{isActive.toString}</td></tr>
+            <tr><td>color</td><td>{color.map(_.stringRGB) getOrElse "None"}</td></tr>
+            <tr><td>tries</td><td>{tries.map(_.stringRGB).mkString(", ")}</td></tr>
+            <tr><td>proposal</td><td>{Option(proposal).map(_.stringRGB) getOrElse "None"}</td></tr>
+            <tr><td>accepted</td><td>{accepted.keys.mkString(", ")}</td></tr>
+            <tr><td>pending</td><td>{pending.keys.mkString(", ")}</td></tr>
+            <tr><td>freeColors</td><td>{freeColors.map(_.stringRGB).mkString(", ")}</td></tr>
+            <tr><td>neighbours</td><td>
+              <table>
+              {
+                neighboursColors.map{case (n, cOpt) => <tr><td>{n.name}</td><td>{cOpt.map(_.stringRGB) getOrElse "None"}</td></tr>}
+              }
+              </table></td></tr>
+          </table>
+        </html>
+    }
+//<tr><td></td><td>{}</td></tr>
+  } getOrElse Future.successful(<html>No info</html>)
+
+  protected lazy val vis = new BatikVisualization(doc, elementByUUID, nodeBasicInfo, nodeAgentInfo)
 
   def update(id: UUID, color: Option[Color]) = vis.updateColor(elementByUUID(id), color)
+  def update(name: Name, color: Option[Color]) = update(factory.reverseNaming(name), color)
 
   def start() = vis.start()
   def stop() = vis.stop()
 }
 
-
-
-object BatikColoringOverseer{
-  class BatikOverseerActor(env: ColoringEnvironment, updater: ActorRef) extends ColoringOverseer.OverseerActor(env){
-    override def receive: Actor.Receive = PartialFunction[Any, Unit]{
-      case SetColor(nodeId, color) =>
-        env.setColor(nodeId, color)
-        updater ! ColorUpdateActor.SetColor(nodeId, color)
-    } orElse super.receive
-
-  }
-}
-
-class BatikColoringOverseer(env: ColoringEnvironment, updater: ActorRef)(implicit system: ActorSystem) extends ColoringOverseer(env){
-  override protected def props = Props(classOf[BatikColoringOverseer.BatikOverseerActor], env, updater)
-}
-
-object GraphColoringApp extends GraphColoringApplication with App{
+object GraphvizGraphColoringApp$ extends GraphvizGraphColoringApplication with App{
   implicit def prog = Fdp
 
   lazy val nNodes = 30
-  lazy val agentActivePhaseDelay = 200 millis span
+//  lazy val agentActivePhaseDelay = 200 millis span
 
   protected lazy val graph = generator.generate("coloring", nNodes, _.nextDouble() < .1)
-  protected def generator = new GraphGeneratorImpl
+  protected def generator = new ColoringGraphGeneratorImpl
   protected lazy val factory = new GenericGraphvizFactory(FdpDsl.indent._4, graph) with SvgLoader
   lazy val ids = elementByUUID.keys.toList
-  implicit def reverseNaming = factory.reverseNaming
+  implicit def reverseNaming = factory.naming
   
   implicit val system = ActorSystem.create()
+  implicit def execContext = system.dispatcher
   implicit val timeout: Timeout = 1 second span
-  lazy val colors = Set(Color.red, Color.blue, Color.green)
+  lazy val colors = Set(Color.red, Color.blue, Color.green, Color.yellow)
   lazy val updaterRef = ColorUpdateActor.actor(this)
-  lazy val env = new GraphColoring(colors, graph, agentActivePhaseDelay, system.scheduler){
-    override protected def buildOverseer = new BatikColoringOverseer(env, updaterRef)
+  lazy val env = new GraphColoring(colors, graph /*agentActivePhaseDelay, system.scheduler*/){
+    override protected def buildOverseer = new ColoringUpdateOverseer(env, updaterRef)
   }
 
-  def getNeighbours(of: UUID) = graph.neighbouringNodes(of).get.map(n => reverseNaming(n.id))
 
-  def createAgent = env.createAgent(reverseNaming, getNeighbours, env.buildRef) _
+  def frame = vis
+  type Visualization = SvgCanvas
+  def graphVisualization = vis.canvas
 
-  lazy val agents = ids.map(createAgent(_, agentActivePhaseDelay))
+  def msgDelay = 400 millis span
+  def getNeighbours(of: UUID) = graph.neighbouringNodes(of).map(n => reverseNaming(n.id))
+  def createAgent = env.createAgent(reverseNaming, getNeighbours, env.buildRef, msgDelay) _
+
+  lazy val agents = ids.map(createAgent)
+
+  val starting = agents.randomChoice
+  println("starting: " + starting)
 
   override def start() = {
-    agents.map(_.actor).foreach(ColoringAgent.start)
+//    agents.map(_.actor).foreach(ColoringAgent.start)
     super.start()
     vis.size = 800 -> 800
+    ColoringAgent start starting.actor
   }
 
   AgentReport.default.enabled = true

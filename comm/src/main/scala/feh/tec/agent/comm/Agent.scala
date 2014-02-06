@@ -1,9 +1,12 @@
 package feh.tec.agent.comm
 
-import java.util.UUID
 import scala.collection.mutable
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Scheduler, Actor, ActorRef}
 import feh.util._
+import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.ExecutionContext
+import akka.pattern.ask
+import akka.util.Timeout
 
 trait AbstractAgent
 
@@ -19,7 +22,7 @@ object Agent{
     def apply(tellSender: Lang#Expr = null.asInstanceOf[Lang#Expr],
               tellAll: Lang#Expr = null.asInstanceOf[Lang#Expr],
               affectEnvironment: EnvironmentRef[Env] => Unit = null): Response[Lang, Env] =
-      Response(Option(tellSender), Option(tellAll), Option(affectEnvironment))
+      Response(Option(tellSender).toSeq, Option(tellAll).toSeq, Option(affectEnvironment).toSeq)
   }
 
   object Response{
@@ -28,12 +31,22 @@ object Agent{
     def apply[Lang <: Language, Env](tellSender: Lang#Expr = null.asInstanceOf[Lang#Expr],
                                      tellAll: Lang#Expr = null.asInstanceOf[Lang#Expr],
                                      affectEnvironment: EnvironmentRef[Env] => Unit = null): Response[Lang, Env] =
-      Response(Option(tellSender), Option(tellAll), Option(affectEnvironment))
+      Response(Option(tellSender).toSeq, Option(tellAll).toSeq, Option(affectEnvironment).toSeq)
   }
 
-  case class Response[Lang <: Language, Env] protected[Agent] (tellSender: Option[Lang#Expr],
-                                                               tellAll: Option[Lang#Expr],
-                                                               affectEnvironment: Option[EnvironmentRef[Env] => Unit])
+  case class Response[Lang <: Language, Env] protected[Agent] (tellSender: Seq[Lang#Expr],
+                                                               tellAll: Seq[Lang#Expr],
+                                                               affectEnvironment: Seq[EnvironmentRef[Env] => Unit]){
+    def append(b: ResponseBuilder[Lang, Env] => Response[Lang, Env]) ={
+      val resp = b(new ResponseBuilder[Lang, Env])
+        copy(
+          tellSender = tellSender ++ resp.tellSender,
+          tellAll = tellAll ++ resp.tellAll,
+          affectEnvironment = affectEnvironment ++ resp.affectEnvironment
+        )
+    }
+    def + = append _
+  }
   
   
   object Communicating{
@@ -45,19 +58,41 @@ object Agent{
 
       def onReceive(msg: Lang#Expr)
 
+      protected def sendResponses(sender: ActorRef, resp: Response[Lang, Env]){
+        val Response(snd, all, affect) = resp
+        snd foreach (sender !)
+        all foreach controller.tellAll
+        affect foreach (_(envRef))
+      }
+
       def receive = {
         case expr if isLangExpr(expr) => {
           onReceive(expr.asInstanceOf[Lang#Expr])
-
-          val Response(resp, all, affect) = respond(controller.id(sender).asInstanceOf[Id], expr.asInstanceOf[Lang#Expr])
-          resp foreach (sender !)
-          all foreach controller.tellAll
-          affect foreach (_(envRef))
+          val resp = respond(controller.id(sender).asInstanceOf[Id], expr.asInstanceOf[Lang#Expr])
+          sendResponses(sender, resp)
         }
       }
     }
 
+    trait ResponseDelay[Id, Lang <: Language, Env] extends AgentActor[Id, Lang, Env] {
+      protected def scheduler: Scheduler
+      def messageDelay: FiniteDuration
+
+      protected implicit def execContext: ExecutionContext
+
+      protected case class Delayed(id: Id, expr: Lang#Expr)
+
+      override def receive = {
+        case Delayed(i, expr) =>
+          sendResponses(controller.ref(i.cast), respond(i, expr))
+        case expr if isLangExpr(expr) =>
+          scheduler
+          .scheduleOnce(messageDelay, self, Delayed(controller.id(sender).asInstanceOf[Id], expr.asInstanceOf[Lang#Expr]))
+        case other => super.receive(other)
+      }
+    }
   }
+
   trait Communicating[Lang <: Language, Env] extends AbstractAgent{
     self =>
 
@@ -87,6 +122,7 @@ object Agent{
     def ref(id: Ag#Id) = agents(id).actor
     def id(ref: ActorRef): Ag#Id = refs(ref)
 
+    def askAny(id: Ag#Id, msg: Any)(implicit timeout: Timeout) = ref(id) ? msg
     def tell(id: Ag#Id, msg: Lang#Expr)(implicit sender: ActorRef): ActorRef = ref(id) $$ (_.tell(msg, sender))
     def tellAll(msg: Lang#Expr)(implicit sender: ActorRef)
   }

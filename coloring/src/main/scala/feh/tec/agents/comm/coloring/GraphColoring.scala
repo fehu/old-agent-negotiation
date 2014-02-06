@@ -12,18 +12,17 @@ import akka.pattern._
 import scala.concurrent.ExecutionContext
 import ColoringGraph._
 import feh.tec.agents.comm.coloring.ColoringOverseer._
-import feh.tec.agents.visualisation.util.Graph
-import feh.dsl.swing.AppFrameControl
+import feh.tec.agents.visualisation.util.{Undirected, Graph}
 import scala.util.Random
 import feh.tec.agents.coloring.util._
 import scala.Some
-import feh.tec.agents.visualisation.util.Graph.Node
+import feh.tec.agents.visualisation.util.Graph.{GraphRef, Node}
 import feh.tec.agents.comm.coloring.ColoringExpression.Accept
 import feh.tec.agents.comm.coloring.ColoringExpression.Reject
 import scala.concurrent.duration.FiniteDuration
-import feh.tec.agent.comm.Agent.Communicating.AgentActor
+import feh.tec.agent.comm.Agent.Communicating.{ResponseDelay, AgentActor}
 import feh.tec.agents.comm.coloring.ColoringAgent.ColoringActorAgent
-import feh.tec.agents.comm.coloring.OneTryColoring.OneTryColoringActorAgent
+import feh.tec.agents.comm.coloring.OneTryColoring.{OneTryDelayedActorAgent, OneTryColoringActorAgent}
 
 class ColoringEnvironment(val colors: Set[Color], envGraph: ColoringGraph) {
   env =>
@@ -76,7 +75,8 @@ object ColoringGraph{
   }
 }
 
-case class ColoringGraph(override val name: String, override val nodes: Set[ColoringGraph.Node]) extends Graph[Option[Color]](null, null)
+case class ColoringGraph(override val ref: GraphRef, override val nodes: Set[ColoringGraph.Node], override val edges: Set[(UUID, UUID)])
+  extends Graph[Option[Color]](null, null, null) with Undirected[Option[Color]]
 
 class ColoringLanguage extends NegotiatingLanguage{
   type Expr = ColoringExpression
@@ -117,8 +117,10 @@ object ColoringExpression{
 import ColoringExpression._
 
 class ColoringAgentController(val gr: ColoringGraph, naming: UUID => ColoringAgent#Id) extends CommAgentController[ColoringLanguage, ColoringEnvironment, ColoringAgent]{
-  override def tellAll(msg: ColoringLanguage#Expr)(implicit sender: ActorRef): Unit =
-    gr.neighbouringNodes(agents(id(sender)).envRef.nodeId).get.foreach(node => tell(naming(node.id), msg))
+  override def tellAll(msg: ColoringLanguage#Expr)(implicit sender: ActorRef): Unit ={
+    val neigh = gr.neighbouringNodes(agents(id(sender)).envRef.nodeId).map(node => naming(node.id))
+    neigh foreach (tell(_, msg))
+  }
 }
 
 object ColoringAgent{
@@ -130,13 +132,11 @@ object ColoringAgent{
   abstract class ColoringActorAgent(name: Name,
                                     controller: CommAgentController[ColoringLanguage, ColoringEnvironment, _],
                                     envRef: ColoringEnvironmentRef,
-                                    val scheduler: Scheduler,
-                                    val selfActivationDelay: FiniteDuration)
+                                    val scheduler: Scheduler)
     extends AgentActor[Name, ColoringLanguage, ColoringEnvironment](name, controller, envRef) with AgentReport
   {
     implicit def execContext = context.dispatcher
 
-    protected var searchingColorToSet = false
     protected var myColor: Option[Color] = None
 
     def proposal: Proposal
@@ -153,15 +153,16 @@ object ColoringAgent{
 
     case object SendProposals
 
-    def scheduleActive = scheduler.scheduleOnce(selfActivationDelay, self, SendProposals)
+    var isActive = false
 
     override def receive = super.receive orElse {
       case Start =>
-        searchingColorToSet = true
+        report("I've started")
         self ! SendProposals
-      case SendProposals if searchingColorToSet =>
+      case SendProposals =>
+        isActive = true
+        report("Sending proposals")
         controller.tellAll(proposal)
-        scheduleActive
     }
   }
 
@@ -185,8 +186,7 @@ trait AgentReport {
 abstract class ColoringAgent(val name: Name,
                              val neighbours: Set[Name],
                              val envRef: ColoringEnvironmentRef,
-                             val controller: ColoringAgentController,
-                             val selfActivationDelay: FiniteDuration)
+                             val controller: ColoringAgentController)
                             (implicit protected val system: ActorSystem)
   extends Agent.Communicating[ColoringLanguage, ColoringEnvironment]
 {
@@ -204,15 +204,23 @@ abstract class ColoringAgent(val name: Name,
 object OneTryColoring{
   protected def response = Response.build[ColoringLanguage, ColoringEnvironment]
 
+  class OneTryDelayedActorAgent(name: Name,
+                                controller: CommAgentController[ColoringLanguage, ColoringEnvironment, _],
+                                envRef: ColoringEnvironmentRef,
+                                scheduler: Scheduler,
+                                neighbours: Set[Name],
+                                val messageDelay: FiniteDuration)
+    extends OneTryColoringActorAgent(name, controller, envRef, scheduler, neighbours)
+    with ResponseDelay[Name, ColoringLanguage, ColoringEnvironment]
+
   class OneTryColoringActorAgent(name: Name,
                                  controller: CommAgentController[ColoringLanguage, ColoringEnvironment, _],
                                  envRef: ColoringEnvironmentRef,
                                  scheduler: Scheduler,
-                                 selfActivationDelay: FiniteDuration,
                                  val neighbours: Set[Name])
-    extends ColoringActorAgent(name, controller, envRef, scheduler, selfActivationDelay)
+    extends ColoringActorAgent(name, controller, envRef, scheduler)
   {
-    protected var tries = envRef.possibleColors
+    protected var tries = envRef.possibleColors.toSeq
 
     var currentProposal = tries.head
     def setProposal() = currentProposal = tries.head
@@ -239,12 +247,12 @@ object OneTryColoring{
     def freeColors = _freeColors
 
     def fallback() = {
-      tries = tries.tail
+      if(currentProposal != null) tries = tries.tail
       if(tries.isEmpty) sys.error("no more colors to try")
       setProposal()
       acceptanceMap = createAcceptanceMap
       _freeColors = calcFreeColors
-      if(!searchingColorToSet) ColoringAgent start self
+      self ! SendProposals
       response(tellAll = NotifyFallback())
     }
 
@@ -256,17 +264,25 @@ object OneTryColoring{
     def accepted(by: Name) = {
       acceptanceMap += by -> true
       if(allAccepted_?) {
-        searchingColorToSet = false
-        setColor(Some(currentProposal.ensuring(_ != null)))
-        response(tellAll = Confirm(currentProposal)) $$ {
-          currentProposal = null
-        }
+        colorAccepted()
       }
       else response()
     }
 
+    def colorAccepted() = {
+      setColor(Some(currentProposal.ensuring(_ != null)))
+      tries = tries.filterNot(currentProposal ==)
+      response(tellAll = Confirm(currentProposal)) $$ {
+        currentProposal = null
+        isActive = false
+      }
+    }
+
     def respond = {
-      case (sender, Proposal(color)) if freeColors.contains(color) => response(tellSender = Accept(color))
+      case (sender, Proposal(color)) if freeColors.contains(color) =>
+        if(sender == name) throw up
+        if(myColor.isEmpty && !isActive) self ! SendProposals
+        response(tellSender = Accept(color))
       case (sender, Proposal(color)) => response(tellSender = Reject(color, freeColors))
       case (sender, Accept(color)) if color == currentProposal => accepted(sender)
       case (sender, Reject(color, colors)) if color == currentProposal =>
@@ -274,6 +290,7 @@ object OneTryColoring{
         if(inters.isEmpty) fallback()
         else {
           currentProposal = inters.randomChoose
+          acceptanceMap = createAcceptanceMap
           response(tellAll = proposal)
         }
       case (sender, Confirm(color)) =>
@@ -292,15 +309,38 @@ object OneTryColoring{
     }
 
     override def unhandled(message: Any) = report("unhandled message: " + message)
+
+    override def receive = {
+      case GetStateInfo =>
+        sender ! StateInfo(name, isActive, myColor, tries, currentProposal, acceptanceMap.toMap, freeColors, neighbourColorMap.toMap)
+      case SendProposals if neighbours.isEmpty => colorAccepted()
+      case other => super.receive(other)
+    }
   }
+
+
+  case object GetStateInfo
+  case class StateInfo(name: Name,
+                       isActive: Boolean,
+                       colorSet: Option[Color],
+                       triesLeft: Seq[Color],
+                       currentProposal: Color,
+                       acceptanceMap: Map[Name, Boolean],
+                       freeColors: Set[Color],
+                       neighboursColorMap: Map[Name, Option[Color]])
 
 }
 
 trait OneTryColoring extends ColoringAgent{
-  def actorProps = Props(classOf[OneTryColoringActorAgent], name, controller, envRef, system.scheduler, selfActivationDelay, neighbours)
+  def actorProps = Props(classOf[OneTryColoringActorAgent], name, controller, envRef, system.scheduler, neighbours)
 }
 
-class GraphColoring(colors: Set[Color], envGraph: ColoringGraph, selfActivation: FiniteDuration, scheduler: Scheduler)
+trait OneTryDelayedColoring extends ColoringAgent{
+  def messageDelay: FiniteDuration
+  def actorProps = Props(classOf[OneTryDelayedActorAgent], name, controller, envRef, system.scheduler, neighbours, messageDelay)
+}
+
+class GraphColoring(colors: Set[Color], envGraph: ColoringGraph)
                    (implicit system: ActorSystem, timeout: Timeout, naming: UUID => ColoringAgent#Id){
   lazy val env = new ColoringEnvironment(colors, envGraph)
 
@@ -313,39 +353,45 @@ class GraphColoring(colors: Set[Color], envGraph: ColoringGraph, selfActivation:
 
   lazy val agentController = new ColoringAgentController(envGraph, naming)
 
-  def agentProps(naming: Map[UUID, Name], getNeighbours: UUID => Set[Name], id: UUID) =
-    Props(classOf[ColoringAgent], naming(id), getNeighbours(id), buildRef(id), agentController)
-  def createAgent(naming: Map[UUID, Name], getNeighbours: UUID => Set[Name], createEnvRef: UUID => ColoringEnvironmentRef)
-                 (id: UUID, selfActivation: FiniteDuration) =
-    new ColoringAgent(naming(id), getNeighbours(id), createEnvRef(id), agentController, selfActivation) with OneTryColoring
-
-//  val agents = envGraph.nodes.map(createAgent)
+  def createAgent(naming: Map[UUID, Name],
+                  getNeighbours: UUID => Set[Name],
+                  createEnvRef: UUID => ColoringEnvironmentRef,
+                  msgDelay: FiniteDuration)
+                 (id: UUID) =
+    new ColoringAgent(naming(id), getNeighbours(id), createEnvRef(id), agentController) with OneTryDelayedColoring
+    {
+      def messageDelay = msgDelay
+    }
 }
 
-trait GraphColoringVisualisation extends AppFrameControl{
-  protected def graph: ColoringGraph
-
-  def update(id: UUID, color: Option[Color])
-}
-
-
-trait GraphGenerator{
+trait ColoringGraphGenerator{
   def generate(name: String, nodes: Set[String], edges: Set[(String, String)]): ColoringGraph
   def generate(name: String, nNodes: Int, edge: (UUID, UUID) => Boolean): ColoringGraph
   def generate(name: String, nNodes: Int, edge: Random => Boolean): ColoringGraph
 }
 
-class GraphGeneratorImpl extends GraphGenerator{
+object ColoringGraphGenerator{
+  protected lazy val impl = new ColoringGraphGeneratorImpl
+
+  def generate(name: String, nNodes: Int, edge: (Random) => Boolean): ColoringGraph = impl.generate(name, nNodes, edge)
+}
+
+class ColoringGraphGeneratorImpl extends ColoringGraphGenerator{
   def generate(name: String, nodes: Set[String], edges: Set[(String, String)]): ColoringGraph = ???
 
   def generate(name: String, nNodes: Int, edge: (UUID, UUID) => Boolean): ColoringGraph = ???
 
   def generate(name: String, nNodes: Int, edge: (Random) => Boolean): ColoringGraph = {
+    val ref = GraphRef(name)
     val nodesIds = for(_ <- 1 to nNodes) yield UUID.randomUUID()
-    val nodes = for {
-      id <- nodesIds
-      neigh = nodesIds.filter(e => e != id && edge(Random))
-    } yield Node[Option[Color]](id, None, neigh.toSet)
-    ColoringGraph(name, nodes.toSet)
+    val nodes = for(id <- nodesIds) yield Node[Option[Color]](ref, id, None)
+    val edges = Y[(List[UUID], List[UUID]), List[(UUID, UUID)]](
+      rec => {
+        case (head :: tail, heads) =>
+          heads.filter(_ => edge(Random)).map(head ->) ++ rec(tail, head +: heads)
+        case (Nil, _) => Nil
+      }
+    )(nodesIds.toList -> Nil)
+    ColoringGraph(ref, nodes.toSet, edges.toSet)
   }
 }

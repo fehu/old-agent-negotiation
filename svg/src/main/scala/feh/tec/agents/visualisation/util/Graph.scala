@@ -2,33 +2,44 @@ package feh.tec.agents.visualisation.util
 
 import java.util.UUID
 import feh.util._
-import feh.tec.agents.visualisation.util.Graph.Node
+import feh.tec.agents.visualisation.util.Graph.{GraphRef, Node}
 import scala.collection.mutable
 
 object Graph{
-  case class Node[T](id: UUID, value: T, neighbours: Set[UUID], name: Option[String] = None){
+  private val register = mutable.Map.empty[GraphRef, Graph[_]]
+  protected def register(gr: Graph[_]){
+    register += gr.ref -> gr
+  }
+
+  case class Node[T](graph: GraphRef, id: UUID, value: T, name: Option[String] = None){
+    def neighbours = graph.neighbours(this)
+
     def hasNeighbours = neighbours.nonEmpty
     def newValue(v: T) = copy(value = v)
   }
 
+  case class GraphRef(name: String, id: UUID = UUID.randomUUID()){
+    def neighbours[T](node: Node[T]) = register(this).neighbouringNodes(node.id).map(_.asInstanceOf[Node[T]])
+  }
 }
 
-abstract class Graph[T](val name: String, val nodes: Set[Node[T]]){
+abstract class Graph[T](val ref: GraphRef, val nodes: Set[Node[T]], val edges: Set[(UUID, UUID)]){
+  Graph.register(this)
+
+  def name = ref.name
+
   def apply(id: UUID) = get(id).get
   def get(id: UUID) = nodes.find(_.id == id)
 
-  def neighbouringNodes(of: UUID): Option[Set[Node[T]]] = byId(of).map(neighbouringNodes)
-  def neighbouringNodes(n: Node[T]): Set[Node[T]] =
-    n.neighbours.map(id => nodes.find(_.id == id)
-      .getOrThrow(s"Incorrect connection: $n with id=$id - no node with such id exists"))
-
-  def edges: Set[(UUID, UUID)] = (mutable.HashSet.empty[(UUID, UUID)] /: nodes){
-    (acc, n) =>
-      acc ++= n.neighbours.withFilter(id => !acc.exists({
-        case (u1, u2) => u1 == id && u2 == n.id || u2 == id && u1 == n.id
-      })).map(n.id ->)
-  }.toSet
-  
+  def neighbouringNodes(of: UUID): Set[Node[T]]
+  def neighbouringNodes(n: Node[T]): Set[Node[T]] = neighbouringNodes(n.id)
   def byId(id: UUID) = nodes.find(_.id == id)
   def getById(id: UUID) = byId(id).get
+}
+
+trait Undirected[T] extends Graph[T]{
+  def neighbouringNodes(of: UUID) = edges.collect{
+    case (`of`, other) => other
+    case (other, `of`) => other
+  }.toSet.map(getById)
 }

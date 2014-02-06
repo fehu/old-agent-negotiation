@@ -70,6 +70,18 @@ object  Build extends sbt.Build {
       lazy val util = "batik" % "batik-util" % BatikVersion
     }
 
+    object jung{
+      lazy val JungVersion = "2.0.1"
+
+      lazy val jung2 = "net.sf.jung" % "jung2" % JungVersion
+      lazy val api = "net.sf.jung" % "jung-api" % JungVersion
+      lazy val graph = "net.sf.jung" % "jung-graph-impl" % JungVersion
+      lazy val visualization = "net.sf.jung" % "jung-visualization" % JungVersion
+      lazy val algorithms = "net.sf.jung" % "jung-algorithms" % JungVersion
+
+      def all = jung2 :: api :: graph :: visualization :: algorithms :: Nil
+    }
+
 
     object feh{
       lazy val util = "feh" %% "util" % "1.0.1"
@@ -120,7 +132,7 @@ object  Build extends sbt.Build {
     id = "coloring",
     base = file("coloring"),
     settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(feh.dsl.swing, feh.dsl.graphviz)
+      libraryDependencies ++= Seq(feh.dsl.swing, feh.dsl.graphviz) ++ jung.all
     )
   ) dependsOn(comm, svg)
 

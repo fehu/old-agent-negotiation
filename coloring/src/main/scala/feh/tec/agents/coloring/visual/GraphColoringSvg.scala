@@ -2,7 +2,7 @@ package feh.tec.agents.coloring.visual
 
 import feh.util._
 import feh.dsl.graphviz._
-import feh.tec.agents.comm.coloring.{ColoringGraph, GraphGeneratorImpl}
+import feh.tec.agents.comm.coloring.{ColoringGraph, ColoringGraphGeneratorImpl}
 import org.w3c.dom.svg.SVGDocument
 import feh.dsl.graphviz.OutFormat.Svg
 import org.apache.batik.dom.svg.SAXSVGDocumentFactory
@@ -12,7 +12,7 @@ import java.util.UUID
 import feh.tec.agents.coloring.util.{Name, NameGenerator}
 
 case class GraphvizGraphGen(nNodes: Int, edgeProb: InUnitInterval) {
-  lazy val generator = new GraphGeneratorImpl
+  lazy val generator = new ColoringGraphGeneratorImpl
   lazy val autogenGr = generator.generate("coloring", nNodes, _.nextDouble() < edgeProb.d)
 }
 
@@ -24,8 +24,8 @@ trait GraphvizGraphFactory extends GraphvizExec{
   def writeToFile(path: Path) = file(path) withOutputStream File.write.utf8(print)
 
   def print: String
-  def reverseNaming: Map[UUID, Name]
-  def naming: Map[Name, UUID] = reverseNaming.map(_.swap)
+  def naming: Map[UUID, Name]
+  def reverseNaming: Map[Name, UUID] = naming.map(_.swap)
 }
 
 class GenericGraphvizFactory[Dsl <: GraphvizDsl](val dsl: Dsl, val gr: ColoringGraph) extends GraphvizGraphFactory{
@@ -51,7 +51,7 @@ class GenericGraphvizFactory[Dsl <: GraphvizDsl](val dsl: Dsl, val gr: ColoringG
   }
 
   def print = root.value
-  def reverseNaming = nodes.mapValues(n => Name(n.name))
+  lazy val naming = nodes.mapValues(n => Name(n.name))
 }
 
 class GenericAutoGraphvizFactory[Dsl <: GraphvizDsl](val nNodes: Int,
