@@ -12,11 +12,11 @@ import akka.pattern._
 import scala.concurrent.ExecutionContext
 import ColoringGraph._
 import feh.tec.agents.comm.coloring.ColoringOverseer._
-import feh.tec.agents.visualisation.util.{Undirected, Graph}
+import feh.util.{Undirected, Graph}
 import scala.util.Random
 import feh.tec.agents.coloring.util._
 import scala.Some
-import feh.tec.agents.visualisation.util.Graph.{GraphRef, Node}
+import feh.util.Graph.{GraphRef, Node}
 import feh.tec.agents.comm.coloring.ColoringExpression.Accept
 import feh.tec.agents.comm.coloring.ColoringExpression.Reject
 import scala.concurrent.duration.FiniteDuration

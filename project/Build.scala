@@ -57,19 +57,6 @@ object  Build extends sbt.Build {
       lazy val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
     }
 
-    lazy val svgSalamander = "com.kitfox.svg" % "svg-salamander" % "1.0"
-    lazy val grappa = "att.grappa" % "grappa" % "1.2"
-
-    object batik{
-      lazy val BatikVersion = "1.6-1"
-
-      lazy val swing = "batik" % "batik-swing" % BatikVersion
-      lazy val svgGen = "batik" % "batik-svggen" % BatikVersion
-      lazy val dom = "batik" % "batik-dom" % BatikVersion
-      lazy val svgDom = "batik" % "batik-svg-dom" % BatikVersion
-      lazy val util = "batik" % "batik-util" % BatikVersion
-    }
-
     object jung{
       lazy val JungVersion = "2.0.1"
 
@@ -84,7 +71,7 @@ object  Build extends sbt.Build {
 
 
     object feh{
-      lazy val util = "feh" %% "util" % "1.0.1"
+      lazy val util = "feh" %% "util" % "1.0.2"
 
       object dsl{
         lazy val swing = "feh.dsl" %% "swing" % "1.0"
@@ -102,7 +89,7 @@ object  Build extends sbt.Build {
       name := "agent-comm"
     }
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(comm, svg, coloring)
+   .aggregate(comm, coloring)
 
   lazy val comm = Project(
     id = "comm",
@@ -112,28 +99,17 @@ object  Build extends sbt.Build {
     )
   )
 
-  lazy val svg = Project(
-    id = "svg",
-    base = file("svg"),
-    settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(
-        svgSalamander,
-        batik.svgGen,
-        batik.swing,
-        batik.util,
-        batik.svgDom,
-        feh.util,
-        scalaSwing
-      )
-    )
-  )
-
   lazy val coloring = Project(
     id = "coloring",
     base = file("coloring"),
     settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(feh.dsl.swing, feh.dsl.graphviz) ++ jung.all
+      libraryDependencies ++= Seq(
+        feh.dsl.swing,
+        feh.dsl.graphviz,
+        feh.util,
+        scalaSwing
+      ) ++ jung.all
     )
-  ) dependsOn(comm, svg)
+  ) dependsOn comm
 
 }
