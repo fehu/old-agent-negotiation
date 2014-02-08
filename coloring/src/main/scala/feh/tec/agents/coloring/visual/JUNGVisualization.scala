@@ -241,17 +241,6 @@ trait JUNGVisualizationBuilderExtraLayoutImpl extends JUNGVisualizationBuilderEx
         pos = theCenter
         )
     )
-/*
-    override protected def appLayout =
-    List(
-      place(visPanel, "graph")
-        .transform(_.addLayout(_.fill = Fill.Both, _.weightx = .9, _.weighty = 1)) in theCenter,
-      place(controlPanelBuilder
-        .layout(_.fill = Fill.Both, _.weightx = 0, _.weighty = 1)
-        , "control-p") to theWest of "graph"
-    )
-*/
-
   }
 }
 

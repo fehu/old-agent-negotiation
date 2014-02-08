@@ -35,6 +35,6 @@ abstract class ColoringVisualizationApplication(val graph: ColoringGraph,
     visual.start()
     visual.frame.size = 800 -> 800
     println("starting: " + starting)
-//    ColoringAgent start starting.actor
+    ColoringAgent start starting.actor
   }
 }
