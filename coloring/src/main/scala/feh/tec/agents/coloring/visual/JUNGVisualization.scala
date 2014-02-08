@@ -132,6 +132,7 @@ trait JUNGVisualizationBuilderExtra{
       def itemStateChanged(e: ItemEvent) = {
         val name = e.getItem.asInstanceOf[Name]
         if(pickedState.isPicked(name)) pickedNamesSettingActor ! name
+        else pickedNamesSettingActor ! None
       }
 
     })
@@ -153,6 +154,9 @@ trait JUNGVisualizationBuilderExtra{
       become{
         case name: Name =>
           buff += name
+          lastMessage = System.nanoTime()
+        case None =>
+          buff.clear()
           lastMessage = System.nanoTime()
         case Tick =>
           if(lastMessage != -1 && System.nanoTime() - lastMessage > namesPickingDelay) {
