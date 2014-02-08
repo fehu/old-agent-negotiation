@@ -8,6 +8,7 @@ import feh.tec.agents.comm.coloring.{ColoringOverseer, ColoringEnvironment, Colo
 import akka.actor.{Props, ActorSystem, Actor, ActorRef}
 import feh.tec.agents.comm.coloring.ColoringOverseer.SetColor
 import scala.swing.Frame
+import akka.util.Timeout
 
 trait GraphColoringVisualisation extends AppFrameControl{
   protected def graph: ColoringGraph
@@ -20,7 +21,8 @@ trait GraphColoringVisualisation extends AppFrameControl{
   def graphVisualization: Visualization
 }
 
-class ColoringUpdateOverseer(env: ColoringEnvironment, updater: ActorRef)(implicit system: ActorSystem) extends ColoringOverseer(env){
+class ColoringUpdateOverseer(env: ColoringEnvironment, updater: ActorRef)
+                            (implicit system: ActorSystem, timeout: Timeout) extends ColoringOverseer(env){
   override protected def props = Props(classOf[ColoringUpdateOverseer.OverseerActor], env, updater)
 }
 
@@ -30,7 +32,8 @@ object ColoringUpdateOverseer{
       case SetColor(nodeId, color) =>
         env.setColor(nodeId, color)
         guiUpdater ! ColorUpdateActor.SetColor(nodeId, color)
-    } orElse super.receive
+      case other => super.receive(other)
+    }
   }
 }
 

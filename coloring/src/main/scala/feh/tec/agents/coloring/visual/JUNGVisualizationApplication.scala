@@ -37,6 +37,7 @@ class JUNGVisualizationAppExtra(graph: ColoringGraph, naming: UUID => Name, env:
   {
     lazy val infoExtractor = new OneTryColoringStateInfoExtractor(env, 10 millis)
     protected implicit def system = asystem
+    def overseer = env.overseer
   }
 
 }

@@ -24,10 +24,10 @@ import feh.tec.agent.comm.Agent.Communicating.{ResponseDelay, AgentActor}
 import feh.tec.agents.comm.coloring.ColoringAgent.ColoringActorAgent
 import feh.tec.agents.comm.coloring.OneTryColoring.{OneTryDelayedActorAgent, OneTryColoringActorAgent}
 
-class ColoringEnvironment(val colors: Set[Color], envGraph: ColoringGraph) {
+class ColoringEnvironment(val colors: Set[Color], val graph: ColoringGraph) {
   env =>
 
-  protected val _nodes = mutable.HashMap(envGraph.nodes.toSeq.map(tuple(_.id, identity)): _*)
+  protected val _nodes = mutable.HashMap(graph.nodes.toSeq.map(tuple(_.id, identity)): _*)
 
   def nodes = _nodes.toMap
 
@@ -37,20 +37,32 @@ class ColoringEnvironment(val colors: Set[Color], envGraph: ColoringGraph) {
 object ColoringOverseer{
   case class SetColor(node: UUID, color: Option[Color])
   case class GetColor(node: UUID)
+  case object GetColors
   case object Done
 
   class OverseerActor(env: ColoringEnvironment) extends Actor{
     def receive: Actor.Receive = {
-      case GetColor(nodeId) => env.nodes(nodeId).color
+      case GetColor(nodeId) => sender ! env.nodes(nodeId).color
       case SetColor(nodeId, color) => env.setColor(nodeId, color)
+      case GetColors => sender ! env.nodes 
       case Done => ???
     }
   }
 }
 
-class ColoringOverseer(val env: ColoringEnvironment)(implicit system: ActorSystem){
+class ColoringOverseer(val env: ColoringEnvironment)(implicit system: ActorSystem, timeout: Timeout){
   protected def props = Props(classOf[ColoringOverseer.OverseerActor], env)
   lazy val actor = system.actorOf(props, "ColoringOverseer")
+  import system.dispatcher
+
+  def validate = (actor ? GetColors).mapTo[Map[UUID, ColoringGraph.Node]].map{
+    nodes =>
+      env.graph.edges.filter{
+        case (i1, i2) =>
+          val c1 = nodes(i1).color
+          c1.isDefined && c1 == nodes(i2).color
+      }
+  }
 }
 
 object ColoringEnvironmentRef{
@@ -243,12 +255,13 @@ object OneTryColoring{
     // assuming no myColor is set
     def calcFreeColors = envRef.possibleColors &~ neighbourColorMap.values.flatten.toSet
 
-    var _freeColors = envRef.possibleColors
+    var _freeColors = calcFreeColors
     def freeColors = _freeColors
 
     def fallback() = {
+      setColor(None)
       if(currentProposal != null) tries = tries.tail
-      if(tries.isEmpty) sys.error("no more colors to try")
+      if(tries.isEmpty) sys.error("no more colors to try") // tries = envRef.possibleColors.toSeq
       setProposal()
       acceptanceMap = createAcceptanceMap
       _freeColors = calcFreeColors
@@ -332,7 +345,7 @@ object OneTryColoring{
 }
 
 trait OneTryColoring extends ColoringAgent{
-  def actorProps = Props(classOf[OneTryColoringActorAgent], name, controller, envRef, system.scheduler, neighbours)
+  def actorProps = Props(classOf[ColoringActorAgent], name, controller, envRef, system.scheduler, neighbours)
 }
 
 trait OneTryDelayedColoring extends ColoringAgent{

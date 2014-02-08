@@ -8,12 +8,12 @@ import java.awt.{Paint, Color}
 import edu.uci.ics.jung.graph.Graph
 import feh.tec.agents.coloring.util.Name
 import edu.uci.ics.jung.algorithms.layout._
-import edu.uci.ics.jung.visualization.VisualizationViewer
+import edu.uci.ics.jung.visualization.{GraphZoomScrollPane, VisualizationViewer}
 import akka.actor.ActorSystem
 import scala.concurrent.duration._
 import scala.swing.GridBagPanel.Fill
 import org.apache.commons.collections15.Transformer
-import edu.uci.ics.jung.visualization.decorators.ToStringLabeller
+import edu.uci.ics.jung.visualization.decorators.{GradientEdgePaintTransformer, ToStringLabeller}
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position
 import scala.collection.mutable
 import edu.uci.ics.jung.visualization.control._
@@ -21,8 +21,8 @@ import java.awt.event._
 import scala.xml.Xhtml
 import akka.actor.ActorDSL._
 import feh.util._
-import scala.swing.ScrollPane.BarPolicy
 import scala.Some
+import scala.concurrent.ExecutionContext
 
 trait JUNGVisualizationBuilder extends SwingAppBuildingEnvironment{
   class JUNGBaseVisualization(val graph: Graph[Name, (Name, Name)],
@@ -201,6 +201,54 @@ trait JUNGVisualizationBuilderExtra{
         updateGraphVisualization()
       })
   }
+
+  trait ZoomScroll{
+    self: JUNGBaseVisualization =>
+
+    def zoomScrollViewer(v: VisualizationViewer[Name, (Name, Name)]) = new GraphZoomScrollPane(v)
+
+    override lazy val visPanel = new Panel {
+      override lazy val peer = zoomScrollViewer(vv)
+    }
+  }
+
+  trait ColorsValidation extends JUNGBaseVisualization{
+    protected lazy val invalid = mutable.Set.empty[(Name, Name)]
+    protected lazy val defaultEdgePaint = Color.black
+    lazy val edgePaint = new GradientEdgePaintTransformer(Color.red, Color.orange, vv){
+      override def transform(e: (Name, Name)) =
+        if(invalid.contains(e) || invalid.contains(e.swap)) super.transform(e)
+        else defaultEdgePaint
+    }
+
+    override def setupFeatures() = {
+      super.setupFeatures()
+      vv.getRenderContext.setEdgeDrawPaintTransformer(edgePaint)
+    }
+
+    def overseer: ColoringOverseer
+    protected implicit def execContext: ExecutionContext
+
+    def validateGraphColors(){
+      overseer.validate.map{
+        set =>
+          invalid.clear()
+          set.map{
+            case (i1, i2) => invalid += naming(i1) -> naming(i2)
+          }
+        vv.repaint()
+      }
+    }
+    def resetGraphColorsValidation(){
+      invalid.clear()
+      vv.repaint()
+    }
+
+    lazy val validateColorsButtonBuilder =
+      triggerFor(validateGraphColors()).button("Validate Colors")
+    lazy val resetColorsValidationButtonBuilder =
+      triggerFor(resetGraphColorsValidation()).button("Reset Validation Highlight")
+  }
 }
 
 trait JUNGVisualizationBuilderExtraLayoutImpl extends JUNGVisualizationBuilderExtra{
@@ -216,26 +264,39 @@ trait JUNGVisualizationBuilderExtraLayoutImpl extends JUNGVisualizationBuilderEx
       .extractFuture(infoExtractor.nodeAgentInfo _ andThen (_.map(Xhtml.toXhtml)))
 
     onVertexSelection{names =>
-      println(s"names=$names")
       selectedVertex = if(names.size == 1) Some(names.head) else None
       updateForms()
     }
   }
 
   trait JUNGVisualizationFeatures extends JUNGBaseVisualization
-    with MouseManipulations with LayoutChanger with JUNGInfoVisualization
+    with MouseManipulations with LayoutChanger with JUNGInfoVisualization with ZoomScroll with ColorsValidation
   {
+
+    lazy val buttonsPanelBuilder = panel.box(_.Vertical)()
+      .doNotGlue
+      .append(validateColorsButtonBuilder -> "validate-b")
+      .appendStrut(10)
+      .append(resetColorsValidationButtonBuilder -> "validation-reset-b")
+      .affect(
+//        _.border = Swing.LineBorder(Color.lightGray),
+//        _.xLayoutAlignment = java.awt.Component.CENTER_ALIGNMENT,
+//        _.peer.setLayout(new BoxLayout(peer, BoxLayout.PAGE_AXIS))
+      )
+
     lazy val controlPanelBuilder = panel.gridBag(
       place(scrollable()(nodeInfo, "node-info")
           .fillBoth.yWeight(.9).xWeight(1).insets(10)(top = 0, right = 5)
         ) in theCenter,
       place(layoutChooserBuilder
           .fillBoth.xWeight(1).insets(10)(right = 5),
-        "layout-chooser") to theNorth of "node-info"
-    ).affect(
-      _.border = Swing.LineBorder(Color.red),
-      p => println("c = " + p.layout)
-      )
+        "layout-chooser") to theNorth of "node-info",
+      place(buttonsPanelBuilder
+          .fillBoth
+          .xWeight(1)
+          .insets(10)(top = 0, right = 5)
+        ) to theSouth of "node-info"
+    )
 
     override protected def appLayout = List(
       SplitLayout(Orientation.Vertical,
@@ -245,6 +306,11 @@ trait JUNGVisualizationBuilderExtraLayoutImpl extends JUNGVisualizationBuilderEx
         pos = theCenter
         )
     )
+
+    override def start() = {
+      super.start()
+      this.size = 1200 -> 800
+    }
   }
 }
 

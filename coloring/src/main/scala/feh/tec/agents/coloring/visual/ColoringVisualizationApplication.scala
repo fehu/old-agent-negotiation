@@ -8,7 +8,6 @@ import akka.actor.ActorSystem
 import feh.tec.agents.coloring.util.NameGenerator
 import java.util.UUID
 import feh.util._
-import scala.swing.Swing._
 
 abstract class ColoringVisualizationApplication(val graph: ColoringGraph,
                                                 colors: Set[Color],
@@ -33,7 +32,6 @@ abstract class ColoringVisualizationApplication(val graph: ColoringGraph,
 
   def start(){
     visual.start()
-    visual.frame.size = 800 -> 800
     println("starting: " + starting)
     ColoringAgent start starting.actor
   }
