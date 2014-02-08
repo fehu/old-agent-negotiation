@@ -74,7 +74,7 @@ object  Build extends sbt.Build {
       lazy val util = "feh" %% "util" % "1.0.2"
 
       object dsl{
-        lazy val swing = "feh.dsl" %% "swing" % "1.0"
+        lazy val swing = "feh.dsl" %% "swing" % "1.1"
         lazy val graphviz = "feh.dsl" %% "graphviz" % "0.1"
       }
     }

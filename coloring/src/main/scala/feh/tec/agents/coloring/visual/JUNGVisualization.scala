@@ -1,8 +1,8 @@
 package feh.tec.agents.coloring.visual
 
 import feh.tec.agents.comm.coloring._
-import scala.swing.{Panel, MainFrame}
-import feh.dsl.swing.{SwingFrameAppCreation, SwingAppFrame}
+import scala.swing._
+import feh.dsl.swing.SwingAppBuildingEnvironment
 import java.util.UUID
 import java.awt.{Paint, Color}
 import edu.uci.ics.jung.graph.Graph
@@ -20,85 +20,97 @@ import edu.uci.ics.jung.visualization.control._
 import java.awt.event._
 import scala.xml.Xhtml
 import akka.actor.ActorDSL._
-import feh.tec.agents.coloring.visual.JUNGVisualization.SelectionEvents
+import feh.util._
+import scala.swing.ScrollPane.BarPolicy
+import scala.Some
 
-class JUNGBaseVisualization(val graph: Graph[Name, (Name, Name)],
-                        bLayout: Graph[Name, (Name, Name)] => AbstractLayout[Name, (Name, Name)])
-                       (gr: ColoringGraph, 
-                        val naming: UUID => Name)
-  extends MainFrame with SwingAppFrame with SwingFrameAppCreation.Frame9PositionsLayoutBuilder{
+trait JUNGVisualizationBuilder extends SwingAppBuildingEnvironment{
+  class JUNGBaseVisualization(val graph: Graph[Name, (Name, Name)],
+                              bLayout: Graph[Name, (Name, Name)] => AbstractLayout[Name, (Name, Name)])
+                             (gr: ColoringGraph,
+                              val naming: UUID => Name)
+    extends MainFrame with SwingAppFrame with Frame9PositionsLayoutBuilder{
 
-  protected def putNodes() = gr.nodes foreach{ n => graph.addVertex(naming(n.id)) }
-  protected def putEdges() = gr.edges foreach{
-    case (i1, i2) =>
-      val n1 = naming(i1)
-      val n2 = naming(i2)
-      graph.addEdge(n1 -> n2, n1, n2)
-  }
-
-  lazy val graphLayout = bLayout(graph)
-  lazy val vv = new VisualizationViewer(graphLayout)
-
-  protected val defaultVertexColor = Color.white
-  protected val vertexColors = mutable.Map(gr.nodes.toSeq.flatMap(n => n.value.map(naming(n.id) -> _)): _*)
-    .withDefault(_ => defaultVertexColor)
-  
-  lazy val vertexPaint = new Transformer[Name, Paint] {
-    def transform(p1: Name) = vertexColors(p1)
-  }
-
-  def updateColor(vertex: Name, color: Option[Color]) = {
-    color match{
-      case Some(c) => vertexColors += vertex -> c
-      case None => vertexColors -= vertex
-    }
-    vv.repaint()
-  }
-
-  def setupFeatures(){
-    vv.getRenderContext.setVertexFillPaintTransformer(vertexPaint)
-    vv.getRenderContext.setVertexLabelTransformer(new ToStringLabeller)
-    vv.getRenderer.getVertexLabelRenderer.setPosition(Position.CNTR)
-  }
-
-  def start() = {
     putNodes()
     putEdges()
-    setupFeatures()
 
-    open()
-    size = 800 -> 800
-    buildLayout()
+    protected def putNodes() = gr.nodes foreach{ n => graph.addVertex(naming(n.id)) }
+    protected def putEdges() = gr.edges foreach{
+      case (i1, i2) =>
+        val n1 = naming(i1)
+        val n2 = naming(i2)
+        graph.addEdge(n1 -> n2, n1, n2)
+    }
+
+    def graphLayout = {
+      bLayout(graph)
+    }
+    lazy val vv = new VisualizationViewer(graphLayout)
+
+    protected val defaultVertexColor = Color.white
+    protected val vertexColors = mutable.Map(gr.nodes.toSeq.flatMap(n => n.value.map(naming(n.id) -> _)): _*)
+      .withDefault(_ => defaultVertexColor)
+
+    lazy val vertexPaint = new Transformer[Name, Paint] {
+      def transform(p1: Name) = vertexColors(p1)
+    }
+
+    def updateColor(vertex: Name, color: Option[Color]) = {
+      color match{
+        case Some(c) => vertexColors += vertex -> c
+        case None => vertexColors -= vertex
+      }
+      vv.repaint()
+    }
+
+    def setupFeatures(){
+      vv.getRenderContext.setVertexFillPaintTransformer(vertexPaint)
+      vv.getRenderContext.setVertexLabelTransformer(new ToStringLabeller)
+      vv.getRenderer.getVertexLabelRenderer.setPosition(Position.CNTR)
+    }
+
+    def start() = {
+      setupFeatures()
+
+      open()
+      size = 800 -> 800
+      buildLayout()
+    }
+    def stop() = close()
+
+    lazy val visPanel = new Panel { peer.add(vv) }
+
+    protected def appLayout: List[AbstractLayoutSetting] = List(
+      place(visPanel, "vv")
+        .transform(_.addLayout(_.fill = Fill.Both, _.weightx = .9, _.weighty = .9)) in theCenter
+    )
+
+    lazy val layout = appLayout
   }
-  def stop() = close()
 
-  lazy val visPanel = new Panel { peer.add(vv) }
-
-  protected def appLayout = List(
-    place(visPanel, "vv")
-      .transform(_.addLayout(_.fill = Fill.Both)) in theCenter
-  ) 
-  
-  lazy val layout = appLayout 
 }
 
-object JUNGVisualization{
+
+trait JUNGVisualizationBuilderExtra{
+  self: JUNGVisualizationBuilder =>
   
   /** Enables some JUNG mouse features:
    * selecting (and moving) with left button, adding to selection using shift,
    * translating with right button
    * zooming with scroll
    */
-  trait MouseManipulations{
-    self: JUNGBaseVisualization =>
+  trait MouseManipulations extends JUNGBaseVisualization{
 
-    val gm = new PluggableGraphMouse
-    gm.add(new TranslatingGraphMousePlugin(InputEvent.BUTTON3_MASK))
-    gm.add(new ScalingGraphMousePlugin(new CrossoverScalingControl(), 0, 1.1f, 0.9f))
+    lazy val gm = new PluggableGraphMouse
 
-    gm.add(new PickingGraphMousePlugin(InputEvent.BUTTON1_MASK, InputEvent.BUTTON1_MASK + InputEvent.SHIFT_MASK) )
+    abstract override def setupFeatures(){
+      super.setupFeatures()
+      gm.add(new TranslatingGraphMousePlugin(InputEvent.BUTTON3_MASK))
+      gm.add(new ScalingGraphMousePlugin(new CrossoverScalingControl(), 0, 1.1f, 0.9f))
+      gm.add(new PickingGraphMousePlugin(InputEvent.BUTTON1_MASK, InputEvent.BUTTON1_MASK + InputEvent.SHIFT_MASK) )
 
-    vv.setGraphMouse(gm)
+      vv.setGraphMouse(gm)
+    }
   }
 
   trait SelectionEvents{
@@ -153,24 +165,93 @@ object JUNGVisualization{
       scheduler.schedule(0 nanos, namesPickingTickDelay, self, Tick)
     })
   }
-}
 
-trait JUNGInfoVisualization extends JUNGBaseVisualization with SelectionEvents{
-  protected var selectedVertex: Option[Name] = None
+  trait LayoutChanger {
+    self: JUNGBaseVisualization =>
 
-  def infoExtractor: OneTryColoringStateInfoExtractor
+    lazy val buildGraphLayout: Map[String, Graph[Name, (Name, Name)] => AbstractLayout[Name, (Name, Name)]] = Map(
+      "Circle"                -> ((gr: Graph[Name, (Name, Name)]) => new CircleLayout(gr)),
+      "Fruchterman-Reingold"  -> ((gr: Graph[Name, (Name, Name)]) => new FRLayout(gr)),
+      "Self-organizing map"   -> ((gr: Graph[Name, (Name, Name)]) => new ISOMLayout(gr)),
+      "Kamada-Kawai"          -> ((gr: Graph[Name, (Name, Name)]) => new KKLayout(gr)),
+      "Spring"                -> ((gr: Graph[Name, (Name, Name)]) => new SpringLayout(gr))
+    )
+    lazy val graphLayoutNames = buildGraphLayout.keys.toSeq
+    protected lazy val buildGraphLayoutCash = mutable.Map.empty[String, AbstractLayout[Name, (Name, Name)]]
+    def layoutByName(n: String) = buildGraphLayoutCash.get(n).getOrElse{
+      buildGraphLayout(n)(graph) $$ {
+        buildGraphLayoutCash += n -> _
+      }
+    }
+    protected var currentGraphLayout = layoutByName(buildGraphLayout.head._1)
+    override def graphLayout = currentGraphLayout
 
-  val nodeInfo = monitorFor(selectedVertex).text
-    .extractFuture(infoExtractor.nodeAgentInfo _ andThen (_.map(Xhtml.toXhtml)))
-    .affect(_.preferredSize = 100 -> 500)
-    .layout(_.fill = Fill.Both, _.weightx = 1.0/3, _.weighty = .5)
+    protected def updateGraphVisualization(){
+      vv.setGraphLayout(graphLayout)
+      vv.doLayout()
+    }
 
-  override protected def appLayout = super.appLayout ::: List(
-    place(scrollable()(nodeInfo, "info")) to theWest of "vv"
-  )
-
-  onVertexSelection{names =>
-    selectedVertex = if(names.size == 1) Some(names.head) else None
-    updateForms()
+    lazy val layoutChooserBuilder = controlForSeq[String](graphLayoutNames, static = true)
+      .dropDownList(name => {
+        currentGraphLayout = layoutByName(name)
+        updateGraphVisualization()
+      })
   }
 }
+
+trait JUNGVisualizationBuilderExtraLayoutImpl extends JUNGVisualizationBuilderExtra{
+  self: JUNGVisualizationBuilder =>
+
+  trait JUNGInfoVisualization extends JUNGBaseVisualization with SelectionEvents
+  {
+    protected var selectedVertex: Option[Name] = None
+
+    def infoExtractor: OneTryColoringStateInfoExtractor
+
+    val nodeInfo = monitorFor(selectedVertex).text
+      .extractFuture(infoExtractor.nodeAgentInfo _ andThen (_.map(Xhtml.toXhtml)))
+
+    onVertexSelection{names =>
+      println(s"names=$names")
+      selectedVertex = if(names.size == 1) Some(names.head) else None
+      updateForms()
+    }
+  }
+
+  trait JUNGVisualizationFeatures extends JUNGBaseVisualization
+    with MouseManipulations with LayoutChanger with JUNGInfoVisualization
+  {
+    lazy val controlPanelBuilder = panel.gridBag(
+      place(scrollable()(nodeInfo, "node-info")
+          .fillBoth.yWeight(.9).xWeight(1).insets(10)(top = 0, right = 5)
+        ) in theCenter,
+      place(layoutChooserBuilder
+          .fillBoth.xWeight(1).insets(10)(right = 5),
+        "layout-chooser") to theNorth of "node-info"
+    ).affect(
+      _.border = Swing.LineBorder(Color.red),
+      p => println("c = " + p.layout)
+      )
+
+    override protected def appLayout = List(
+      SplitLayout(Orientation.Vertical,
+        controlPanelBuilder -> "control",
+        visPanel -> "graph"
+      )(
+        pos = theCenter
+        )
+    )
+/*
+    override protected def appLayout =
+    List(
+      place(visPanel, "graph")
+        .transform(_.addLayout(_.fill = Fill.Both, _.weightx = .9, _.weighty = 1)) in theCenter,
+      place(controlPanelBuilder
+        .layout(_.fill = Fill.Both, _.weightx = 0, _.weighty = 1)
+        , "control-p") to theWest of "graph"
+    )
+*/
+
+  }
+}
+
