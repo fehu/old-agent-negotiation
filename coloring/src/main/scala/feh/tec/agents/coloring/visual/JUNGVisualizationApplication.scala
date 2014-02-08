@@ -9,6 +9,7 @@ import java.awt.Color
 import edu.uci.ics.jung.visualization.VisualizationViewer
 import scala.concurrent.duration._
 import akka.actor.ActorSystem
+import feh.tec.agents.comm.coloring.ColoringGraphGenerator.RandConfig
 
 class JUNGVisualizationApp(val graph: ColoringGraph,
                            naming: UUID => Name)
@@ -45,10 +46,10 @@ class JUNGVisualizationAppExtra(graph: ColoringGraph, naming: UUID => Name, env:
 
 object JUNGVisualizationApplication extends App{
   val app = new ColoringVisualizationApplication(
-    graph = ColoringGraphGenerator.generate("coloring", 30, _.nextDouble() < .1),
+    graph = ColoringGraphGenerator.generate("coloring", 30, _.nextDouble() < .1, RandConfig(Some(4))),
     colors = Set(Color.red, Color.green, Color.blue, Color.yellow),
     defaultTimeout = 10 millis,
-    msgDelay = 300 millis
+    msgDelay = 1 milli //300 millis
   ){
     app =>
 

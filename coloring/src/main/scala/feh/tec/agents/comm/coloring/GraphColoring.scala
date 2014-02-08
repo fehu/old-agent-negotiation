@@ -15,14 +15,14 @@ import feh.tec.agents.comm.coloring.ColoringOverseer._
 import feh.util.{Undirected, Graph}
 import scala.util.Random
 import feh.tec.agents.coloring.util._
-import scala.Some
 import feh.util.Graph.{GraphRef, Node}
 import feh.tec.agents.comm.coloring.ColoringExpression.Accept
 import feh.tec.agents.comm.coloring.ColoringExpression.Reject
 import scala.concurrent.duration.FiniteDuration
 import feh.tec.agent.comm.Agent.Communicating.{ResponseDelay, AgentActor}
 import feh.tec.agents.comm.coloring.ColoringAgent.ColoringActorAgent
-import feh.tec.agents.comm.coloring.OneTryColoring.{OneTryDelayedActorAgent, OneTryColoringActorAgent}
+import feh.tec.agents.comm.coloring.OneTryColoring.OneTryDelayedActorAgent
+import feh.tec.agents.comm.coloring.ColoringGraphGenerator.RandConfig
 
 class ColoringEnvironment(val colors: Set[Color], val graph: ColoringGraph) {
   env =>
@@ -229,13 +229,23 @@ object OneTryColoring{
                                  controller: CommAgentController[ColoringLanguage, ColoringEnvironment, _],
                                  envRef: ColoringEnvironmentRef,
                                  scheduler: Scheduler,
+//                                 proposalTickDelay: FiniteDuration,
                                  val neighbours: Set[Name])
     extends ColoringActorAgent(name, controller, envRef, scheduler)
   {
     protected var tries = envRef.possibleColors.toSeq
 
     var currentProposal = tries.head
-    def setProposal() = currentProposal = tries.head
+    def nextProposal() = currentProposal = {
+      tries match{
+        case Nil =>
+          tries = envRef.possibleColors.toSeq
+        case _ =>
+      }
+      val r = tries.head
+      tries = tries.tail
+      r
+    }
     def proposal = Proposal(currentProposal)
 
     def createAcceptanceMap = mutable.Map(neighbours.toSeq.zipMap(_ => false): _*)
@@ -250,6 +260,7 @@ object OneTryColoring{
     }
     def colorFreed(by: Name) {
       neighbourColorMap += by -> None
+      acceptanceMap += by -> false
       _freeColors = calcFreeColors
     }
     // assuming no myColor is set
@@ -260,9 +271,9 @@ object OneTryColoring{
 
     def fallback() = {
       setColor(None)
-      if(currentProposal != null) tries = tries.tail
-      if(tries.isEmpty) sys.error("no more colors to try") // tries = envRef.possibleColors.toSeq
-      setProposal()
+//      if(currentProposal != null) tries = tries.tail
+//      if(tries.isEmpty) sys.error("no more colors to try") // tries = envRef.possibleColors.toSeq
+      nextProposal()
       acceptanceMap = createAcceptanceMap
       _freeColors = calcFreeColors
       self ! SendProposals
@@ -315,7 +326,8 @@ object OneTryColoring{
       case (sender, Fallback()) => fallback()
       case (sender, NotifyFallback()) =>
         colorFreed(sender)
-        Response()
+        if(acceptanceMap.forall(_._2)) Response()
+        else response(tellSender = proposal)
       case (sender, u) =>
         unhandled(u)
         response()
@@ -378,15 +390,20 @@ class GraphColoring(colors: Set[Color], envGraph: ColoringGraph)
 }
 
 trait ColoringGraphGenerator{
+
+
   def generate(name: String, nodes: Set[String], edges: Set[(String, String)]): ColoringGraph
   def generate(name: String, nNodes: Int, edge: (UUID, UUID) => Boolean): ColoringGraph
-  def generate(name: String, nNodes: Int, edge: Random => Boolean): ColoringGraph
+  def generate(name: String, nNodes: Int, edge: Random => Boolean, conf: RandConfig): ColoringGraph
 }
 
 object ColoringGraphGenerator{
+  case class RandConfig(maxEdgesPerNode: Option[Int])
+
   protected lazy val impl = new ColoringGraphGeneratorImpl
 
-  def generate(name: String, nNodes: Int, edge: (Random) => Boolean): ColoringGraph = impl.generate(name, nNodes, edge)
+  def generate(name: String, nNodes: Int, edge: (Random) => Boolean, conf: RandConfig): ColoringGraph =
+    impl.generate(name, nNodes, edge, conf)
 }
 
 class ColoringGraphGeneratorImpl extends ColoringGraphGenerator{
@@ -394,7 +411,8 @@ class ColoringGraphGeneratorImpl extends ColoringGraphGenerator{
 
   def generate(name: String, nNodes: Int, edge: (UUID, UUID) => Boolean): ColoringGraph = ???
 
-  def generate(name: String, nNodes: Int, edge: (Random) => Boolean): ColoringGraph = {
+
+  def generate(name: String, nNodes: Int, edge: (Random) => Boolean, conf: RandConfig) = {
     val ref = GraphRef(name)
     val nodesIds = for(_ <- 1 to nNodes) yield UUID.randomUUID()
     val nodes = for(id <- nodesIds) yield Node[Option[Color]](ref, id, None)
@@ -405,6 +423,33 @@ class ColoringGraphGeneratorImpl extends ColoringGraphGenerator{
         case (Nil, _) => Nil
       }
     )(nodesIds.toList -> Nil)
-    ColoringGraph(ref, nodes.toSet, edges.toSet)
+
+    val filteredEdges = conf.maxEdgesPerNode.map{
+      max =>
+        val edgesByNode = mutable.Map.empty[UUID, mutable.HashSet[(UUID, UUID)]]
+          .withDefault(_ => mutable.HashSet())
+
+        edges foreach {
+          case e@(i1, i2) =>
+            edgesByNode <<= (i1, _ += e)
+            edgesByNode <<= (i2, _ += e)
+        }
+
+        val toDelete = edgesByNode.toSeq flatMap {
+          case (k, v) if v.size > max =>
+            v.toSeq.sortBy{
+              case (i1, i2) => edgesByNode(i1).size min edgesByNode(i2).size
+            }.toSeq |> {
+              s =>
+                s.take(s.size-max)
+            }
+          case _ => Nil
+        }
+
+        edges.toSet -- toDelete.toSet
+      }
+      .getOrElse(edges.toSet)
+
+    ColoringGraph(ref, nodes.toSet, filteredEdges)
   }
 }
