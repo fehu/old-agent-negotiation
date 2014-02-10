@@ -23,6 +23,7 @@ import akka.actor.ActorDSL._
 import feh.util._
 import scala.Some
 import scala.concurrent.ExecutionContext
+import scala.collection.immutable.{ListMap, TreeMap}
 
 trait JUNGVisualizationBuilder extends SwingAppBuildingEnvironment{
   class JUNGBaseVisualization(val graph: Graph[Name, (Name, Name)],
@@ -173,9 +174,9 @@ trait JUNGVisualizationBuilderExtra{
   trait LayoutChanger {
     self: JUNGBaseVisualization =>
 
-    lazy val buildGraphLayout: Map[String, Graph[Name, (Name, Name)] => AbstractLayout[Name, (Name, Name)]] = Map(
-      "Circle"                -> ((gr: Graph[Name, (Name, Name)]) => new CircleLayout(gr)),
+    lazy val buildGraphLayout: Map[String, Graph[Name, (Name, Name)] => AbstractLayout[Name, (Name, Name)]] = ListMap(
       "Fruchterman-Reingold"  -> ((gr: Graph[Name, (Name, Name)]) => new FRLayout(gr)),
+      "Circle"                -> ((gr: Graph[Name, (Name, Name)]) => new CircleLayout(gr)),
       "Self-organizing map"   -> ((gr: Graph[Name, (Name, Name)]) => new ISOMLayout(gr)),
       "Kamada-Kawai"          -> ((gr: Graph[Name, (Name, Name)]) => new KKLayout(gr)),
       "Spring"                -> ((gr: Graph[Name, (Name, Name)]) => new SpringLayout(gr))
@@ -263,35 +264,70 @@ trait JUNGVisualizationBuilderExtraLayoutImpl extends JUNGVisualizationBuilderEx
     val nodeInfo = monitorFor(selectedVertex).text
       .extractFuture(infoExtractor.nodeAgentInfo _ andThen (_.map(Xhtml.toXhtml)))
 
-    onVertexSelection{names =>
+    protected def setSelectedVertex(names: Set[Name]){
       selectedVertex = if(names.size == 1) Some(names.head) else None
+    }
+
+    onVertexSelection{names =>
+      setSelectedVertex(names)
       updateForms()
     }
   }
 
+  trait NodeSearch extends JUNGInfoVisualization{
+
+    implicit def tBuilder: String => Option[Name]
+    lazy val nodeSearchTextBuilder = controlFor(Option.empty[Name]){
+      name =>
+        name match{
+          case Some(Name("")) => // do nothing
+          case other => selectedVertex = other
+        }
+        updateForms()
+    }.textForm.swapStatic.extract(_ => "")
+
+    override protected def setSelectedVertex(names: Set[Name]) = {
+      val old = selectedVertex
+      super.setSelectedVertex(names)
+      if(selectedVertex != old && selectedVertex.size == 1) nodeSearchTextBuilder.formMeta.form.text = ""
+    }
+  }
+
+
   trait JUNGVisualizationFeatures extends JUNGBaseVisualization
     with MouseManipulations with LayoutChanger with JUNGInfoVisualization with ZoomScroll with ColorsValidation
+    with NodeSearch
   {
 
-    lazy val buttonsPanelBuilder = panel.box(_.Vertical)()
+    lazy val leftTopPanelBuilder = panel.box(_.Vertical)()
+      .doNotGlue
+      .append(layoutChooserBuilder -> "layout-chooser")
+      .appendStrut(10)
+      .append(panel.box(_.Horizontal)(
+          label("Search node ").withoutId : UnplacedLayoutElem,
+          nodeSearchTextBuilder -> "node-search-t" : UnplacedLayoutElem
+        ).withoutId
+      )
+
+    lazy val leftBottomPanelBuilder = panel.box(_.Vertical)()
       .doNotGlue
       .append(validateColorsButtonBuilder -> "validate-b")
       .appendStrut(10)
       .append(resetColorsValidationButtonBuilder -> "validation-reset-b")
-      .affect(
-//        _.border = Swing.LineBorder(Color.lightGray),
-//        _.xLayoutAlignment = java.awt.Component.CENTER_ALIGNMENT,
-//        _.peer.setLayout(new BoxLayout(peer, BoxLayout.PAGE_AXIS))
-      )
 
     lazy val controlPanelBuilder = panel.gridBag(
       place(scrollable()(nodeInfo, "node-info")
-          .fillBoth.yWeight(.9).xWeight(1).insets(10)(top = 0, right = 5)
+          .fillBoth
+          .yWeight(.9)
+          .xWeight(1)
+          .insets(10)(top = 0, right = 5)
         ) in theCenter,
-      place(layoutChooserBuilder
-          .fillBoth.xWeight(1).insets(10)(right = 5),
-        "layout-chooser") to theNorth of "node-info",
-      place(buttonsPanelBuilder
+      place(leftTopPanelBuilder
+          .fillBoth
+          .xWeight(1)
+          .insets(10)(right = 5)
+        ) to theNorth of "node-info",
+      place(leftBottomPanelBuilder
           .fillBoth
           .xWeight(1)
           .insets(10)(top = 0, right = 5)

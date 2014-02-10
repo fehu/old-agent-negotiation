@@ -29,31 +29,34 @@ class JUNGVisualizationApp(val graph: ColoringGraph,
   def graphVisualization = vis.vv
 }
 
-class JUNGVisualizationAppExtra(graph: ColoringGraph, naming: UUID => Name, env: GraphColoring)
+class JUNGVisualizationAppExtra(graph: ColoringGraph, env: GraphColoring)
                                (implicit asystem: ActorSystem)
-  extends JUNGVisualizationApp(graph, naming) with JUNGVisualizationBuilderExtraLayoutImpl
+  extends JUNGVisualizationApp(graph, env.naming) with JUNGVisualizationBuilderExtraLayoutImpl
 {
-  override lazy val vis = new JUNGBaseVisualization(new UndirectedSparseGraph, null)(graph, naming)
+  override lazy val vis = new JUNGBaseVisualization(new UndirectedSparseGraph, null)(graph, env.naming)
     with JUNGVisualizationFeatures with JUNGInfoVisualization
   {
     lazy val infoExtractor = new OneTryColoringStateInfoExtractor(env, 10 millis)
     protected implicit def system = asystem
     def overseer = env.overseer
+    implicit def tBuilder = str =>
+      if(str == "") Some(Name(""))
+      else env.naming.values.find(_.name == str)
   }
 
 }
-
 
 object JUNGVisualizationApplication extends App{
   val app = new ColoringVisualizationApplication(
     graph = ColoringGraphGenerator.generate("coloring", 30, _.nextDouble() < .1, RandConfig(Some(4))),
     colors = Set(Color.red, Color.green, Color.blue, Color.yellow),
     defaultTimeout = 10 millis,
+    tickDelay = 200 millis,
     msgDelay = 1 milli //300 millis
   ){
     app =>
 
-    lazy val visual = new JUNGVisualizationAppExtra(graph, naming, env)
+    lazy val visual = new JUNGVisualizationAppExtra(graph, env)
   }
 
   app.start()

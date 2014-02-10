@@ -12,6 +12,7 @@ import feh.util._
 abstract class ColoringVisualizationApplication(val graph: ColoringGraph,
                                                 colors: Set[Color],
                                                 val msgDelay: FiniteDuration,
+                                                val tickDelay: FiniteDuration,
                                                 implicit val defaultTimeout: Timeout)
                                                (implicit val system: ActorSystem = ActorSystem.create()){
   lazy val generator = new NameGenerator(Set())
@@ -25,7 +26,7 @@ abstract class ColoringVisualizationApplication(val graph: ColoringGraph,
   }
   protected def getNeighbours(id: UUID) = graph.neighbouringNodes(id).map(_.id |> naming)
 
-  def createAgent = env.createAgent(naming, getNeighbours, env.buildRef, msgDelay) _
+  def createAgent = env.createAgent(naming, getNeighbours, env.buildRef, msgDelay, tickDelay) _
 
   lazy val agents = naming.keys.map(createAgent).toList
   lazy val starting = agents.randomChoice
