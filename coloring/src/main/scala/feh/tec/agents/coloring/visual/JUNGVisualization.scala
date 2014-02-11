@@ -259,7 +259,7 @@ trait JUNGVisualizationBuilderExtraLayoutImpl extends JUNGVisualizationBuilderEx
   {
     protected var selectedVertex: Option[Name] = None
 
-    def infoExtractor: OneTryColoringStateInfoExtractor
+    def infoExtractor: ColoringImplStateInfoExtractor
 
     val nodeInfo = monitorFor(selectedVertex).text
       .extractFuture(infoExtractor.nodeAgentInfo _ andThen (_.map(Xhtml.toXhtml)))

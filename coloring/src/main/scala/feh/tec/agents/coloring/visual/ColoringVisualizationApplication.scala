@@ -2,7 +2,7 @@ package feh.tec.agents.coloring.visual
 
 import feh.tec.agents.comm.coloring.{ColoringAgent, GraphColoring, ColoringGraph}
 import java.awt.Color
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration._
 import akka.util.Timeout
 import akka.actor.ActorSystem
 import feh.tec.agents.coloring.util.NameGenerator
@@ -20,9 +20,12 @@ abstract class ColoringVisualizationApplication(val graph: ColoringGraph,
 
   def visual: GraphColoringVisualisation
 
+  def ensuringDoneDuration = 1 second span
+  def coloringDone()
+
   lazy val updaterRef = ColorUpdateActor.actor(visual)
-  lazy val env = new GraphColoring(colors, graph){
-    override protected def buildOverseer = new ColoringUpdateOverseer(env, updaterRef)
+  lazy val env = new GraphColoring(colors, graph, ensuringDoneDuration, coloringDone.lifted){
+    override protected def buildOverseer = new ColoringUpdateOverseer(env, updaterRef, ensuringDoneDuration, coloringDone)
   }
   protected def getNeighbours(id: UUID) = graph.neighbouringNodes(id).map(_.id |> naming)
 
@@ -31,9 +34,11 @@ abstract class ColoringVisualizationApplication(val graph: ColoringGraph,
   lazy val agents = naming.keys.map(createAgent).toList
   lazy val starting = agents.randomChoice
 
+  def oneStart = false
+
   def start(){
     visual.start()
-    println("starting: " + starting)
-    ColoringAgent start starting.actor
+    if(oneStart) ColoringAgent start starting.actor
+    else agents.par.foreach(ColoringAgent start _.actor)
   }
 }

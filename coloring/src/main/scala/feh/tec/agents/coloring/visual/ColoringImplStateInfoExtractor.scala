@@ -2,17 +2,17 @@ package feh.tec.agents.coloring.visual
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
-import feh.tec.agents.comm.coloring.OneTryColoring.{StateInfo, GetStateInfo}
+import feh.tec.agents.comm.coloring.ColoringAgentsImpl.{StateInfo, GetStateInfo}
 import feh.tec.agents.comm.coloring.GraphColoring
 import feh.tec.agents.coloring.util.Name
 import akka.util.Timeout
 import feh.util._
 
-class OneTryColoringStateInfoExtractor(env: GraphColoring, nodeUpdateResponseTimeout: Timeout)(implicit context: ExecutionContext) {
+class ColoringImplStateInfoExtractor(env: GraphColoring, nodeUpdateResponseTimeout: Timeout)(implicit context: ExecutionContext) {
 
   def nodeAgentInfo(nameOpt: Option[Name]): Future[NodeSeq] = nameOpt map {
     name => env.agentController.askAny(name, GetStateInfo)(nodeUpdateResponseTimeout) map {
-      case StateInfo(`name`, isActive, color, tries, proposal, acceptance, freeColors, neighboursColors) =>
+      case StateInfo(`name`, isActive, color, tries, proposal, acceptance, neighboursColors) =>
         val (accepted, pending) = acceptance.span(_._2)
         <html>
           <table>
@@ -23,8 +23,7 @@ class OneTryColoringStateInfoExtractor(env: GraphColoring, nodeUpdateResponseTim
             <tr><td>proposal</td><td>{Option(proposal).map(_.stringRGB) getOrElse "None"}</td></tr>
             <tr><td>accepted</td><td>{accepted.keys.mkString(", ")}</td></tr>
             <tr><td>pending</td><td>{pending.keys.mkString(", ")}</td></tr>
-            <tr><td>freeColors</td><td>{freeColors.map(_.stringRGB).mkString(", ")}</td></tr>
-            <tr><td>neighbours</td><td>
+            <tr><td>neighbours</td><td>n
               <table>
                 {
                 neighboursColors.map{case (n, cOpt) => <tr><td>{n.name}</td><td>{cOpt.map(_.stringRGB) getOrElse "None"}</td></tr>}

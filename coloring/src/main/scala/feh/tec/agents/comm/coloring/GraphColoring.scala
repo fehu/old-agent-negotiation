@@ -18,10 +18,9 @@ import feh.tec.agents.coloring.util._
 import feh.util.Graph.{GraphRef, Node}
 import feh.tec.agents.comm.coloring.ColoringExpression.Accept
 import feh.tec.agents.comm.coloring.ColoringExpression.Reject
-import scala.concurrent.duration.FiniteDuration
 import feh.tec.agent.comm.Agent.Communicating.{ResponseDelay, AgentActor}
 import feh.tec.agents.comm.coloring.ColoringAgent.ColoringActorAgent
-import feh.tec.agents.comm.coloring.OneTryColoring.OneTryDelayedActorAgent
+import feh.tec.agents.comm.coloring.ColoringAgentsImpl.DelayedActorAgentImpl
 import feh.tec.agents.comm.coloring.ColoringGraphGenerator.RandConfig
 import scala.concurrent.duration._
 
@@ -41,21 +40,46 @@ object ColoringOverseer{
   case object GetColors
   case class GetNNeighbours(of: UUID)
   case class NNeighbours(of: UUID, n: Int)
-  case object Done
+  case class Working(node: UUID)
+  case class Done(node: UUID)
 
-  class OverseerActor(env: ColoringEnvironment) extends Actor{
+  class OverseerActor(env: ColoringEnvironment,
+                      ensureDone: FiniteDuration,
+                      done: () => Unit,
+                      implicit val system: ActorSystem) extends Actor{
+    import system.dispatcher
+    val ready = mutable.HashMap(env.nodes.mapValues(_ => false).toSeq: _*)
+
+    private def isDone = ready.forall(_._2)
+    def ifDone(f: => Unit) = Future(isDone).filter(identity).foreach(_ => f)
+    
+    case object EnsuringDone
+    var ensuringDoneInProgress = false
+    
     def receive: Actor.Receive = {
       case GetColor(nodeId) => sender ! env.nodes(nodeId).color
       case SetColor(nodeId, color) => env.setColor(nodeId, color)
       case GetColors => sender ! env.nodes
       case GetNNeighbours(id) => env.graph.byId(id).foreach(n => sender ! NNeighbours(n.id, n.neighbours.size))
-      case Done => ???
+      case Working(nodeId) => ready += nodeId -> false
+      case Done(nodeId) =>
+        ready += nodeId -> true
+        if(!ensuringDoneInProgress) ifDone{
+          ensuringDoneInProgress = true
+          system.scheduler.scheduleOnce(ensureDone, self, EnsuringDone)
+        }
+      case EnsuringDone =>
+        ensuringDoneInProgress = false
+        ifDone{ Future(done()) }
     }
   }
 }
 
-class ColoringOverseer(val env: ColoringEnvironment)(implicit system: ActorSystem, timeout: Timeout){
-  protected def props = Props(classOf[ColoringOverseer.OverseerActor], env)
+class ColoringOverseer(val env: ColoringEnvironment,
+                       ensureDone: FiniteDuration,
+                       done: () => Unit)
+                      (implicit system: ActorSystem, timeout: Timeout){
+  protected def props = Props(classOf[ColoringOverseer.OverseerActor], env, ensureDone, done, system)
   lazy val actor = system.actorOf(props, "ColoringOverseer")
   import system.dispatcher
 
@@ -85,6 +109,9 @@ class ColoringEnvironmentRef(val nodeId: UUID,
   def color(implicit context: ExecutionContext) = (overseerRef ? GetColor(nodeId)).mapTo[Option[Color]]
   def nConnections(nodeId: UUID)(implicit context: ExecutionContext): Future[Int] = overseerRef.ask(GetNNeighbours(nodeId))
     .mapTo[NNeighbours].map(_.ensuring(_.of == nodeId).n)
+  
+  def notifyActiveState() = overseerRef ! Working(nodeId)
+  def notifyInactiveState() = overseerRef ! Done(nodeId)
   
   lazy val reverseNaming = naming.map(_.swap).toMap 
 }
@@ -118,8 +145,8 @@ object ColoringExpression{
   case class Proposal(color: Color)(implicit val sender: ActorRef) extends ColoringIssue{
     def asText = s"I propose I set color $color"
   }
-  case class Reject(offer: Color, colors: Set[Color])(implicit val sender: ActorRef) extends ColoringIssue{
-    def asText = s"Your offer ($offer) is unacceptable, those are colors I can set: $colors"
+  case class Reject(offer: Color)(implicit val sender: ActorRef) extends ColoringIssue{
+    def asText = s"Your offer ($offer) is unacceptable, i have already set it"
   }
   case class Accept(color: Color)(implicit val sender: ActorRef) extends ColoringExpression{
     def asText = s"I'm ok with your color assignation ($color)"
@@ -137,9 +164,12 @@ object ColoringExpression{
 
 import ColoringExpression._
 
-class ColoringAgentController(val gr: ColoringGraph, naming: UUID => ColoringAgent#Id) extends CommAgentController[ColoringLanguage, ColoringEnvironment, ColoringAgent]{
+class ColoringAgentController(val gr: ColoringGraph, naming: UUID => ColoringAgent#Id)
+  extends CommAgentController[ColoringLanguage, ColoringEnvironment, Name]
+{
   override def tellAll(msg: ColoringLanguage#Expr)(implicit sender: ActorRef): Unit ={
-    val neigh = gr.neighbouringNodes(agents(id(sender)).envRef.nodeId).map(node => naming(node.id))
+    val neigh = gr.neighbouringNodes(agents(id(sender)).asInstanceOf[ColoringAgent].envRef.nodeId)
+      .map(node => naming(node.id))
     neigh foreach (tell(_, msg))
   }
 }
@@ -151,7 +181,7 @@ object ColoringAgent{
   def start(agent: ActorRef) = agent ! Start
 
   abstract class ColoringActorAgent(name: Name,
-                                    controller: CommAgentController[ColoringLanguage, ColoringEnvironment, _],
+                                    controller: CommAgentController[ColoringLanguage, ColoringEnvironment, Name],
                                     envRef: ColoringEnvironmentRef,
                                     val scheduler: Scheduler)
     extends AgentActor[Name, ColoringLanguage, ColoringEnvironment](name, controller, envRef) with AgentReport
@@ -174,7 +204,22 @@ object ColoringAgent{
 
     case object SendProposals
 
-    var isActive = false
+    protected def stateActivate(){ envRef.notifyActiveState() }
+    protected def stateDeactivate(){ envRef.notifyInactiveState() }
+
+    object state{
+      private var _isActive = false
+      def isActive = _isActive
+      def activate() = {
+        _isActive = true
+        stateActivate()
+      }
+      def deactivate()= {
+        _isActive = false
+        stateDeactivate()
+      }
+    }
+
 
     def onStart() {}
 
@@ -184,7 +229,7 @@ object ColoringAgent{
         self ! SendProposals
         onStart()
       case SendProposals =>
-        isActive = true
+        state.activate()
         report("Sending proposals")
         controller.tellAll(proposal)
     }
@@ -226,28 +271,29 @@ abstract class ColoringAgent(val name: Name,
   lazy val actor = system.actorOf(actorProps, name)
 }
 
-object OneTryColoring{
-  protected def response = Response.build[ColoringLanguage, ColoringEnvironment]
+object ColoringAgentsImpl{
+  protected def response = Response.build[ColoringLanguage, ColoringEnvironment, Name]
 
-  class OneTryDelayedActorAgent(name: Name,
-                                controller: CommAgentController[ColoringLanguage, ColoringEnvironment, _],
+  class DelayedActorAgentImpl(name: Name,
+                                controller: CommAgentController[ColoringLanguage, ColoringEnvironment, Name],
                                 envRef: ColoringEnvironmentRef,
                                 scheduler: Scheduler,
                                 neighbours: Set[Name],
                                 proposalTickDelay: FiniteDuration,
                                 val messageDelay: FiniteDuration)
-    extends OneTryColoringActorAgent(name, controller, envRef, scheduler, proposalTickDelay, neighbours)
+    extends ColoringActorAgentImpl(name, controller, envRef, scheduler, proposalTickDelay, neighbours)
     with ResponseDelay[Name, ColoringLanguage, ColoringEnvironment]
 
-  class OneTryColoringActorAgent(name: Name,
-                                 controller: CommAgentController[ColoringLanguage, ColoringEnvironment, _],
+  class ColoringActorAgentImpl(name: Name,
+                                 controller: CommAgentController[ColoringLanguage, ColoringEnvironment, Name],
                                  envRef: ColoringEnvironmentRef,
                                  scheduler: Scheduler,
                                  proposalTickDelay: FiniteDuration,
                                  val neighbours: Set[Name])
     extends ColoringActorAgent(name, controller, envRef, scheduler)
   {
-    var tries = envRef.possibleColors.toSeq
+    def initTries = envRef.possibleColors.toSeq.randomOrder()
+    var tries = initTries
     lazy val nNeighbours = neighbours.size 
     lazy val nNeighboursConnections = neighbours.zipMap(envRef.reverseNaming).toMap.par.mapValues{
       id => Await.result(envRef.nConnections(id), 200 millis)
@@ -257,7 +303,7 @@ object OneTryColoring{
     def nextProposal() = currentProposal = {
       tries match{
         case Nil =>
-          tries = envRef.possibleColors.toSeq
+          tries = initTries
         case _ =>
       }
       val r = tries.head
@@ -277,39 +323,29 @@ object OneTryColoring{
 
     def colorOccupied(by: Name, c: Color)  {
       neighbourColorMap += by -> Some(c)
-      _freeColors = calcFreeColors
     }
     def colorFreed(by: Name) {
       neighbourColorMap += by -> None
       acceptanceMap += by -> false
-      _freeColors = calcFreeColors
     }
     // assuming no myColor is set
     def calcFreeColors = envRef.possibleColors &~ neighbourColorMap.values.flatten.toSet
 
-    var _freeColors = calcFreeColors
-    def freeColors = _freeColors
-
     def fallback() = {
       setColor(None)
-//      if(currentProposal != null) tries = tries.tail
-//      if(tries.isEmpty) sys.error("no more colors to try") // tries = envRef.possibleColors.toSeq
       nextProposal()
       acceptanceMap = createAcceptanceMap
-      _freeColors = calcFreeColors
       self ! SendProposals
       response(tellAll = NotifyFallback())
-    }
-
-    override def setColor(c: Option[Color]): Unit = {
-      super.setColor(c)
-      c.foreach(_freeColors -= _)
     }
 
     def accepted(by: Name) = {
       acceptanceMap += by -> true
       if(allAccepted_?) {
-        colorAccepted()
+        // ensure no one has set it
+        val contradicting = neighbourColorMap.flatMap(p => p._2.find(currentProposal ==).map(p._1 ->))
+        if(contradicting.isEmpty) colorAccepted()
+        else response.seq(personal = contradicting.mapValues(_ => proposal).toList)
       }
       else response()
     }
@@ -319,18 +355,23 @@ object OneTryColoring{
       tries = tries.filterNot(currentProposal ==)
       response(tellAll = Confirm(currentProposal)) $$ {
         currentProposal = null
-        isActive = false
+        state.deactivate()
       }
     }
 
     def ignoreFallbackRequestCoeff = .4
-    def ignoreFallbackRequest =
-      ignoreFallbackRequestCoeff * (1 - tries.size.toDouble / envRef.possibleColors.size) > Random.nextDouble()
+    def fallbackDespiteCoeff = .4
+    // p diminishes as tries's size diminishes
+    def triesDependantProbDim = (_: Double) * tries.size.toDouble / envRef.possibleColors.size > Random.nextDouble()
+    // p rises as tries's size diminishes
+    def triesDependantProbCres = (_: Double) * (1 - tries.size.toDouble / envRef.possibleColors.size) > Random.nextDouble()
+    def ignoreFallbackRequest = triesDependantProbCres(ignoreFallbackRequestCoeff)
+    def fallbackDespiteNNeighbours = triesDependantProbDim(fallbackDespiteCoeff)
 
-    def ifHasNotLessNeighbors[R](sender: Name)(f: => Response[ColoringLanguage, ColoringEnvironment]) =
+    def ifHasNotLessNeighbors[R](sender: Name)(f: => Response[ColoringLanguage, ColoringEnvironment, Name]) =
       nNeighboursConnections.get(sender).map{
         n => 
-          if(n >= nNeighbours && !ignoreFallbackRequest) Some(f)
+          if(n >= nNeighbours && !ignoreFallbackRequest || fallbackDespiteNNeighbours) Some(f)
           else None
       }.getOrElse{
         sys.error(s"$sender is not neighbour of $name")
@@ -338,45 +379,37 @@ object OneTryColoring{
     
     def respond = {
 /* * * * */
-      case (sender, Proposal(color)) if freeColors.contains(color) =>
-        if(sender == name) throw up
-        if(myColor.isEmpty && !isActive) self ! SendProposals
-        response(tellSender = Accept(color))
+      case (sender, Proposal(color)) if myColor.exists(color ==) => response(tellSender = Reject(color))
 /* * * * */
-      case (sender, Proposal(color)) => response(tellSender = Reject(color, freeColors))
+      case (sender, Proposal(color)) =>
+        if(sender == name) throw up
+        if(myColor.isEmpty && !state.isActive) self ! SendProposals
+        response(tellSender = Accept(color))
 /* * * * */
       case (sender, Accept(color)) if color == currentProposal => accepted(sender)
 /* * * * */
       case (sender, Accept(_)) => response(tellSender = proposal)
 /* * * * */
-      case (sender, Reject(color, colors)) if color == currentProposal =>
-        val inters = freeColors & colors
-        ifHasNotLessNeighbors(sender){
-          if(inters.isEmpty) fallback()
-          else {
-            currentProposal = inters.randomChoose
-            acceptanceMap = createAcceptanceMap
-            response(tellAll = proposal)
-          }
-        } getOrElse response()
+      case (sender, Reject(color)) if color == currentProposal =>
+        nextProposal()
+        acceptanceMap = createAcceptanceMap
+        response(tellAll = proposal)
 /* * * * */
-      case (sender, Reject(_, _)) => response() // ignore, it's outdated
+      case (sender, Reject(_)) => response(tellSender = proposal) // it's outdated, send proposal
 /* * * * */
       case (sender, Confirm(color)) =>
         colorOccupied(sender, color)
-        if(freeColors contains color) Response()
-        else if(myColor == Some(color)) ifHasNotLessNeighbors(sender){
+        if(myColor == Some(color)) ifHasNotLessNeighbors(sender){
           fallback()
         } getOrElse response(tellSender = Fallback())
-        else response(tellSender = Fallback())
+        else response()
 /* * * * */
       case (sender, Fallback()) =>
-        ifHasNotLessNeighbors(sender)(fallback()) getOrElse response()
+        ifHasNotLessNeighbors(sender)(fallback()) getOrElse response(tellSender = Fallback())
 /* * * * */
       case (sender, NotifyFallback()) =>
         colorFreed(sender)
-        if(acceptanceMap.forall(_._2)) Response()
-        else response(tellSender = proposal)
+        response(tellSender = proposal)
 /* * * * */
       case (sender, u) =>
         unhandled(u)
@@ -385,23 +418,9 @@ object OneTryColoring{
 
     override def unhandled(message: Any) = alwaysReport("unhandled message: " + message)
 
-    case object Tick
-
-    def startTicks() = scheduler.schedule(0 millis, proposalTickDelay, self, Tick)
-
-    override def onStart() = {
-      super.onStart()
-      startTicks()
-    }
-
     override def receive = {
-      case Tick =>
-        if(!acceptanceMap.forall(_._2)) {
-          println("tick proposals")
-          self ! SendProposals
-        }
       case GetStateInfo =>
-        sender ! StateInfo(name, isActive, myColor, tries, currentProposal, acceptanceMap.toMap, freeColors, neighbourColorMap.toMap)
+        sender ! StateInfo(name, state.isActive, myColor, tries, currentProposal, acceptanceMap.toMap, neighbourColorMap.toMap)
       case SendProposals if neighbours.isEmpty => colorAccepted()
       case other => super.receive(other)
     }
@@ -415,26 +434,28 @@ object OneTryColoring{
                        triesLeft: Seq[Color],
                        currentProposal: Color,
                        acceptanceMap: Map[Name, Boolean],
-                       freeColors: Set[Color],
                        neighboursColorMap: Map[Name, Option[Color]])
 
 }
 
-trait OneTryColoring extends ColoringAgent{
+trait ColoringAgentsImpl extends ColoringAgent{
   def actorProps = Props(classOf[ColoringActorAgent], name, controller, envRef, system.scheduler, neighbours)
 }
 
-trait OneTryDelayedColoring extends ColoringAgent{
+trait DelayedColoring extends ColoringAgent{
   def messageDelay: FiniteDuration
   def proposalTickDelay: FiniteDuration
-  def actorProps = Props(classOf[OneTryDelayedActorAgent], name, controller, envRef, system.scheduler, neighbours, proposalTickDelay, messageDelay)
+  def actorProps = Props(classOf[DelayedActorAgentImpl], name, controller, envRef, system.scheduler, neighbours, proposalTickDelay, messageDelay)
 }
 
-class GraphColoring(colors: Set[Color], envGraph: ColoringGraph)
+class GraphColoring(colors: Set[Color],
+                    envGraph: ColoringGraph,
+                    ensuringDoneDuration: FiniteDuration,
+                    done: () => Unit)
                    (implicit system: ActorSystem, timeout: Timeout, val naming: Map[UUID, ColoringAgent#Id]){
   lazy val env = new ColoringEnvironment(colors, envGraph)
 
-  protected def buildOverseer = new ColoringOverseer(env)
+  protected def buildOverseer = new ColoringOverseer(env, ensuringDoneDuration, done)
 
   lazy val overseer = buildOverseer
   def overseerRef = overseer.actor
@@ -449,7 +470,7 @@ class GraphColoring(colors: Set[Color], envGraph: ColoringGraph)
                   tickDelay: FiniteDuration,
                   msgDelay: FiniteDuration)
                  (id: UUID) =
-    new ColoringAgent(naming(id), getNeighbours(id), createEnvRef(id), agentController) with OneTryDelayedColoring
+    new ColoringAgent(naming(id), getNeighbours(id), createEnvRef(id), agentController) with DelayedColoring
     {
       def messageDelay = msgDelay
       def proposalTickDelay = tickDelay
@@ -465,7 +486,7 @@ trait ColoringGraphGenerator{
 }
 
 object ColoringGraphGenerator{
-  case class RandConfig(maxEdgesPerNode: Option[Int])
+  case class RandConfig(maxEdgesPerNode: Option[Int] = None)
 
   protected lazy val impl = new ColoringGraphGeneratorImpl
 

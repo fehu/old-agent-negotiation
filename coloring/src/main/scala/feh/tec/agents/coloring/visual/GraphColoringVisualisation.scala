@@ -5,10 +5,11 @@ import feh.tec.agents.coloring.util.Name
 import java.awt.Color
 import java.util.UUID
 import feh.tec.agents.comm.coloring.{ColoringOverseer, ColoringEnvironment, ColoringGraph}
-import akka.actor.{Props, ActorSystem, Actor, ActorRef}
-import feh.tec.agents.comm.coloring.ColoringOverseer.SetColor
+import akka.actor._
 import scala.swing.Frame
 import akka.util.Timeout
+import feh.tec.agents.comm.coloring.ColoringOverseer.SetColor
+import scala.concurrent.duration.FiniteDuration
 
 trait GraphColoringVisualisation extends AppFrameControl{
   protected def graph: ColoringGraph
@@ -21,13 +22,21 @@ trait GraphColoringVisualisation extends AppFrameControl{
   def graphVisualization: Visualization
 }
 
-class ColoringUpdateOverseer(env: ColoringEnvironment, updater: ActorRef)
-                            (implicit system: ActorSystem, timeout: Timeout) extends ColoringOverseer(env){
-  override protected def props = Props(classOf[ColoringUpdateOverseer.OverseerActor], env, updater)
+class ColoringUpdateOverseer(env: ColoringEnvironment,
+                             updater: ActorRef,
+                             ensureDone: FiniteDuration,
+                             done: () => Unit)
+                            (implicit system: ActorSystem, timeout: Timeout) extends ColoringOverseer(env, ensureDone, done){
+  override protected def props =
+    Props(classOf[ColoringUpdateOverseer.OverseerActor], env, updater, ensureDone, done, system)
 }
 
 object ColoringUpdateOverseer{
-  class OverseerActor(env: ColoringEnvironment, guiUpdater: ActorRef) extends ColoringOverseer.OverseerActor(env){
+  class OverseerActor(env: ColoringEnvironment,
+                      guiUpdater: ActorRef,
+                      ensureDone: FiniteDuration,
+                      done: () => Unit,
+                      system: ActorSystem) extends ColoringOverseer.OverseerActor(env, ensureDone, done, system){
     override def receive: Actor.Receive = PartialFunction[Any, Unit]{
       case SetColor(nodeId, color) =>
         env.setColor(nodeId, color)

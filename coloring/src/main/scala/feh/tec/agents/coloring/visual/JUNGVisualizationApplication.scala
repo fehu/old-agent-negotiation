@@ -10,6 +10,7 @@ import edu.uci.ics.jung.visualization.VisualizationViewer
 import scala.concurrent.duration._
 import akka.actor.ActorSystem
 import feh.tec.agents.comm.coloring.ColoringGraphGenerator.RandConfig
+import scala.swing.Dialog
 
 class JUNGVisualizationApp(val graph: ColoringGraph,
                            naming: UUID => Name)
@@ -36,7 +37,7 @@ class JUNGVisualizationAppExtra(graph: ColoringGraph, env: GraphColoring)
   override lazy val vis = new JUNGBaseVisualization(new UndirectedSparseGraph, null)(graph, env.naming)
     with JUNGVisualizationFeatures with JUNGInfoVisualization
   {
-    lazy val infoExtractor = new OneTryColoringStateInfoExtractor(env, 10 millis)
+    lazy val infoExtractor = new ColoringImplStateInfoExtractor(env, 20 millis)
     protected implicit def system = asystem
     def overseer = env.overseer
     implicit def tBuilder = str =>
@@ -48,15 +49,19 @@ class JUNGVisualizationAppExtra(graph: ColoringGraph, env: GraphColoring)
 
 object JUNGVisualizationApplication extends App{
   val app = new ColoringVisualizationApplication(
-    graph = ColoringGraphGenerator.generate("coloring", 30, _.nextDouble() < .1, RandConfig(Some(4))),
+    graph = ColoringGraphGenerator.generate("coloring", 90, _.nextDouble() < .1, RandConfig(Some(6))),
     colors = Set(Color.red, Color.green, Color.blue, Color.yellow),
-    defaultTimeout = 10 millis,
+    defaultTimeout = 30 millis,
     tickDelay = 200 millis,
     msgDelay = 1 milli //300 millis
   ){
     app =>
 
     lazy val visual = new JUNGVisualizationAppExtra(graph, env)
+    def coloringDone() = {
+//      env.agentController.allRefs foreach system.stop
+      Dialog.showMessage(null, "Done coloring!", "Ready", Dialog.Message.Info)
+    }
   }
 
   app.start()
