@@ -22,8 +22,11 @@ import scala.xml.Xhtml
 import akka.actor.ActorDSL._
 import feh.util._
 import scala.Some
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Future, ExecutionContext}
 import scala.collection.immutable.{ListMap, TreeMap}
+import feh.tec.agents.interactive.ScalaConsoleProvider
+import scala.tools.nsc.interpreter.Results
+import scala.swing.ScrollPane.BarPolicy
 
 trait JUNGVisualizationBuilder extends SwingAppBuildingEnvironment{
   class JUNGBaseVisualization(val graph: Graph[Name, (Name, Name)],
@@ -294,13 +297,91 @@ trait JUNGVisualizationBuilderExtraLayoutImpl extends JUNGVisualizationBuilderEx
   }
 
 
+  trait ScalaConsole extends ScalaConsoleProvider{
+    self: SwingAppFrame with Frame9PositionsLayoutBuilder =>
+
+    def consolePanel: DSLPanelBuilder
+  }
+
+  trait EditPanesScalaConsole extends ScalaConsole with ScalaConsoleProvider.InOutEditPanes{
+    vis: SwingAppFrame with Frame9PositionsLayoutBuilder =>
+
+    def clearInput() = console.input.text = ""
+    def clearOutput() = console.output.text = ""
+
+    lazy val executeButton = triggerFor(console.executeInput{
+      case Results.Incomplete =>
+      case Results.Error | Results.Success => clearInput()
+    }).button("Execute")
+
+    lazy val clearInputButton = triggerFor(clearInput()).button("Clear")
+
+    lazy val inputButtonsPanel = panel.box(_.Horizontal)(
+      executeButton -> "execute",
+      clearInputButton -> "clear-input")
+
+    lazy val clearOutputButton = triggerFor(clearOutput()).button("Clear")
+    lazy val outputButtonsPanel = panel.box(_.Horizontal)(clearOutputButton -> "clear-output")
+
+    lazy val miscPanel = panel.grid(1, 1)(label("todo").withoutId)
+
+    lazy val consolePanel = panel.grid(1, 1)(
+      split(_.Vertical)(
+        split(_.Horizontal)(
+          miscPanel -> "misc",
+          panel.gridBag(
+            place(scrollable()(console.input, "input")
+              .fillBoth.maxXWeight.maxYWeight)                                             in theCenter,
+            place(inputButtonsPanel
+              .fillHorizontally,                                        "input-buttons-p") to theSouth of "input"
+          ) -> "input-p"
+        ) -> "split-input-misc",
+        panel.gridBag(
+          place(scrollable(vert = BarPolicy.Always)(console.output, "output")
+            .fillBoth.maxXWeight.maxYWeight)                                               in theCenter,
+          place(outputButtonsPanel
+            .fillHorizontally,                                         "output-buttons-p") to theSouth of "output"
+        ).withoutId
+      ) -> "split-in-out"
+
+    )
+  }
+
+  trait ScalaConsoleInFrame{
+    self: JUNGBaseVisualization =>
+
+    lazy val consoleFrame = new Frame with EditPanesScalaConsole with SwingAppFrame with Frame9PositionsLayoutBuilder{
+      override def closeOperation() = {
+        super.closeOperation()
+        consoleFrameTrigger.component.asInstanceOf[ToggleButton].selected = false
+      }
+
+      def start() = {
+        if(console.initialized) open()
+        else {
+          console.initIMainAsync{
+            buildLayout()
+            size = 600 -> 400
+            open()
+          }
+
+        }
+      }
+      def stop() = close()
+      lazy val layout = List(consolePanel)
+    }
+    lazy val consoleFrameTrigger: DSLToggleButtonBuilder = toggleFor(consoleFrame.start(), consoleFrame.stop()).toggle("Console")
+  }
+
   trait JUNGVisualizationFeatures extends JUNGBaseVisualization
     with MouseManipulations with LayoutChanger with JUNGInfoVisualization with ZoomScroll with ColorsValidation
-    with NodeSearch
+    with NodeSearch with ScalaConsoleInFrame
   {
 
     lazy val leftTopPanelBuilder = panel.box(_.Vertical)()
       .doNotGlue
+      .append(consoleFrameTrigger -> "console-toggle")
+      .appendStrut(10)
       .append(layoutChooserBuilder -> "layout-chooser")
       .appendStrut(10)
       .append(panel.box(_.Horizontal)(
@@ -335,12 +416,10 @@ trait JUNGVisualizationBuilderExtraLayoutImpl extends JUNGVisualizationBuilderEx
     )
 
     override protected def appLayout = List(
-      SplitLayout(Orientation.Vertical,
+      split(_.Vertical)(
         controlPanelBuilder -> "control",
         visPanel -> "graph"
-      )(
-        pos = theCenter
-        )
+      )
     )
 
     override def start() = {

@@ -49,11 +49,11 @@ class JUNGVisualizationAppExtra(graph: ColoringGraph, env: GraphColoring)
 
 object JUNGVisualizationApplication extends App{
   val app = new ColoringVisualizationApplication(
-    graph = ColoringGraphGenerator.generate("coloring", 90, _.nextDouble() < .1, RandConfig(Some(6))),
+    graph = ColoringGraphGenerator.generate("coloring", 50, _.nextDouble() < .1, RandConfig(Some(4))),
     colors = Set(Color.red, Color.green, Color.blue, Color.yellow),
     defaultTimeout = 30 millis,
     tickDelay = 200 millis,
-    msgDelay = 1 milli //300 millis
+    msgDelay = 100 milli //300 millis
   ){
     app =>
 

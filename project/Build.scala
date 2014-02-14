@@ -39,10 +39,13 @@ object  Build extends sbt.Build {
 
   object Dependencies{
     lazy val akka = "com.typesafe.akka" %% "akka-actor" % "2.2.1"
-    lazy val reflectApi = "org.scala-lang" % "scala-reflect" % ScalaVersion
-    lazy val scalaSwing = "org.scala-lang" % "scala-swing" % ScalaVersion
-    lazy val scalaCompiler = "org.scala-lang" % "scala-compiler" % ScalaVersion
     lazy val shapeless = "com.chuusai" % "shapeless_2.10.2" % "2.0.0-M1"
+
+    object scala{
+      lazy val compiler = "org.scala-lang" % "scala-compiler" % ScalaVersion
+      lazy val swing = "org.scala-lang" % "scala-swing" % ScalaVersion
+      lazy val reflectApi = "org.scala-lang" % "scala-reflect" % ScalaVersion
+    }
 
     object Apache{
       lazy val ioCommons = "commons-io" % "commons-io" % "2.4"
@@ -72,6 +75,10 @@ object  Build extends sbt.Build {
 
     object feh{
       lazy val util = "feh" %% "util" % "1.0.2"
+
+      object utils{
+        lazy val compiler = "feh.util" %% "scala-compiler-utils" % "0.1"
+      }
 
       object dsl{
         lazy val swing = "feh.dsl" %% "swing" % "1.1"
@@ -103,11 +110,11 @@ object  Build extends sbt.Build {
     id = "coloring",
     base = file("coloring"),
     settings = buildSettings ++ Seq(
+      resolvers += Snapshot.sonatype,
       libraryDependencies ++= Seq(
-        feh.dsl.swing,
-        feh.dsl.graphviz,
         feh.util,
-        scalaSwing
+        feh.dsl.swing,
+        feh.utils.compiler
       ) ++ jung.all
     )
   ) dependsOn comm
