@@ -2,7 +2,7 @@ package feh.tec.agents.interactive
 
 import feh.util._
 import feh.util.scutil._
-import feh.util.swing.completion.{TextCompletion, CompletionEditorPane}
+import feh.util.swing.completion.{CompletionListEditorPane, TextCompletion}
 import scala.swing.{TextComponent, EditorPane}
 import scala.tools.nsc.interpreter.Results
 
@@ -44,7 +44,7 @@ object ConsoleCompletionEditor{
   }
 }
 
-class ConsoleCompletionEditor[C <% TextCompletion](c: C) extends CompletionEditorPane(c: TextCompletion)
+class ConsoleCompletionEditor[C <% TextCompletion](c: C) extends CompletionListEditorPane(c: TextCompletion)
 
 trait ScalaConsoleProvider{
   def console: ScalaConsole
