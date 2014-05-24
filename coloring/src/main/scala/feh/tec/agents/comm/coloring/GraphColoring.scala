@@ -1,11 +1,11 @@
 package feh.tec.agents.comm.coloring
 
-import feh.tec.agent.comm._
+import feh.tec.agent.oldcomm._
 import java.awt.Color
 import java.util.UUID
 import feh.util._
 import scala.collection.mutable
-import feh.tec.agent.comm.Agent.{Response, CommAgentController}
+import feh.tec.agent.oldcomm.Agent.{Response, CommAgentController}
 import akka.actor._
 import akka.util.Timeout
 import akka.pattern._
@@ -18,7 +18,7 @@ import feh.tec.agents.coloring.util._
 import feh.util.Graph.{GraphRef, Node}
 import feh.tec.agents.comm.coloring.ColoringExpression.Accept
 import feh.tec.agents.comm.coloring.ColoringExpression.Reject
-import feh.tec.agent.comm.Agent.Communicating.{ResponseDelay, AgentActor}
+import feh.tec.agent.oldcomm.Agent.Communicating.{ResponseDelay, AgentActor}
 import feh.tec.agents.comm.coloring.ColoringAgent.ColoringActorAgent
 import feh.tec.agents.comm.coloring.ColoringAgentsImpl.DelayedActorAgentImpl
 import feh.tec.agents.comm.coloring.ColoringGraphGenerator.RandConfig

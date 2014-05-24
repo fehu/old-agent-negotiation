@@ -96,11 +96,11 @@ object  Build extends sbt.Build {
       name := "agent-comm"
     }
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(comm, coloring)
+   .aggregate(oldcomm, coloring)
 
-  lazy val comm = Project(
-    id = "comm",
-    base = file("comm"),
+  lazy val oldcomm = Project(
+    id = "oldcomm",
+    base = file("oldcomm"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(akka, feh.util)
     )
@@ -117,6 +117,6 @@ object  Build extends sbt.Build {
         feh.utils.compiler
       ) ++ jung.all
     )
-  ) dependsOn comm
+  ) dependsOn oldcomm
 
 }

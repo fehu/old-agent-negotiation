@@ -1,4 +1,4 @@
-package feh.tec.agent.comm
+package feh.tec.agent.oldcomm
 
 import scala.collection.mutable
 import akka.actor.{Scheduler, Actor, ActorRef}
