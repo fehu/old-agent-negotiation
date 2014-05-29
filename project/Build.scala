@@ -5,14 +5,14 @@ import org.sbtidea.SbtIdeaPlugin._
 
 object  Build extends sbt.Build {
 
-  val ScalaVersion = "2.10.3"
-  val Version = "0.0.2"
+  val ScalaVersion = "2.11.1"
+  val Version = "0.1"
 
   import Resolvers._
   import Dependencies._
 
   val buildSettings = Defaults.defaultSettings ++ Seq (
-    organization  := "feh.tec.agents",
+    organization  := "feh.agents",
     version       := Version,
     scalaVersion  := ScalaVersion,
 //    scalacOptions ++= Seq("-explaintypes"),
@@ -38,7 +38,7 @@ object  Build extends sbt.Build {
   }
 
   object Dependencies{
-    lazy val akka = "com.typesafe.akka" %% "akka-actor" % "2.2.1"
+    lazy val akka = "com.typesafe.akka" %% "akka-actor" % "2.3.3"
     lazy val shapeless = "com.chuusai" % "shapeless_2.10.2" % "2.0.0-M1"
 
     object scala{
@@ -97,6 +97,14 @@ object  Build extends sbt.Build {
     }
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
    .aggregate(oldcomm, coloring)
+
+  lazy val comm = Project(
+    id = "comm",
+    base = file("comm"),
+    settings = buildSettings ++ Seq(
+      libraryDependencies ++= Seq(akka, feh.util)
+    )
+  )
 
   lazy val oldcomm = Project(
     id = "oldcomm",
