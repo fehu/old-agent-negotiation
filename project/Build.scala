@@ -5,7 +5,7 @@ import org.sbtidea.SbtIdeaPlugin._
 
 object  Build extends sbt.Build {
 
-  val ScalaVersion = "2.10.3"
+  val ScalaVersion = "2.11.1"
   val Version = "0.0.2"
 
   import Resolvers._
@@ -38,11 +38,16 @@ object  Build extends sbt.Build {
   }
 
   object Dependencies{
-    lazy val akka = "com.typesafe.akka" %% "akka-actor" % "2.2.1"
-    lazy val reflectApi = "org.scala-lang" % "scala-reflect" % ScalaVersion
-    lazy val scalaSwing = "org.scala-lang" % "scala-swing" % ScalaVersion
-    lazy val scalaCompiler = "org.scala-lang" % "scala-compiler" % ScalaVersion
+    lazy val akka = "com.typesafe.akka" %% "akka-actor" % "2.3.3"
     lazy val shapeless = "com.chuusai" % "shapeless_2.10.2" % "2.0.0-M1"
+
+    object scala{
+      def allLibs(version: String) = "org.scala-lang" % "scala-library-all" % version // 2.11.x
+
+      lazy val swing = allLibs(ScalaVersion)// there is no "scala-swing" for 2.11.1 now, it's in lib-all
+      lazy val compiler = "org.scala-lang" % "scala-compiler" % ScalaVersion
+      lazy val reflectApi = "org.scala-lang" % "scala-reflect" % ScalaVersion
+    }
 
     object Apache{
       lazy val ioCommons = "commons-io" % "commons-io" % "2.4"
@@ -105,9 +110,9 @@ object  Build extends sbt.Build {
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
         feh.dsl.swing,
-        feh.dsl.graphviz,
+//        feh.dsl.graphviz,
         feh.util,
-        scalaSwing
+        scala.swing
       ) ++ jung.all
     )
   ) dependsOn comm

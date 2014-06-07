@@ -34,11 +34,14 @@ abstract class ColoringVisualizationApplication(val graph: ColoringGraph,
   lazy val agents = naming.keys.map(createAgent).toList
   lazy val starting = agents.randomChoice
 
-  def oneStart = false
+  def oneStart = true
+
+  def startExec =
+    if(oneStart) ColoringAgent start starting.actor
+    else agents.par.foreach(ColoringAgent start _.actor)
 
   def start(){
     visual.start()
-    if(oneStart) ColoringAgent start starting.actor
-    else agents.par.foreach(ColoringAgent start _.actor)
+    startExec
   }
 }

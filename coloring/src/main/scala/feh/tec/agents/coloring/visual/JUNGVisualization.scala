@@ -338,9 +338,7 @@ trait JUNGVisualizationBuilderExtraLayoutImpl extends JUNGVisualizationBuilderEx
       SplitLayout(Orientation.Vertical,
         controlPanelBuilder -> "control",
         visPanel -> "graph"
-      )(
-        pos = theCenter
-        )
+      )
     )
 
     override def start() = {
