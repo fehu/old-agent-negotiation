@@ -5,7 +5,7 @@ import org.sbtidea.SbtIdeaPlugin._
 
 object  Build extends sbt.Build {
 
-  val ScalaVersion = "2.11.1"
+  val ScalaVersion = "2.11.2"
   val Version = "0.1"
 
   import Resolvers._
@@ -74,7 +74,7 @@ object  Build extends sbt.Build {
 
 
     object feh{
-      lazy val util = "feh" %% "util" % "1.0.2"
+      lazy val util = "feh.util" %% "util" % "1.0.4"
 
       object utils{
         lazy val compiler = "feh.util" %% "scala-compiler-utils" % "0.1"
@@ -96,7 +96,7 @@ object  Build extends sbt.Build {
       name := "agent-comm"
     }
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(oldcomm, coloring)
+   .aggregate(comm, oldcomm, coloring)
 
   lazy val comm = Project(
     id = "comm",
@@ -111,6 +111,17 @@ object  Build extends sbt.Build {
     base = file("oldcomm"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(akka, feh.util)
+    )
+  )
+
+  lazy val nQueen = Project(
+    id = "n-queen",
+    base = file("n-queen"),
+    settings = buildSettings ++ Seq(
+      libraryDependencies ++= Seq(
+        feh.util,
+        akka
+        )
     )
   )
 
