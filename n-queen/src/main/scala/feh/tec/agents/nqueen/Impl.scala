@@ -55,7 +55,3 @@ object Impl {
   }
 */
 }
-
-object Coloring{
-
-}
