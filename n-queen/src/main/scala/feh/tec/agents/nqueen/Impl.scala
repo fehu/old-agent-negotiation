@@ -1,8 +1,9 @@
 package feh.tec.agents.nqueen
 
 import feh.tec.agents.View.Estimation
-import feh.tec.agents.Views._
 import feh.tec.agents._
+import feh.tec.agents.impl.{DefaultNegotiatingLanguage, PriorityBasedBacktrack, StaticScopeNegotiation}
+
 
 object Impl {
   val Size = 4
@@ -14,15 +15,48 @@ object Impl {
   implicit object XYIterator extends DomainIterator.Range()
 
 
+  object LangTest {
+    import feh.tec.agents.impl.Language.dsl._
+
+    I propose You set 5 `for` X
+
+    I propose I set 1 `for` Y
+
+    I.accept
+
+    I request You `do` fallback
+  }
+
   implicit class VarWrapper[V <: Var, T](v: V){
     def it(implicit it: DomainIterator[V#Domain, T]) = v -> it(v.domain)
-    def view(expectingResponseTo: Message.Id => Boolean,
-             buildOpinion: VarView with Views.DefaultSchema => PartialFunction[Message, Estimation.Opinion]) =
-      new VarView(v) with Views.DefaultSchema with View.Default
-      {
-        def expectingResponse = expectingResponseTo
-        def opinion: PartialFunction[Message, Estimation.Opinion] = buildOpinion(this)
-      }
+//    def view(expectingResponseTo: Message.Id => Boolean,
+//             buildOpinion: VarView with Views.DefaultSchema => PartialFunction[Message, Estimation.Opinion]) =
+//      new VarView(v) with Views.DefaultSchema with View.Default
+//      {
+//        def expectingResponse = expectingResponseTo
+//        def opinion: PartialFunction[Message, Estimation.Opinion] = buildOpinion(this)
+//      }
+  }
+
+
+  object Queen{
+    case class Init(priority: Priority, vals: Map[Var, Any])
+    
+    def negotiation(init: Init, getScope: () => Set[AgentRef]) =
+      new StaticScopeNegotiation(NegotiationId("N-Queen"), getScope(), init.priority, init.vals)
+  }
+
+  class Queen extends PriorityBasedBacktrack[DefaultNegotiatingLanguage]
+    with DefaultNegotiatingLanguage.Builder with impl.Agent.SystemSupport
+  {
+
+    def negotiations = ???
+
+    val role: Role = _
+    implicit val ref: AgentRef = _
+    val vars: Set[Var] = _
+    protected var _currentMsg: AbstractMessage = _
+    val id: Id = _
   }
 
 /*

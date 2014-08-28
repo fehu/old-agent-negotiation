@@ -1,5 +1,7 @@
 package feh.tec.agents
 
+import java.util.UUID
+
 import akka.actor.Actor
 
 import scala.collection.mutable
@@ -12,8 +14,13 @@ trait AbstractAgent extends Actor{
   def lifeCycle: PartialFunction[AbstractMessage, Unit]
 
   def receive = {
-    case msg: AbstractMessage => lifeCycle(msg)
+    case msg: AbstractMessage =>
+      _currentMsg = msg
+      lifeCycle(msg)
   }
+
+  def currentMsg = _currentMsg
+  protected var _currentMsg: AbstractMessage
 }
 
 class Priority(val get: Int) extends AnyVal
@@ -21,7 +28,11 @@ object Priority{
   implicit def priorityToIntWrapper(p: Priority) = p.get
 }
 
+case class NegotiationId(name: String, id: UUID = UUID.randomUUID())
+
 trait Negotiation{
+  def id: NegotiationId
+
   implicit var currentPriority: Priority
 
   def scope: Set[AgentRef]
@@ -77,13 +88,13 @@ trait BackTracking[Lang <: BacktrackLanguage] extends ProposalBased[Lang]{
 }
 
 trait StaticScope{
-  self: AbstractAgent =>
+  self: Negotiation =>
 
   val scope: Set[AgentRef]
 }
 
 trait DynamicScope{
-  self: AbstractAgent =>
+  self: Negotiation =>
 
   protected def scopeProvider: () => Set[AgentRef]
 

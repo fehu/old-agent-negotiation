@@ -3,27 +3,27 @@ package feh.tec.agents
 import akka.actor.ActorRef
 
 abstract class Var(val name: String, test: Any => Boolean){
-  type T
+  type Tpe
   type Domain
   def domain: Domain
 
-  def cast(a: Any) = if(test(a)) Some(a.asInstanceOf[T]) else None
+  def cast(a: Any): Option[Tpe] = if(test(a)) Some(a.asInstanceOf[Tpe]) else None
 
   override def toString = name
 }
 
 object Domain{
-  trait Small[Tpe]{
+  trait Small[T]{
     self: Var =>
 
-    type T = Tpe
+    type Tpe = T
     type Domain = Set[T]
   }
 
   trait Range{
     self: Var =>
 
-    type T = Int
+    type Tpe = Int
     type Domain = scala.collection.immutable.Range
   }
 

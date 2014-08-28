@@ -17,3 +17,13 @@ trait CounterProposalLanguage extends ProposalLanguage{
 trait BacktrackLanguage extends ProposalLanguage{
   type Fallback <: Msg
 }
+
+object Language{
+  trait Priority{
+    self: Language =>
+
+    type Msg <: {
+      def priority: Priority
+    }
+  }
+}

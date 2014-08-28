@@ -2,7 +2,6 @@ package feh.tec.agents
 
 import feh.tec.agents.Message.{Rejected, Accepted}
 import feh.tec.agents.View.Estimation.Opinion
-import feh.tec.agents.Views.DefaultSchema
 import feh.util.InUnitInterval
 
 import scala.collection.mutable
@@ -77,6 +76,7 @@ trait View{
 
 }
 
+/*
 object Views{
   import View._
   import Estimation.Constraint
@@ -105,6 +105,7 @@ object Views{
   }
 
 }
+*/
 
 /** Agent's views of its position in the negotiation TODO
  */
