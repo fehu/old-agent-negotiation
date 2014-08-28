@@ -24,7 +24,23 @@ trait Message extends AbstractMessage{
 protected[agents] trait SystemMessage extends AbstractMessage
 
 object SystemMessage{
-  case class Start(id: Message.Id)(implicit val sender: AgentRef) extends SystemMessage
+  case class Start(id: Message.Id)(implicit val sender: AgentRef) extends SystemMessage{
+
+    def done = Start.Started(id)
+    def notInitialized = Start.NotInitialized(id)
+    def stillInitializing = Start.StillInitializing(id)
+    def alreadyRunning = Start.AlreadyRunning(id)
+  }
+  object Start{
+    case class Started protected[Start] (respondingTo: Message.Id)
+                                        (implicit val sender: AgentRef) extends SystemMessage { def id = respondingTo }
+    case class NotInitialized protected[Start] (respondingTo: Message.Id)
+                                               (implicit val sender: AgentRef) extends SystemMessage { def id = respondingTo }
+    case class StillInitializing protected[Start] (respondingTo: Message.Id)
+                                                  (implicit val sender: AgentRef) extends SystemMessage { def id = respondingTo }
+    case class AlreadyRunning protected[Start] (respondingTo: Message.Id)
+                                               (implicit val sender: AgentRef) extends SystemMessage { def id = respondingTo }
+  }
 
   trait ScopeUpdate extends SystemMessage{
     def negotiation: NegotiationId

@@ -2,7 +2,7 @@ package feh.tec.agents.nqueen
 
 import feh.tec.agents.View.Estimation
 import feh.tec.agents._
-import feh.tec.agents.impl.{DefaultNegotiatingLanguage, PriorityBasedBacktrack, StaticScopeNegotiation}
+import feh.tec.agents.impl.{DynamicScopeNegotiation, DynamicScopeSupport, DefaultNegotiatingLanguage, PriorityBasedBacktrackAgent}
 
 
 object Impl {
@@ -42,21 +42,18 @@ object Impl {
   object Queen{
     case class Init(priority: Priority, vals: Map[Var, Any])
     
-    def negotiation(init: Init, getScope: () => Set[AgentRef]) =
-      new StaticScopeNegotiation(NegotiationId("N-Queen"), getScope(), init.priority, init.vals)
+    def negotiation(init: Init) = new DynamicScopeNegotiation(NegotiationId("N-Queen"), init.priority, init.vals)
+
+    def role = new Role{ val name = "Queen" }
   }
 
-  class Queen extends PriorityBasedBacktrack[DefaultNegotiatingLanguage]
-    with DefaultNegotiatingLanguage.Builder with impl.Agent.SystemSupport
+  class Queen(val id: impl.Agent.Id, init: Queen.Init) extends PriorityBasedBacktrackAgent[DefaultNegotiatingLanguage]
+    with DefaultNegotiatingLanguage.Builder
   {
+    val role = Queen.role
+    val vars: Set[Var] = Set(X, Y)
+    val negotiations = Set(Queen.negotiation(init))
 
-    def negotiations = ???
-
-    val role: Role = _
-    implicit val ref: AgentRef = _
-    val vars: Set[Var] = _
-    protected var _currentMsg: AbstractMessage = _
-    val id: Id = _
   }
 
 /*

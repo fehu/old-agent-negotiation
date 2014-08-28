@@ -39,5 +39,7 @@ object DomainIterator{
   }
 }
 
-case class AgentRef(id: Agent.Id, ref: ActorRef)
+case class AgentRef(id: impl.Agent.Id, ref: ActorRef){
+  def !(msg: AbstractMessage) = ref ! msg
+}
 

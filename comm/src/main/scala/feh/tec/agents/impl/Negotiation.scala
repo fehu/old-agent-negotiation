@@ -2,9 +2,21 @@ package feh.tec.agents.impl
 
 import feh.tec.agents.SystemMessage.ScopeUpdate
 import feh.tec.agents._
+import feh.tec.agents.impl.Negotiation.DynamicScope
 
 import scala.collection.mutable
 
+object Negotiation{
+
+  trait DynamicScope{
+    self: Negotiation =>
+
+    def updateScope(msg: ScopeUpdate)
+  }
+
+}
+
+/*
 class StaticScopeNegotiation(val id: NegotiationId,
                              val scope: Set[AgentRef],
                              initPriority: Priority,
@@ -14,9 +26,9 @@ class StaticScopeNegotiation(val id: NegotiationId,
   implicit var currentPriority: Priority = initPriority
   val vals: mutable.HashMap[Var, Any] = mutable.HashMap(initVals.toSeq: _*)
 }
+*/
 
 class DynamicScopeNegotiation(val id: NegotiationId,
-                              initScope: Set[AgentRef],
                               initPriority: Priority,
                               initVals: Map[Var, Any])
   extends Negotiation with DynamicScope
@@ -26,7 +38,7 @@ class DynamicScopeNegotiation(val id: NegotiationId,
 
   protected val _scope = mutable.HashSet.empty[AgentRef]
 
-  protected def scopeProvider = () => scope.toSet
+  def scope = scope.toSet
 
   def updateScope(msg: ScopeUpdate) = msg match {
     case ScopeUpdate.NewScope(scope, neg, _) if neg == id =>
@@ -37,9 +49,10 @@ class DynamicScopeNegotiation(val id: NegotiationId,
   }
 }
 
-trait DynNegotiationSupport[Lang <: Language] extends NegotiatingAgent[Lang]{
+/*
+trait DynNegotiationSupport[Lang <: Language] extends NegotiatingAgent{
 
-  abstract override def process(sys: SystemMessage) = sys match {
+  abstract override def processSys = {
     case upd: ScopeUpdate =>
       val neg = negotiations
         .find(_.id == upd.negotiation)
@@ -48,9 +61,10 @@ trait DynNegotiationSupport[Lang <: Language] extends NegotiatingAgent[Lang]{
         case dyn: DynamicScopeNegotiation => dyn.updateScope(upd)
         case _ => throw ScopeUpdateException(neg.id, "isn't DynamicScopeNegotiation")
       }
-    case other => super.process(other)
+    case other => super.processSys(other)
   }
 }
+*/
 
 abstract class NegotiationException(msg: String) extends Exception(msg)
 

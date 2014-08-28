@@ -20,7 +20,7 @@ trait AbstractAgent extends Actor{
   }
 
   def currentMsg = _currentMsg
-  protected var _currentMsg: AbstractMessage
+  protected var _currentMsg: AbstractMessage = null
 }
 
 class Priority(val get: Int) extends AnyVal
@@ -49,26 +49,33 @@ trait Role {
   val name: String
 }
 
-trait NegotiatingAgent[Lang <: Language] extends AbstractAgent{
+trait NegotiatingAgent extends AbstractAgent{
   implicit val ref: AgentRef
 
   val role: Role
   val vars: Set[Var]
 
-  def negotiations: Set[Negotiation]
+  type ANegotiation <: Negotiation
+  def negotiations: Set[ANegotiation]
 
-  def process(sys: SystemMessage)
-  def process(p: Message)
+}
 
-  def lifeCycle = {
-    case sys: SystemMessage => process(sys)
-    case msg: Message => process(msg)
+trait SpeakingAgent[Lang <: Language]{
+  self: NegotiatingAgent =>
+
+  val lang: Lang
+
+  def processSys: PartialFunction[SystemMessage, Unit]
+  def process: PartialFunction[Lang#Msg, Unit]
+
+  def lifeCycle: PartialFunction[AbstractMessage, Unit] = {
+    case sys: SystemMessage => processSys(sys)
+    case msg: Lang#Msg if lang.isMessage(msg) => process(msg)
   }
 }
 
-
-trait ProposalBased[Lang <: ProposalLanguage] {
-  self: NegotiatingAgent[Lang] =>
+trait ProposalBased[Lang <: ProposalLanguage] extends SpeakingAgent[Lang]{
+  self: NegotiatingAgent =>
 
   def createProposal(negotiation: Negotiation): Lang#Proposal
   def createRejected(negotiation: Negotiation): Lang#Rejected
@@ -77,26 +84,22 @@ trait ProposalBased[Lang <: ProposalLanguage] {
   def onProposal(msg: Lang#Proposal)
   def onRejected(msg: Lang#Rejected)
   def onAccepted(msg: Lang#Accepted)
+
+  def process = {// type test might fail
+    case msg: Lang#Proposal if lang.isProposal(msg)    => onProposal(msg)
+    case msg: Lang#Accepted if lang.isAcceptance(msg)  => onAccepted(msg)
+    case msg: Lang#Rejected if lang.isRejection(msg)   => onRejected(msg)
+  }
 }
 
 trait BackTracking[Lang <: BacktrackLanguage] extends ProposalBased[Lang]{
-  self: NegotiatingAgent[Lang] =>
+  self: NegotiatingAgent =>
 
   def createFallback(negotiation: Negotiation): Lang#Proposal
 
   def onFallback(msg: Lang#Fallback)
-}
 
-trait StaticScope{
-  self: Negotiation =>
-
-  val scope: Set[AgentRef]
-}
-
-trait DynamicScope{
-  self: Negotiation =>
-
-  protected def scopeProvider: () => Set[AgentRef]
-
-  final def scope = scopeProvider()
+  override def process = super.process orElse  {
+    case msg: Lang#Fallback if lang.isFallback(msg) => onFallback(msg)
+  }
 }

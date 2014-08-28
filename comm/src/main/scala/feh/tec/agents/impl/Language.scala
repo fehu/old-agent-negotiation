@@ -65,7 +65,9 @@ object DefaultNegotiatingLanguage {
   import Language._
 
   trait Builder extends Language.Builder[DefaultNegotiatingLanguage]{
-    self: NegotiatingAgent[DefaultNegotiatingLanguage] =>
+    self: NegotiatingAgent =>
+
+    val lang = Static
 
     def buildMessage(negId: NegotiationId, b: Buildable) = {
       implicit def priority = priorityOf(negId)
@@ -81,15 +83,27 @@ object DefaultNegotiatingLanguage {
     private def priorityOf(neg: NegotiationId) = 
       negotiations.find(_.id == neg).map(_.currentPriority) getOrThrow UnknownNegotiation(neg)
   }
+
+  object Static extends DefaultNegotiatingLanguage
 }
 
-class DefaultNegotiatingLanguage extends BacktrackLanguage with CounterProposalLanguage with feh.tec.agents.Language.Priority{
+class DefaultNegotiatingLanguage extends BacktrackLanguage with CounterProposalLanguage /*with feh.tec.agents.Language.Priority*/{
   type Msg = Message
 
   type Proposal = Message.Proposal
   type Accepted = Message.Accepted
   type Rejected = Message.Rejected
 
-//  type CounterProposal =
+//  type CounterProposal = this.type
+
   type Fallback = Message.Fallback
+
+  def isMessage(any: Any)         = any.isInstanceOf[Msg]
+  def isProposal(msg: Any)        = msg.isInstanceOf[Proposal]
+  def isAcceptance(msg: Any)      = msg.isInstanceOf[Accepted]
+  def isRejection(msg: Any)       = msg.isInstanceOf[Rejected]
+  def isCounterProposal(msg: Any) = msg.isInstanceOf[CounterProposal]
+  def isFallback(msg: Any)        = msg.isInstanceOf[Fallback]
+
 }
+
