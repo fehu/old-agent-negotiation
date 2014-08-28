@@ -1,0 +1,4 @@
+- [ ]  move to new comm
+- [ ]  create an outer-layer app for generating graph and running agents on it (should reuse visualization)
+- [ ]  console-utils: a set of functions to change visualisation of chosen objects and API for environment
+- [ ]  advanced graph generation

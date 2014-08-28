@@ -1,12 +1,13 @@
 package feh.tec.agents
 
 import feh.tec.agents.Message.{Rejected, Accepted}
-import feh.tec.agents.View.Estimation.Opinion
+import feh.tec.agents.OldView.Estimation.Opinion
 import feh.util.InUnitInterval
 
 import scala.collection.mutable
 
-object View{
+@deprecated("rewrite")
+object OldView{
   type Default = Impl.HashMapView
 
   object Estimation{
@@ -31,7 +32,7 @@ object View{
 
   // todo: history based on value changes
   object Impl{
-    trait HashMapView extends View{
+    trait HashMapView extends OldView{
       protected val _opinions = mutable.HashMap.empty[AgentRef, Estimation.Opinion]
 
       def opinions = _opinions.toMap
@@ -43,7 +44,7 @@ object View{
   }
 
   trait Helper{
-    self: View =>
+    self: OldView =>
 
     def collectEstimations(f: PartialFunction[Estimation.Opinion, Map[AgentRef, Estimation.Opinion]]) =
       self.opinions.filter( f isDefinedAt _._2 )
@@ -54,8 +55,9 @@ object View{
 /** A view over an aspect of relation
   *
   */
-trait View{
-  import View._
+@deprecated("rewrite")
+trait OldView{
+  import OldView._
 
   def aspect: String
   def opinions: Map[AgentRef, Estimation.Opinion]
@@ -109,10 +111,11 @@ object Views{
 
 /** Agent's views of its position in the negotiation TODO
  */
-trait Views {
-  self: NegotiatingAgent[_] =>
+@deprecated("rewrite")
+trait OldViews {
+  self: NegotiatingAgent =>
 
-  def views: Set[View]
+  def views: Set[OldView]
 
   protected def processMsgViews(msg: Message) = views.par foreach (_.process(msg))
 
@@ -124,7 +127,7 @@ trait Views {
 //      }
 //    }
 
-    def opinionDistribution[T](select: PartialFunction[Opinion, T], in: Set[View] = views): Map[T, (Set[AgentRef], InUnitInterval)] = {
+    def opinionDistribution[T](select: PartialFunction[Opinion, T], in: Set[OldView] = views): Map[T, (Set[AgentRef], InUnitInterval)] = {
       val results = views.toSeq.flatMap(_.opinions.toSeq.collect{
         case (ag, op) if select isDefinedAt op => select(op) -> ag
       })

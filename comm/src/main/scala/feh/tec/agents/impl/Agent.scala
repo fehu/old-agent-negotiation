@@ -50,6 +50,15 @@ object Agent{
       case start: SystemMessage.Start if status == Status.Working => start.sender.ref ! start.alreadyRunning
     }
   }
+
+  trait Helpers[Lang <: Language]{
+    self: NegotiatingAgent with SpeakingAgent[Lang] =>
+
+    def sendToAll(neg: Negotiation, msg: Lang#Msg) = neg.scope.foreach(_ ! msg)
+
+    protected var negotiationsCache = negotiations.map(n => n.id -> n).toMap
+    def get(neg: NegotiationId) = negotiationsCache(neg)
+  }
 }
 
 trait DynamicScopeSupport extends Agent.SystemSupport with NegotiatingAgent{
@@ -68,34 +77,45 @@ trait DynamicScopeSupport extends Agent.SystemSupport with NegotiatingAgent{
   }
 }
 
-
-// todo separate
-trait PriorityBasedBacktrackAgent[Lang <: BacktrackLanguage]
-  extends NegotiatingAgent with BackTracking[Lang] with Language.Builder[Lang] with DynamicScopeSupport
+abstract class Agent[Lang <: BacktrackLanguage]() extends NegotiatingAgent
+  with ProposalBased[Lang] with Language.Builder[Lang] with DynamicScopeSupport with Agent.Helpers[Lang]
 {
   type Id = Agent.Id
-  type ANegotiation = DynamicScopeNegotiation
   final implicit val ref = AgentRef(id, self)
 
-  def startLife() = negotiations.foreach{
-    neg =>
-      val prop = createProposal(neg)
-      neg.scope.foreach(_ ! prop)
-  }
+  def startLife() = negotiations.foreach(neg => createProposal(neg.id) $$ (sendToAll(neg, _)))
 
-  def onProposal(msg: Lang#Proposal) = ???
-  def onAccepted(msg: Lang#Accepted) = ???
-  def onRejected(msg: Lang#Rejected) = ???
-  def onFallback(msg: Lang#Fallback) = ???
-
-  def createProposal(negotiation: Negotiation) = build[Lang#Proposal](negotiation, I propose I set (
-    negotiation.vals.toSeq map {
+  def createProposal(id: NegotiationId) = build[Lang#Proposal](get(id), I propose I set (
+    get(id).vals.toSeq map {
       case (issue, value) => issue -> issue.cast(value).getOrThrow(s"wrong value $value for $issue")
     } : _*))
-  def createAccepted(negotiation: Negotiation) = buildMessage(negotiation.id, I.accept).asInstanceOf[Lang#Accepted]
-  def createRejected(negotiation: Negotiation) = buildMessage(negotiation.id, I.reject).asInstanceOf[Lang#Rejected]
-  def createFallback(negotiation: Negotiation) = ???
+  def createAccepted(id: NegotiationId) = buildMessage(id, I.accept).asInstanceOf[Lang#Accepted]
+  def createRejected(id: NegotiationId) = buildMessage(id, I.reject).asInstanceOf[Lang#Rejected]
 
   private def build[T <: Lang#Msg](neg: Negotiation, expr: Language.Buildable) =
     buildMessage(neg.id, I.accept).asInstanceOf[T]
+}
+
+// intended to be used with Views
+trait PriorityBasedBacktrackAgent[Lang <: BacktrackLanguage] extends Agent[Lang]
+{
+//  type ANegotiation = DynamicScopeNegotiation
+
+  protected def accept(prop: Lang#Proposal): Boolean
+
+  def onProposal = {
+    case prop: Lang#Proposal if lang.isProposal(prop) && prop.priority == get(prop.negotiation).priority => //todo
+      
+    case prop: Lang#Proposal if lang.isProposal(prop) && prop.priority < get(prop.negotiation).priority =>
+      prop.sender ! (if(accept(prop)) createAccepted(prop.negotiation) else createRejected(prop.negotiation))
+  }
+  def onRejected = {
+    case msg: Lang#Rejected if lang.isRejection(msg) && msg.priority == get(msg.negotiation).priority => //todo 
+    case msg: Lang#Rejected if lang.isRejection(msg) && msg.priority > get(msg.negotiation).priority => 
+      decideOnRejection(msg)
+  }
+  // do nothing for now
+  def onAccepted = Map()
+
+  def decideOnRejection(msg: Lang#Rejected)
 }

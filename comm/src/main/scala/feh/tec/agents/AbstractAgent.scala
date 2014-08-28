@@ -33,6 +33,7 @@ case class NegotiationId(name: String, id: UUID = UUID.randomUUID())
 trait Negotiation{
   def id: NegotiationId
 
+  def priority = currentPriority
   implicit var currentPriority: Priority
 
   def scope: Set[AgentRef]
@@ -77,13 +78,13 @@ trait SpeakingAgent[Lang <: Language]{
 trait ProposalBased[Lang <: ProposalLanguage] extends SpeakingAgent[Lang]{
   self: NegotiatingAgent =>
 
-  def createProposal(negotiation: Negotiation): Lang#Proposal
-  def createRejected(negotiation: Negotiation): Lang#Rejected
-  def createAccepted(negotiation: Negotiation): Lang#Accepted
+  def createProposal(id: NegotiationId): Lang#Proposal
+  def createRejected(id: NegotiationId): Lang#Rejected
+  def createAccepted(id: NegotiationId): Lang#Accepted
 
-  def onProposal(msg: Lang#Proposal)
-  def onRejected(msg: Lang#Rejected)
-  def onAccepted(msg: Lang#Accepted)
+  def onProposal: PartialFunction[Lang#Proposal, Unit]
+  def onRejected: PartialFunction[Lang#Rejected, Unit]
+  def onAccepted: PartialFunction[Lang#Accepted, Unit]
 
   def process = {// type test might fail
     case msg: Lang#Proposal if lang.isProposal(msg)    => onProposal(msg)
@@ -92,7 +93,8 @@ trait ProposalBased[Lang <: ProposalLanguage] extends SpeakingAgent[Lang]{
   }
 }
 
-trait BackTracking[Lang <: BacktrackLanguage] extends ProposalBased[Lang]{
+@deprecated("use PriorityBasedBacktrackAgent implementation instead")
+trait FallbackBackTracking[Lang <: BacktrackLanguage] extends ProposalBased[Lang]{
   self: NegotiatingAgent =>
 
   def createFallback(negotiation: Negotiation): Lang#Proposal
@@ -101,5 +103,18 @@ trait BackTracking[Lang <: BacktrackLanguage] extends ProposalBased[Lang]{
 
   override def process = super.process orElse  {
     case msg: Lang#Fallback if lang.isFallback(msg) => onFallback(msg)
+  }
+}
+
+trait InfoGathering extends AbstractAgent{
+  /**
+   * WARNING: currentMessage will show the previous one;
+   * anyway, the actual gathering is supposed to be performed externally
+   */
+  def gatherInfo(msg: AbstractMessage)
+
+  override def receive = {
+    case msg: AbstractMessage =>
+      gatherInfo(msg)
   }
 }

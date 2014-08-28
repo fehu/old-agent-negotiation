@@ -1,7 +1,7 @@
 package feh.tec.agents
 
 trait Language {
-  type Msg <: AbstractMessage
+  type Msg <: Message
   
   def isMessage(any: Any): Boolean
 }
