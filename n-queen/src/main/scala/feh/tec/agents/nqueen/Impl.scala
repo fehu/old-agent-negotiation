@@ -1,6 +1,5 @@
 package feh.tec.agents.nqueen
 
-import feh.tec.agents.View.Estimation
 import feh.tec.agents._
 import feh.tec.agents.impl.{DynamicScopeNegotiation, DynamicScopeSupport, DefaultNegotiatingLanguage, PriorityBasedBacktrackAgent}
 

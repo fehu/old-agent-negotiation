@@ -10,6 +10,7 @@ trait AbstractAgent extends Actor{
   type Id
 
   val id: Id
+  implicit val ref: AgentRef
 
   def lifeCycle: PartialFunction[AbstractMessage, Unit]
 
@@ -50,9 +51,9 @@ trait Role {
   val name: String
 }
 
-trait NegotiatingAgent extends AbstractAgent{
-  implicit val ref: AgentRef
+protected[agents] trait SystemRole extends Role
 
+trait NegotiatingAgent extends AbstractAgent{
   val role: Role
   val vars: Set[Var]
 

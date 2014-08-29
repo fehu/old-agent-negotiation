@@ -1,3 +1,3 @@
 - [ ] make use of `DomainIterator`s
 - [ ] rewrite and make use of `View`s
-- [ ] add same-priority conflict resolver (a system actor)
+- [+] add same-priority conflict resolver (a system actor)

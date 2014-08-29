@@ -60,7 +60,7 @@ object Message{
   type Id = UUID
 
   trait AutoId{
-    self: Message =>
+    self: AbstractMessage =>
     val id = UUID.randomUUID()
   }
 
