@@ -1,7 +1,7 @@
 package feh.tec.agents.nqueen
 
 import feh.tec.agents._
-import feh.tec.agents.impl.{DynamicScopeNegotiation, DynamicScopeSupport, DefaultNegotiatingLanguage, PriorityBasedBacktrackAgent}
+import feh.tec.agents.impl.{DefaultNegotiatingLanguage, DynamicScopeNegotiation}
 
 
 object Impl {
@@ -46,7 +46,8 @@ object Impl {
     def role = new Role{ val name = "Queen" }
   }
 
-  class Queen(val id: impl.Agent.Id, init: Queen.Init) extends PriorityBasedBacktrackAgent[DefaultNegotiatingLanguage]
+/*
+  class Queen(val id: impl.Agent.Id, init: Queen.Init) extends PriorityBasedNegotiatingAgent[DefaultNegotiatingLanguage]
     with DefaultNegotiatingLanguage.Builder
   {
     val role = Queen.role
@@ -54,6 +55,7 @@ object Impl {
     val negotiations = Set(Queen.negotiation(init))
 
   }
+*/
 
 /*
   trait Queen extends BacktrackAgent.Default with StaticScope with DomainIterators with StaticScopeAndIteratorInit {

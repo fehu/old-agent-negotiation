@@ -1,5 +1,7 @@
 package feh.tec.agents
 
+import feh.tec.agents.Message.Response
+
 trait Language {
   type Msg <: Message
   
@@ -8,8 +10,8 @@ trait Language {
 
 trait ProposalLanguage extends Language{
   type Proposal <: Msg
-  type Rejected <: Msg
-  type Accepted <: Msg
+  type Rejected <: Msg with Response
+  type Accepted <: Msg with Response
   
   def isProposal(msg: Any): Boolean
   def isRejection(msg: Any): Boolean
@@ -22,6 +24,7 @@ trait CounterProposalLanguage extends ProposalLanguage{
   def isCounterProposal(msg: Any): Boolean
 }
 
+@deprecated
 trait BacktrackLanguage extends ProposalLanguage{
   type Fallback <: Msg
 
@@ -38,4 +41,13 @@ object Language{
     }
   }
 */
+}
+
+trait DataExtractor[Lang <: Language]{
+  type Tpe
+  def extract: PartialFunction[Message, Tpe]
+}
+
+trait IssuesExtractor[Lang <: Language] extends DataExtractor[Lang]{
+  type Tpe = Map[Var, Any]
 }

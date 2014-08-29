@@ -1,3 +1,4 @@
 - [ ] make use of `DomainIterator`s
 - [ ] rewrite and make use of `View`s
 - [x] add same-priority conflict resolver (a system actor)
+- [ ] sent proposals registry ?? or the grouping by proposal in the view is enough 

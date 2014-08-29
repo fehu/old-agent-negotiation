@@ -85,6 +85,12 @@ object DefaultNegotiatingLanguage {
   }
 
   object Static extends DefaultNegotiatingLanguage
+
+  implicit object ExtractIssues extends IssuesExtractor[DefaultNegotiatingLanguage]{
+    def extract = {
+      case Message.Proposal(_, issues) => issues
+    }
+  }
 }
 
 class DefaultNegotiatingLanguage extends BacktrackLanguage with CounterProposalLanguage /*with feh.tec.agents.Language.Priority*/{
@@ -106,4 +112,3 @@ class DefaultNegotiatingLanguage extends BacktrackLanguage with CounterProposalL
   def isFallback(msg: Any)        = msg.isInstanceOf[Fallback]
 
 }
-

@@ -23,7 +23,7 @@ trait ExternalView extends View{
 
   def data: Map[AgentRef, Data]
 
-  def process(msg: AbstractMessage)
+  def process: PartialFunction[AbstractMessage, Unit]
 }
 
 /** A view over own constraints
@@ -36,7 +36,7 @@ trait ConstraintsView extends InternalView{
 
   def constraints: Set[Constraint[Var]]
 
-  def satisfies[V <: Var](issue: V, value: V#Tpe): Boolean
+  def satisfies(issue: Var, value: Any): Boolean
 }
 
 object ConstraintsView{
@@ -64,7 +64,11 @@ trait InterlocutorsVarsView extends ExternalView{
  *  the look on if the current values satisfy the constraints of others
  */
 trait ExternalConstraintsView extends ExternalView{
-  type Data = Map[Var, Any]
+  /** Response to a proposal by id
+   */
+  type Data = Map[Message.Id, Option[Boolean]] // accepted / rejected / unknown
 
   def aspect = "Interlocutors' proposal responses"
+
+  def discard(id: Message.Id)
 }

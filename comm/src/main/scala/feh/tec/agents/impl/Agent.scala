@@ -2,12 +2,15 @@ package feh.tec.agents.impl
 
 import java.util.UUID
 import Language.dsl._
-import feh.tec.agents
+import akka.actor.Props
 import feh.tec.agents.SystemMessage.ScopeUpdate
 import feh.tec.agents.impl.Negotiation.DynamicScope
+import scala.reflect
 import feh.util._
 
 import feh.tec.agents._
+
+import scala.reflect.ClassTag
 
 object Agent{
   case class Id(role: Role, uuid: UUID)
@@ -51,14 +54,6 @@ object Agent{
     }
   }
 
-  trait Helpers[Lang <: Language]{
-    self: NegotiatingAgent with SpeakingAgent[Lang] =>
-
-    def sendToAll(neg: Negotiation, msg: Lang#Msg) = neg.scope.foreach(_ ! msg)
-
-    protected var negotiationsCache = negotiations.map(n => n.id -> n).toMap
-    def get(neg: NegotiationId) = negotiationsCache(neg)
-  }
 }
 
 trait DynamicScopeSupport extends Agent.SystemSupport with NegotiatingAgent{
@@ -77,8 +72,8 @@ trait DynamicScopeSupport extends Agent.SystemSupport with NegotiatingAgent{
   }
 }
 
-abstract class Agent[Lang <: BacktrackLanguage]() extends NegotiatingAgent
-  with ProposalBased[Lang] with Language.Builder[Lang] with DynamicScopeSupport with Agent.Helpers[Lang]
+abstract class Agent[Lang <: ProposalLanguage]() extends NegotiatingAgent
+  with ProposalBased[Lang] with Language.Builder[Lang] with DynamicScopeSupport with AgentHelpers[Lang]
 {
   type Id = Agent.Id
   final implicit val ref = AgentRef(id, self)
@@ -96,26 +91,41 @@ abstract class Agent[Lang <: BacktrackLanguage]() extends NegotiatingAgent
     buildMessage(neg.id, I.accept).asInstanceOf[T]
 }
 
-// intended to be used with Views
-trait PriorityBasedBacktrackAgent[Lang <: BacktrackLanguage] extends Agent[Lang]
+abstract class AgentCreation[Lang <: ProposalLanguage](uuid: UUID,
+                                                       negotiationInit: Map[NegotiationId, AgentCreation.NegotiationInit])
+  extends Agent[Lang]
 {
-//  type ANegotiation = DynamicScopeNegotiation
+  def createNegotiation(id: NegotiationId, init: AgentCreation.NegotiationInit): ANegotiation
 
-  protected def accept(prop: Lang#Proposal): Boolean
+  val id = Agent.Id(role, uuid)
+  lazy val negotiations = negotiationInit.toSet.map((createNegotiation _).tupled)
 
-  def onProposal = {
-    case prop: Lang#Proposal if lang.isProposal(prop) && prop.priority == get(prop.negotiation).priority => //todo
-      
-    case prop: Lang#Proposal if lang.isProposal(prop) && prop.priority < get(prop.negotiation).priority =>
-      prop.sender ! (if(accept(prop)) createAccepted(prop.negotiation) else createRejected(prop.negotiation))
+}
+
+object AgentCreation{
+  type Interface = (UUID, Map[NegotiationId, NegotiationInit])
+
+  def props[Ag <: AgentCreation[_] : ClassTag](uuid: UUID,
+                                               negotiationInit: Map[NegotiationId, AgentCreation.NegotiationInit]) =
+    Props(reflect.classTag[Ag].runtimeClass, uuid, negotiationInit)
+
+  trait NegotiationInit{
+    def priority: Priority
+    def values: Map[Var, Any]
   }
-  def onRejected = {
-    case msg: Lang#Rejected if lang.isRejection(msg) && msg.priority == get(msg.negotiation).priority => //todo 
-    case msg: Lang#Rejected if lang.isRejection(msg) && msg.priority > get(msg.negotiation).priority => 
-      decideOnRejection(msg)
-  }
-  // do nothing for now
-  def onAccepted = Map()
 
-  def decideOnRejection(msg: Lang#Rejected)
+  type DefaultNegInit = (Priority, Map[Var, Any])
+
+  trait NegotiationInitBuilder[-Ag <: Agent[_], Args]{
+    def build(args: Args): NegotiationInit
+  }
+
+  implicit object DefaultNegotiationInit extends NegotiationInitBuilder[AgentCreation[_], DefaultNegInit]{
+    def build(args: (Priority, Map[Var, Any])) =
+      new NegotiationInit {
+        def values = args._2
+        def priority = args._1
+      }
+  }
+
 }

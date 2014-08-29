@@ -1,0 +1,72 @@
+package feh.tec.agents.impl
+
+import akka.pattern.ask
+import akka.util.Timeout
+import feh.tec.agents.service.ConflictResolver.{ConflictResolved, ResolveConflict}
+import feh.tec.agents._
+
+import scala.concurrent.Await
+
+/**
+ */
+trait PriorityBasedAgent[Lang <: ProposalLanguage] extends PriorityBasedNegotiatingAgent[Lang]{
+  
+  def conflictResolver: AgentRef
+  def conflictResolveTimeout: Timeout
+  
+  def accept(prop: Lang#Proposal): Boolean
+  def checkConstraints()
+  
+  /** blocking until resolved
+    */
+  def resolvePriorityConflict(causedBy: Message) = {
+    implicit def timeout = conflictResolveTimeout
+    val req = ResolveConflict("priority", causedBy.negotiation, causedBy.sender)
+    Await.result(conflictResolver.ref ? req, timeout.duration) match {
+      case ConflictResolved(req.id, won, _) => won
+    }
+  }
+  
+  lazy val behaviourOnProposal = new PriorityBasedBacktrackBehaviour[Lang#Proposal]{
+    def disputeOverPriorityWon(msg: Lang#Msg) = {
+      risePriority(msg.negotiation)
+      act(msg.asInstanceOf[Lang#Proposal])
+    }
+    def disputeOverPriorityLost(msg: Lang#Msg) = {} // do nothing
+    def act(prop: Lang#Proposal) =
+      prop.sender ! (if(accept(prop)) createAccepted(prop.negotiation) else createRejected(prop.negotiation))
+  }
+
+  lazy val behaviourOnRejection = new PriorityBasedBacktrackBehaviour[Lang#Rejected] {
+    def disputeOverPriorityWon(msg: Lang#Msg) = {
+      risePriority(msg.negotiation)
+      checkConstraints()
+    }
+    def disputeOverPriorityLost(msg: Lang#Msg) = checkConstraints()
+    def act(on: Lang#Rejected) = checkConstraints()
+  }
+
+  lazy val behaviourOnAcceptance = new PriorityBasedBacktrackBehaviour[Lang#Accepted] {
+    def disputeOverPriorityWon(msg: Lang#Msg) = {
+      risePriority(msg.negotiation)
+      checkConstraints()
+    }
+    def disputeOverPriorityLost(msg: Lang#Msg) = checkConstraints()
+    def act(on: Lang#Accepted) = checkConstraints()
+  } 
+
+  private def risePriority(negId: NegotiationId) = {
+    val neg = get(negId)
+    neg.currentPriority = new Priority(neg.currentPriority.get + 1)
+  }
+}
+
+trait PriorityBasedAgentViews extends ExternalViewSupport{
+  self: PriorityBasedAgent[_] =>
+
+  def constraintsSatisfactions: view.ConstraintsSatisfactionWithPriority
+  def proposalSatisfaction: view.Constraints
+
+  def externalViews = (constraintsSatisfactions: ExternalView) :: Nil
+  def filterIncoming = _ => true
+}
