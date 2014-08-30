@@ -58,3 +58,10 @@ trait PriorityBasedNegotiatingAgent[Lang <: ProposalLanguage]
     selectLangTest(lang)(msg) && comparePriority(msg.priority, get(msg.negotiation).priority)
 
 }
+
+trait ProposalRegister[Lang <: ProposalLanguage]{
+  def registerProposal(msg: Lang#Proposal, to: AgentRef)
+  def discardProposal(id: Message.Id)
+
+  def expectingResponse(msg: Lang#Msg): Boolean
+}

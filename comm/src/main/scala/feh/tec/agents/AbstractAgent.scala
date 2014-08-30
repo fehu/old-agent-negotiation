@@ -2,7 +2,7 @@ package feh.tec.agents
 
 import java.util.UUID
 
-import akka.actor.Actor
+import akka.actor.{ActorRef, Actor}
 
 import scala.collection.mutable
 
@@ -22,6 +22,12 @@ trait AbstractAgent extends Actor{
 
   def currentMsg = _currentMsg
   protected var _currentMsg: AbstractMessage = null
+}
+
+trait AgentRef{
+  def id: impl.Agent.Id
+  def ref: ActorRef
+  def !(msg: AbstractMessage)
 }
 
 class Priority(val get: Int) extends AnyVal

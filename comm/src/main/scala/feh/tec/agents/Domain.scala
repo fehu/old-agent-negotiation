@@ -1,7 +1,5 @@
 package feh.tec.agents
 
-import akka.actor.ActorRef
-
 abstract class Var(val name: String, test: Any => Boolean){
   type Tpe
   type Domain
@@ -38,8 +36,3 @@ object DomainIterator{
     def apply(v1: scala.collection.immutable.Range) = v1.dropWhile(_ < min).by(2).takeWhile(_ > max).iterator
   }
 }
-
-case class AgentRef(id: impl.Agent.Id, ref: ActorRef){
-  def !(msg: AbstractMessage) = ref ! msg
-}
-

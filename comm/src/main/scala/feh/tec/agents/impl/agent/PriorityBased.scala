@@ -16,8 +16,8 @@ trait PriorityBased[Lang <: ProposalLanguage] extends AgentCreation[Lang] with P
 
   def accept(prop: Lang#Proposal) = issuesExtractor.extract(prop) forall (proposalSatisfaction.satisfies _).tupled
 
-  // ConstraintsCheckPolicy mechanism
-  def checkConstraints() = ???
+  // define in Impl // here
+  def checkConstraints(negId: NegotiationId) = ???
 
   // trait ProposalRegistering
   def expectingResponse(id: Message.Id) = ???
@@ -42,3 +42,6 @@ trait PriorityBased[Lang <: ProposalLanguage] extends AgentCreation[Lang] with P
 
 }
 
+object PriorityBased{
+
+}

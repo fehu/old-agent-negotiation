@@ -2,9 +2,11 @@ package feh.tec.agents.impl
 
 import java.util.UUID
 import Language.dsl._
-import akka.actor.Props
+import akka.actor.{ActorRef, Props}
+import feh.tec.agents.Message.Response
 import feh.tec.agents.SystemMessage.ScopeUpdate
 import feh.tec.agents.impl.Negotiation.DynamicScope
+import scala.collection.mutable
 import scala.reflect
 import feh.util._
 
@@ -54,6 +56,54 @@ object Agent{
     }
   }
 
+  /** Registers proposals sent using AgentRef.! method to provide `expectingResponse` method of [[ProposalRegister]],
+   *  removes them from the register after onAccepted/onRejected execution
+   *  expects the default AgentRef implementation is used
+   *  don't forget to use discard if a proposal is discarded to preserve memory (not all agents may respond)
+   */
+  trait ProposalRegistering[Lang <: ProposalLanguage] extends ProposalBased[Lang] with ProposalRegister[Lang]{
+    self: NegotiatingAgent =>
+
+    protected var proposalsWithoutResponse = mutable.HashSet.empty[(Message.Id, AgentRef)]
+
+    def expectingResponse(msg: Lang#Msg) = proposalsWithoutResponse contains msg.id -> msg.sender
+    def discardProposal(id: Message.Id) = proposalsWithoutResponse = proposalsWithoutResponse.filter(_._1 != id)
+    def registerProposal(msg: Lang#Proposal, to: AgentRef) = proposalsWithoutResponse += msg.id -> to
+
+    override def lifeCycle = AgentRef.withOnSendHook{
+      case (msg, to) if lang.isProposal(msg) => proposalsWithoutResponse += msg.id -> to
+      case (_, _) => // do nothing
+    }(super.lifeCycle)
+
+
+    abstract override def onRejected =  execAndMarkRespondedAfter(super.onRejected)
+    abstract override def onAccepted = execAndMarkRespondedAfter(super.onAccepted)
+
+    private def execAndMarkRespondedAfter[Expr <: Lang#Msg](behaviorFunc: PartialFunction[Expr, Unit]): PartialFunction[Expr, Unit] = {
+      case msg: Response if behaviorFunc.isDefinedAt(msg) =>
+        behaviorFunc(msg)
+        proposalsWithoutResponse -= msg.respondingTo -> msg.sender
+    }
+  }
+
+}
+
+object AgentRef{
+  type OnSendHook = (AbstractMessage, AgentRef) => Unit
+  private object OnSendHook extends ScopedState[(AbstractMessage, AgentRef) => Unit]((_, _) => {})
+
+  def withOnSendHook[R](hook: OnSendHook)(f: => R) = OnSendHook.doWith(hook)(f)
+
+  def apply(_id: impl.Agent.Id, _ref: ActorRef) =
+    new AgentRef{
+      def id = _id
+      def ref = _ref
+
+      def !(msg: AbstractMessage) = {
+        ref ! msg
+        OnSendHook.get(msg, this)
+      }
+    }
 }
 
 trait DynamicScopeSupport extends Agent.SystemSupport with NegotiatingAgent{

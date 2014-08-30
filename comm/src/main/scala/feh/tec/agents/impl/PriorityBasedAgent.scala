@@ -15,7 +15,7 @@ trait PriorityBasedAgent[Lang <: ProposalLanguage] extends PriorityBasedNegotiat
   def conflictResolveTimeout: Timeout
   
   def accept(prop: Lang#Proposal): Boolean
-  def checkConstraints()
+  def checkConstraints(negId: NegotiationId)
   
   /** blocking until resolved
     */
@@ -40,19 +40,19 @@ trait PriorityBasedAgent[Lang <: ProposalLanguage] extends PriorityBasedNegotiat
   lazy val behaviourOnRejection = new PriorityBasedBacktrackBehaviour[Lang#Rejected] {
     def disputeOverPriorityWon(msg: Lang#Msg) = {
       risePriority(msg.negotiation)
-      checkConstraints()
+      checkConstraints(msg.negotiation)
     }
-    def disputeOverPriorityLost(msg: Lang#Msg) = checkConstraints()
-    def act(on: Lang#Rejected) = checkConstraints()
+    def disputeOverPriorityLost(msg: Lang#Msg) = checkConstraints(msg.negotiation)
+    def act(on: Lang#Rejected) = checkConstraints(on.negotiation)
   }
 
   lazy val behaviourOnAcceptance = new PriorityBasedBacktrackBehaviour[Lang#Accepted] {
     def disputeOverPriorityWon(msg: Lang#Msg) = {
       risePriority(msg.negotiation)
-      checkConstraints()
+      checkConstraints(msg.negotiation)
     }
-    def disputeOverPriorityLost(msg: Lang#Msg) = checkConstraints()
-    def act(on: Lang#Accepted) = checkConstraints()
+    def disputeOverPriorityLost(msg: Lang#Msg) = checkConstraints(msg.negotiation)
+    def act(on: Lang#Accepted) = checkConstraints(on.negotiation)
   } 
 
   private def risePriority(negId: NegotiationId) = {
