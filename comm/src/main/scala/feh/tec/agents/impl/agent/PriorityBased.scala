@@ -42,18 +42,20 @@ trait PriorityBased[Lang <: ProposalLanguage] extends AgentCreation[Lang]
         case (ag, (opt, pr)) if neg.scope.contains(ag) && pr > neg.currentPriority => opt
       }
 
-      if(isFailure(weighted)) setNextProposalAndSpam(neg)
+      if(isFailure(weighted))
+        setNextProposal(neg)
+          .map( _ => spamProposal _ )
+          .getOrElse( noMoreProposals _ )
+          .apply(neg)
   }
 
-  override def startLife() = negotiations foreach setNextProposalAndSpam
+  override def startLife() = negotiations foreach {
+    neg =>
+      resetProposal(neg)
+      spamProposal(neg)
+  }
 
   protected def spamProposal(neg: ANegotiation) = sendToAll(neg, neg.state.currentProposal.asInstanceOf[Lang#Msg])
-
-  protected def setNextProposalAndSpam(neg: ANegotiation) =
-    setNextProposal(neg)
-      .map( _ => spamProposal _ )
-      .getOrElse( noMoreProposals _ )
-      .apply(neg)
 
   protected def maxPriority = constraintsSatisfactions.merge._2.data.maxBy(_._2.get)._2
 
