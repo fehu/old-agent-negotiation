@@ -1,7 +1,11 @@
 package feh.tec.agents.nqueen
 
+import java.util.UUID
+
+import feh.tec.agents.Message.Id
 import feh.tec.agents._
-import feh.tec.agents.impl.{DefaultNegotiatingLanguage, DynamicScopeNegotiation}
+import feh.tec.agents.impl.AgentCreation.NegotiationInit
+import feh.tec.agents.impl.{NegotiationSupport, AgentCreation, DefaultNegotiatingLanguage, DynamicScopeNegotiation}
 
 
 object Impl {
@@ -39,23 +43,29 @@ object Impl {
 
 
   object Queen{
-    case class Init(priority: Priority, vals: Map[Var, Any])
-    
-    def negotiation(init: Init) = new DynamicScopeNegotiation(NegotiationId("N-Queen"), init.priority, init.vals)
+    def negotiationId = NegotiationId("N-Queen")
+//    def negotiation(init: Init) = new DynamicScopeNegotiation(, init.priority, init.vals)
 
+    def init(count: Int) = NegotiationInit(new Priority(count), Map(X -> 1, Y -> 1)) // all start in (1, 1)
+    
     def role = new Role{ val name = "Queen" }
   }
 
-/*
-  class Queen(val id: impl.Agent.Id, init: Queen.Init) extends PriorityBasedNegotiatingAgent[DefaultNegotiatingLanguage]
+  class Queen(uuid: UUID, negInit: Map[NegotiationId, NegotiationInit]) extends AgentCreation[DefaultNegotiatingLanguage](uuid, negInit)
+    with impl.agent.PriorityBased[DefaultNegotiatingLanguage]
     with DefaultNegotiatingLanguage.Builder
+    with NegotiationSupport.Default
   {
     val role = Queen.role
     val vars: Set[Var] = Set(X, Y)
-    val negotiations = Set(Queen.negotiation(init))
+    val constraints = ???
 
+    protected def issuesExtractor = implicitly
+
+    // init
+    def conflictResolveTimeout = ???
+    def conflictResolver = ???
   }
-*/
 
 /*
   trait Queen extends BacktrackAgent.Default with StaticScope with DomainIterators with StaticScopeAndIteratorInit {

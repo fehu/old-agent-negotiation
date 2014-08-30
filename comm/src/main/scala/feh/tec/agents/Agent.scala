@@ -11,13 +11,11 @@ trait AgentHelpers[Lang <: Language]{
 
 
 trait PriorityBasedNegotiatingAgent[Lang <: ProposalLanguage]
-  extends NegotiatingAgent with ProposalBased[Lang] with AgentHelpers[Lang]
+  extends NegotiatingAgent with ProposalBased[Lang] with AgentHelpers[Lang] with ProposalRegister[Lang]
 {
   def behaviourOnProposal: PriorityBasedBacktrackBehaviour[Lang#Proposal]
   def behaviourOnRejection: PriorityBasedBacktrackBehaviour[Lang#Rejected]
   def behaviourOnAcceptance: PriorityBasedBacktrackBehaviour[Lang#Accepted]
-
-  def expectingResponse(id: Message.Id): Boolean
 
   /** blocking until resolved
     */
@@ -37,18 +35,18 @@ trait PriorityBasedNegotiatingAgent[Lang <: ProposalLanguage]
       behaviourOnProposal act prop
   }
   def onRejected = {
-    case msg: Lang#Rejected if testMsg(msg, _.isRejection, _ == _) && expectingResponse(msg.respondingTo) =>
+    case msg: Lang#Rejected if testMsg(msg, _.isRejection, _ == _) && expectingResponse(msg) =>
       if( resolvePriorityConflict(msg) ) behaviourOnRejection.disputeOverPriorityWon(msg)
       else behaviourOnRejection.disputeOverPriorityLost(msg)
-    case msg: Lang#Rejected if testMsg(msg, _.isRejection, _ > _) && expectingResponse(msg.respondingTo) =>
+    case msg: Lang#Rejected if testMsg(msg, _.isRejection, _ > _) && expectingResponse(msg) =>
       behaviourOnRejection act msg
   }
 
   def onAccepted = {
-    case msg: Lang#Accepted if testMsg(msg, _.isAcceptance, _ == _) && expectingResponse(msg.respondingTo) =>
+    case msg: Lang#Accepted if testMsg(msg, _.isAcceptance, _ == _) && expectingResponse(msg) =>
       if( resolvePriorityConflict(msg) ) behaviourOnAcceptance.disputeOverPriorityWon(msg)
       else behaviourOnAcceptance.disputeOverPriorityLost(msg)
-    case msg: Lang#Accepted if testMsg(msg, _.isAcceptance, _ > _) && expectingResponse(msg.respondingTo) =>
+    case msg: Lang#Accepted if testMsg(msg, _.isAcceptance, _ > _) && expectingResponse(msg) =>
       behaviourOnAcceptance act msg
   }
 

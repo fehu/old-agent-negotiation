@@ -5,11 +5,16 @@ import feh.util.InUnitInterval
 trait ViewUtils {
   utils =>
 
-  def regroup[V, NK, NV](byRef: Map[AgentRef, V], foo: V => (NK, NV)): Map[NK, (NV, AgentRef)] = byRef.map{
-    case (k, v) =>
-      val (nk, nv) = foo(v)
-      nk -> (nv, k)
-  }
+  private def doTheGrouping[NK, NV](it: Iterable[(AgentRef, (NK, NV))]) =
+    it.groupBy(_._2._1).mapValues{
+      _.map{ case (ag, (k, v)) => ag -> v}.toMap
+    }
+
+  def regroup[V, NK, NV](byRef: Map[AgentRef, V], foo: V => (NK, NV)): Map[NK, Map[AgentRef, NV]] =
+    doTheGrouping(byRef.mapValues(foo))
+
+  def regroupSeq[V, NK, NV](byRef: Map[AgentRef, V], foo: V => Seq[(NK, NV)]): Map[NK, Map[AgentRef, NV]] =
+    doTheGrouping( byRef.toSeq.flatMap{ case (k, v) => foo(v) map (k -> _) } )
 
   def weight[I <: Iterable[T], T, K](what: I, select: PartialFunction[T, K]): Map[K, InUnitInterval] = {
     val size = what.size
@@ -19,9 +24,10 @@ trait ViewUtils {
 
   implicit class ExternalDataMapWrapper[V](map: Map[AgentRef, V]){
     def regroup[NK, NV](foo: V => (NK, NV)) = utils.regroup(map, foo)
+    def regroupSeq[NK, NV](foo: V => Seq[(NK, NV)]) = utils.regroupSeq(map, foo)
   }
 
-  implicit class IterableWrapper[I <: Iterable[T], T](it: I){
+  implicit class IterableWrapper[T](it: Iterable[T]){
     def weight[K](select: PartialFunction[T, K]) = utils.weight(it, select)
   }
 

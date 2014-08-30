@@ -16,17 +16,25 @@ object Negotiation{
 
 }
 
-/*
-class StaticScopeNegotiation(val id: NegotiationId,
-                             val scope: Set[AgentRef],
-                             initPriority: Priority,
-                             initVals: Map[Var, Any])
-  extends Negotiation with StaticScope
-{
-  implicit var currentPriority: Priority = initPriority
-  val vals: mutable.HashMap[Var, Any] = mutable.HashMap(initVals.toSeq: _*)
+/** Holds implementation specific variables, that need no initial values
+ */
+trait NegotiationState{
+  def negotiation: Negotiation
 }
-*/
+
+trait NegotiationStateSupport{
+  self: NegotiatingAgent =>
+
+  type StateOfNegotiation <: NegotiationState
+
+  def newNegotiationState(of: Negotiation): StateOfNegotiation
+  
+  val negotiationStates = negotiations.map(ng => ng.id -> newNegotiationState(ng)).toMap
+
+  implicit class NegotiationSyntaxExtender(n: Negotiation){
+    def state = negotiationStates(n.id)
+  }
+}
 
 class DynamicScopeNegotiation(val id: NegotiationId,
                               initPriority: Priority,
@@ -48,23 +56,6 @@ class DynamicScopeNegotiation(val id: NegotiationId,
     case ScopeUpdate.RmAgents(refs, neg, _)  if neg == id => _scope --= refs
   }
 }
-
-/*
-trait DynNegotiationSupport[Lang <: Language] extends NegotiatingAgent{
-
-  abstract override def processSys = {
-    case upd: ScopeUpdate =>
-      val neg = negotiations
-        .find(_.id == upd.negotiation)
-        .getOrElse( throw UnknownNegotiation(upd.negotiation) )
-      neg match {
-        case dyn: DynamicScopeNegotiation => dyn.updateScope(upd)
-        case _ => throw ScopeUpdateException(neg.id, "isn't DynamicScopeNegotiation")
-      }
-    case other => super.processSys(other)
-  }
-}
-*/
 
 abstract class NegotiationException(msg: String) extends Exception(msg)
 

@@ -30,7 +30,9 @@ trait AgentRef{
   def !(msg: AbstractMessage)
 }
 
-class Priority(val get: Int) extends AnyVal
+class Priority(val get: Int) extends AnyVal{
+  def raise(amount: Int = 1) = new Priority(get + amount)
+}
 object Priority{
   implicit def priorityToIntWrapper(p: Priority) = p.get
 }
@@ -100,7 +102,7 @@ trait ProposalBased[Lang <: ProposalLanguage] extends SpeakingAgent[Lang]{
   }
 }
 
-@deprecated("use PriorityBasedBacktrackAgent implementation instead")
+@deprecated("use PriorityBasedNegotiatingAgent instead")
 trait FallbackBackTracking[Lang <: BacktrackLanguage] extends ProposalBased[Lang]{
   self: NegotiatingAgent =>
 

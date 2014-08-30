@@ -67,7 +67,7 @@ object DefaultNegotiatingLanguage {
   trait Builder extends Language.Builder[DefaultNegotiatingLanguage]{
     self: NegotiatingAgent =>
 
-    val lang = Static
+    val lang = DefaultNegotiatingLanguage.Static
 
     def buildMessage(negId: NegotiationId, b: Buildable) = {
       implicit def priority = priorityOf(negId)

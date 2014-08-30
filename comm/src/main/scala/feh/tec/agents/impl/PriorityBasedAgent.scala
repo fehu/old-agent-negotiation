@@ -7,14 +7,18 @@ import feh.tec.agents._
 
 import scala.concurrent.Await
 
-/**
+/** Intended to be used with views
  */
-trait PriorityBasedAgent[Lang <: ProposalLanguage] extends PriorityBasedNegotiatingAgent[Lang]{
-  
+trait PriorityBasedAgent[Lang <: ProposalLanguage] extends Agent[Lang]
+  with PriorityBasedNegotiatingAgent[Lang] with ExternalViewSupport
+{
   def conflictResolver: AgentRef
   def conflictResolveTimeout: Timeout
-  
+
+  /** test if accept the proposal */
   def accept(prop: Lang#Proposal): Boolean
+
+  /** check your views and act accordingly */
   def checkConstraints(negId: NegotiationId)
   
   /** blocking until resolved

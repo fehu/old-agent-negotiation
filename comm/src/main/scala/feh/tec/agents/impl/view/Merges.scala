@@ -4,7 +4,7 @@ import feh.tec.agents._
 import feh.tec.agents
 
 class ConstraintsSatisfactionWithPriority(constraints: ExternalConstraintsView, priority: PriorityView)
-  extends ViewMerge._2(constraints, priority)({
+  extends ViewMerge._2[ExternalConstraintsView, PriorityView, (ExternalConstraintsView#Data, PriorityView#Data)](constraints, priority)({
     case pair => pair
   })
 
