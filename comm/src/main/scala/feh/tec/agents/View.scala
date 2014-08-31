@@ -40,16 +40,16 @@ trait ConstraintsView extends InternalView{
 }
 
 object ConstraintsView{
-  case class Constraint[V <: Var](over: V, satisfies: V#Tpe => Boolean)
+  case class Constraint[V <: Var](over: V, in: NegotiationId, satisfies: V#Tpe => Boolean)
 }
 
 
 /** Gathers priority from all messages
  */
 trait PriorityView extends ExternalView{
-  type Data = Priority
+  type Data = (NegotiationId, Priority)
 
-  def aspect = "Interlocutors' priority"
+  def aspect = "Interlocutors' priorities by negotiation"
 }
 
 /** Gathers data from proposals and counter-proposals

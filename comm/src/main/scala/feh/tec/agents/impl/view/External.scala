@@ -14,7 +14,7 @@ trait ExternalViewImpl extends ExternalView{
 /** Gathers priority from all messages */
 class Priority(filter: Message => Boolean = _ => true) extends PriorityView with ExternalViewImpl{
   def process = {
-    case msg: Message if filter(msg) => _data += msg.sender -> msg.priority
+    case msg: Message if filter(msg) => _data += msg.sender -> (msg.negotiation -> msg.priority)
     case _ => // ignore
   }
 }

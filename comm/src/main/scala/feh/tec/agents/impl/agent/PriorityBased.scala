@@ -1,10 +1,9 @@
 package feh.tec.agents.impl.agent
 
 import feh.tec.agents.ConstraintsView.Constraint
-import feh.tec.agents.Message.Proposal
 import feh.tec.agents._
-import feh.tec.agents.impl.view.{ConstraintsSatisfactionWithPriority, Constraints}
 import feh.tec.agents.impl._
+import feh.tec.agents.impl.view.{Constraints, ConstraintsSatisfactionWithPriority}
 import feh.util._
 
 
@@ -22,7 +21,7 @@ trait PriorityBased[Lang <: ProposalLanguage] extends AgentCreation[Lang]
   def constraints: Set[Constraint[Var]]
   protected def issuesExtractor: IssuesExtractor[Lang]
 
-  protected def isFailure(weighted: Map[Option[Boolean], InUnitInterval]): Boolean
+  protected def isFailure(neg: Negotiation, weighted: Map[Option[Boolean], InUnitInterval]): Boolean
 
   def accept_?(prop: Lang#Proposal) = issuesExtractor.extract(prop) forall (proposalSatisfaction.satisfies _).tupled
   
@@ -36,10 +35,10 @@ trait PriorityBased[Lang <: ProposalLanguage] extends AgentCreation[Lang]
             }
           }
           val weighted = viewsByMsgId(currentProposal.id).weight{
-            case (ag, (opt, pr)) if neg.scope.contains(ag) && pr > neg.currentPriority => opt
+            case (ag, (opt, pr)) if neg.scope.contains(ag) && pr._2 > neg.currentPriority => opt
           }
 
-          if(isFailure(weighted))
+          if(isFailure(neg, weighted))
             setNextProposal(neg)
               .map( _ => spamProposal _ )
               .getOrElse( noMoreProposals _ )
@@ -55,10 +54,11 @@ trait PriorityBased[Lang <: ProposalLanguage] extends AgentCreation[Lang]
 
   protected def spamProposal(neg: ANegotiation) = sendToAll(neg, neg.state.currentProposal.asInstanceOf[Lang#Msg])
 
-  protected def maxPriority = constraintsSatisfactions.merge._2.data.maxBy(_._2.get)._2
+  protected def maxPriority(negId: NegotiationId) = constraintsSatisfactions.merge._2
+    .data.filter(_._2._1 == negId).map(_._2._2).maxBy(_.get)
 
   protected def noMoreProposals(neg: ANegotiation) = {
-    neg.currentPriority = maxPriority.raise()
+    neg.currentPriority = maxPriority(neg.id).raise()
     resetProposal(neg)
     spamProposal(neg)
   }

@@ -59,6 +59,10 @@ trait Role {
   val name: String
 }
 
+object Role{
+  def apply(nme: String) = new Role{ val name: String = nme }
+}
+
 protected[agents] trait SystemRole extends Role
 
 trait NegotiatingAgent extends AbstractAgent{

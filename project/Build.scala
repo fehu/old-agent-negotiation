@@ -96,7 +96,7 @@ object  Build extends sbt.Build {
       name := "agent-comm"
     }
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(comm, oldcomm, coloring, nQueen)
+   .aggregate(comm, oldcomm, coloring, misc)
 
   lazy val comm = Project(
     id = "comm",
@@ -106,9 +106,9 @@ object  Build extends sbt.Build {
     )
   )
 
-  lazy val nQueen = Project(
-    id = "n-queen",
-    base = file("n-queen"),
+  lazy val misc = Project(
+    id = "misc",
+    base = file("misc"),
     settings = buildSettings
   ) dependsOn comm
 

@@ -1,6 +1,6 @@
 package feh.tec.agents
 
-import scala.collection.mutable
+import scala.collection.{IterableLike, mutable}
 
 abstract class Var(val name: String, test: Any => Boolean){
   type Tpe
@@ -36,6 +36,15 @@ object DomainIterator{
     extends DomainIterator[scala.collection.immutable.Range, Int]
   {
     def apply(v1: scala.collection.immutable.Range) = v1.dropWhile(_ < min).by(2).takeWhile(_ > max).iterator
+  }
+  
+  class Generic[T] extends DomainIterator[IterableLike[T, _], T]{
+    def apply(v1: IterableLike[T, _]) = new Iterator[T]{
+      val it = v1.iterator
+
+      def hasNext = it.hasNext
+      def next() = it.next()
+    }
   }
 
   def zip[D1, T1, D2, T2](it1: DomainIterator[D1, T1], it2: DomainIterator[D2, T2]): DomainIterator[(D1, D2), (T1, T2)] =

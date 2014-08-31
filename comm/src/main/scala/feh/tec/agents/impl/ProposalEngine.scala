@@ -1,5 +1,7 @@
 package feh.tec.agents.impl
 
+import java.util.Date
+
 import feh.tec.agents.Message.Proposal
 import feh.tec.agents._
 import feh.util._
@@ -21,6 +23,7 @@ trait ProposalEngine[Lang <: ProposalLanguage] extends NegotiationStateSupport{
 
 trait ProposalNegotiationState[Lang <: ProposalLanguage] extends NegotiationState{
   var currentProposal: Option[Lang#Proposal] = None
+  var currentProposalDate: Option[Date] = None
 }
 
 trait ProposalIteratorNegotiationState[Lang <: ProposalLanguage] extends ProposalNegotiationState[Lang]{
@@ -34,6 +37,11 @@ object ProposalEngine{
     def domainIterators: Map[Var, DomainIterator[Var#Domain, Var#Tpe]]
     
     type StateOfNegotiation <: ProposalIteratorNegotiationState[Lang]
+
+    implicit class VarWrapper[V <: Var](v: V){
+      def it(implicit it: DomainIterator[V#Domain, V#Tpe]) = (v, it).asInstanceOf[(Var, DomainIterator[Var#Domain, Var#Tpe])]
+    }
+
   }
 
   /** Iterates over the domains values using DomainIterator.overSeq
@@ -80,6 +88,7 @@ object ProposalEngine{
         neg.vals ++= issues
         val prop = createProposal(neg.id)
         neg.state.currentProposal = Option(prop)
+        neg.state.currentProposalDate = Some(new Date())
         prop
     }
   }

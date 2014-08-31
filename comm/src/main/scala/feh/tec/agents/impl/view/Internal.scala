@@ -10,6 +10,6 @@ class Constraints(val constraints: Set[Constraint[Var]]) extends ConstraintsView
 
   def satisfies(issue: Var, value: Any) =
     (true /: constraintsSearch.getOrElse(issue, Set())){
-      case (acc, Constraint(_, test)) => acc && issue.cast(value).exists(test)
+      case (acc, Constraint(_, _, test)) => acc && issue.cast(value).exists(test)
     }
 }
