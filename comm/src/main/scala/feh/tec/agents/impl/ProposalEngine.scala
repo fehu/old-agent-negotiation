@@ -1,0 +1,87 @@
+package feh.tec.agents.impl
+
+import feh.tec.agents.Message.Proposal
+import feh.tec.agents._
+import feh.util._
+
+/** Handles updates of negotiation values and `currentProposal` state
+ *  actual proposal creation is defined in [[feh.tec.agents.ProposalBased]]
+ */
+trait ProposalEngine[Lang <: ProposalLanguage] extends NegotiationStateSupport{
+  self: NegotiatingAgent with ProposalBased[Lang] =>
+
+  type StateOfNegotiation <: ProposalNegotiationState[Lang]
+
+  /** resets values and sets a new proposal */
+  def resetProposal(neg: ANegotiation)
+
+  /** sets next values set from the common domain and updates proposal */
+  def setNextProposal(neg: ANegotiation): Option[Lang#Proposal]
+}
+
+trait ProposalNegotiationState[Lang <: ProposalLanguage] extends NegotiationState{
+  var currentProposal: Option[Lang#Proposal] = None
+}
+
+trait ProposalIteratorNegotiationState[Lang <: ProposalLanguage] extends ProposalNegotiationState[Lang]{
+  var currentIterator: Option[Iterator[Map[Var, Any]]] = None
+}
+
+object ProposalEngine{
+  trait Iterating[Lang <: ProposalLanguage] extends ProposalEngine[Lang]{
+    self: NegotiatingAgent with ProposalBased[Lang] =>
+
+    def domainIterators: Map[Var, DomainIterator[Var#Domain, Var#Tpe]]
+    
+    type StateOfNegotiation <: ProposalIteratorNegotiationState[Lang]
+  }
+  
+  trait IteratingAllDomains[Lang <: ProposalLanguage] extends Iterating[Lang]{
+    self: NegotiatingAgent with ProposalBased[Lang] =>
+
+    protected val domainSeqIterators = negotiations.map{ neg => neg.id -> iteratorForNegotiation(neg) }.toMap
+
+    protected def iteratorForNegotiation(ng: Negotiation) = {
+      val dItByVar = ng.vals.keys.toSeq.zipMap(domainIterators)
+      val it = () => DomainIterator overSeq dItByVar.map(_._2) apply dItByVar.map(_._1.domain)
+      val vars = dItByVar.map(_._1)
+      val i2i: Seq[Any] => Map[Var, Any] = seq => {
+        assert(vars.length == seq.length)
+        vars.zip(seq).toMap
+      }
+      it -> i2i
+    }
+
+    protected def newIterator(negId: NegotiationId): Iterator[Map[Var, Any]] = {
+      val (dIt, toIssues) = domainSeqIterators(negId)
+      val it = dIt()
+      new Iterator[Map[Var, Any]]{
+        def hasNext = it.hasNext
+        def next() = it.next() |> toIssues
+      }
+    }
+
+    protected def nextIssues(neg: Negotiation) =  neg.state.currentIterator flatMap {
+      _.inCase(_.hasNext).map(_.next())
+    }
+
+    /** resets values and sets a new proposal */
+    def resetProposal(neg: ANegotiation) = {
+      neg.state.currentIterator = Some(newIterator(neg.id))
+      setNextProposal(neg)
+    }
+
+    /** sets next values set from the common domain and updates proposal */
+    def setNextProposal(neg: ANegotiation) = nextIssues(neg).map{
+      issues =>
+        neg.vals ++= issues
+        val prop = createProposal(neg.id)
+        neg.state.currentProposal = Option(prop)
+        prop
+    }
+  }
+  
+  trait IteratingCurrentIssues[Lang <: ProposalLanguage] extends ProposalEngine[Lang]{ // todo
+    self: NegotiatingAgent with ProposalBased[Lang] =>
+  } 
+}

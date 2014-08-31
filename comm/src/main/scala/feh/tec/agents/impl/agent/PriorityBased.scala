@@ -11,42 +11,40 @@ import feh.util._
 trait PriorityBased[Lang <: ProposalLanguage] extends AgentCreation[Lang]
   with PriorityBasedAgent[Lang]
   with impl.Agent.ProposalRegistering[Lang]
+  with ProposalEngine[Lang] 
   with PriorityBasedAgentViews
   with NegotiationStateSupport
   with ViewUtils
 {
-  type StateOfNegotiation <: PriorityBased.NegotiationState
-
   lazy val constraintsSatisfactions = ConstraintsSatisfactionWithPriority(lang)
   lazy val proposalSatisfaction = new Constraints(constraints)
-
-  def accept(prop: Lang#Proposal) = issuesExtractor.extract(prop) forall (proposalSatisfaction.satisfies _).tupled
 
   def constraints: Set[Constraint[Var]]
   protected def issuesExtractor: IssuesExtractor[Lang]
 
   protected def isFailure(weighted: Map[Option[Boolean], InUnitInterval]): Boolean
-  protected def setNextProposal(neg: ANegotiation): Option[Lang#Proposal]
-  protected def resetProposal(neg: ANegotiation)
 
+  def accept_?(prop: Lang#Proposal) = issuesExtractor.extract(prop) forall (proposalSatisfaction.satisfies _).tupled
+  
   def checkConstraints(negId: NegotiationId) = get(negId) |> {
     neg =>
-      val viewsByMsgId = constraintsSatisfactions.data.regroupSeq{
-        case (mp, pr) => mp.toSeq.map{
-          case (msgId, opt) => msgId -> (opt, pr)
-        }
-      }
-      val currentProposal = neg.state.currentProposal
+      neg.state.currentProposal map {
+        currentProposal =>
+          val viewsByMsgId = constraintsSatisfactions.data.regroupSeq{
+            case (mp, pr) => mp.toSeq.map{
+              case (msgId, opt) => msgId -> (opt, pr)
+            }
+          }
+          val weighted = viewsByMsgId(currentProposal.id).weight{
+            case (ag, (opt, pr)) if neg.scope.contains(ag) && pr > neg.currentPriority => opt
+          }
 
-      val weighted = viewsByMsgId(currentProposal.id).weight{
-        case (ag, (opt, pr)) if neg.scope.contains(ag) && pr > neg.currentPriority => opt
+          if(isFailure(weighted))
+            setNextProposal(neg)
+              .map( _ => spamProposal _ )
+              .getOrElse( noMoreProposals _ )
+              .apply(neg)
       }
-
-      if(isFailure(weighted))
-        setNextProposal(neg)
-          .map( _ => spamProposal _ )
-          .getOrElse( noMoreProposals _ )
-          .apply(neg)
   }
 
   override def startLife() = negotiations foreach {
@@ -63,11 +61,5 @@ trait PriorityBased[Lang <: ProposalLanguage] extends AgentCreation[Lang]
     neg.currentPriority = maxPriority.raise()
     resetProposal(neg)
     spamProposal(neg)
-  }
-}
-
-object PriorityBased{
-  trait NegotiationState extends impl.NegotiationState{
-    var currentProposal: Proposal = null
   }
 }

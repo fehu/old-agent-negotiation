@@ -16,7 +16,7 @@ trait PriorityBasedAgent[Lang <: ProposalLanguage] extends Agent[Lang]
   def conflictResolveTimeout: Timeout
 
   /** test if accept the proposal */
-  def accept(prop: Lang#Proposal): Boolean
+  def accept_?(prop: Lang#Proposal): Boolean
 
   /** check your views and act accordingly */
   def checkConstraints(negId: NegotiationId)
@@ -38,7 +38,7 @@ trait PriorityBasedAgent[Lang <: ProposalLanguage] extends Agent[Lang]
     }
     def disputeOverPriorityLost(msg: Lang#Msg) = {} // do nothing
     def act(prop: Lang#Proposal) =
-      prop.sender ! (if(accept(prop)) createAccepted(prop.negotiation) else createRejected(prop.negotiation))
+      prop.sender ! (if(accept_?(prop)) createAccepted(prop.negotiation) else createRejected(prop.negotiation))
   }
 
   lazy val behaviourOnRejection = new PriorityBasedBacktrackBehaviour[Lang#Rejected] {
