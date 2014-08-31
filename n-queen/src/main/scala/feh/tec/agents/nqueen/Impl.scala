@@ -5,7 +5,8 @@ import java.util.UUID
 import feh.tec.agents.Message.Id
 import feh.tec.agents._
 import feh.tec.agents.impl.AgentCreation.NegotiationInit
-import feh.tec.agents.impl.{NegotiationSupport, AgentCreation, DefaultNegotiatingLanguage, DynamicScopeNegotiation}
+import feh.tec.agents.impl._
+import feh.util.InUnitInterval
 
 
 object Impl {
@@ -55,12 +56,21 @@ object Impl {
     with impl.agent.PriorityBased[DefaultNegotiatingLanguage]
     with DefaultNegotiatingLanguage.Builder
     with NegotiationSupport.Default
+    with ProposalEngine.IteratingAllDomains[DefaultNegotiatingLanguage]
   {
     val role = Queen.role
     val vars: Set[Var] = Set(X, Y)
     val constraints = ???
 
     protected def issuesExtractor = implicitly
+
+    protected def isFailure(weighted: Map[Option[Boolean], InUnitInterval]) = ???
+
+    def domainIterators = ???
+
+    type StateOfNegotiation = this.type
+
+    def newNegotiationState(of: Negotiation) = ???
 
     // init
     def conflictResolveTimeout = ???

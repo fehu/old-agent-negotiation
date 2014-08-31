@@ -1,4 +1,4 @@
-- [x] make use of `DomainIterator`s
-- [x] rewrite and make use of `View`s
+- [x] make use of `DomainIterator`
+- [x] rewrite and make use of `View`
 - [x] add same-priority conflict resolver (a system actor)
 - [x] sent proposals registry 

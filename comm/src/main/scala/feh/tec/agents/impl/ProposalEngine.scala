@@ -35,7 +35,10 @@ object ProposalEngine{
     
     type StateOfNegotiation <: ProposalIteratorNegotiationState[Lang]
   }
-  
+
+  /** Iterates over the domains values using DomainIterator.overSeq
+    * ignores initial values
+    */
   trait IteratingAllDomains[Lang <: ProposalLanguage] extends Iterating[Lang]{
     self: NegotiatingAgent with ProposalBased[Lang] =>
 
