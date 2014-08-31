@@ -1,16 +1,19 @@
 package feh.tec.agents.impl.agent
 
+import java.util.UUID
+
+import akka.util.Timeout
 import feh.tec.agents.ConstraintsView.Constraint
 import feh.tec.agents._
+import AgentCreation.NegotiationInit
 import feh.tec.agents.impl._
 import feh.tec.agents.impl.view.{Constraints, ConstraintsSatisfactionWithPriority}
 import feh.util._
 
 
-trait PriorityBased[Lang <: ProposalLanguage] extends AgentCreation[Lang]
-  with PriorityBasedAgent[Lang]
+trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   with impl.Agent.ProposalRegistering[Lang]
-  with ProposalEngine[Lang] 
+  with ProposalEngine[Lang]
   with PriorityBasedAgentViews
   with NegotiationStateSupport
   with ViewUtils
@@ -62,4 +65,17 @@ trait PriorityBased[Lang <: ProposalLanguage] extends AgentCreation[Lang]
     resetProposal(neg)
     spamProposal(neg)
   }
+}
+
+abstract class PriorityBasedCreation[Lang <: ProposalLanguage](
+             uuid: UUID,
+             negotiationInit: Map[NegotiationId, NegotiationInit],
+             val conflictResolver: AgentRef,
+             val conflictResolveTimeout: Timeout)
+  extends AgentCreation[Lang](uuid, negotiationInit) with PriorityBased[Lang]
+
+object PriorityBasedCreation{
+  type Interface = (UUID, Map[NegotiationId, NegotiationInit], AgentRef, Timeout)
+
+  object Builder extends AgentBuilder[PriorityBasedCreation[_], Interface]
 }

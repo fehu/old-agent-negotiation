@@ -2,6 +2,8 @@ package feh.tec.agents
 
 import java.util.UUID
 
+import feh.tec.agents.Message.AutoId
+
 sealed trait AbstractMessage{
   def id: Message.Id
   def sender: AgentRef
@@ -47,13 +49,15 @@ object SystemMessage{
   }
 
   object ScopeUpdate{
-    case class NewScope(scope: Set[AgentRef], negotiation: NegotiationId, id: Message.Id)
-                       (implicit val sender: AgentRef) extends ScopeUpdate
-    case class NewAgents(refs: Set[AgentRef], negotiation: NegotiationId, id: Message.Id)
-                        (implicit val sender: AgentRef) extends ScopeUpdate
-    case class RmAgents(refs: Set[AgentRef], negotiation: NegotiationId, id: Message.Id)
-                       (implicit val sender: AgentRef) extends ScopeUpdate
+    case class NewScope(scope: Set[AgentRef], negotiation: NegotiationId)
+                       (implicit val sender: AgentRef) extends ScopeUpdate with AutoId
+    case class NewAgents(refs: Set[AgentRef], negotiation: NegotiationId)
+                        (implicit val sender: AgentRef) extends ScopeUpdate with AutoId
+    case class RmAgents(refs: Set[AgentRef], negotiation: NegotiationId)
+                       (implicit val sender: AgentRef) extends ScopeUpdate with AutoId
   }
+
+  case class RefDemand(implicit val sender: AgentRef) extends SystemMessage with AutoId
 }
 
 object Message{

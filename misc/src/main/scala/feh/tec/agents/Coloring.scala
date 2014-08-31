@@ -4,8 +4,9 @@ import java.awt.{Color => JColor}
 import java.util.UUID
 
 import akka.util.Timeout
-import feh.tec.agents.impl.AgentCreation.NegotiationInit
-import feh.tec.agents.impl.{AgentCreation, DefaultNegotiatingLanguage}
+import feh.tec.agents.impl.agent.AgentCreation
+import AgentCreation.NegotiationInit
+import feh.tec.agents.impl.DefaultNegotiatingLanguage
 
 object Coloring{
 

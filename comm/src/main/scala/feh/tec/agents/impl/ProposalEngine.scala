@@ -48,12 +48,12 @@ object ProposalEngine{
     * ignores initial values
     */
   trait IteratingAllDomains[Lang <: ProposalLanguage] extends Iterating[Lang]{
-    self: NegotiatingAgent with ProposalBased[Lang] =>
+    self: NegotiatingAgent with ProposalBased[Lang] with ProposalRegister[Lang] =>
 
     protected val domainSeqIterators = negotiations.map{ neg => neg.id -> iteratorForNegotiation(neg) }.toMap
 
     protected def iteratorForNegotiation(ng: Negotiation) = {
-      val dItByVar = ng.vals.keys.toSeq.zipMap(domainIterators)
+      val dItByVar = ng.currentValues.keys.toSeq.zipMap(domainIterators)
       val it = () => DomainIterator overSeq dItByVar.map(_._2) apply dItByVar.map(_._1.domain)
       val vars = dItByVar.map(_._1)
       val i2i: Seq[Any] => Map[Var, Any] = seq => {
@@ -85,9 +85,10 @@ object ProposalEngine{
     /** sets next values set from the common domain and updates proposal */
     def setNextProposal(neg: ANegotiation) = nextIssues(neg).map{
       issues =>
-        neg.vals ++= issues
+        neg.currentValues ++= issues
         val prop = createProposal(neg.id)
-        neg.state.currentProposal = Option(prop)
+        neg.state.currentProposal.foreach( _.id |> discardProposal )  // discard the old proposal in the register
+        neg.state.currentProposal = Option(prop)                      // when a new one is set
         neg.state.currentProposalDate = Some(new Date())
         prop
     }

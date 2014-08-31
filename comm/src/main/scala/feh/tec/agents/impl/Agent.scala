@@ -1,20 +1,18 @@
 package feh.tec.agents.impl
 
 import java.util.UUID
-import Language.dsl._
-import akka.actor.{ActorRef, Props}
+
+import akka.actor.ActorRef
 import feh.tec.agents.Message.Response
 import feh.tec.agents.SystemMessage.ScopeUpdate
-import feh.tec.agents.impl.AgentCreation.NegotiationInit
-import feh.tec.agents.impl.Language.Buildable
+import feh.tec.agents._
+import feh.tec.agents.impl.agent.AgentCreation
+import AgentCreation.NegotiationInit
+import feh.tec.agents.impl.Language.dsl._
 import feh.tec.agents.impl.Negotiation.DynamicScope
-import scala.collection.mutable
-import scala.reflect
 import feh.util._
 
-import feh.tec.agents._
-
-import scala.reflect.ClassTag
+import scala.collection.mutable
 
 object Agent{
   case class Id(role: Role, uuid: UUID)
@@ -133,7 +131,7 @@ abstract class Agent[Lang <: ProposalLanguage]() extends NegotiatingAgent
   def startLife() = negotiations.foreach(neg => createProposal(neg.id) $$ (sendToAll(neg, _)))
 
   def createProposal(id: NegotiationId) = build[Lang#Proposal](get(id), I propose I set (
-    get(id).vals.toSeq map {
+    get(id).currentValues.toSeq map {
       case (issue, value) => issue -> issue.cast(value).getOrThrow(s"wrong value $value for $issue")
     } : _*))
   def createAccepted(id: NegotiationId) = buildMessage(id, I.accept).asInstanceOf[Lang#Accepted]
@@ -143,48 +141,12 @@ abstract class Agent[Lang <: ProposalLanguage]() extends NegotiatingAgent
     buildMessage(neg.id, I.accept).asInstanceOf[T]
 }
 
-abstract class AgentCreation[Lang <: ProposalLanguage](uuid: UUID,
-                                                       negotiationInit: Map[NegotiationId, AgentCreation.NegotiationInit])
-  extends Agent[Lang]
-{
-  def createNegotiation(id: NegotiationId, init: AgentCreation.NegotiationInit): ANegotiation
-
-  val id = Agent.Id(role, uuid)
-  lazy val negotiations = negotiationInit.toSet.map((createNegotiation _).tupled)
-
-}
-
-object AgentCreation{
-  type Interface = (UUID, Map[NegotiationId, NegotiationInit])
-
-  def props[Ag <: AgentCreation[_] : ClassTag](uuid: UUID,
-                                            negotiationInit: Map[NegotiationId, AgentCreation.NegotiationInit]) =
-    Props(reflect.classTag[Ag].runtimeClass, uuid, negotiationInit)
-
-  case class NegotiationInit(priority: Priority, values: Map[Var, Any])
-
-//  type DefaultNegInit = (Priority, Map[Var, Any])
-//
-//  trait NegotiationInitBuilder[-Ag <: Agent[_], Args]{
-//    def build(args: Args): NegotiationInit
-//  }
-//
-//  implicit object DefaultNegotiationInit extends NegotiationInitBuilder[AgentCreation[_], DefaultNegInit]{
-//    def build(args: (Priority, Map[Var, Any])) =
-//      new NegotiationInit {
-//        def values = args._2
-//        def priority = args._1
-//      }
-//  }
-
-}
-
 object NegotiationSupport{
   trait Default {
     self: AgentCreation[_] =>
 
     type ANegotiation = DynamicScopeNegotiation
     def createNegotiation(id: NegotiationId, init: NegotiationInit) =
-      new DynamicScopeNegotiation(id, init.priority, init.values)
+      new DynamicScopeNegotiation(id, init.priority, init.issues)
   }
 }

@@ -2,6 +2,7 @@ package feh.tec.agents.service
 
 import feh.tec.agents.Message.AutoId
 import feh.tec.agents._
+import feh.tec.agents.impl.SystemAgent
 import feh.tec.agents.service.ConflictResolver.{ConflictResolved, ResolveConflict}
 
 import scala.collection.mutable
@@ -9,7 +10,9 @@ import scala.util.Random
 
 /** Resolves any conflict between two agents
  */
-trait ConflictResolver extends AbstractAgent{
+trait ConflictResolver extends SystemAgent{
+  def role = ConflictResolver.Role
+
   /** keys are (sender, issue)
    */
   val conflicts = mutable.HashMap.empty[(AgentRef, Any), ResolveConflict]

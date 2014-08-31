@@ -47,7 +47,7 @@ trait Negotiation{
 
   def scope: Set[AgentRef]
 
-  val vals: mutable.HashMap[Var, Any]
+  val currentValues: mutable.HashMap[Var, Any]
 }
 
 trait WeakCommitmentNegotiation extends Negotiation{
@@ -57,6 +57,11 @@ trait WeakCommitmentNegotiation extends Negotiation{
 
 trait Role {
   val name: String
+
+  override def equals(obj: scala.Any) = obj match {
+    case that: Role => that.name == this.name
+    case _ => false
+  }
 }
 
 object Role{

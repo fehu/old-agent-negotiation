@@ -4,7 +4,8 @@ import java.util.UUID
 
 import akka.util.Timeout
 import feh.tec.agents.ConstraintsView.Constraint
-import feh.tec.agents.impl.AgentCreation.NegotiationInit
+import feh.tec.agents.impl.agent.AgentCreation
+import AgentCreation.NegotiationInit
 import feh.tec.agents.impl._
 
 
@@ -18,7 +19,7 @@ object NQueen{
 
   def negotiationId = NegotiationId("N-Queen")
 
-  def init(count: Int) = NegotiationInit(new Priority(count), Map(X -> 1, Y -> 1)) // all start in (1, 1)
+//  def init(count: Int) = NegotiationInit(new Priority(count), Set(X, Y))
 
   def role = Role("Queen")
 }

@@ -2,6 +2,7 @@ package feh.tec.agents
 
 import feh.tec.agents.ConstraintsView.Constraint
 import feh.tec.agents.impl._
+import feh.tec.agents.impl.agent.AgentCreation
 import feh.util.InUnitInterval
 
 trait AgentImpl extends AgentCreation[DefaultNegotiatingLanguage]
@@ -27,6 +28,6 @@ trait AgentImpl extends AgentCreation[DefaultNegotiatingLanguage]
   }
 
   object CreateConstraint{
-    def notEquals(vr: Var, in: NegotiationId) = Constraint(vr, in, get(in).vals(vr) != )
+    def notEquals(vr: Var, in: NegotiationId) = Constraint(vr, in, get(in).currentValues(vr) != )
   }
 }

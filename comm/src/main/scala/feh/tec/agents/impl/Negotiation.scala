@@ -38,22 +38,22 @@ trait NegotiationStateSupport{
 
 class DynamicScopeNegotiation(val id: NegotiationId,
                               initPriority: Priority,
-                              initVals: Map[Var, Any])
+                              vars: Set[Var])
   extends Negotiation with DynamicScope
 {
   implicit var currentPriority: Priority = initPriority
-  val vals: mutable.HashMap[Var, Any] = mutable.HashMap(initVals.toSeq: _*)
+  val currentValues: mutable.HashMap[Var, Any] = mutable.HashMap(vars.toSeq.map(_ -> null): _*)
 
   protected val _scope = mutable.HashSet.empty[AgentRef]
 
   def scope = scope.toSet
 
   def updateScope(msg: ScopeUpdate) = msg match {
-    case ScopeUpdate.NewScope(scope, neg, _) if neg == id =>
+    case ScopeUpdate.NewScope(scope, neg) if neg == id =>
       _scope.clear()
       _scope ++= scope
-    case ScopeUpdate.NewAgents(refs, neg, _) if neg == id => _scope ++= refs
-    case ScopeUpdate.RmAgents(refs, neg, _)  if neg == id => _scope --= refs
+    case ScopeUpdate.NewAgents(refs, neg) if neg == id => _scope ++= refs
+    case ScopeUpdate.RmAgents(refs, neg)  if neg == id => _scope --= refs
   }
 }
 
