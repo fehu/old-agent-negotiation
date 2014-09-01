@@ -24,7 +24,10 @@ class NegotiationSpecification extends ANegotiationSpecification{
   protected def equal = Equal
 
   protected def spawn = new Spawn
-  
+
+  /** language sugar */
+  protected def other = identity[String] _
+
   protected class Define{
     def variable(name: String) = new VarDefBuilder(name)
     def negotiation(name: String) = new NegotiationDefBuilder(name)
