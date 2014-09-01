@@ -1,9 +1,8 @@
 package feh.tec.agents
 
 import feh.tec.agents.SystemMessage.ScopeUpdate
-import feh.tec.agents.impl.SystemAgent
 
-trait NegotiationController extends SystemAgent{
+trait NegotiationController extends AbstractAgent{
 
   def agents: Seq[AgentRef]
   def systemAgents: Seq[AgentRef]

@@ -102,7 +102,7 @@ object  Build extends sbt.Build {
     id = "comm",
     base = file("comm"),
     settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(akka, feh.util)
+      libraryDependencies ++= Seq(akka, feh.util, scala.reflectApi)
     )
   )
 

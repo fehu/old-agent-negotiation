@@ -21,7 +21,7 @@ object NegotiationController{
                          resolveConflictTimeout: Timeout,
                          startTimeout: Timeout,
                          creationTimeout: Timeout)
-  extends NegotiationController
+  extends NegotiationController with SystemAgent
   {
     implicit def acSys = context.system
     implicit def exContext = context.dispatcher

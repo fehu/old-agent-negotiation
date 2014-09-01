@@ -15,7 +15,7 @@ object System {
 
   def conflictResolver = Props(classOf[ConflictResolver])
 
-  class ConflictResolver extends service.ConflictResolver with Service.Args0
+  class ConflictResolver extends SystemAgent with service.ConflictResolver with Service.Args0
 }
 
 trait SystemAgent extends AbstractAgent{
