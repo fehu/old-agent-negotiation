@@ -13,7 +13,7 @@ class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecification{
   define negotiation "queen's position" over ("x", "y")
 
   define agent "Queen" withRole "chess queen" that(
-    negotiates the "queen's position" `with` "chess queen" and 
+    negotiates the "queen's position" `with` other("chess queen") and 
       hasConstraints.over(
         "x" -> (proposed mustNot equal),
         "y" -> (proposed mustNot equal)
