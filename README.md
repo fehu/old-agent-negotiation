@@ -3,17 +3,25 @@ Negotiating Agents
 A Thesis Project in ITESM
 
 ### Negotiation Specification
-[Example](comm/src/main/scala/feh/tec/agents/impl/NegotiationSpecification.scala):
+[Example](/data/ext/dev/scala/agents/negotiation/misc/src/main/scala/feh/tec/agents/NQueen.scala):
 ```
-  define variable "v1" `with` domain.range(1 to 10)
-  define variable "v2" `with` domain.set('A', 'B', 'C')
+class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecification{
+  
+  define variable "x" `with` domain.range(1 to boardSize)
+  define variable "y" `with` domain.range(1 to boardSize)
 
-  define negotiation "neg-1" over ("v1", "v2", "v5")
+  define negotiation "queen's position" over ("x", "y")
 
-  define agent "ag-1" withRole "does something" that (
-    negotiates the "neg-1" `with` ("role-1", "role-2") and
+  define agent "Queen" withRole "chess queen" that(
+    negotiates the "queen's position" `with` "chess queen" and 
       hasConstraints.over(
-        "v1" -> (proposed mustNot equal)
-      )
+        "x" -> (proposed mustNot equal),
+        "y" -> (proposed mustNot equal)
+      ) 
     )
+  
+  spawn agents(
+    "Queen" -> boardSize
+    )
+}
 ```

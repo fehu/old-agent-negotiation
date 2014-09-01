@@ -1,8 +1,8 @@
 package feh.tec.agents
 
-import feh.tec.agents.ConstraintsView.Constraint
 import feh.tec.agents.impl._
 import feh.tec.agents.impl.agent.AgentCreation
+import feh.tec.agents.impl.view.CreateConstraintsHelper
 import feh.util.InUnitInterval
 
 trait AgentImpl extends AgentCreation[DefaultNegotiatingLanguage]
@@ -10,6 +10,7 @@ trait AgentImpl extends AgentCreation[DefaultNegotiatingLanguage]
   with DefaultNegotiatingLanguage.Builder
   with NegotiationSupport.Default
   with ProposalEngine.IteratingAllDomains[DefaultNegotiatingLanguage]
+  with CreateConstraintsHelper
 {
 
   type StateOfNegotiation = ProposalIteratorNegotiationState[DefaultNegotiatingLanguage]
@@ -27,7 +28,4 @@ trait AgentImpl extends AgentCreation[DefaultNegotiatingLanguage]
       weighted(None) <= unknownLimit && weighted(Some(false)) > .5
   }
 
-  object CreateConstraint{
-    def notEquals(vr: Var, in: NegotiationId) = Constraint(vr, in, get(in).currentValues(vr) != )
-  }
 }

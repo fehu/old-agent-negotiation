@@ -11,7 +11,6 @@ import AgentCreation.NegotiationInit
 import feh.tec.agents.impl.Language.dsl._
 import feh.tec.agents.impl.Negotiation.DynamicScope
 import feh.util._
-
 import scala.collection.mutable
 
 object Agent{
@@ -141,9 +140,13 @@ abstract class Agent[Lang <: ProposalLanguage]() extends NegotiatingAgent
     buildMessage(neg.id, I.accept).asInstanceOf[T]
 }
 
+trait NegotiationSupport{
+  type ANegotiation <: Negotiation
+
+  def createNegotiation(id: NegotiationId, init: NegotiationInit): ANegotiation
+}
 object NegotiationSupport{
-  trait Default {
-    self: AgentCreation[_] =>
+  trait Default extends NegotiationSupport{
 
     type ANegotiation = DynamicScopeNegotiation
     def createNegotiation(id: NegotiationId, init: NegotiationInit) =

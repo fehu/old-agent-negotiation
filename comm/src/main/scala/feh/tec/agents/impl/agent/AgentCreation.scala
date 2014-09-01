@@ -3,11 +3,11 @@ package feh.tec.agents.impl.agent
 import java.util.UUID
 
 import akka.actor.{ActorSystem, Props}
+import akka.pattern.ask
 import akka.util.Timeout
 import feh.tec.agents.SystemMessage.RefDemand
-import feh.tec.agents.impl.{AgentRef, Agent}
 import feh.tec.agents._
-import akka.pattern.ask
+import feh.tec.agents.impl.{Agent, GenericIteratingAgentCreation}
 import feh.util._
 
 import scala.concurrent.Await
@@ -37,17 +37,19 @@ object AgentCreation{
   object Builder extends AgentBuilder[AgentCreation[_], Interface]
 }
 
-trait AgentBuilder[Ag <: AbstractAgent, Args <: Product]{
-  def props(args: Args)(implicit cTag: ClassTag[Ag]) = Props(cTag.runtimeClass, args.productIterator.toSeq: _*)
-  def create(args: Args)(implicit cTag: ClassTag[Ag], asys: ActorSystem, timeout: Timeout): AgentRef =
+trait AgentBuilder[-SupAg <: AbstractAgent, -Args <: Product]{
+  def props[Ag <: SupAg](args: Args)(implicit cTag: ClassTag[Ag]) = Props(cTag.runtimeClass, args.productIterator.toSeq: _*)
+  def create[Ag <: SupAg](args: Args)(implicit cTag: ClassTag[Ag], asys: ActorSystem, timeout: Timeout): AgentRef =
     (asys.actorOf(props(args)) ? RefDemand).mapTo[AgentRef] |> (Await.result(_, timeout.duration))
 }
 
 object AgentBuilder{
   implicit lazy val Default = AgentCreation.Builder
   implicit lazy val PriorityBased = PriorityBasedCreation.Builder
+  implicit lazy val GenericIterating = GenericIteratingAgentCreation.Builder
 
-  implicit object SystemArgs0Service extends AgentBuilder[impl.System.Service.Args0 with AbstractAgent, Tuple0]
+  trait SystemArgs0Service extends AgentBuilder[impl.System.Service.Args0 with AbstractAgent, Tuple0]
+  implicit object SystemArgs0Service extends SystemArgs0Service
 
 }
 

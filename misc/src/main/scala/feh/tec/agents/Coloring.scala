@@ -29,7 +29,6 @@ class Coloring(uuid: UUID,
   import Coloring._
 
   val role: Role = Coloring.role
-  val vars: Set[Var] = Set(Color)
   val domainIterators = Map(Color.it)
   val constraints = Set( CreateConstraint.notEquals(Color, negotiationId) )
 }

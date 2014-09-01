@@ -72,7 +72,6 @@ protected[agents] trait SystemRole extends Role
 
 trait NegotiatingAgent extends AbstractAgent{
   val role: Role
-  val vars: Set[Var]
 
   type ANegotiation <: Negotiation
   def negotiations: Set[ANegotiation]

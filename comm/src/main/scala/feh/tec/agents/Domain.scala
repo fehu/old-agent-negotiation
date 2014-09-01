@@ -2,12 +2,12 @@ package feh.tec.agents
 
 import scala.collection.{IterableLike, mutable}
 
-abstract class Var(val name: String, test: Any => Boolean){
+abstract class Var(val name: String, testType: Any => Boolean){
   type Tpe
   type Domain
   def domain: Domain
 
-  def cast(a: Any): Option[Tpe] = if(test(a)) Some(a.asInstanceOf[Tpe]) else None
+  def cast(a: Any): Option[Tpe] = if(testType(a)) Some(a.asInstanceOf[Tpe]) else None
 
   override def toString = name
 }
