@@ -3,7 +3,7 @@ Negotiating Agents
 A Thesis Project in ITESM
 
 ### Negotiation Specification
-[Example](/data/ext/dev/scala/agents/negotiation/misc/src/main/scala/feh/tec/agents/NQueen.scala):
+[Example](misc/src/main/scala/feh/tec/agents/NQueen.scala):
 ```
 class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecification{
   
