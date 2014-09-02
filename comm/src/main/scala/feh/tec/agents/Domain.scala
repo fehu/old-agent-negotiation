@@ -35,7 +35,7 @@ object DomainIterator{
   class Range(min: Int = Int.MinValue, max: Int = Int.MaxValue, step: Int = 1)
     extends DomainIterator[scala.collection.immutable.Range, Int]
   {
-    def apply(v1: scala.collection.immutable.Range) = v1.dropWhile(_ < min).by(2).takeWhile(_ > max).iterator
+    def apply(v1: scala.collection.immutable.Range) = v1.dropWhile(_ < min).by(step).takeWhile(_ < max).iterator
   }
   
   class Generic[T] extends DomainIterator[IterableLike[T, _], T]{
@@ -69,6 +69,7 @@ object DomainIterator{
 
   def overSeq[D, T](di: Seq[DomainIterator[D, T]]): DomainIterator[Seq[D], Seq[T]] = new DomainIterator[Seq[D], Seq[T]] {
     def apply(v1: Seq[D]) = new Iterator[Seq[T]]{
+      val v = v1
       val iteratorCreation = di.zip(v1)
         .map { case (domIt, domain) => () => domIt(domain)}
         .zipWithIndex.map(_.swap).toMap
@@ -78,8 +79,15 @@ object DomainIterator{
 
       def hasNext = iterators.head._2.hasNext
 
+      var isFirstTime = true
+
       def next() = {
-        nextValue(di.length-1)
+        if(isFirstTime){
+          for(i <- 0 until di.length) nextValue(i)
+          isFirstTime = false
+        }
+        else nextValue(di.length-1)
+
         currentValues.values.toSeq
       }
 

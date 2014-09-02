@@ -67,7 +67,7 @@ class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecification{
     )
 
   configure timeouts(
-    "creation" -> 30.millis
+    "creation" -> 100.millis
     )
 }
 
@@ -99,7 +99,7 @@ class NQueenUserAgent extends UserAgent{
   println("builder.agentsCount = " + builder.agentsCount)
 
   println("starting")
-  controller ! SystemMessage.Start
+  controller ! SystemMessage.Start()
 
   implicit def timeout = Timeout(300 millis)
 

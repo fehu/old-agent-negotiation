@@ -1,8 +1,7 @@
 package feh.tec.agents.impl
 
 import feh.tec.agents._
-import feh.tec.agents.impl.Language.Buildable
-import feh.tec.agents.impl.Language.dsl.{Rejection, Acceptation, ProposalSubj}
+import feh.tec.agents.impl.Language.dsl.{ProposalsSubj, Rejection, Acceptation, ProposalSubj}
 import feh.util._
 
 object Language {
@@ -10,7 +9,7 @@ object Language {
   object dsl{
 
 
-    object I extends ProposalTarget{              //(implicit val me: AgentRef)
+    case object I extends ProposalTarget{              //(implicit val me: AgentRef)
       def propose(whom: ProposalTarget) = new ChooseSubj(whom)
       def request(whom: ProposalTarget) = new ChooseSubj(whom)
       
@@ -19,7 +18,7 @@ object Language {
     }
 
     trait ProposalTarget
-    object You extends ProposalTarget
+    case object You extends ProposalTarget
     
     trait RequestOperation
     case object fallback extends RequestOperation
@@ -85,6 +84,8 @@ object DefaultNegotiatingLanguage {
       b match{
         case ProposalSubj(issue, v, dsl.I)      => Message.Proposal(negId, Map(issue -> v))
         case ProposalSubj(issue, v, dsl.You)    => Message.Demand  (negId, Map(issue -> v))
+        case ProposalsSubj(issues, dsl.I)       => Message.Proposal(negId, issues)
+        case ProposalsSubj(issues, dsl.You)     => Message.Demand  (negId, issues)
         case Acceptation()                      => Message.Accepted(negId, currentMsg.id)
         case Rejection()                        => Message.Rejected(negId, currentMsg.id)
         case dsl.Request(dsl.You, dsl.fallback) => Message.Fallback(negId)

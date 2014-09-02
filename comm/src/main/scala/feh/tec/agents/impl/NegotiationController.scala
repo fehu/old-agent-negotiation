@@ -2,6 +2,7 @@ package feh.tec.agents.impl
 
 import java.util.UUID
 
+import akka.actor.ActorLogging
 import akka.pattern.ask
 import akka.util.Timeout
 import feh.tec.agents.Message.AutoId
@@ -24,7 +25,7 @@ object NegotiationController{
 
   case class Timeouts(resolveConflict: Timeout, agentCreation: Timeout, agentStartup: Timeout)
 
-  trait GenericBuilding extends NegotiationController with SystemAgent{
+  trait GenericBuilding extends NegotiationController with SystemAgent with ActorLogging{
     def role = Role
 
     implicit def acSys = context.system
@@ -47,18 +48,16 @@ object NegotiationController{
     def start() = {
       implicit def timeout = timeouts.agentStartup
       systemAgents // init lazy
-      agents map (_.ref ? SystemMessage.Start |> (_.mapTo[SystemMessage] map handleStartup))
+
+      agents map (_.ref ? SystemMessage.Start() |> (_.mapTo[SystemMessage] map handleStartup))
     }
 
     def stop() = ???
 
     // todo: stop
-    override def lifeCycle = super.lifeCycle orElse {
-      case _: SystemMessage.Start => start()
-    }
-
     override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse{
       case req@Request.AgentRefs() => sender() ! agents
+      case _: SystemMessage.Start => start()
     }
   }
 
@@ -141,7 +140,7 @@ object NegotiationController{
                                                     )
 
   abstract class GenericStaticAgentsInit[BuildAgentArgs](arg: GenericStaticInitArgs[BuildAgentArgs])
-    extends GenericBuilding with ScopesInitialization with PriorityAssignation
+    extends GenericBuilding with ScopesInitialization with PriorityAssignation with ActorLogging
   {
     import GenericStaticAgentsInit._
 
@@ -158,15 +157,22 @@ object NegotiationController{
 
     lazy val agents = agentsInfo.keys.toSeq
 
-    def scopeFor(ag: AgentRef, in: NegotiationId): Set[AgentRef] = agentsInfo(ag)._1(in).flatMap{
-      case role => agents.filter(_.id.role == role)
+    def scopeFor(ag: AgentRef, in: NegotiationId): Set[AgentRef] = {
+      agentsInfo(ag)._1(in).flatMap{
+        case role => agents.filter(a => a.id.role.name == role && a != ag)
+      }
     }
 
     def handleStartup: PartialFunction[SystemMessage, Unit] = {
-      case _: SystemMessage.Start.Started => // it's ok
+      case msg: SystemMessage.Start.Started => log.info(msg.id + " successfully started")
     }
 
-    agents // init lazy
+    override def start(): Unit = {
+      systemAgents; agents // init lazy
+      arg.negotiationIds foreach updateScopes
+      super.start()
+    }
+
   }
 }
 

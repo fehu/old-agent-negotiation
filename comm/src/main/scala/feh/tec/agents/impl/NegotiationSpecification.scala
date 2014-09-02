@@ -3,6 +3,7 @@ package feh.tec.agents.impl
 import feh.tec.agents.{NegotiationSpecification => ANegotiationSpecification}
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
+import scala.reflect.ClassTag
 import scala.reflect.runtime.{ universe => ru }
 
 
@@ -109,7 +110,16 @@ object NegotiationSpecification{
 
   protected abstract class DomainDef[T : ru.TypeTag]{
     val tpe = ru.typeTag[T].tpe
-    val clazz = ru.runtimeMirror(getClass.getClassLoader).runtimeClass(tpe)
+    val clazz = ru.runtimeMirror(getClass.getClassLoader).runtimeClass(tpe) match{ // replace primitive type classes by the boxes
+      case c if c == classOf[Int] => classOf[Integer]
+      case c if c == classOf[Long] => classOf[java.lang.Long]
+      case c if c == classOf[Byte] => classOf[java.lang.Byte]
+      case c if c == classOf[Float] => classOf[java.lang.Float]
+      case c if c == classOf[Double] => classOf[java.lang.Double]
+      case c if c == classOf[Char] => classOf[Character]
+      case c if c == classOf[Boolean] => classOf[java.lang.Boolean]
+      case c => c
+    }
   }
   case class DomainRange protected[NegotiationSpecification] (range: Range) extends DomainDef[Int]
   case class DomainSet[T: ru.TypeTag] protected[NegotiationSpecification] (set: Set[T]) extends DomainDef[T]

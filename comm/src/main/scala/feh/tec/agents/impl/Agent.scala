@@ -6,10 +6,9 @@ import akka.actor.ActorRef
 import feh.tec.agents.Message.Response
 import feh.tec.agents.SystemMessage.{RefDemand, ReportAllStates, ReportStates, ScopeUpdate}
 import feh.tec.agents._
-import feh.tec.agents.impl.agent.AgentCreation
-import AgentCreation.NegotiationInit
 import feh.tec.agents.impl.Language.dsl._
 import feh.tec.agents.impl.Negotiation.DynamicScope
+import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
 import feh.util._
 import scala.collection.mutable
 
@@ -164,7 +163,7 @@ abstract class Agent[Lang <: ProposalLanguage]() extends NegotiatingAgent
   def createRejected(id: NegotiationId) = buildMessage(id, I.reject).asInstanceOf[Lang#Rejected]
 
   private def build[T <: Lang#Msg](neg: Negotiation, expr: Language.Buildable) =
-    buildMessage(neg.id, I.accept).asInstanceOf[T]
+    buildMessage(neg.id, expr).asInstanceOf[T]
 }
 
 trait NegotiationSupport{

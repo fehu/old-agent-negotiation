@@ -2,6 +2,7 @@ package feh.tec.agents.impl.agent
 
 import java.util.UUID
 
+import akka.actor.ActorLogging
 import akka.util.Timeout
 import feh.tec.agents.ConstraintsView.Constraint
 import feh.tec.agents._
@@ -17,6 +18,7 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   with PriorityBasedAgentViews
   with NegotiationStateSupport
   with ViewUtils
+  with ActorLogging
 {
   lazy val constraintsSatisfactions = ConstraintsSatisfactionWithPriority(lang)
   lazy val proposalSatisfaction = new Constraints(constraints)
@@ -52,10 +54,11 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   override def startLife() = negotiations foreach {
     neg =>
       resetProposal(neg)
+      log.info(s"state of ${neg.id}: ${neg.state.currentProposal}, ${neg.state.asInstanceOf[ProposalIteratorNegotiationState[_]].currentIterator}")
       spamProposal(neg)
   }
 
-  protected def spamProposal(neg: ANegotiation) = sendToAll(neg, neg.state.currentProposal.asInstanceOf[Lang#Msg])
+  protected def spamProposal(neg: ANegotiation) = sendToAll(neg, neg.state.currentProposal.get)
 
   protected def maxPriority(negId: NegotiationId) = constraintsSatisfactions.merge._2
     .data.filter(_._2._1 == negId).map(_._2._2).maxBy(_.get)

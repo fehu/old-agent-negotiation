@@ -29,32 +29,34 @@ trait PriorityBasedNegotiatingAgent[Lang <: ProposalLanguage]
   }
 
   def onProposal = {
-    case prop: Lang#Proposal if testMsg(prop, _.isProposal, _ == _) =>
+    case prop if testMsg(prop, _ == _) =>
       if( resolvePriorityConflict(prop) ) behaviourOnProposal.disputeOverPriorityWon(prop)
       else behaviourOnProposal.disputeOverPriorityLost(prop)
-    case prop: Lang#Proposal if testMsg(prop, _.isProposal, _ < _) =>
+    case prop if testMsg(prop, _ < _) =>
       behaviourOnProposal act prop
+    case prop if testMsg(prop, _ > _) => // ignore
   }
   def onRejected = {
-    case msg: Lang#Rejected if testMsg(msg, _.isRejection, _ == _) && expectingResponse(msg) =>
+    case msg if testMsg(msg, _ == _) && expectingResponse(msg) =>
       if( resolvePriorityConflict(msg) ) behaviourOnRejection.disputeOverPriorityWon(msg)
       else behaviourOnRejection.disputeOverPriorityLost(msg)
-    case msg: Lang#Rejected if testMsg(msg, _.isRejection, _ > _) && expectingResponse(msg) =>
+    case msg if testMsg(msg, _ > _) && expectingResponse(msg) =>
       behaviourOnRejection act msg
+    case msg if testMsg(msg, _ < _) || ! expectingResponse(msg) => // ignore
   }
 
   def onAccepted = {
-    case msg: Lang#Accepted if testMsg(msg, _.isAcceptance, _ == _) && expectingResponse(msg) =>
+    case msg if testMsg(msg, _ == _) && expectingResponse(msg) =>
       if( resolvePriorityConflict(msg) ) behaviourOnAcceptance.disputeOverPriorityWon(msg)
       else behaviourOnAcceptance.disputeOverPriorityLost(msg)
-    case msg: Lang#Accepted if testMsg(msg, _.isAcceptance, _ > _) && expectingResponse(msg) =>
+    case msg if testMsg(msg, _ > _) && expectingResponse(msg) =>
       behaviourOnAcceptance act msg
+    case msg if testMsg(msg, _ < _) || ! expectingResponse(msg) => // ignore
   }
 
   private def testMsg(msg: Message,
-                      selectLangTest: Lang => (Any => Boolean),
                       comparePriority: (Priority, Priority) => Boolean) =
-    selectLangTest(lang)(msg) && comparePriority(msg.priority, get(msg.negotiation).priority)
+    comparePriority(msg.priority, get(msg.negotiation).priority)
 
 }
 

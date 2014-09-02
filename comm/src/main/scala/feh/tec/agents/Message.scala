@@ -17,7 +17,7 @@ trait Message extends AbstractMessage{
 
   def asString: String
 
-  override def toString = super.toString + "\n>  " + asString + "  <"
+  override def toString = super.toString + "\"" + asString + "\""
 
   /** The message's priority is higher than scope's
     */
