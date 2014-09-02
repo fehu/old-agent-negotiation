@@ -7,6 +7,7 @@ trait AgentHelpers[Lang <: Language]{
 
   protected var negotiationsCache = negotiations.map(n => n.id -> n).toMap
   def get(neg: NegotiationId) = negotiationsCache(neg)
+  def getOpt(neg: NegotiationId) = negotiationsCache.get(neg)
 }
 
 

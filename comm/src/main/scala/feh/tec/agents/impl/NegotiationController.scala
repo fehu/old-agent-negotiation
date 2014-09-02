@@ -4,6 +4,7 @@ import java.util.UUID
 
 import akka.pattern.ask
 import akka.util.Timeout
+import feh.tec.agents.Message.AutoId
 import feh.tec.agents.NegotiationController.ScopesInitialization
 import feh.tec.agents._
 import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
@@ -15,6 +16,9 @@ import scala.concurrent.duration.Duration
 import scala.reflect.ClassTag
 
 object NegotiationController{
+  object Request{
+    case class AgentRefs() extends SystemMessage with AutoId
+  }
 
   case object Role extends SystemRole{ val name = "Negotiation Controller" }
 
@@ -34,7 +38,7 @@ object NegotiationController{
     lazy val systemAgents = {
       systemAgentBuilders.toSeq.par.flatMap{
         case (Tuple2(b: AgentBuilder.SystemArgs0Service, cTag), count) =>
-          for(_ <- 1 to count) yield b.create(Tuple0)(cTag, implicitly, timeouts.agentCreation)
+          for(_ <- 1 to count) yield b.create(Tuple0, extracting = true)(cTag, implicitly, timeouts.agentCreation)
       }.toList
     }
 
@@ -49,10 +53,13 @@ object NegotiationController{
     def stop() = ???
 
     // todo: stop
-    def lifeCycle = {
+    override def lifeCycle = super.lifeCycle orElse {
       case _: SystemMessage.Start => start()
     }
 
+    override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse{
+      case req@Request.AgentRefs() => sender() ! agents
+    }
   }
 
   class Counter[T, C](val starting: C, getNext: C => C){
@@ -74,7 +81,7 @@ object NegotiationController{
 
     def startingPriority: Priority
 
-    val assigningPriority = new Counter[NegotiationId, Priority](startingPriority, _.raise())
+    lazy val assigningPriority = new Counter[NegotiationId, Priority](startingPriority, _.raise())
   }
 
 
@@ -91,10 +98,11 @@ object NegotiationController{
       agentBuilders.toSeq.par.flatMap{
         case (b@AgentBuilder.Default, (issuesByNeg, count)) =>
           val init = issuesByNeg.mapValues(negotiationInit)
-          for(_ <- 1 to count) yield b.create((UUID.randomUUID(), init))
+          for(_ <- 1 to count) yield b.create((UUID.randomUUID(), init), extracting = true)
         case (b@AgentBuilder.PriorityBased, (issuesByNeg, count)) =>
           val init = issuesByNeg.mapValues(negotiationInit)
-          for(_ <- 1 to count) yield b.create((UUID.randomUUID(), init, conflictResolver, timeouts.resolveConflict))
+          for(_ <- 1 to count) yield
+            b.create((UUID.randomUUID(), init, conflictResolver, timeouts.resolveConflict), extracting = true)
       }.toList
     }
 
@@ -115,30 +123,37 @@ object NegotiationController{
 
   object GenericStaticAgentsInit{
     case class AgentInit[BuildAgentArgs, Args <: Product, Ag <: AbstractAgent](
+                                               agTag: ClassTag[_ <: Ag],
                                                builder: AgentBuilder[Ag, Args],
                                                buildArgs: BuildAgentArgs => Args,
+                                               actorName: String,
                                                scopes: Map[NegotiationId, Set[String]],
                                                count: Int)
-                                              (implicit val agTag: ClassTag[Ag])
     case class Timings(retryToStartAgent: Duration)
   }
 
-  abstract class GenericStaticAgentsInit[BuildAgentArgs](
-                                val systemAgentBuilders: Map[(AgentBuilder[Ag, Arg], ClassTag[Ag]) forSome {type Ag <: AbstractAgent; type Arg <: Product}, Int],
-                                negotiationIds: Set[NegotiationId],
-                                agentBuilders: Seq[GenericStaticAgentsInit.AgentInit[BuildAgentArgs, _, _]],
-                                val timeouts: Timeouts,
-                                timings: GenericStaticAgentsInit.Timings)
+  case class GenericStaticInitArgs[BuildAgentArgs](
+              systemAgentBuilders: Map[(AgentBuilder[Ag, Arg], ClassTag[Ag]) forSome {type Ag <: AbstractAgent; type Arg <: Product}, Int],
+              negotiationIds: Set[NegotiationId],
+              agentBuilders: Seq[GenericStaticAgentsInit.AgentInit[BuildAgentArgs, _, _]],
+              timeouts: Timeouts,
+              timings: GenericStaticAgentsInit.Timings
+                                                    )
+
+  abstract class GenericStaticAgentsInit[BuildAgentArgs](arg: GenericStaticInitArgs[BuildAgentArgs])
     extends GenericBuilding with ScopesInitialization with PriorityAssignation
   {
     import GenericStaticAgentsInit._
 
     protected def buildAgentArgs: BuildAgentArgs
 
-    lazy val agentsInfo = agentBuilders.flatMap{
-      case init@AgentInit(builder, args, scopes, count) =>
-        for(_ <- 1 to count) yield
-          builder.create(args(buildAgentArgs))(init.agTag, implicitly, timeouts.agentCreation) -> (scopes, count)
+    def systemAgentBuilders = arg.systemAgentBuilders
+    def timeouts = arg.timeouts
+
+    lazy val agentsInfo = arg.agentBuilders.flatMap{
+      case init@AgentInit(cTag, builder, bArgs, actorName, scopes, count) =>
+        for(i <- 1 to count) yield
+          builder.create(bArgs(buildAgentArgs), actorName + "-" + i)(cTag, implicitly, timeouts.agentCreation) -> (scopes, count)
     }.toMap
 
     lazy val agents = agentsInfo.keys.toSeq
@@ -151,6 +166,7 @@ object NegotiationController{
       case _: SystemMessage.Start.Started => // it's ok
     }
 
+    agents // init lazy
   }
 }
 

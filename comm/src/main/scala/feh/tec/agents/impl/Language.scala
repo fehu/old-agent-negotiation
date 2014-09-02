@@ -59,12 +59,22 @@ object Language {
     def buildMessage(negotiation: NegotiationId, b: Buildable): Lang#Msg
   }
 
+  trait Extractor[Lang <: Language]{
+    protected def issuesExtractor: IssuesExtractor[Lang]
+  }
 }
 
 object DefaultNegotiatingLanguage {
   import Language._
 
-  trait Builder extends Language.Builder[DefaultNegotiatingLanguage]{
+  implicit object ExtractIssues extends IssuesExtractor[DefaultNegotiatingLanguage]{
+    def extract = {
+      case Message.Proposal(_, issues) => issues
+    }
+  }
+
+
+  trait Builder extends Language.Builder[DefaultNegotiatingLanguage] with Extractor[DefaultNegotiatingLanguage]{
     self: NegotiatingAgent =>
 
     val lang = DefaultNegotiatingLanguage.Static
@@ -82,15 +92,11 @@ object DefaultNegotiatingLanguage {
 
     private def priorityOf(neg: NegotiationId) = 
       negotiations.find(_.id == neg).map(_.currentPriority) getOrThrow UnknownNegotiation(neg)
+
+    protected def issuesExtractor = implicitly[IssuesExtractor[DefaultNegotiatingLanguage]]
   }
 
   object Static extends DefaultNegotiatingLanguage
-
-  implicit object ExtractIssues extends IssuesExtractor[DefaultNegotiatingLanguage]{
-    def extract = {
-      case Message.Proposal(_, issues) => issues
-    }
-  }
 }
 
 class DefaultNegotiatingLanguage extends BacktrackLanguage with CounterProposalLanguage /*with feh.tec.agents.Language.Priority*/{

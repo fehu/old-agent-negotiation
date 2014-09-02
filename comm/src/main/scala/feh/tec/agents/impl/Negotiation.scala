@@ -46,7 +46,7 @@ class DynamicScopeNegotiation(val id: NegotiationId,
 
   protected val _scope = mutable.HashSet.empty[AgentRef]
 
-  def scope = scope.toSet
+  def scope = _scope.toSet
 
   def updateScope(msg: ScopeUpdate) = msg match {
     case ScopeUpdate.NewScope(scope, neg) if neg == id =>

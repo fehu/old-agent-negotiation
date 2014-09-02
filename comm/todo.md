@@ -2,3 +2,4 @@
 - [x] rewrite and make use of `View`
 - [x] add same-priority conflict resolver (a system actor)
 - [x] sent proposals registry 
+- [ ] when creating negotiation scopes - filter same agent

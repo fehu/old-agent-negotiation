@@ -28,6 +28,8 @@ trait AgentRef{
   def id: impl.Agent.Id
   def ref: ActorRef
   def !(msg: AbstractMessage)
+
+  override def toString: String = s"Agent($id)"
 }
 
 class Priority(val get: Int) extends AnyVal{
@@ -62,13 +64,16 @@ trait Role {
     case that: Role => that.name == this.name
     case _ => false
   }
+
+  override def toString = s"Role($name)"
 }
 
 object Role{
   def apply(nme: String) = new Role{ val name: String = nme }
 }
 
-protected[agents] trait SystemRole extends Role
+protected[agents] trait SystemRole extends Role{ override def toString = s"SystemRole($name)" }
+trait UserRole extends Role{ override def toString = s"UserRole($name)" }
 
 trait NegotiatingAgent extends AbstractAgent{
   val role: Role
@@ -133,5 +138,6 @@ trait InfoGathering extends AbstractAgent{
   override def receive = {
     case msg: AbstractMessage =>
       gatherInfo(msg)
+      super.receive(msg)
   }
 }

@@ -19,9 +19,10 @@ abstract class AgentCreation[Lang <: ProposalLanguage](uuid: UUID,
 {
   def createNegotiation(id: NegotiationId, init: AgentCreation.NegotiationInit): ANegotiation
 
-  val id = Agent.Id(role, uuid)
+  lazy val id = Agent.Id(role, uuid)
   lazy val negotiations = negotiationInit.toSet.map((createNegotiation _).tupled)
 
+  id; negotiations // init lazy vals
 }
 
 
@@ -38,9 +39,16 @@ object AgentCreation{
 }
 
 trait AgentBuilder[-SupAg <: AbstractAgent, -Args <: Product]{
-  def props[Ag <: SupAg](args: Args)(implicit cTag: ClassTag[Ag]) = Props(cTag.runtimeClass, args.productIterator.toSeq: _*)
-  def create[Ag <: SupAg](args: Args)(implicit cTag: ClassTag[Ag], asys: ActorSystem, timeout: Timeout): AgentRef =
-    (asys.actorOf(props(args)) ? RefDemand).mapTo[AgentRef] |> (Await.result(_, timeout.duration))
+  def props[Ag <: SupAg](args: Args, extracting: Boolean = false)(implicit cTag: ClassTag[Ag]) =
+    Props(cTag.runtimeClass, (if(extracting) args.productIterator.toSeq else Seq(args)): _*)
+  def create[Ag <: SupAg](args: Args, name: String = null, extracting: Boolean = false)
+                         (implicit cTag: ClassTag[Ag], asys: ActorSystem, timeout: Timeout): AgentRef =
+  {
+    val pr = props(args, extracting)
+    val ag = Option(name).map(asys.actorOf(pr, _)) getOrElse asys.actorOf(pr)
+
+    (ag ? RefDemand()).mapTo[AgentRef] |> (Await.result(_, timeout.duration))
+  }
 }
 
 object AgentBuilder{

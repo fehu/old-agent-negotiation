@@ -2,6 +2,7 @@ package feh.tec.agents.impl
 
 import feh.tec.agents.{NegotiationSpecification => ANegotiationSpecification}
 import scala.collection.mutable
+import scala.concurrent.duration.FiniteDuration
 import scala.reflect.runtime.{ universe => ru }
 
 
@@ -11,9 +12,10 @@ class NegotiationSpecification extends ANegotiationSpecification{
 
   type Config = {
     def agentSpawn: Seq[SpawnDef]
+    def configs: Seq[ConfigureDef]
   }
 
-  implicit def specificationBuild = new SpecificationBuild
+  implicit protected val specificationBuild = new SpecificationBuild
 
   protected def define = new Define
   protected def domain = new DomainChooser
@@ -24,6 +26,8 @@ class NegotiationSpecification extends ANegotiationSpecification{
   protected def equal = Equal
 
   protected def spawn = new Spawn
+
+  protected def configure = new Configure
 
   /** language sugar */
   protected def other = identity[String] _
@@ -73,12 +77,20 @@ class NegotiationSpecification extends ANegotiationSpecification{
     def agents(mp: (String, Int)*) = SimpleSpawnDef(mp.toMap)
   }
 
+  protected class Configure{
+    def timeouts(mp: (String, FiniteDuration)*) = TimeoutsDef(mp.toMap)
+    def timings (mp: (String, FiniteDuration)*) = TimingsDef(mp.toMap)
+  }
+
   // extract SpecificationBuild
   lazy val variables    = specificationBuild.collect{ case d: VarDef          => d }
   lazy val negotiations = specificationBuild.collect{ case d: NegotiationDef  => d }
   lazy val agents       = specificationBuild.collect{ case d: AgentDef        => d }
   lazy val config       = new {
     def agentSpawn: Seq[SpawnDef] = specificationBuild.collect{ case d: SimpleSpawnDef  => d }
+    def configs: Seq[ConfigureDef] = specificationBuild.collect{ case cd: ConfigureDef => cd }
+
+    override def toString = s"Config(\n\t\tagentSpawn = $agentSpawn.\n\t\tconfigs = $configs)"
   }
 }
 
@@ -140,9 +152,16 @@ object NegotiationSpecification{
 //    protected case class Code extends ConstraintTest todo
   }
 
-  sealed trait SpawnDef
-  case class SimpleSpawnDef protected[NegotiationSpecification] (mp: Map[String, Int]) extends SpawnDef
-  
+  sealed trait SpawnDef extends ADef
+  case class SimpleSpawnDef protected[NegotiationSpecification] (mp: Map[String, Int])(implicit build: SpecificationBuild)
+    extends SpawnDef { build register this }
+
+  sealed trait ConfigureDef extends ADef
+  case class TimeoutsDef protected[NegotiationSpecification] (mp: Map[String, FiniteDuration])(implicit build: SpecificationBuild)
+    extends ConfigureDef { build register this }
+  case class TimingsDef protected[NegotiationSpecification] (mp: Map[String, FiniteDuration])(implicit build: SpecificationBuild)
+    extends ConfigureDef { build register this }
+
   protected class SpecificationBuild{
     protected val defs = mutable.Buffer.empty[ADef]
 

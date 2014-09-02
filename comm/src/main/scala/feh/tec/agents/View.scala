@@ -23,7 +23,7 @@ trait ExternalView extends View{
 
   def data: Map[AgentRef, Data]
 
-  def process: PartialFunction[AbstractMessage, Unit]
+  def process: PartialFunction[Message, Unit]
 }
 
 /** A view over own constraints

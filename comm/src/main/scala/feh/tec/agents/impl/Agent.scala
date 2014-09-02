@@ -4,7 +4,7 @@ import java.util.UUID
 
 import akka.actor.ActorRef
 import feh.tec.agents.Message.Response
-import feh.tec.agents.SystemMessage.ScopeUpdate
+import feh.tec.agents.SystemMessage.{RefDemand, ReportAllStates, ReportStates, ScopeUpdate}
 import feh.tec.agents._
 import feh.tec.agents.impl.agent.AgentCreation
 import AgentCreation.NegotiationInit
@@ -15,6 +15,23 @@ import scala.collection.mutable
 
 object Agent{
   case class Id(role: Role, uuid: UUID)
+  trait IdNamed extends Id{
+    def name: String
+
+    override def toString: String = s"Id($name, $role, $uuid)"
+  }
+  object Id{
+    def withName(role: Role, uuid: UUID, nme: String): IdNamed = new Id(role, uuid) with IdNamed{ def name = nme }
+  }
+
+  trait EssentialSystemSupport{
+    self: AbstractAgent =>
+
+    // RefDemand Messages are essential for agent creation
+    def processSys: PartialFunction[SystemMessage, Unit] = {
+      case RefDemand() => sender() ! ref
+    }
+  }
 
   sealed trait Status
   object Status{
@@ -33,8 +50,8 @@ object Agent{
     var status: Status = Status.Created
   }
 
-  trait SystemSupport extends HasStatus{
-    self: SpeakingAgent[_] =>
+  trait SystemSupport extends HasStatus with EssentialSystemSupport{
+    self: SpeakingAgent[_] with AgentHelpers[_] =>
 
     def initReady_? = true
     protected def updateInitStatus() =
@@ -42,17 +59,27 @@ object Agent{
 
     def startLife()
 
-    def processSys: PartialFunction[SystemMessage, Unit] = {
+    override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse {
+// Start messages
       case start: SystemMessage.Start if status == Status.Initialized || status == Status.Created && initReady_? =>
         startLife()
         status = Status.Working
-        start.sender.ref ! start.done
-      case start: SystemMessage.Start if status == Status.Created => start.sender.ref ! start.notInitialized
+        sender() ! start.done
+      case start: SystemMessage.Start if status == Status.Created => sender() ! start.notInitialized
       case start: SystemMessage.Start if status == Status.Initializing =>
-        start.sender.ref ! start.stillInitializing
+        sender() ! start.stillInitializing
         updateInitStatus()
-      case start: SystemMessage.Start if status == Status.Working => start.sender.ref ! start.alreadyRunning
+      case start: SystemMessage.Start if status == Status.Working => sender ! start.alreadyRunning
+// ReportState Messages
+      case req: ReportStates => sender ! req.response(getOpt _ andThen{ _.map{
+        neg => (neg.priority, neg.currentValues.toMap, neg.scope, extractReportExtra(neg.id))
+      }})
+      case req: ReportAllStates => sender ! req.response(negotiations.map{
+        neg => neg.id -> (neg.priority, neg.currentValues.toMap, neg.scope, extractReportExtra(neg.id))
+      }.toMap)
     }
+
+    protected def extractReportExtra(negId: NegotiationId): Option[Any] = None
   }
 
   /** Registers proposals sent using AgentRef.! method to provide `expectingResponse` method of [[ProposalRegister]],
@@ -106,7 +133,7 @@ object AgentRef{
 }
 
 trait DynamicScopeSupport extends Agent.SystemSupport with NegotiatingAgent{
-  self: SpeakingAgent[_] =>
+  self: SpeakingAgent[_] with AgentHelpers[_] =>
 
   type ANegotiation <: Negotiation with DynamicScope
 

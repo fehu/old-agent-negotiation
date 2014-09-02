@@ -1,16 +1,17 @@
 package feh.tec.agents
 
 import java.util.UUID
-
-import feh.tec.agents.Message.AutoId
+import feh.util._
+import feh.tec.agents.Message.{Response, AutoId}
 
 sealed trait AbstractMessage{
   def id: Message.Id
-  def sender: AgentRef
 }
 
 trait Message extends AbstractMessage{
   def priority: Priority
+
+  def sender: AgentRef
 
   def negotiation: NegotiationId
 
@@ -26,7 +27,7 @@ trait Message extends AbstractMessage{
 protected[agents] trait SystemMessage extends AbstractMessage
 
 object SystemMessage{
-  case class Start(id: Message.Id)(implicit val sender: AgentRef) extends SystemMessage{
+  case class Start() extends SystemMessage with AutoId{
 
     def done = Start.Started(id)
     def notInitialized = Start.NotInitialized(id)
@@ -34,14 +35,10 @@ object SystemMessage{
     def alreadyRunning = Start.AlreadyRunning(id)
   }
   object Start{
-    case class Started protected[Start] (respondingTo: Message.Id)
-                                        (implicit val sender: AgentRef) extends SystemMessage { def id = respondingTo }
-    case class NotInitialized protected[Start] (respondingTo: Message.Id)
-                                               (implicit val sender: AgentRef) extends SystemMessage { def id = respondingTo }
-    case class StillInitializing protected[Start] (respondingTo: Message.Id)
-                                                  (implicit val sender: AgentRef) extends SystemMessage { def id = respondingTo }
-    case class AlreadyRunning protected[Start] (respondingTo: Message.Id)
-                                               (implicit val sender: AgentRef) extends SystemMessage { def id = respondingTo }
+    case class Started protected[Start] (respondingTo: Message.Id) extends SystemMessage { def id = respondingTo }
+    case class NotInitialized protected[Start] (respondingTo: Message.Id) extends SystemMessage { def id = respondingTo }
+    case class StillInitializing protected[Start] (respondingTo: Message.Id) extends SystemMessage { def id = respondingTo }
+    case class AlreadyRunning protected[Start] (respondingTo: Message.Id) extends SystemMessage { def id = respondingTo }
   }
 
   trait ScopeUpdate extends SystemMessage{
@@ -49,15 +46,37 @@ object SystemMessage{
   }
 
   object ScopeUpdate{
-    case class NewScope(scope: Set[AgentRef], negotiation: NegotiationId)
-                       (implicit val sender: AgentRef) extends ScopeUpdate with AutoId
-    case class NewAgents(refs: Set[AgentRef], negotiation: NegotiationId)
-                        (implicit val sender: AgentRef) extends ScopeUpdate with AutoId
-    case class RmAgents(refs: Set[AgentRef], negotiation: NegotiationId)
-                       (implicit val sender: AgentRef) extends ScopeUpdate with AutoId
+    case class NewScope(scope: Set[AgentRef], negotiation: NegotiationId) extends ScopeUpdate with AutoId
+    case class NewAgents(refs: Set[AgentRef], negotiation: NegotiationId) extends ScopeUpdate with AutoId
+    case class RmAgents(refs: Set[AgentRef], negotiation: NegotiationId) extends ScopeUpdate with AutoId
   }
 
-  case class RefDemand(implicit val sender: AgentRef) extends SystemMessage with AutoId
+  case class RefDemand() extends SystemMessage with AutoId
+
+  case class ReportStates(of: NegotiationId*) extends SystemMessage with AutoId{
+    def response(f: NegotiationId => Option[(Priority, Map[Var, Any], Set[AgentRef], Option[Any])])(implicit responding: AgentRef) =
+      of.zipMap(f).map {
+        case (negId, Some(t)) => negId -> StateReportEntry.tupled(t)
+        case (negId, None)    => negId -> null
+      }.toMap |> (StateReport(responding, _, id))
+  }
+
+  case class ReportAllStates() extends SystemMessage with AutoId{
+    def response(res: Map[NegotiationId, (Priority, Map[Var, Any], Set[AgentRef], Option[Any])])(implicit responding: AgentRef) =
+      res.map {
+        case (negId, (p, v, s, e)) => negId -> StateReportEntry(p, v, s, e)
+      }.toMap |> (StateReport(responding, _, id))
+  }
+
+  case class StateReport protected[SystemMessage](of: AgentRef, 
+                                                  report: Map[NegotiationId, StateReportEntry], 
+                                                  respondingTo: Message.Id)
+    extends SystemMessage { def id = respondingTo }
+
+  case class StateReportEntry protected[SystemMessage](priority: Priority,
+                                                       vals: Map[Var, Any],
+                                                       scope: Set[AgentRef],
+                                                       extra: Option[Any])
 }
 
 object Message{

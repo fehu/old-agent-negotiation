@@ -23,5 +23,10 @@ class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecification{
   spawn agents(
     "Queen" -> boardSize
     )
+    
+  configure timeouts(
+    "creation" -> 30.millis
+    )
+
 }
 ```

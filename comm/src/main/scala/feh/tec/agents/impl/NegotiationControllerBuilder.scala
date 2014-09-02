@@ -2,13 +2,17 @@ package feh.tec.agents.impl
 
 import java.util.UUID
 
+import akka.actor.{Props, ActorSystem}
 import akka.util.Timeout
 import feh.tec.agents
 import feh.tec.agents.ConstraintsView.Constraint
 import feh.tec.agents.NegotiationController.ScopesInitialization
 import feh.tec.agents._
-import feh.tec.agents.impl.NegotiationController.{GenericStaticAgentsInit, Counter}
+import feh.tec.agents.impl.Agent.Id
+import feh.tec.agents.impl.NegotiationController.GenericStaticAgentsInit.Timings
+import feh.tec.agents.impl.NegotiationController.{Timeouts, GenericStaticInitArgs, GenericStaticAgentsInit, Counter}
 import feh.tec.agents.impl.NegotiationSpecification.ConstraintBuilder.{MustNot, Equal, Must}
+import feh.tec.agents.impl.NegotiationSpecification.{TimeoutsDef, TimingsDef}
 import feh.tec.agents.impl.agent.AgentBuilder
 import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
 import feh.tec.agents.impl.view.CreateConstraintsHelper
@@ -103,27 +107,70 @@ object NegotiationControllerBuilder{
                                    conflictResolver: AgentRef,
                                    countByRole: String => Int)
 
-  class Default extends NegotiationControllerBuilder[NegotiationController.GenericStaticAgentsInit[DefaultBuildAgentArgs]]{
+
+
+  class DefaultController(arg: GenericStaticInitArgs[DefaultBuildAgentArgs])
+    extends NegotiationController.GenericStaticAgentsInit[DefaultBuildAgentArgs](arg)
+  {
+    lazy val roleCounter = new Counter[String, Int](0, 1+)
+
+    def startingPriority = new Priority(0)
+
+    protected def buildAgentArgs = DefaultBuildAgentArgs(
+      priorityByNeg = negId => assigningPriority.next(negId),
+      conflictResolver,
+      countByRole = roleCounter.next
+    )
+  }
+
+
+  class Default[AgImpl <: GenericIteratingAgentCreation[_]]
+               (implicit acSys: ActorSystem, defaultAgentImplementation: ClassTag[AgImpl])
+    extends NegotiationControllerBuilder[NegotiationController.GenericStaticAgentsInit[DefaultBuildAgentArgs]]
+  {
     type BuildAgentArgs = DefaultBuildAgentArgs
 
+    val defaultTimeouts = Timeouts(
+      resolveConflict = 30 millis,
+      agentCreation = 10 millis,
+      agentStartup = 30 millis
+    )
+
+    val defaultTimings = Timings(
+      retryToStartAgent = 50 millis
+    )
 
     var vars: Map[String, Var] = null
     var negotiations: Map[String, (NegotiationId, (Set[Var], (Priority) => NegotiationInit))] = null
     var agentsCount: Map[String, Int] = null
     var agents: Map[String, (Map[NegotiationId, Set[String]], AgentBuilder[_ <: AbstractAgent, Args], BuildAgentArgs => Args) forSome { type Args <: Product }] = null
+    var timeouts: Timeouts = null
+    var timings: Timings = null
 
     def systemAgents: Map[(AgentBuilder[Ag, Arg], ClassTag[Ag]) forSome {type Ag <: AbstractAgent; type Arg <: Product}, Int] = Map(
-
+      (AgentBuilder.SystemArgs0Service, scala.reflect.classTag[System.ConflictResolver]) -> 1
     )
 
     private def agentsToAgentInits = agents.toSeq map{
       case (k, Tuple3(negRoles, builder, buildArgs)) =>
         GenericStaticAgentsInit.AgentInit[BuildAgentArgs, Product, AbstractAgent](
+          defaultAgentImplementation,
           builder.asInstanceOf[AgentBuilder[AbstractAgent, Product]],
           buildArgs,
-          negRoles,
+          actorName = k,
+          scopes = negRoles,
           agentsCount(k)
         )
+    }
+    
+    def buildTimeouts(timeouts: Map[String, FiniteDuration]) = (defaultTimeouts /: timeouts.mapKeys(_.toLowerCase)){
+      case (acc, ("creation", time)) => acc.copy(agentCreation = time)
+      case (acc, ("startup", time)) => acc.copy(agentStartup = time)
+      case (acc, ("resolve conflict", time)) => acc.copy(resolveConflict = time)
+    }
+    
+    def buildTimings(timings: Map[String, FiniteDuration]) = (defaultTimings /: timings.mapKeys(_.toLowerCase)){
+      case (acc, ("retry startup", time)) => acc.copy(retryToStartAgent = time)
     }
 
     def apply(v1: NegotiationSpecification) = {
@@ -131,37 +178,33 @@ object NegotiationControllerBuilder{
       negotiations = buildNegotiations(v1.negotiations)
       agents = buildAgents(v1.agents)
       agentsCount = buildAgentsCount(v1.config.agentSpawn)
+      timeouts = v1.config.configs.collect { case TimeoutsDef(t) => t }.flatten.toMap |> buildTimeouts
+      timings  = v1.config.configs.collect { case TimingsDef(t)  => t }.flatten.toMap |> buildTimings
 
-      new NegotiationController.GenericStaticAgentsInit[DefaultBuildAgentArgs](
+      val props = Props(classOf[DefaultController], GenericStaticInitArgs[DefaultBuildAgentArgs](
         systemAgentBuilders = systemAgents,
         negotiationIds = negotiations.map(_._2._1).toSet,
         agentBuilders = agentsToAgentInits,
-        timeouts = ???,
-        timings = ???
-      ) {
-        val roleCounter = new Counter[String, Int](0, 1+)
-
-        def startingPriority = new Priority(0)
-
-        protected def buildAgentArgs = DefaultBuildAgentArgs(
-          priorityByNeg = negId => assigningPriority.next(negId),
-          conflictResolver,
-          countByRole = roleCounter.next
+        timeouts,
+        timings
         )
-      }
+      )
+      acSys.actorOf(props, "NegotiationController")
     }
   }
 }
 
 abstract class GenericIteratingAgentCreation[Lang <: ProposalLanguage](args: GenericIteratingAgentCreation.Args)
-  extends agent.PriorityBasedCreation(args.uuid, args.negotiationInit, args.conflictResolver, args.conflictResolveTimeout)
+  extends agent.PriorityBasedCreation[Lang](args.uuid, args.negotiationInit, args.conflictResolver, args.conflictResolveTimeout)
   with CreateConstraintsHelper
 {
   self: ProposalEngine.Iterating[Lang] =>
 
-  val role: Role = args.role
+
+  override lazy val id = Id.withName(role, args.uuid, args.name)
+  lazy val role: Role = args.role
   def domainIterators = args.domainIterators
-  val constraints = args.constraints.map(_(this)).toSet
+  lazy val constraints = args.constraints.map(_(this)).toSet
 
 }
 
