@@ -18,7 +18,6 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   with PriorityBasedAgentViews
   with NegotiationStateSupport
   with ViewUtils
-  with ActorLogging
 {
   lazy val constraintsSatisfactions = ConstraintsSatisfactionWithPriority(lang)
   lazy val proposalSatisfaction = new Constraints(constraints)
@@ -54,7 +53,6 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   override def startLife() = negotiations foreach {
     neg =>
       resetProposal(neg)
-      log.info(s"state of ${neg.id}: ${neg.state.currentProposal}, ${neg.state.asInstanceOf[ProposalIteratorNegotiationState[_]].currentIterator}")
       spamProposal(neg)
   }
 

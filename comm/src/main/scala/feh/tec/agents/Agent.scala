@@ -1,7 +1,40 @@
 package feh.tec.agents
 
+import feh.util.AbstractScopedState
+
 trait AgentHelpers[Lang <: Language]{
   self: NegotiatingAgent with SpeakingAgent[Lang] =>
+
+  protected object hooks{
+
+    object OnSend extends AbstractScopedState[Set[(AgentRef, Lang#Msg) => Unit]]{
+      private var hooks = default
+
+      protected def default = Set()
+      def get = hooks
+      protected def state_=(t: Set[(AgentRef, Lang#Msg) => Unit]) = hooks = t
+
+      def withHooks[R](hooks: ((AgentRef, Lang#Msg) => Unit)*)(f: => R) = {
+        val old = get
+        this.hooks ++= hooks
+        val res = f
+        this.hooks = old
+        res
+      }
+    }
+
+  }
+
+  protected abstract class AgentRefWrapper(ref: AgentRef){
+    def !(msg: Lang#Msg)
+  }
+
+  implicit def agentRefWrapper(ref: AgentRef): AgentRefWrapper = new AgentRefWrapper(ref) {
+    def !(msg: Lang#Msg) = {
+      ref.ref ! msg
+      hooks.OnSend.get foreach (_(ref, msg))
+    }
+  }
 
   def sendToAll(neg: Negotiation, msg: Lang#Msg) = neg.scope.foreach(_ ! msg)
 

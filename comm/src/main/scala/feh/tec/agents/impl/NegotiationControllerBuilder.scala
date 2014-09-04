@@ -8,7 +8,7 @@ import feh.tec.agents
 import feh.tec.agents.ConstraintsView.Constraint
 import feh.tec.agents.NegotiationController.ScopesInitialization
 import feh.tec.agents._
-import feh.tec.agents.impl.Agent.Id
+import feh.tec.agents.impl.Agent.{AgentReporting, Id}
 import feh.tec.agents.impl.NegotiationController.GenericStaticAgentsInit.Timings
 import feh.tec.agents.impl.NegotiationController.{Timeouts, GenericStaticInitArgs, GenericStaticAgentsInit, Counter}
 import feh.tec.agents.impl.NegotiationSpecification.ConstraintBuilder.{MustNot, Equal, Must}
@@ -29,6 +29,7 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
   type BuildAgentArgs <: Product{
     def priorityByNeg: NegotiationId => Int
     def conflictResolver: AgentRef
+    def reportingTo: AgentRef
     def countByRole: String => Int
   }
 
@@ -90,7 +91,8 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
             conflictResolveTimeout = Timeout(30 millis), // todo
             Role(role),
             domainIterators.asInstanceOf[Map[Var, DomainIterator[Var#Domain, Var#Tpe]]],
-            constraints
+            constraints,
+            reportingTo = args.reportingTo
           )
       })
     }.toMap
@@ -105,6 +107,7 @@ object NegotiationControllerBuilder{
 
   case class DefaultBuildAgentArgs(priorityByNeg: NegotiationId => Int,
                                    conflictResolver: AgentRef,
+                                   reportingTo: AgentRef,
                                    countByRole: String => Int)
 
 
@@ -119,6 +122,7 @@ object NegotiationControllerBuilder{
     protected def buildAgentArgs = DefaultBuildAgentArgs(
       priorityByNeg = negId => assigningPriority.next(negId),
       conflictResolver,
+      reportingTo,
       countByRole = roleCounter.next
     )
   }
@@ -148,7 +152,8 @@ object NegotiationControllerBuilder{
     var timings: Timings = null
 
     def systemAgents: Map[(AgentBuilder[Ag, Arg], ClassTag[Ag]) forSome {type Ag <: AbstractAgent; type Arg <: Product}, Int] = Map(
-      (AgentBuilder.SystemArgs0Service, scala.reflect.classTag[System.ConflictResolver]) -> 1
+      (AgentBuilder.SystemArgs0Service, scala.reflect.classTag[System.ConflictResolver]) -> 1,
+      (AgentBuilder.SystemArgs0Service, scala.reflect.classTag[ReportsPrinter]) -> 1
     )
 
     private def agentsToAgentInits = agents.toSeq map{
@@ -196,10 +201,12 @@ object NegotiationControllerBuilder{
 
 abstract class GenericIteratingAgentCreation[Lang <: ProposalLanguage](args: GenericIteratingAgentCreation.Args)
   extends agent.PriorityBasedCreation[Lang](args.uuid, args.negotiationInit, args.conflictResolver, args.conflictResolveTimeout)
-  with CreateConstraintsHelper
+  with CreateConstraintsHelper with AgentReporting[Lang]
 {
   self: ProposalEngine.Iterating[Lang] =>
 
+
+  def reportingTo = args.reportingTo
 
   override lazy val id = Id.withName(role, args.uuid, args.name)
   lazy val role: Role = args.role
@@ -216,7 +223,8 @@ object GenericIteratingAgentCreation{
                   conflictResolveTimeout: Timeout,
                   role: Role,
                   domainIterators: Map[Var, DomainIterator[Var#Domain, Var#Tpe]],
-                  constraints: Seq[CreateConstraintsHelper => Constraint[Var]])
+                  constraints: Seq[CreateConstraintsHelper => Constraint[Var]],
+                  reportingTo: AgentRef)
 
   object Builder extends AgentBuilder[GenericIteratingAgentCreation[_], Args]
 }

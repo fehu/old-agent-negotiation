@@ -2,7 +2,7 @@ package feh.tec.agents
 
 import java.util.UUID
 
-import akka.actor.{ActorRef, Actor}
+import akka.actor.{Actor, ActorRef}
 
 import scala.collection.mutable
 
@@ -27,7 +27,7 @@ trait AbstractAgent extends Actor{
 trait AgentRef{
   def id: impl.Agent.Id
   def ref: ActorRef
-  def !(msg: AbstractMessage)
+//  def !(msg: AbstractMessage)
 
   override def toString: String = s"Agent($id)"
 }

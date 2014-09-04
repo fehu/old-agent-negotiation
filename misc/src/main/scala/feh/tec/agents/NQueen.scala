@@ -5,7 +5,6 @@ import java.util.UUID
 import akka.actor.{Props, ActorSystem}
 import akka.util.Timeout
 import feh.tec.agents.ConstraintsView.Constraint
-import feh.tec.agents.SystemMessage.StateReportEntry
 import feh.tec.agents.impl.agent.AgentCreation
 import AgentCreation.NegotiationInit
 import feh.tec.agents.impl._
@@ -109,25 +108,24 @@ class NQueenUserAgent extends UserAgent{
 
   def agents = Await.result(agF, 300 millis)
 
-  context.system.scheduler.schedule(0 millis, 1 second, self, "printReports")
+//  context.system.scheduler.schedule(0 millis, 1 second, self, "printReports")
 
-  def printReports() = agents.map(impl.System.allNegotiationReports).map(_.map{
-    msg =>
-      val sb = new StringBuilder
-      sb ++= s"Report by ${msg.of.id}:\n"
-      msg.report foreach {
-        case (negId, StateReportEntry(p, v, s, extra)) =>
-          sb ++= (" "*12 + s"priority: $p\n")
-          sb ++= (" "*12 + s"  values: $v\n")
-          sb ++= (" "*12 + s"   scope: $s")
-          if(extra.isDefined) sb ++= ("\n" + " "*12 + s"   extra: ${extra.get}")
-      }
-      println(sb.mkString)
-  })
+//  def printReports() = agents.map(impl.System.allNegotiationReports).map(_.map{
+//    msg =>
+//      val sb = new StringBuilder
+//      sb ++= s"Report by ${msg.of.id}:\n"
+//      msg.report foreach {
+//        case (negId, AgentReports.StateReportEntry(p, v, s, extra)) =>
+//          sb ++= (" "*12 + s"priority: $p\n")
+//          sb ++= (" "*12 + s"  values: $v\n")
+//          sb ++= (" "*12 + s"   scope: $s")
+//          if(extra.isDefined) sb ++= ("\n" + " "*12 + s"   extra: ${extra.get}")
+//      }
+//      println(sb.mkString)
+//  })
 
-  override def receive = ({
-    case "printReports" =>
-//      println(agents)
-      printReports()
-  }: PartialFunction[Any, Unit]) orElse super.receive
+//  override def receive = ({
+//    case "printReports" =>
+//      printReports()
+//  }: PartialFunction[Any, Unit]) orElse super.receive
 }

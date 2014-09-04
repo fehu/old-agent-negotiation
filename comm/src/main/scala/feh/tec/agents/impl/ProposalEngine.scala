@@ -2,7 +2,6 @@ package feh.tec.agents.impl
 
 import java.util.Date
 
-import akka.actor.ActorLogging
 import feh.tec.agents._
 import feh.util._
 
@@ -47,7 +46,7 @@ object ProposalEngine{
   /** Iterates over the domains values using DomainIterator.overSeq
     * ignores initial values
     */
-  trait IteratingAllDomains[Lang <: ProposalLanguage] extends Iterating[Lang] with ActorLogging{
+  trait IteratingAllDomains[Lang <: ProposalLanguage] extends Iterating[Lang]{
     self: NegotiatingAgent with ProposalBased[Lang] with ProposalRegister[Lang] =>
 
     protected val domainSeqIterators = negotiations.map{ neg => neg.id -> iteratorForNegotiation(neg) }.toMap
@@ -57,9 +56,7 @@ object ProposalEngine{
       val domains = dItByVar.map(_._1.domain)
       val it = () => DomainIterator overSeq dItByVar.map(_._2) apply domains
       val vars = dItByVar.map(_._1)
-      log.info(s"iteratorForNegotiation: domains=$domains, vars=$vars")
       val i2i: Seq[Any] => Map[Var, Any] = seq => {
-        log.info(s"i2i called for ${seq.toList}, vars=$vars")
         assert(vars.length == seq.length)
         vars.zip(seq).toMap
       }
@@ -69,7 +66,6 @@ object ProposalEngine{
     protected def newIterator(negId: NegotiationId): Iterator[Map[Var, Any]] = {
       val (dIt, toIssues) = domainSeqIterators(negId)
       val it = dIt()
-      log.info(s"it = $it, next = ${it.next().toList}")
       it map toIssues
     }
 

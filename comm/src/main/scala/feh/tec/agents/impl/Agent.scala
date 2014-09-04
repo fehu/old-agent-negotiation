@@ -4,7 +4,7 @@ import java.util.UUID
 
 import akka.actor.ActorRef
 import feh.tec.agents.Message.Response
-import feh.tec.agents.SystemMessage.{RefDemand, ReportAllStates, ReportStates, ScopeUpdate}
+import feh.tec.agents.SystemMessage.{RefDemand, ScopeUpdate}
 import feh.tec.agents._
 import feh.tec.agents.impl.Language.dsl._
 import feh.tec.agents.impl.Negotiation.DynamicScope
@@ -70,12 +70,17 @@ object Agent{
         updateInitStatus()
       case start: SystemMessage.Start if status == Status.Working => sender ! start.alreadyRunning
 // ReportState Messages
-      case req: ReportStates => sender ! req.response(getOpt _ andThen{ _.map{
+      case req: AgentReports.ReportStates => sender ! req.response(getOpt _ andThen{ _.map{
         neg => (neg.priority, neg.currentValues.toMap, neg.scope, extractReportExtra(neg.id))
       }})
-      case req: ReportAllStates => sender ! req.response(negotiations.map{
-        neg => neg.id -> (neg.priority, neg.currentValues.toMap, neg.scope, extractReportExtra(neg.id))
-      }.toMap)
+      case req: AgentReports.ReportAllStates => sender ! reportAllStates(req.id)
+    }
+
+    protected def reportAllStates(id: UUID = UUID.randomUUID()) = {
+      val negs = negotiations.map{
+        neg => neg.id -> AgentReports.StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, extractReportExtra(neg.id))
+      }.toMap
+      AgentReports.StateReport(ref, negs, id)
     }
 
     protected def extractReportExtra(negId: NegotiationId): Option[Any] = None
@@ -87,7 +92,7 @@ object Agent{
    *  don't forget to use discard if a proposal is discarded to preserve memory (not all agents may respond)
    */
   trait ProposalRegistering[Lang <: ProposalLanguage] extends ProposalBased[Lang] with ProposalRegister[Lang]{
-    self: NegotiatingAgent =>
+    self: NegotiatingAgent with AgentHelpers[Lang] =>
 
     protected var proposalsWithoutResponse = mutable.HashSet.empty[(Message.Id, AgentRef)]
 
@@ -95,10 +100,13 @@ object Agent{
     def discardProposal(id: Message.Id) = proposalsWithoutResponse = proposalsWithoutResponse.filter(_._1 != id)
     def registerProposal(msg: Lang#Proposal, to: AgentRef) = proposalsWithoutResponse += msg.id -> to
 
-    override def lifeCycle = AgentRef.withOnSendHook{
-      case (msg, to) if lang.isProposal(msg) => proposalsWithoutResponse += msg.id -> to
-      case (_, _) => // do nothing
-    }(super.lifeCycle)
+    override def lifeCycle = {
+      case m if super.lifeCycle isDefinedAt m =>
+        hooks.OnSend.withHooks{
+          case (to, msg) if lang.isProposal(msg) => proposalsWithoutResponse += msg.id -> to
+          case (_, _) => // do nothing
+        }(super.lifeCycle(m))
+    }
 
 
     abstract override def onRejected =  execAndMarkRespondedAfter(super.onRejected)
@@ -111,23 +119,44 @@ object Agent{
     }
   }
 
+  trait AgentReporting[Lang <: Language] extends SpeakingAgent[Lang] with SystemSupport{
+    self: NegotiatingAgent with AgentHelpers[Lang] =>
+
+    def reportingTo: AgentRef
+
+    override def lifeCycle: PartialFunction[AbstractMessage, Unit] = {
+      case m if super.lifeCycle isDefinedAt m =>
+        hooks.OnSend.withHooks{
+          case (to, msg) if lang.isMessage(msg) =>
+            buildReports(msg.asInstanceOf[Lang#Msg], to) foreach reportingTo.ref.!
+          case msg => // ignore system messages
+        }(super.lifeCycle(m))
+    }
+
+    protected def buildReports: (Lang#Msg, AgentRef) =>  Set[AgentReport]
+  }
+
+  trait AgentReportingMessagesAndState[Lang <: Language] extends AgentReporting[Lang]{
+    self: NegotiatingAgent with AgentHelpers[Lang] =>
+
+    protected def buildReports = (msg, to) =>  Set(
+      AgentReports.MessageReport(to, msg),
+      reportAllStates()
+    )
+
+  }
+}
+
+trait ActorHooks{
+  def send: Set[(AgentRef, AbstractMessage) => Unit]
 }
 
 object AgentRef{
-  type OnSendHook = (AbstractMessage, AgentRef) => Unit
-  private object OnSendHook extends ScopedState[(AbstractMessage, AgentRef) => Unit]((_, _) => {})
-
-  def withOnSendHook[R](hook: OnSendHook)(f: => R) = OnSendHook.doWith(hook)(f)
 
   def apply(_id: impl.Agent.Id, _ref: ActorRef) =
     new AgentRef{
       def id = _id
       def ref = _ref
-
-      def !(msg: AbstractMessage) = {
-        ref ! msg
-        OnSendHook.get(msg, this)
-      }
     }
 }
 

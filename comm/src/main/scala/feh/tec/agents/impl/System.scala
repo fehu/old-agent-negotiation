@@ -13,11 +13,11 @@ import scala.concurrent.ExecutionContext
 object System {
   def negotiationReports(ag: AgentRef, of: NegotiationId*)
                         (implicit xc: ExecutionContext, askTimeout: Timeout) =
-    (ag.ref ? SystemMessage.ReportStates(of: _*)).mapTo[SystemMessage.StateReport]
+    (ag.ref ? AgentReports.ReportStates(of: _*)).mapTo[AgentReports.StateReport]
 
   def allNegotiationReports(ag: AgentRef)
                            (implicit xc: ExecutionContext, askTimeout: Timeout) =
-    (ag.ref ? SystemMessage.ReportAllStates()).mapTo[SystemMessage.StateReport]
+    (ag.ref ? AgentReports.ReportAllStates()).mapTo[AgentReports.StateReport]
   
   object Service{
     sealed trait ArgsArity{ self: AbstractAgent => }

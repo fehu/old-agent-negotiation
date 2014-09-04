@@ -25,7 +25,7 @@ object NegotiationController{
 
   case class Timeouts(resolveConflict: Timeout, agentCreation: Timeout, agentStartup: Timeout)
 
-  trait GenericBuilding extends NegotiationController with SystemAgent with ActorLogging{
+  trait GenericBuilding extends NegotiationController with SystemAgent{
     def role = Role
 
     implicit def acSys = context.system
@@ -43,7 +43,8 @@ object NegotiationController{
       }.toList
     }
 
-    def conflictResolver = systemAgents.filter(_.id.role == ConflictResolver.Role).ensuring(_.size == 1).head
+    def conflictResolver = getSystemAgent(ConflictResolver.Role)
+    def reportingTo = getSystemAgent(ReportsPrinter)
 
     def start() = {
       implicit def timeout = timeouts.agentStartup
@@ -59,6 +60,8 @@ object NegotiationController{
       case req@Request.AgentRefs() => sender() ! agents
       case _: SystemMessage.Start => start()
     }
+
+    private def getSystemAgent(role: Role) = systemAgents.filter(_.id.role == role).ensuring(_.size == 1).head
   }
 
   class Counter[T, C](val starting: C, getNext: C => C){

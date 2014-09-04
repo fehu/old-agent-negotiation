@@ -30,3 +30,12 @@ class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecification{
 
 }
 ```
+
+Running the queens' negotiation
+ 
+ ```
+ user:project_root> sbt
+ > project misc
+ > run
+ 
+ ```

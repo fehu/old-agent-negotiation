@@ -19,7 +19,7 @@ object NegotiationController{
     def scopeFor(ag: AgentRef, in: NegotiationId): Set[AgentRef]
 
     def updateScopes(neg: NegotiationId) = agents foreach {
-      ag => ag ! ScopeUpdate.NewScope(scopeFor(ag, neg), neg)
+      ag => ag.ref ! ScopeUpdate.NewScope(scopeFor(ag, neg), neg)
     }
   }
 

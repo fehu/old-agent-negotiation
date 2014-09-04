@@ -53,30 +53,6 @@ object SystemMessage{
 
   case class RefDemand() extends SystemMessage with AutoId
 
-  case class ReportStates(of: NegotiationId*) extends SystemMessage with AutoId{
-    def response(f: NegotiationId => Option[(Priority, Map[Var, Any], Set[AgentRef], Option[Any])])(implicit responding: AgentRef) =
-      of.zipMap(f).map {
-        case (negId, Some(t)) => negId -> StateReportEntry.tupled(t)
-        case (negId, None)    => negId -> null
-      }.toMap |> (StateReport(responding, _, id))
-  }
-
-  case class ReportAllStates() extends SystemMessage with AutoId{
-    def response(res: Map[NegotiationId, (Priority, Map[Var, Any], Set[AgentRef], Option[Any])])(implicit responding: AgentRef) =
-      res.map {
-        case (negId, (p, v, s, e)) => negId -> StateReportEntry(p, v, s, e)
-      }.toMap |> (StateReport(responding, _, id))
-  }
-
-  case class StateReport protected[SystemMessage](of: AgentRef, 
-                                                  report: Map[NegotiationId, StateReportEntry], 
-                                                  respondingTo: Message.Id)
-    extends SystemMessage { def id = respondingTo }
-
-  case class StateReportEntry protected[SystemMessage](priority: Priority,
-                                                       vals: Map[Var, Any],
-                                                       scope: Set[AgentRef],
-                                                       extra: Option[Any])
 }
 
 object Message{

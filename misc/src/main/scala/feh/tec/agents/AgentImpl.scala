@@ -1,6 +1,7 @@
 package feh.tec.agents
 
 import akka.actor.ActorLogging
+import feh.tec.agents.impl.Agent.AgentReportingMessagesAndState
 import feh.tec.agents.impl._
 import feh.tec.agents.impl.agent.AgentCreation
 import feh.tec.agents.impl.view.CreateConstraintsHelper
@@ -35,6 +36,7 @@ class GenericNegotiatingAgentImpl(arg: GenericIteratingAgentCreation.Args)
   with DefaultNegotiatingLanguage.Builder
   with NegotiationSupport.Default
   with ProposalEngine.IteratingAllDomains[DefaultNegotiatingLanguage]
+  with AgentReportingMessagesAndState[DefaultNegotiatingLanguage]
   with ActorLogging
 {
   type StateOfNegotiation = ProposalIteratorNegotiationState[DefaultNegotiatingLanguage]
