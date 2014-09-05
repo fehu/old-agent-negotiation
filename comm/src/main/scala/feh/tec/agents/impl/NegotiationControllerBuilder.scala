@@ -186,16 +186,19 @@ object NegotiationControllerBuilder{
       timeouts = v1.config.configs.collect { case TimeoutsDef(t) => t }.flatten.toMap |> buildTimeouts
       timings  = v1.config.configs.collect { case TimingsDef(t)  => t }.flatten.toMap |> buildTimings
 
-      val props = Props(classOf[DefaultController], GenericStaticInitArgs[DefaultBuildAgentArgs](
+      val arg = GenericStaticInitArgs[DefaultBuildAgentArgs](
         systemAgentBuilders = systemAgents,
         negotiationIds = negotiations.map(_._2._1).toSet,
         agentBuilders = agentsToAgentInits,
         timeouts,
         timings
-        )
       )
-      acSys.actorOf(props, "NegotiationController")
+
+      acSys.actorOf(props(arg), "NegotiationController")
     }
+
+    protected def props(arg: GenericStaticInitArgs[DefaultBuildAgentArgs]) = Props(classOf[DefaultController], arg)
+
   }
 }
 

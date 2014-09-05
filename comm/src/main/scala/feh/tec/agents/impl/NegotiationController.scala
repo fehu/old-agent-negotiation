@@ -61,7 +61,7 @@ object NegotiationController{
       case _: SystemMessage.Start => start()
     }
 
-    private def getSystemAgent(role: Role) = systemAgents.filter(_.id.role == role).ensuring(_.size == 1).head
+    protected def getSystemAgent(role: Role) = systemAgents.filter(_.id.role == role).ensuring(_.size == 1).head
   }
 
   class Counter[T, C](val starting: C, getNext: C => C){

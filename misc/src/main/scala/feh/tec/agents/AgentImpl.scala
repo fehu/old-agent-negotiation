@@ -54,6 +54,6 @@ class GenericNegotiatingAgentImpl(arg: GenericIteratingAgentCreation.Args)
 
   log.info(s"I'm created! $id" )
 
-  override protected def extractReportExtra(negId: NegotiationId) = getOpt(negId).map(_.state.currentProposal)
+  override protected def extractReportExtra(negId: NegotiationId) = getOpt(negId).flatMap(_.state.currentProposal)
 
 }

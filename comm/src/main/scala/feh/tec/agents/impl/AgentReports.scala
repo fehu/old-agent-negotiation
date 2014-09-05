@@ -8,12 +8,21 @@ import feh.tec.agents._
 import feh.tec.agents.impl.System.Service
 import feh.util._
 
-case object ReportsPrinter extends SystemRole{ val name = "ReportsPrinter" }
+import scala.collection.mutable
+
+case object ReportsPrinter extends SystemRole{
+  val name = "ReportsPrinter"
+
+  case class Forward(to: AgentRef) extends SystemMessage with AutoId
+}
 class ReportsPrinter extends SystemAgent with Service.Args0 with ActorLogging{
   def role = ReportsPrinter
 
+  val forwarding = mutable.HashSet.empty[AgentRef]
+
   override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse{
-    case AgentReports.StateReport(of, report, _) =>
+    case rep@AgentReports.StateReport(of, report, _) =>
+      forwarding.foreach(_.ref ! rep)
       val sb = new StringBuilder
       sb ++= s"Report by $of:\n"
       report foreach {
@@ -24,8 +33,27 @@ class ReportsPrinter extends SystemAgent with Service.Args0 with ActorLogging{
           if(extra.isDefined) sb ++= ("\n" + " "*12 + s"   extra: ${extra.get}")
       }
       log.info(sb.mkString)
-    case AgentReports.MessageReport(to, msg) =>
+    case rep@AgentReports.MessageReport(to, msg) =>
+      forwarding.foreach(_.ref ! rep)
       log.info(s"Message $msg was sent by ${msg.sender} to $to")
+    case ReportsPrinter.Forward(to) =>
+      log.info(s"Forwarding to $to registered")
+      forwarding += to
+  }
+}
+
+object ReportArchive extends SystemRole{ val name = "ReportArchive" }
+abstract class ReportArchive extends SystemAgent with Service.Args0 with ActorLogging {
+  def role = ReportArchive
+
+  def reports: Map[AgentRef, Seq[AgentReport]]
+
+  def newReport(rep: AgentReport)
+
+  override def processSys = super.processSys orElse{
+    case rep: AgentReport =>
+      log.info(s"report received: $rep")
+      newReport(rep)
   }
 }
 

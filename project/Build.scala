@@ -81,7 +81,7 @@ object  Build extends sbt.Build {
       }
 
       object dsl{
-        lazy val swing = "feh.dsl" %% "swing" % "1.1"
+        lazy val swing = "feh.dsl" %% "swing" % "1.2"
         lazy val graphviz = "feh.dsl" %% "graphviz" % "0.1"
       }
     }
@@ -109,7 +109,11 @@ object  Build extends sbt.Build {
   lazy val misc = Project(
     id = "misc",
     base = file("misc"),
-    settings = buildSettings
+    settings = buildSettings ++ Seq(
+      libraryDependencies ++= Seq(
+        feh.dsl.swing
+      )
+    )
   ) dependsOn comm
 
 

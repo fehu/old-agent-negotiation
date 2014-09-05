@@ -9,6 +9,8 @@ sealed trait AbstractMessage{
 }
 
 trait Message extends AbstractMessage{
+  def messageType: String
+
   def priority: Priority
 
   def sender: AgentRef
@@ -17,7 +19,7 @@ trait Message extends AbstractMessage{
 
   def asString: String
 
-  override def toString = super.toString + "\"" + asString + "\""
+  override def toString = s"$messageType: $asString (${sender.id}, $priority})"
 
   /** The message's priority is higher than scope's
     */
@@ -72,6 +74,8 @@ object Message{
                      (implicit val sender: AgentRef, val priority: Priority)
     extends Response with AutoId
   {
+
+    def messageType = "Accepted"
     def respondingTo = offer
     def asString = "I accept your offer"
   }
@@ -79,6 +83,7 @@ object Message{
                      (implicit val sender: AgentRef, val priority: Priority)
     extends Response with AutoId
   {
+    def messageType = "Rejected"
     def respondingTo = offer
     def asString = "I reject your offer"
   }
@@ -91,6 +96,7 @@ object Message{
                      (implicit val sender: AgentRef, val priority: Priority)
     extends AbstractProposal with AutoId
   {
+    def messageType = "Proposal"
     def asString = s"I would like to set values: $get, are you ok with it?"
   }
 
@@ -98,11 +104,13 @@ object Message{
                    (implicit val sender: AgentRef, val priority: Priority)
     extends AbstractProposal with AutoId
   {
+    def messageType = "Demand"
     def asString = s"I want you to set values: $get, do you accept?"
   }
 
   abstract class Fallback(val negotiation: NegotiationId)
                          (implicit val sender: AgentRef, val priority: Priority) extends Message {
+    def messageType = "Fallback"
     def asString = s"I ran out of possible variants, please fallback"
   }
 

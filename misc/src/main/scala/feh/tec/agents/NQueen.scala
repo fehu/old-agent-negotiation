@@ -89,7 +89,7 @@ class NQueenUserAgent extends UserAgent{
   println("spec.agents = " + spec.agents)
   println("spec.config = " + spec.config)
 
-  val builder = new NegotiationControllerBuilder.Default[GenericNegotiatingAgentImpl]
+  val builder = new ControllerBuilder[GenericNegotiatingAgentImpl]
   val controller = builder(spec)
 
   println("builder.vars = " + builder.vars)
@@ -107,6 +107,10 @@ class NQueenUserAgent extends UserAgent{
   Thread.sleep(500)
 
   def agents = Await.result(agF, 300 millis)
+
+//  agents foreach (ag => controller ! Controller.ShowReportGui(ag) )
+
+  agents.headOption foreach (ag => controller ! Controller.ShowReportGui(ag) )
 
 //  context.system.scheduler.schedule(0 millis, 1 second, self, "printReports")
 
