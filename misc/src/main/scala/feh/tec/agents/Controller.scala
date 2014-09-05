@@ -32,10 +32,10 @@ class Controller(arg: GenericStaticInitArgs[DefaultBuildAgentArgs]) extends Nego
   }
 
   override def processSys = super.processSys orElse{
-    case Controller.ShowReportGui(ag) => reportsGui.ref ! ReportArchiveGUI.ShowReports(ag)
+    case Controller.ShowReportsGui(ag) => reportsGui.ref ! ReportArchiveGUI.ShowReports(ag)
   }
 }
 
 object Controller{
-  case class ShowReportGui(ag: AgentRef) extends SystemMessage with AutoId
+  case class ShowReportsGui(agents: Seq[AgentRef]) extends SystemMessage with AutoId
 }

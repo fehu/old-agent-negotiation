@@ -110,7 +110,7 @@ class NQueenUserAgent extends UserAgent{
 
 //  agents foreach (ag => controller ! Controller.ShowReportGui(ag) )
 
-  agents.headOption foreach (ag => controller ! Controller.ShowReportGui(ag) )
+  controller ! Controller.ShowReportsGui(agents)
 
 //  context.system.scheduler.schedule(0 millis, 1 second, self, "printReports")
 
