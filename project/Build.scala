@@ -2,6 +2,8 @@ import sbt._
 import Keys._
 import sbtunidoc.Plugin._
 import org.sbtidea.SbtIdeaPlugin._
+import scala.scalajs.sbtplugin._
+import ScalaJSPlugin._
 
 object  Build extends sbt.Build {
 
@@ -33,6 +35,7 @@ object  Build extends sbt.Build {
     object Snapshot{
       val sonatype = "Sonatype Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots"
       val eulergui = "eulergui" at "http://eulergui.sourceforge.net/maven2"
+      val spray = "spray nightlies repo" at "http://nightlies.spray.io"
     }
 
   }
@@ -52,7 +55,9 @@ object  Build extends sbt.Build {
     }
 
     object spray{
-      lazy val json = "io.spray" %%  "spray-json" % "1.2.5"
+      val version = "1.3.1"
+      lazy val json = "io.spray" %%  "spray-json" % version
+      lazy val can = "io.spray" %% "spray-can" % version
     }
 
     object Tests{
@@ -96,7 +101,7 @@ object  Build extends sbt.Build {
       name := "agent-comm"
     }
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(comm, oldcomm, coloring, misc)
+   .aggregate(comm, oldcomm, coloring, misc, webFrontend)
 
   lazy val comm = Project(
     id = "comm",
@@ -133,5 +138,14 @@ object  Build extends sbt.Build {
       ) ++ jung.all
     )
   ) dependsOn oldcomm
+
+  lazy val webFrontend = Project(// libraryDependencies in build.sbt
+    id = "web-frontend",
+    base = file("web-frontend"),
+    settings = buildSettings ++ /*scalaJSSettings ++ */Seq(
+      resolvers += Snapshot.spray,
+      libraryDependencies ++= Seq()
+    )
+  )
 
 }
