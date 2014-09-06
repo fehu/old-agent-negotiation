@@ -23,8 +23,9 @@ sealed trait ViewMerge extends ExternalView{
   def process = {
     case msg if filterIncoming(msg) =>
       _refs += msg.sender
-      mergeSet.withFilter(filterForward).foreach(_ process msg)
+      mergeSet.withFilter(filterForward).foreach(_.process lift msg)
       updateData()
+//      sys.error("_data = " + data)
   }
 
   protected def getData[V <: ExternalView](select: Merge => V)(implicit ref: AgentRef): V#Data =

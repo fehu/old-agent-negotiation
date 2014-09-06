@@ -31,4 +31,6 @@ class Coloring(uuid: UUID,
   val role: Role = Coloring.role
   val domainIterators = Map(Color.it)
   val constraints = Set( CreateConstraint.notEquals(Color, negotiationId) )
+
+  def checkConstraintsRepeat = ???
 }

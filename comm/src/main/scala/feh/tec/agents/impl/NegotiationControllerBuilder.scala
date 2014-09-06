@@ -92,7 +92,8 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
             Role(role),
             domainIterators.asInstanceOf[Map[Var, DomainIterator[Var#Domain, Var#Tpe]]],
             constraints,
-            reportingTo = args.reportingTo
+            reportingTo = args.reportingTo,
+            checkConstraintsRepeat = 1 second // todo
           )
       })
     }.toMap
@@ -210,6 +211,7 @@ abstract class GenericIteratingAgentCreation[Lang <: ProposalLanguage](args: Gen
 
 
   def reportingTo = args.reportingTo
+  def checkConstraintsRepeat = args.checkConstraintsRepeat
 
   override lazy val id = Id.withName(role, args.uuid, args.name)
   lazy val role: Role = args.role
@@ -227,7 +229,8 @@ object GenericIteratingAgentCreation{
                   role: Role,
                   domainIterators: Map[Var, DomainIterator[Var#Domain, Var#Tpe]],
                   constraints: Seq[CreateConstraintsHelper => Constraint[Var]],
-                  reportingTo: AgentRef)
+                  reportingTo: AgentRef,
+                  checkConstraintsRepeat: FiniteDuration)
 
   object Builder extends AgentBuilder[GenericIteratingAgentCreation[_], Args]
 }

@@ -10,6 +10,7 @@ import feh.tec.agents.impl.AgentReports.{StateReportEntry, MessageReport, StateR
 import feh.tec.agents.impl.{Agent, AgentReport, ReportArchive}
 import feh.util._
 import scala.collection.mutable
+import scala.concurrent.duration._
 
 // todo
 class ReportArchiveGUI extends ReportArchive with SwingAppBuildingEnvironment{
@@ -17,23 +18,35 @@ class ReportArchiveGUI extends ReportArchive with SwingAppBuildingEnvironment{
   lazy val states   = mutable.HashMap.empty[AgentRef, mutable.Buffer[StateReport]] withDefault(_ => mutable.Buffer.empty)
   lazy val messages = mutable.HashMap.empty[AgentRef, mutable.Buffer[MessageReport]] withDefault(_ => mutable.Buffer.empty)
 
-  def reports = (states ++ messages).toMap // .mapValues(_.toSeq)
+  def reports = states.zipByKey(messages).mapValues[List[AgentReport]]{case (x, y) => x.toList ::: y. toList}
+
+  def repSize = states.zipByKey(messages).mapValues{
+    case (bs, bm) => bs.size.ensuring(_ == bm.size)
+  } 
+  
+  private val lastSize = mutable.HashMap.empty[AgentRef, Int]
 
   def newReport(rep: AgentReport) = {
+    log.info("!!!!!!!newReport")
     rep match{
       case rep: StateReport => states <<= (rep.of, _ += rep)
       case rep: MessageReport => messages <<= (rep.of, _ += rep)
     }
-    gui foreach (_.updateForms())
   }
 
   var gui: Option[ReportsGui] = None
 
+  case object Upd extends SystemMessage{ def id = ??? }
+
   override def processSys = super.processSys orElse{
-    case ShowReports(agents) =>
+    case ShowReports(agents, updFreq) =>
       gui = Some(new ReportsGui(agents))
       gui.get.start()
-      gui.get.updateForms()
+      context.system.scheduler.schedule(0 millis, updFreq, self, Upd)(context.system.dispatcher, self)
+    case Upd if lastSize.toMap == repSize => // do nothing
+    case Upd =>
+        lastSize ++= repSize
+        gui foreach (_.updateForms())
   }
 
   class ReportsGui(agents: Seq[AgentRef]) extends SwingAppFrame with Frame9PositionsLayoutBuilder{
@@ -52,7 +65,6 @@ class ReportArchiveGUI extends ReportArchive with SwingAppBuildingEnvironment{
 
     def start() = {
       open()
-//      size = Toolkit.getDefaultToolkit.getScreenSize
       preferredSize = Toolkit.getDefaultToolkit.getScreenSize
       buildLayout()
     }
@@ -113,5 +125,5 @@ class ReportArchiveGUI extends ReportArchive with SwingAppBuildingEnvironment{
 
 
 object ReportArchiveGUI{
-  case class ShowReports(of: Seq[AgentRef]) extends SystemMessage with AutoId
+  case class ShowReports(of: Seq[AgentRef], updateFreq: FiniteDuration) extends SystemMessage with AutoId
 }

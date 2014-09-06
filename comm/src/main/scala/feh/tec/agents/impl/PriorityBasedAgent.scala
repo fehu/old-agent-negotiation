@@ -1,11 +1,14 @@
 package feh.tec.agents.impl
 
+import java.util.concurrent.TimeoutException
+
 import akka.pattern.ask
 import akka.util.Timeout
 import feh.tec.agents.service.ConflictResolver.{ConflictResolved, ResolveConflict}
 import feh.tec.agents._
 
 import scala.concurrent.Await
+import scala.util.{Failure, Success}
 
 /** Intended to be used with views
  */
@@ -26,11 +29,12 @@ trait PriorityBasedAgent[Lang <: ProposalLanguage] extends Agent[Lang]
   def resolvePriorityConflict(causedBy: Message) = {
     implicit def timeout = conflictResolveTimeout
     val req = ResolveConflict("priority", causedBy.negotiation, causedBy.sender)
-    Await.result(conflictResolver.ref ? req, timeout.duration) match {
-      case ConflictResolved(req.id, won, _) => won
+    Await.ready(conflictResolver.ref ? req, timeout.duration*2).value.get match {
+      case Success(ConflictResolved(req.id, won, _)) => won
+      case Failure(_: TimeoutException) => true
     }
   }
-  
+
   lazy val behaviourOnProposal = new PriorityBasedBacktrackBehaviour[Lang#Proposal]{
     def disputeOverPriorityWon(msg: Lang#Msg) = {
       risePriority(msg.negotiation)

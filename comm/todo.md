@@ -5,3 +5,4 @@
 - [x] when creating negotiation scopes - filter same agent
 - [ ] agents should report on messages sent 
 - [ ] remove debug outputs
+- [ ] timings from NegotiationControllerBuilder.buildAgents should ne configurable

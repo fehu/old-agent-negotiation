@@ -7,6 +7,7 @@ import feh.tec.agents.impl.NegotiationControllerBuilder.DefaultBuildAgentArgs
 import feh.tec.agents.impl.agent.AgentBuilder
 import feh.tec.agents.impl.{ReportsPrinter, ReportArchive, GenericIteratingAgentCreation, NegotiationControllerBuilder}
 
+import scala.concurrent.duration.FiniteDuration
 import scala.reflect.ClassTag
 
 class ControllerBuilder[AgImpl <: GenericIteratingAgentCreation[_]]
@@ -32,10 +33,14 @@ class Controller(arg: GenericStaticInitArgs[DefaultBuildAgentArgs]) extends Nego
   }
 
   override def processSys = super.processSys orElse{
-    case Controller.ShowReportsGui(ag) => reportsGui.ref ! ReportArchiveGUI.ShowReports(ag)
+    case Controller.ShowReportsGui(ag, silence, updateFreq) =>
+      reportsGui.ref ! ReportArchiveGUI.ShowReports(ag, updateFreq)
+      reportingTo.ref ! ReportsPrinter.Silent(silence)
   }
 }
 
 object Controller{
-  case class ShowReportsGui(agents: Seq[AgentRef]) extends SystemMessage with AutoId
+  case class ShowReportsGui(agents: Seq[AgentRef],
+                            silence: Boolean,
+                            updateFreq: FiniteDuration) extends SystemMessage with AutoId
 }

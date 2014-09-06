@@ -77,7 +77,7 @@ object DomainIterator{
       
       val currentValues = mutable.HashMap.empty[Int, T]
 
-      def hasNext = iterators.head._2.hasNext
+      def hasNext = iterators.last._2.hasNext
 
       var isFirstTime = true
 

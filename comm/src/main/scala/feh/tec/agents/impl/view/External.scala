@@ -1,8 +1,10 @@
 package feh.tec.agents.impl.view
 
+import java.util.UUID
+
 import feh.tec.agents.Message.Id
 import feh.tec.agents._
-
+import feh.util._
 import scala.collection.mutable
 
 
@@ -41,14 +43,18 @@ class ExternalConstraints[Lang <: ProposalLanguage](lang: Lang,
   extends ExternalConstraintsView
 {
   def data = _data.mapValues(_.toMap).toMap
-  protected lazy val _data = 
-    mutable.HashMap.empty[AgentRef, mutable.Map[Message.Id, Option[Boolean]]]
-      .withDefaultValue(mutable.HashMap.empty.withDefaultValue(None))
+  protected lazy val _data = mutable.HashMap.empty[AgentRef, mutable.Map[Message.Id, Option[Boolean]]]
   
   def process = {
-    case msg if lang.isAcceptance(msg) => _data(msg.sender) += msg.id -> Some(true)
-    case msg if lang.isRejection(msg) => _data(msg.sender) += msg.id -> Some(false)
+    case msg if lang.isAcceptance(msg) => addData(msg.sender, msg.asInstanceOf[Lang#Accepted].respondingTo, Some(true))
+    case msg if lang.isRejection(msg) => addData(msg.sender, msg.asInstanceOf[Lang#Accepted].respondingTo, Some(false))
+    case msg if lang.isMessage(msg) && ! _data.contains(msg.sender) => //addData(msg.sender, msg.id, None)
   }
+
+  private def addData(sender: AgentRef, id: UUID, v: Option[Boolean]) =
+    _data.getOrElse(sender, mutable.HashMap.empty[Message.Id, Option[Boolean]] //.withDefaultValue(None)
+      .$$(_data += sender -> _)) += id -> v
+//    _data.getOrElseUpdate(msg.sender, mutable.HashMap.empty.withDefaultValue(None)) += msg.id -> v
 
   def discard(id: Id) = _data.foreach(_._2.remove(id))
 }

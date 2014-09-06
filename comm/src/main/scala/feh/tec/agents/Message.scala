@@ -27,6 +27,7 @@ trait Message extends AbstractMessage{
 }
 
 protected[agents] trait SystemMessage extends AbstractMessage
+protected[agents] abstract class LocalSystemMessage extends SystemMessage{ def id = ??? }
 
 object SystemMessage{
   case class Start() extends SystemMessage with AutoId{
@@ -85,7 +86,7 @@ object Message{
   {
     def messageType = "Rejected"
     def respondingTo = offer
-    def asString = "I reject your offer"
+    def asString = s"I reject your offer $offer"
   }
 
   trait AbstractProposal extends Request{
@@ -97,7 +98,7 @@ object Message{
     extends AbstractProposal with AutoId
   {
     def messageType = "Proposal"
-    def asString = s"I would like to set values: $get, are you ok with it?"
+    def asString = s"I would like to set values: $get, are you ok with it? ($id)"
   }
 
   case class Demand(negotiation: NegotiationId, get: Map[Var, Any])

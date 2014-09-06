@@ -1,5 +1,6 @@
 package feh.tec.agents
 
+import akka.actor.ActorLogging
 import feh.util.InUnitInterval
 
 trait ViewUtils {
@@ -33,9 +34,14 @@ trait ViewUtils {
 
 }
 
-trait ExternalViewSupport extends InfoGathering{
+trait ExternalViewSupport extends InfoGathering with ActorLogging{
   def externalViews: Seq[ExternalView]
   def filterIncoming: AbstractMessage => Boolean
 
-  def gatherInfo(msg: AbstractMessage) = if(filterIncoming(msg)) externalViews.foreach(_.process)
+  def gatherInfo(msg: AbstractMessage) = msg match{
+    case msg: Message if filterIncoming(msg) =>
+      log.info(s"gatherInfo($msg)")
+      externalViews.foreach(_.process.lift(msg))
+    case other =>
+  }
 }

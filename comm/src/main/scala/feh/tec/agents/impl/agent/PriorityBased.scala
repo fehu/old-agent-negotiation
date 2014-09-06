@@ -8,9 +8,16 @@ import feh.tec.agents.ConstraintsView.Constraint
 import feh.tec.agents._
 import AgentCreation.NegotiationInit
 import feh.tec.agents.impl._
-import feh.tec.agents.impl.view.{Constraints, ConstraintsSatisfactionWithPriority}
+import feh.tec.agents
+import feh.tec.agents.impl.view.{Priority, ExternalConstraints, Constraints, ConstraintsSatisfactionWithPriority}
 import feh.util._
 
+import scala.concurrent.duration.FiniteDuration
+
+
+object PriorityBased{
+  protected case object CheckConstraints extends LocalSystemMessage
+}
 
 trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   with impl.Agent.ProposalRegistering[Lang]
@@ -18,9 +25,22 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   with PriorityBasedAgentViews
   with NegotiationStateSupport
   with ViewUtils
+  with ActorLogging
 {
-  lazy val constraintsSatisfactions = ConstraintsSatisfactionWithPriority(lang)
+  def constraintsFilter: Message => Boolean = _ => true
+  lazy val constraintsSatisfactions = new ConstraintsSatisfactionWithPriority(
+    new ExternalConstraints(lang, constraintsFilter), new Priority(constraintsFilter))
+  {
+    override def process = {
+      case msg =>
+        log.info(s"process($msg)")
+        super.process(msg)
+    }
+  }
   lazy val proposalSatisfaction = new Constraints(constraints)
+
+  def scheduleCheckConstraints(init: FiniteDuration, delay: FiniteDuration) =
+    context.system.scheduler.schedule(init, delay, self, PriorityBased.CheckConstraints)(context.system.dispatcher, self)
 
   def constraints: Set[Constraint[Var]]
   protected def issuesExtractor: IssuesExtractor[Lang]
@@ -28,19 +48,53 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   protected def isFailure(neg: Negotiation, weighted: Map[Option[Boolean], InUnitInterval]): Boolean
 
   def accept_?(prop: Lang#Proposal) = issuesExtractor.extract(prop) forall (proposalSatisfaction.satisfies _).tupled
-  
-  def checkConstraints(negId: NegotiationId) = get(negId) |> {
+
+
+  override def processSys = super.processSys orElse{
+    case PriorityBased.CheckConstraints => negotiations.foreach(_.id |> checkConstraints)
+  }
+
+  override def gatherInfo(msg: AbstractMessage) = {
+    log.info(s"gatherInfo($msg)")
+    super.gatherInfo(msg)
+  }
+
+  def checkConstraints(negId: NegotiationId): Unit = get(negId) |> {
     neg =>
       neg.state.currentProposal map {
         currentProposal =>
           val viewsByMsgId = constraintsSatisfactions.data.regroupSeq{
-            case (mp, pr) => mp.toSeq.map{
-              case (msgId, opt) => msgId -> (opt, pr)
-            }
+            case (_mp, _pr) =>
+              // null tests
+              val mp = Option(_mp)
+              val pr = Option(_pr) //Message.Id, Option[Boolean]
+
+
+              mp.map(_.toSeq).getOrElse(Nil).map{
+                case (msgId, opt) => msgId -> (opt -> (negId -> pr.map(_._2).getOrElse(null.asInstanceOf[agents.Priority])))
+              }
           }
-          val weighted = viewsByMsgId(currentProposal.id).weight{
+
+          val maxPriority = constraintsSatisfactions.data.map(_._2._2._2).maxBy(_.get)
+
+          if(neg.currentPriority > maxPriority) return
+
+          val xx = constraintsSatisfactions.data.map(_._2._1)
+          log.info(s"currentProposal.id=${currentProposal.id}, xx=$xx")
+          val weighted = viewsByMsgId.getOrElse(currentProposal.id, Map()).weight{
             case (ag, (opt, pr)) if neg.scope.contains(ag) && pr._2 > neg.currentPriority => opt
           }
+
+          log.info("weighted = " + weighted)
+          log.info("viewsByMsgId = " + viewsByMsgId)
+
+          if(weighted.isEmpty) {
+            spamProposal(neg)
+            return
+          }
+
+          log.info("constraintsSatisfactions.data = " + constraintsSatisfactions.data)
+          log.info("externalConstraints.data = " + constraintsSatisfactions.merge._1.data)
 
           if(isFailure(neg, weighted))
             setNextProposal(neg)
@@ -50,10 +104,13 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
       }
   }
 
+  def checkConstraintsRepeat: FiniteDuration
+
   override def startLife() = negotiations foreach {
     neg =>
       resetProposal(neg)
       spamProposal(neg)
+      scheduleCheckConstraints(checkConstraintsRepeat, checkConstraintsRepeat)
   }
 
   protected def spamProposal(neg: ANegotiation) = sendToAll(neg, neg.state.currentProposal.get)

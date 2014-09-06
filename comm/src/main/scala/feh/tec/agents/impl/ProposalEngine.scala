@@ -2,6 +2,7 @@ package feh.tec.agents.impl
 
 import java.util.Date
 
+import akka.actor.ActorLogging
 import feh.tec.agents._
 import feh.util._
 
@@ -46,7 +47,7 @@ object ProposalEngine{
   /** Iterates over the domains values using DomainIterator.overSeq
     * ignores initial values
     */
-  trait IteratingAllDomains[Lang <: ProposalLanguage] extends Iterating[Lang]{
+  trait IteratingAllDomains[Lang <: ProposalLanguage] extends Iterating[Lang] with ActorLogging{
     self: NegotiatingAgent with ProposalBased[Lang] with ProposalRegister[Lang] =>
 
     protected val domainSeqIterators = negotiations.map{ neg => neg.id -> iteratorForNegotiation(neg) }.toMap
@@ -76,6 +77,7 @@ object ProposalEngine{
     /** resets values and sets a new proposal */
     def resetProposal(neg: ANegotiation) = {
       neg.state.currentIterator = Some(newIterator(neg.id))
+      val it = neg.state.currentIterator.get
       setNextProposal(neg)
     }
 
@@ -84,6 +86,7 @@ object ProposalEngine{
       issues =>
         neg.currentValues ++= issues
         val prop = createProposal(neg.id)
+        log.info(s"new proposal $prop")
         neg.state.currentProposal.foreach( _.id |> discardProposal )  // discard the old proposal in the register
         neg.state.currentProposal = Option(prop)                      // when a new one is set
         neg.state.currentProposalDate = Some(new Date())

@@ -14,14 +14,16 @@ case object ReportsPrinter extends SystemRole{
   val name = "ReportsPrinter"
 
   case class Forward(to: AgentRef) extends SystemMessage with AutoId
+  case class Silent(v: Boolean) extends SystemMessage with AutoId
 }
 class ReportsPrinter extends SystemAgent with Service.Args0 with ActorLogging{
   def role = ReportsPrinter
 
+  var silent = false
   val forwarding = mutable.HashSet.empty[AgentRef]
 
   override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse{
-    case rep@AgentReports.StateReport(of, report, _) =>
+    case rep@AgentReports.StateReport(of, report, _) if !silent =>
       forwarding.foreach(_.ref ! rep)
       val sb = new StringBuilder
       sb ++= s"Report by $of:\n"
@@ -33,12 +35,17 @@ class ReportsPrinter extends SystemAgent with Service.Args0 with ActorLogging{
           if(extra.isDefined) sb ++= ("\n" + " "*12 + s"   extra: ${extra.get}")
       }
       log.info(sb.mkString)
-    case rep@AgentReports.MessageReport(to, msg) =>
+    case rep: AgentReports.StateReport =>
+      forwarding.foreach(_.ref ! rep)
+    case rep@AgentReports.MessageReport(to, msg) if !silent=>
       forwarding.foreach(_.ref ! rep)
       log.info(s"Message $msg was sent by ${msg.sender} to $to")
+    case rep: AgentReports.MessageReport =>
+      forwarding.foreach(_.ref ! rep)
     case ReportsPrinter.Forward(to) =>
       log.info(s"Forwarding to $to registered")
       forwarding += to
+    case ReportsPrinter.Silent(v) => silent = v
   }
 }
 
@@ -51,9 +58,7 @@ abstract class ReportArchive extends SystemAgent with Service.Args0 with ActorLo
   def newReport(rep: AgentReport)
 
   override def processSys = super.processSys orElse{
-    case rep: AgentReport =>
-      log.info(s"report received: $rep")
-      newReport(rep)
+    case rep: AgentReport => newReport(rep)
   }
 }
 

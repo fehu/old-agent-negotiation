@@ -43,6 +43,8 @@ class NQueen(uuid: UUID,
     CreateConstraint.notEquals(X, negotiationId),
     CreateConstraint.notEquals(Y, negotiationId)
   )
+
+  def checkConstraintsRepeat = ???
 }
 
 
@@ -67,6 +69,7 @@ class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecification{
 
   configure timeouts(
     "creation" -> 100.millis
+//    "resolve conflict" -> 100.millis
     )
 }
 
@@ -102,34 +105,10 @@ class NQueenUserAgent extends UserAgent{
 
   implicit def timeout = Timeout(300 millis)
 
-  def agF = (controller ? impl.NegotiationController.Request.AgentRefs()).mapTo[Seq[AgentRef]]
+  def agFuture = (controller ? impl.NegotiationController.Request.AgentRefs()).mapTo[Seq[AgentRef]]
 
-  Thread.sleep(500)
+  agFuture.map{
+    agents => controller ! Controller.ShowReportsGui(agents, silence = true, updateFreq = 200 millis)
+  }
 
-  def agents = Await.result(agF, 300 millis)
-
-//  agents foreach (ag => controller ! Controller.ShowReportGui(ag) )
-
-  controller ! Controller.ShowReportsGui(agents)
-
-//  context.system.scheduler.schedule(0 millis, 1 second, self, "printReports")
-
-//  def printReports() = agents.map(impl.System.allNegotiationReports).map(_.map{
-//    msg =>
-//      val sb = new StringBuilder
-//      sb ++= s"Report by ${msg.of.id}:\n"
-//      msg.report foreach {
-//        case (negId, AgentReports.StateReportEntry(p, v, s, extra)) =>
-//          sb ++= (" "*12 + s"priority: $p\n")
-//          sb ++= (" "*12 + s"  values: $v\n")
-//          sb ++= (" "*12 + s"   scope: $s")
-//          if(extra.isDefined) sb ++= ("\n" + " "*12 + s"   extra: ${extra.get}")
-//      }
-//      println(sb.mkString)
-//  })
-
-//  override def receive = ({
-//    case "printReports" =>
-//      printReports()
-//  }: PartialFunction[Any, Unit]) orElse super.receive
 }

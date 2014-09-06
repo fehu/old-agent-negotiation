@@ -30,7 +30,7 @@ object System {
 
   class ConflictResolver extends SystemAgent with service.ConflictResolver with Service.Args0{
     override def lifeCycle: PartialFunction[AbstractMessage, Unit] =
-      super[SystemAgent].lifeCycle orElse super[ConflictResolver].lifeCycle
+      super[ConflictResolver].lifeCycle orElse super[SystemAgent].lifeCycle
   }
 }
 

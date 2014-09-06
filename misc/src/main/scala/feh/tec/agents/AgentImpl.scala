@@ -48,8 +48,8 @@ class GenericNegotiatingAgentImpl(arg: GenericIteratingAgentCreation.Args)
     val rejectLimit = .9
     def unknownLimit = .2 // todo: should change with time
 
-    weighted(Some(false)) >= rejectLimit ||
-      weighted(None) <= unknownLimit && weighted(Some(false)) > .5
+    weighted.get(Some(false)).exists(_ >= rejectLimit)  ||
+      weighted.get(None).exists(_ <= unknownLimit) && weighted.get(Some(false)).exists(_ > .5)
   }
 
   log.info(s"I'm created! $id" )
