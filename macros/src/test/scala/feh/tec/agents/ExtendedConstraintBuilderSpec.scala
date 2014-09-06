@@ -10,27 +10,27 @@ ${"ExtendedConstraintBuilder".title}
 
 `ExtendedConstraintBuilder` allows building constraint functions in terms of `proposed` and `value`.
 
-    ```
-    import ExtendedConstraintBuilder._
+```
+import ExtendedConstraintBuilder._
 
-    build[Any]{ implicit cw =>
-      proposal == value
-    }
+build[Any]{ implicit cw =>
+  proposal == value
+}
 
-    build[String]( implicit cw =>
-      proposal.indexOf(value) >= 3
-    )
-    ```
-< basic functionality > ${test1 and test2}
+build[String]( implicit cw =>
+  proposal.indexOf(value) >= 3
+)
+```
+**< basic functionality > ${test1 and test2}**
 
-  there are cases when compiler cannot determine which overloaded method to use for wrapped value
+there are cases when compiler cannot determine which overloaded method to use for wrapped value
 
-  ```
-    build[Int]{ implicit cw =>
-      proposal > (my current value)
-    }
-  ```
-< primitive types support >   $test3
+```
+build[Int]{ implicit cw =>
+  proposal > (my current value)
+}
+```
+**< primitive types support > $test3**
 """
 
   def test1 = {
