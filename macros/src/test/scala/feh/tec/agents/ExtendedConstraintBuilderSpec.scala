@@ -21,7 +21,7 @@ build[String]( implicit cw =>
   proposal.indexOf(value) >= 3
 )
 ```
-**< basic functionality > ${test1 and test2}**
+**< basic functionality >** ${test1 and test2}
 
 there are cases when compiler cannot determine which overloaded method to use for wrapped value
 
@@ -30,7 +30,7 @@ build[Int]{ implicit cw =>
   proposal > (my current value)
 }
 ```
-**< primitive types support > $test3**
+**< primitive types support >** $test3
 """
 
   def test1 = {

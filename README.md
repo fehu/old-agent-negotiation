@@ -31,7 +31,9 @@ class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecification{
 }
 ```
 
-Running the queens' negotiation
+see also [ExtendedConstraintBuilder](macros/test-reports/feh.tec.agents.ExtendedConstraintBuilderSpec.md)
+
+####Running the queens' negotiation
  
  ```
  user:project_root> sbt
