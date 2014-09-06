@@ -1,20 +1,21 @@
 ## ExtendedConstraintBuilder
-                                                                              
-                                                                                                                                                            
-                                                                              `ExtendedConstraintBuilder` allows building constraint functions in terms of `proposed` and `value`.
-                                                                              
-                                                                                  ```
-                                                                                  import ExtendedConstraintBuilder._
-                                                                              
-                                                                                  build[Any]{ implicit cw =>
-                                                                                    proposal == value
-                                                                                  }
-                                                                              
-                                                                                  build[String]( implicit cw =>
-                                                                                    proposal.indexOf(value) >= 3
-                                                                                  )
-                                                                                  ```
-                                                                                  < basic functionality > (+)  
+
+
+
+`ExtendedConstraintBuilder` allows building constraint functions in terms of `proposed` and `value`.
+
+    ```
+    import ExtendedConstraintBuilder._
+
+    build[Any]{ implicit cw =>
+      proposal == value
+    }
+
+    build[String]( implicit cw =>
+      proposal.indexOf(value) >= 3
+    )
+    ```
+    < basic functionality > (+)  
   
     there are cases when compiler cannot determine which overloaded method to use for wrapped value
   
@@ -26,5 +27,5 @@
     < primitive types support > (+)
 
 | ExtendedConstraintBuilder |
-| Finished in 10 ms |
+| Finished in 9 ms |
 | 2 examples, 0 failure, 0 error |

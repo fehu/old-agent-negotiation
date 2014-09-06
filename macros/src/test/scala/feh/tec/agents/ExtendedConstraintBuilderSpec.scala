@@ -6,7 +6,8 @@ import ExtendedConstraintBuilder._
 
 class ExtendedConstraintBuilderSpec extends Specification { def is =
 s2"""
-                                                                              ${"ExtendedConstraintBuilder".title}
+${"ExtendedConstraintBuilder".title}
+
 `ExtendedConstraintBuilder` allows building constraint functions in terms of `proposed` and `value`.
 
     ```
