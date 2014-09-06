@@ -22,6 +22,11 @@ object  Build extends sbt.Build {
 //     mainClass in Compile := Some("")
   )
 
+  lazy val testSettings = TestSettings.get ++ Seq(
+    TestSettings.copyTestReportsDir <<= baseDirectory(base => Some(base / "test-reports")),
+    TestSettings.autoAddReportsToGit := true
+  )
+
   // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
   object Resolvers{
@@ -96,7 +101,7 @@ object  Build extends sbt.Build {
       name := "agent-comm"
     }
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(comm, oldcomm, coloring, misc)
+   .aggregate(comm, oldcomm, coloring, misc, macros)
 
   lazy val comm = Project(
     id = "comm",
@@ -109,9 +114,8 @@ object  Build extends sbt.Build {
   lazy val macros: Project = Project(
     "macros",
     file("macros"),
-    settings = buildSettings ++ Seq(
-      libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-reflect" % _),
-      libraryDependencies ++= Seq(Tests.specs2)
+    settings = buildSettings ++ testSettings ++ Seq(
+      libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-reflect" % _)
     )
   )
 
