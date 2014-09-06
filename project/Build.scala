@@ -57,7 +57,7 @@ object  Build extends sbt.Build {
 
     object Tests{
       lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.10.1" % "test"
-      lazy val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
+      lazy val specs2 = "org.specs2" %% "specs2" % "2.4.2" % "test"
     }
 
     object jung{
@@ -103,6 +103,15 @@ object  Build extends sbt.Build {
     base = file("comm"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(akka, feh.util, scala.reflectApi)
+    )
+  ) dependsOn macros
+
+  lazy val macros: Project = Project(
+    "macros",
+    file("macros"),
+    settings = buildSettings ++ Seq(
+      libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-reflect" % _),
+      libraryDependencies ++= Seq(Tests.specs2)
     )
   )
 

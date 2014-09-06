@@ -2,15 +2,15 @@ package feh.tec.agents
 
 import java.util.UUID
 
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{ActorSystem, Props}
+import akka.pattern.ask
 import akka.util.Timeout
 import feh.tec.agents.ConstraintsView.Constraint
-import feh.tec.agents.impl.agent.AgentCreation
-import AgentCreation.NegotiationInit
 import feh.tec.agents.impl._
-import scala.concurrent.Await
+import feh.tec.agents.impl.agent.AgentCreation
+import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
+
 import scala.concurrent.duration._
-import akka.pattern.ask
 
 object NQueen{
   val Size = 4

@@ -3,9 +3,8 @@ package feh.tec.agents.impl
 import feh.tec.agents.{NegotiationSpecification => ANegotiationSpecification}
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
-import scala.reflect.ClassTag
-import scala.reflect.runtime.{ universe => ru }
-
+import scala.language.experimental.macros
+import scala.reflect.runtime.{universe => ru}
 
 class NegotiationSpecification extends ANegotiationSpecification{
   import feh.tec.agents.impl.NegotiationSpecification.ConstraintBuilder._
@@ -30,6 +29,8 @@ class NegotiationSpecification extends ANegotiationSpecification{
 
   protected def configure = new Configure
 
+  protected def variable = new NamelessVarDefBuilder
+
   /** language sugar */
   protected def other = identity[String] _
 
@@ -39,8 +40,12 @@ class NegotiationSpecification extends ANegotiationSpecification{
     def agent(name: String) = new AgentDefBuilder(name)
   }
   protected class VarDefBuilder(name: String){
-    def `with`[T: ru.TypeTag](domain: DomainDef[T]) = VarDef(name, domain)
+    def `with`[T/*: ru.TypeTag*/](domain: DomainDef[T]): feh.tec.agents.NegotiationSpecification.VarDef = VarDef(name, domain)
   }
+  protected class NamelessVarDefBuilder extends VarDefBuilder(null) {
+    override def `with`[T/*: ru.TypeTag*/](domain: DomainDef[T]) = VarDefNameless(domain)
+  }
+
   protected class DomainChooser{
     def range(r: Range) = DomainRange(r)
     def set[T : ru.TypeTag](s: T*) = DomainSet(s.toSet)
@@ -99,6 +104,9 @@ object NegotiationSpecification{
   protected trait ADef
 
   case class VarDef(name: String, domain: DomainDef[_])(implicit build: SpecificationBuild)
+    extends ANegotiationSpecification.VarDef with ADef { build register this }
+
+  case class VarDefNameless(domain: DomainDef[_])(implicit build: SpecificationBuild)
     extends ANegotiationSpecification.VarDef with ADef { build register this }
 
   case class NegotiationDef(name: String, issues: Seq[String])(implicit build: SpecificationBuild)
@@ -200,4 +208,26 @@ class NegotiationSpecificationExample extends NegotiationSpecification{
     "ag-1" -> 10 
     )
   
+}
+
+class NegotiationSpecificationExample2 extends NegotiationSpecification{
+
+
+  val v1 = variable `with` domain.range(1 to 10)
+  val v2 = variable `with` domain.set('A', 'B', 'C')
+
+  define negotiation "neg-1" over ("v1", "v2", "v5")
+
+  define agent "ag-1" withRole "does something" that (
+    negotiates the "neg-1" `with` ("role-1", "role-2") and
+      hasConstraints.over(
+//        v1 -> (proposed mustNot equal)
+      )
+    )
+
+
+  spawn agents(
+    "ag-1" -> 10
+    )
+
 }
