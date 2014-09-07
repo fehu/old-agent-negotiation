@@ -50,16 +50,16 @@ class NQueen(uuid: UUID,
 
 class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecification{
   
-  define variable "x" `with` domain.range(1 to boardSize)
-  define variable "y" `with` domain.range(1 to boardSize)
+  val x = variable `with` domain.range(1 to boardSize)
+  val y = variable `with` domain.range(1 to boardSize)
 
   define negotiation "queen's position" over ("x", "y")
 
   define agent "Queen" withRole "chess queen" that(
     negotiates the "queen's position" `with` other("chess queen") and
       hasConstraints.over(
-        "x" -> (proposed mustNot equal),
-        "y" -> (proposed mustNot equal)
+        x >> { _ => proposed != value },
+        y >> { _ => proposed != value }
       )
     )
 

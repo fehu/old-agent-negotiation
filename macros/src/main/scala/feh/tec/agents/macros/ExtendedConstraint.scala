@@ -10,7 +10,6 @@ object ExtendedConstraint {
     import c.universe._
 
     def dsl = withWrapper.tree
-
     val Function(List(ValDef(_, iParam, _, _)), body) = dsl
     val IParam = iParam
 
@@ -94,16 +93,12 @@ object ExtendedConstraint {
       transformed
     )
 
-//
-    val s = c.universe.showRaw(func)
-//
-//    c.Expr[(T, T) => Boolean]( q"""{println($s); ((t1, t2) => true)}""")
     c.Expr[(T, T) => Boolean](func)
   }
 
 
   class CW[T] protected[macros] (f: CBuilderKey => T) extends (CBuilderKey => T){
-    def apply(v1: CBuilderKey) = f(v1)
+    def apply(v1: CBuilderKey) = ???
   }
 
 }

@@ -1,13 +1,15 @@
 package feh.tec.agents.impl
 
+import feh.tec.agents.macros.ExtendedConstraint
+import feh.tec.agents.macros.ExtendedConstraint.CW
 import feh.tec.agents.{NegotiationSpecification => ANegotiationSpecification}
+
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
 import scala.language.experimental.macros
 import scala.reflect.runtime.{universe => ru}
 
-class NegotiationSpecification extends ANegotiationSpecification{
-  import feh.tec.agents.impl.NegotiationSpecification.ConstraintBuilder._
+class NegotiationSpecification extends ANegotiationSpecification with ExtendedConstraintBuilder.Env{
   import feh.tec.agents.impl.NegotiationSpecification._
 
   type Config = {
@@ -20,10 +22,8 @@ class NegotiationSpecification extends ANegotiationSpecification{
   protected def define = new Define
   protected def domain = new DomainChooser
   protected def negotiates = new AgentNegDefBuilder
-  
-  protected def hasConstraints = new AgentConstraintsBuilder 
-  protected def proposed = new ConstraintChooser
-  protected def equal = Equal
+
+  protected def hasConstraints = new AgentConstraintsBuilder
 
   protected def spawn = new Spawn
 
@@ -40,17 +40,34 @@ class NegotiationSpecification extends ANegotiationSpecification{
     def agent(name: String) = new AgentDefBuilder(name)
   }
   protected class VarDefBuilder(name: String){
-    def `with`[T/*: ru.TypeTag*/](domain: DomainDef[T]): feh.tec.agents.NegotiationSpecification.VarDef = VarDef(name, domain)
+    def `with`[T: ru.TypeTag](domain: DomainDef[T]): feh.tec.agents.NegotiationSpecification.VarDef = VarDef(name, domain)
   }
   protected class NamelessVarDefBuilder extends VarDefBuilder(null) {
-    override def `with`[T/*: ru.TypeTag*/](domain: DomainDef[T]) = VarDefNameless(domain)
+    override def `with`[T: ru.TypeTag](domain: DomainDef[T]) = VarDefNameless(domain)
   }
+  implicit protected class NamelessVarDefConstraintBuilder[T](protected val buildingFor: VarDefNameless[T])
+    extends ExtendedConstraintBuilder.BProvider[T]
+  {
+
+    specificationBuild
+
+    /**
+     * @return (descriptor, ((proposal, value) => bool))
+     */
+    def >>(withWrapper: CW[T] =>  Boolean): (T, T) => Boolean = macro ExtendedConstraint.impl[T]
+  }
+
+  implicit protected def buildAgentConstraintDef[T](pair: (Any, (T, T) => Boolean)) = pair._1 match{
+    case v: VarDefNameless[T] => AgentConstraintDef(v, pair._2)
+  }
+
 
   protected class DomainChooser{
     def range(r: Range) = DomainRange(r)
     def set[T : ru.TypeTag](s: T*) = DomainSet(s.toSet)
   }
   protected class NegotiationDefBuilder(name: String){
+    @deprecated("should use VarDef")
     def over(vars: String*) = NegotiationDef(name, vars)
   }
   protected case class AgentDefBuilder(name: String){
@@ -63,20 +80,13 @@ class NegotiationSpecification extends ANegotiationSpecification{
       def `with` (roles: String*) = AgentNegMainDef(negotiation, roles)
     }
   }
+  protected class AgentConstraintsBuilder {
+    def over(constraints: AgentConstraintDef[_]*) = AgentConstraintsDef(constraints)
+  }
 
   implicit protected def partialDefToDef(pd: AgentNegPartialDef) = pd match {
     case AgentNegMainDef(neg, roles) => AgentNegDef(neg, roles.toSet, Nil)
     case CompositeAgentNegPartialDef(AgentNegMainDef(neg, roles), extra) => AgentNegDef(neg, roles.toSet, extra)
-  }
-
-
-  protected class AgentConstraintsBuilder {
-    def over(constraints: AgentConstraintDef*) = AgentConstraintsDef(constraints)
-  }
-  implicit def issueConstraintDefPairToConstraintBuilder(p: (String, ConstraintDef)) = AgentConstraintDef(p._1, p._2)
-  protected class ConstraintChooser{
-    def must(cTest: ConstraintTest) = Must(cTest)
-    def mustNot(cTest: ConstraintTest) = MustNot(cTest)
   }
 
   protected class Spawn{
@@ -106,7 +116,7 @@ object NegotiationSpecification{
   case class VarDef(name: String, domain: DomainDef[_])(implicit build: SpecificationBuild)
     extends ANegotiationSpecification.VarDef with ADef { build register this }
 
-  case class VarDefNameless(domain: DomainDef[_])(implicit build: SpecificationBuild)
+  case class VarDefNameless[T](domain: DomainDef[T])(implicit build: SpecificationBuild, val tTag: ru.TypeTag[T])
     extends ANegotiationSpecification.VarDef with ADef { build register this }
 
   case class NegotiationDef(name: String, issues: Seq[String])(implicit build: SpecificationBuild)
@@ -156,19 +166,8 @@ object NegotiationSpecification{
     }
   }
 
-  case class AgentConstraintDef protected[NegotiationSpecification] (issue: String, cDef: ConstraintBuilder.ConstraintDef)
-  case class AgentConstraintsDef protected[NegotiationSpecification](contraints: Seq[AgentConstraintDef]) extends AgentNegPartialDef
-
-  protected[agents] object ConstraintBuilder{
-    sealed trait ConstraintDef
-    sealed trait ConstraintTest
-    
-    case class Must     protected[NegotiationSpecification](test: ConstraintTest) extends ConstraintDef
-    case class MustNot  protected[NegotiationSpecification](test: ConstraintTest) extends ConstraintDef
-    
-    protected[agents] case object Equal extends ConstraintTest
-//    protected case class Code extends ConstraintTest todo
-  }
+  case class AgentConstraintDef[T] protected[NegotiationSpecification](v: VarDefNameless[T], test: (T, T) => Boolean) extends
+  case class AgentConstraintsDef protected[NegotiationSpecification](contraints: Seq[AgentConstraintDef[_]]) extends AgentNegPartialDef
 
   sealed trait SpawnDef extends ADef
   case class SimpleSpawnDef protected[NegotiationSpecification] (mp: Map[String, Int])(implicit build: SpecificationBuild)
@@ -190,7 +189,7 @@ object NegotiationSpecification{
 }
 
 
-class NegotiationSpecificationExample extends NegotiationSpecification{
+/*class NegotiationSpecificationExample extends NegotiationSpecification{
 
   define variable "v1" `with` domain.range(1 to 10)
   define variable "v2" `with` domain.set('A', 'B', 'C')
@@ -208,7 +207,7 @@ class NegotiationSpecificationExample extends NegotiationSpecification{
     "ag-1" -> 10 
     )
   
-}
+}*/
 
 class NegotiationSpecificationExample2 extends NegotiationSpecification{
 
@@ -221,7 +220,9 @@ class NegotiationSpecificationExample2 extends NegotiationSpecification{
   define agent "ag-1" withRole "does something" that (
     negotiates the "neg-1" `with` ("role-1", "role-2") and
       hasConstraints.over(
-//        v1 -> (proposed mustNot equal)
+        v1 >> { implicit cw =>
+          proposed / 2 != value
+        }
       )
     )
 
@@ -229,5 +230,14 @@ class NegotiationSpecificationExample2 extends NegotiationSpecification{
   spawn agents(
     "ag-1" -> 10
     )
+
+}
+
+
+object Tst extends App{
+
+  val spec = new NegotiationSpecificationExample2
+
+  spec.agents.foreach(println)
 
 }

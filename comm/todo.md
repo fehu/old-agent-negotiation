@@ -6,3 +6,4 @@
 - [ ] agents should report on messages sent 
 - [ ] remove debug outputs
 - [ ] timings from NegotiationControllerBuilder.buildAgents should ne configurable
+- [ ] whole negotiation definition should be using macros

@@ -34,18 +34,16 @@ build[Int]{ implicit cw =>
 """
 
   def test1 = {
-
-    val f = build[Any]{ implicit cw =>
-      proposal == ExtendedConstraintBuilder.value
+    val f = constraintTest[Any].build{ implicit cw =>
+      proposed == ExtendedConstraintBuilder.value
     }
 
     (f("a", "a") must beTrue) and (f("a", "b") must beFalse)
   }
   
   def test2 = {
-
-    val f = build[String]( implicit cw =>
-      proposal.indexOf(ExtendedConstraintBuilder.value) >= 3
+    val f = constraintTest[String].build( implicit cw =>
+      proposed.indexOf(ExtendedConstraintBuilder.value) >= 3
     )
     
     (f("qwerty", "q") must beFalse) and
@@ -55,10 +53,16 @@ build[Int]{ implicit cw =>
   }
 
   def test3 = {
-    val f = build[Int]{ implicit cw =>
-      proposal > (my current ExtendedConstraintBuilder.value)
+    val f = constraintTest[Int].build{ implicit cw =>
+      proposed > (my current ExtendedConstraintBuilder.value)
     }
 
     f(1, 2) === false and f(2, 2) === false and f(2, 1) === true
   }
+
+  private class ConstraintTest[T] extends BProvider[T]{
+    protected def buildingFor = null
+  }
+
+  private def constraintTest[T] = new ConstraintTest[T]
 }

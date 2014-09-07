@@ -11,7 +11,6 @@ import feh.tec.agents._
 import feh.tec.agents.impl.Agent.{AgentReporting, Id}
 import feh.tec.agents.impl.NegotiationController.GenericStaticAgentsInit.Timings
 import feh.tec.agents.impl.NegotiationController.{Timeouts, GenericStaticInitArgs, GenericStaticAgentsInit, Counter}
-import feh.tec.agents.impl.NegotiationSpecification.ConstraintBuilder.{MustNot, Equal, Must}
 import feh.tec.agents.impl.NegotiationSpecification.{TimeoutsDef, TimingsDef}
 import feh.tec.agents.impl.agent.AgentBuilder
 import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
@@ -63,14 +62,7 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
         val (_negExtracted, _competitors, _constraints) = negs.map{
           case AgentNegDef(neg, competitors, extra) =>
             val (negId, negCreate) = negotiations(neg)
-            val constraints = extra.collect{
-              case AgentConstraintsDef(c) => c.map{
-                case AgentConstraintDef(issue, Must(Equal)) =>
-                  (ag: CreateConstraintsHelper) => ag.CreateConstraint.equals(vars(issue), negId)
-                case AgentConstraintDef(issue, MustNot(Equal)) =>
-                  (ag: CreateConstraintsHelper) => ag.CreateConstraint.notEquals(vars(issue), negId)
-              }
-            }.flatten
+            val constraints = ??? // todo
             (negotiations(neg), (negId, competitors), constraints)
         }.unzip3
         val constraints = _constraints.flatten
