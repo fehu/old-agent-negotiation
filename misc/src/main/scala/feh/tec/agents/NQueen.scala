@@ -53,24 +53,28 @@ class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecificationD
   val x = variable `with` domain (1 to boardSize)
   val y = variable `with` domain (1 to boardSize)
 
-  define negotiation "queen's position" over (x, y)
+  val `queen's position` = negotiation over (x, y)
 
   val Queen = agent withRole "chess queen" that(
-    negotiates the "queen's position" `with` the.others and
-      hasConstraints.over(
-        x >> { _ => proposed != value },
-        y >> { _ => proposed != value }
+    negotiates the `queen's position` `with` the.others and
+      hasConstraints(
+        "direct-line sight" |{
+          proposed(x) != valueOf(x) && proposed(y) != valueOf(y)
+        },
+        "diagonal-line sight" |{
+          proposed(x) != valueOf(y) && proposed(y) != valueOf(x)
+        }
       )
     )
 
-//  spawn agents(
-//    "Queen" -> boardSize
-//    )
+  spawn agents(
+    Queen -> boardSize
+    )
 
-//  configure timeouts(
-//    "creation" -> 100.millis
-//    "resolve conflict" -> 100.millis
-//    )
+  configure(
+    timeout.creation            <= 100.millis,
+    timeout.`resolve conflict`  <= 100.millis
+    )
 }
 
 object NQueenApp extends App{

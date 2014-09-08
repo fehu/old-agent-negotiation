@@ -56,9 +56,9 @@ class NegotiationSpecificationExample2 extends NegotiationSpecificationDSL{
 
   val ag1 = agent withRole "does something" that (
     negotiates the "neg-1" `with` neighbours and
-      hasConstraints.over(
-        v1 >> { implicit cw =>
-          proposed / 2 != value
+      hasConstraints(
+        "constraint 1" |{
+          proposed(v1) / 2 != valueOf(v2)
         }
       )
     )

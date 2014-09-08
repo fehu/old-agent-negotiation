@@ -1,8 +1,9 @@
 package feh.tec.agents.impl
 
+import scala.concurrent.duration.FiniteDuration
 import scala.language.experimental.macros
 
-trait NegotiationSpecificationDSL extends ConstraintsSpecificationDSL{
+trait NegotiationSpecificationDSL extends ConstraintsSpecificationDSL with CreationSpecificationDSL{
   import NegotiationSpecification._
 
   type ChooseVarDomain = {
@@ -21,15 +22,15 @@ trait NegotiationSpecificationDSL extends ConstraintsSpecificationDSL{
   }
 
   type ChooseAgentNegotiation = {
-    def the(neg: String): {
+    type ChooseWith = {
       def `with`[S: SelectsInterlocutors](interlocutors: S*): AgentNegPartialDef
     }
+
+    def the(neg: String): ChooseWith
+    def the(neg: NegotiationDef): ChooseWith
   }
   sealed trait SelectsInterlocutors[S]
 
-  type ChooseAgentConstraints = {
-    def over(c: AgentConstraint*): AgentNegPartialDef
-  }
   protected trait AgentConstraint
 
   def define = new {
@@ -41,11 +42,11 @@ trait NegotiationSpecificationDSL extends ConstraintsSpecificationDSL{
   def negotiation       : ChooseNegotiationOver = stub
   def agent             : ChooseAgentRole = stub
   def negotiates        : ChooseAgentNegotiation = stub
-  def hasConstraints    : ChooseAgentConstraints = stub
-
 
   def domain[C[_], T](subj: C[T]): DomainDef[T] = stub
   def domain(r: Range): DomainDef[Int] = stub
+
+  def hasConstraints(c: AgentConstraint*): AgentNegPartialDef = stub
 
   case object neighbours
   protected case object TheOthers
@@ -63,32 +64,49 @@ trait NegotiationSpecificationDSL extends ConstraintsSpecificationDSL{
   protected def stub = sys.error("this method should never be called")
 }
 
+trait CreationSpecificationDSL{
+  self: NegotiationSpecificationDSL =>
+
+  import NegotiationSpecification._
+
+  protected type TimeoutIdent = {
+    def <= (t: FiniteDuration): TimeoutDef
+  }
+
+  protected type ConfDef
+  protected type TimeoutDef <: ConfDef
+
+  type ChooseTimeout = {
+    def creation: TimeoutIdent
+    def startup: TimeoutIdent
+    def `resolve conflict`: TimeoutIdent
+  }
+  
+  def spawn:{
+    def agents(count: (AgentDef, Int))
+    def agents(count: (String, Int))
+    def agent(ag: AgentDef)
+  } = stub
+  
+  def configure(c: ConfDef*) = stub
+  def timeout: ChooseTimeout = stub
+
+  implicit class TimingDefWrapper(f: ChooseTimeout => TimeoutIdent){
+    def >>(time: FiniteDuration): TimeoutDef = stub
+  }
+}
+
 trait ConstraintsSpecificationDSL{
   self:  NegotiationSpecificationDSL =>
 
   import NegotiationSpecification._
-  import ConstraintsSpecificationDSL.CW
 
-  def proposed  = ConstraintsSpecificationDSL.proposed
-  def value     = ConstraintsSpecificationDSL.value
-  def my        = ConstraintsSpecificationDSL.my
+  def proposed[T] (vr: AbstractVarDef[T]): T = stub
+  def valueOf[T]  (vr: AbstractVarDef[T]): T = stub
 
 
-  implicit class VarDefConstraintBuilder[T](buildingFor: AbstractVarDef[T]){
-    def >>(withWrapper: CW[T] => Boolean): AgentConstraint = stub
+  implicit class VarDefConstraintBuilder[T](name: String){
+    def |(withWrapper: Boolean): AgentConstraint = stub
   }
 
-}
-
-object ConstraintsSpecificationDSL{
-  protected class CW[T] private (f: CBuilderKey => T) extends (CBuilderKey => T){
-    def apply(v1: CBuilderKey): T = ???
-  }
-
-  sealed trait CBuilderKey
-  object proposed extends CBuilderKey
-  object value extends CBuilderKey
-  object my{
-    def current[T](v: value.type)(implicit wrap: CW[T]) = wrap(v)
-  }
 }
