@@ -3,7 +3,7 @@
 - [x] add same-priority conflict resolver (a system actor)
 - [x] sent proposals registry 
 - [x] when creating negotiation scopes - filter same agent
-- [ ] agents should report on messages sent 
+- [x] agents should report on messages sent 
 - [ ] remove debug outputs
 - [ ] timings from NegotiationControllerBuilder.buildAgents should ne configurable
 - [ ] whole negotiation definition should be using macros
