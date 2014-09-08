@@ -1,12 +1,12 @@
 package feh.tec.agents.macros
 
-import scala.reflect.macros.blackbox
+import scala.reflect.macros.whitebox
 import scala.language.experimental.macros
-import feh.tec.agents.impl.ExtendedConstraintBuilder._
 
 
 object ExtendedConstraint {
-  def impl[T: c.WeakTypeTag](c: blackbox.Context)(withWrapper: c.Expr[CW[T] => Boolean]): c.Expr[(T, T) => Boolean] = {
+/*
+  def impl[T: c.WeakTypeTag](c: whitebox.Context)(withWrapper: c.Expr[CW[T] => Boolean]): c.Expr[(T, T) => Boolean] = {
     import c.universe._
 
     def dsl = withWrapper.tree
@@ -95,11 +95,9 @@ object ExtendedConstraint {
 
     c.Expr[(T, T) => Boolean](func)
   }
+*/
 
 
-  class CW[T] protected[macros] (f: CBuilderKey => T) extends (CBuilderKey => T){
-    def apply(v1: CBuilderKey) = ???
-  }
 
 }
 

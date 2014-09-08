@@ -48,37 +48,38 @@ class NQueen(uuid: UUID,
 }
 
 
-class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecification{
+class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecificationDSL{
   
-  val x = variable `with` domain.range(1 to boardSize)
-  val y = variable `with` domain.range(1 to boardSize)
+  val x = variable `with` domain (1 to boardSize)
+  val y = variable `with` domain (1 to boardSize)
 
-  define negotiation "queen's position" over ("x", "y")
+  define negotiation "queen's position" over (x, y)
 
-  define agent "Queen" withRole "chess queen" that(
-    negotiates the "queen's position" `with` other("chess queen") and
+  val Queen = agent withRole "chess queen" that(
+    negotiates the "queen's position" `with` the.others and
       hasConstraints.over(
         x >> { _ => proposed != value },
         y >> { _ => proposed != value }
       )
     )
 
-  spawn agents(
-    "Queen" -> boardSize
-    )
+//  spawn agents(
+//    "Queen" -> boardSize
+//    )
 
-  configure timeouts(
-    "creation" -> 100.millis
+//  configure timeouts(
+//    "creation" -> 100.millis
 //    "resolve conflict" -> 100.millis
-    )
+//    )
 }
 
 object NQueenApp extends App{
   implicit val acSys = ActorSystem.create("NQueenApp")
 
-  acSys.actorOf(Props(classOf[NQueenUserAgent]), "NQueenUserAgent")
+//  acSys.actorOf(Props(classOf[NQueenUserAgent]), "NQueenUserAgent")
 }
 
+/*
 class NQueenUserAgent extends UserAgent{
   def name = "user"
 
@@ -111,4 +112,4 @@ class NQueenUserAgent extends UserAgent{
     agents => controller ! Controller.ShowReportsGui(agents, silence = true, updateFreq = 200 millis)
   }
 
-}
+}*/

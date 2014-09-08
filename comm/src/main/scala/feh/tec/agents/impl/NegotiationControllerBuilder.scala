@@ -21,7 +21,7 @@ import feh.util._
 import scala.reflect.ClassTag
 
 trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesInitialization]
-  extends agents.NegotiationControllerBuilder[NegotiationSpecification, Control]
+  extends agents.NegotiationControllerBuilder[NegotiationSpecificationAdapter, Control]
 {
   import NegotiationSpecification._
 
@@ -39,13 +39,14 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
 
   def buildAgentsCount(defs: Seq[SpawnDef]) = defs.collect{ case SimpleSpawnDef(mp) => mp }.flatten.toMap
 
-  protected def buildVars(defs: Seq[VarDef]): Map[String, Var] = defs.map{
-    case VarDef(name, domainDef) =>
-      name -> (domainDef match {
-        case dom@DomainRange(range) => new Var(name, dom.clazz.isInstance) with Domain.Range{ def domain = range }
-        case dom@DomainSet(set: Set[Any]) => new Var(name, dom.clazz.isInstance) with Domain.Small[Any]{ def domain = set }
-      })
-  }.toMap
+  protected def buildVars(defs: Seq[VarDef[_]]): Map[String, Var] = ???
+//  defs.map{
+//    case VarDef(name, domainDef) =>
+//      name -> (domainDef match {
+//        case dom@DomainRange(range) => new Var(name, dom.clazz.isInstance) with Domain.Range{ def domain = range }
+//        case dom@DomainSet(set: Set[Any]) => new Var(name, dom.clazz.isInstance) with Domain.Small[Any]{ def domain = set }
+//      })
+//  }.toMap
 
   protected def buildNegotiations(defs: Seq[NegotiationDef]): Map[String, (NegotiationId, (Set[Var], Priority => NegotiationInit))] =
     defs.map{
@@ -171,7 +172,7 @@ object NegotiationControllerBuilder{
       case (acc, ("retry startup", time)) => acc.copy(retryToStartAgent = time)
     }
 
-    def apply(v1: NegotiationSpecification) = {
+    def apply(v1: NegotiationSpecificationAdapter) = ??? /*{
       vars = buildVars(v1.variables)
       negotiations = buildNegotiations(v1.negotiations)
       agents = buildAgents(v1.agents)
@@ -188,7 +189,7 @@ object NegotiationControllerBuilder{
       )
 
       acSys.actorOf(props(arg), "NegotiationController")
-    }
+    }*/
 
     protected def props(arg: GenericStaticInitArgs[DefaultBuildAgentArgs]) = Props(classOf[DefaultController], arg)
 

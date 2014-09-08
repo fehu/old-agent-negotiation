@@ -102,7 +102,7 @@ object  Build extends sbt.Build {
       name := "agent-comm"
     }
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(comm, oldcomm, coloring, misc, macros)
+   .aggregate(comm, oldcomm, coloring, misc, negDSL)
 
   lazy val comm = Project(
     id = "comm",
@@ -110,11 +110,11 @@ object  Build extends sbt.Build {
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(akka, feh.util, scala.reflectApi)
     )
-  ) dependsOn macros
+  ) dependsOn negDSL
 
-  lazy val macros: Project = Project(
-    "macros",
-    file("macros"),
+  lazy val negDSL: Project = Project(
+    "negotiation-dsl",
+    file("negotiation-dsl"),
     settings = buildSettings ++ testSettings ++ Seq(
       libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-reflect" % _)
     )

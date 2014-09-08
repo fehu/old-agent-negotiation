@@ -4,21 +4,15 @@ import akka.actor.ActorRef
 
 /** define the negotiation environment */
 trait NegotiationSpecification{
-  import NegotiationSpecification._
-
+  type VarDef
+  type AgentDef
+  type NegotiationDef
   type Config
 
   def variables: Seq[VarDef]
   def negotiations: Seq[NegotiationDef]
   def agents: Seq[AgentDef]
-
   def config: Config
-}
-
-object NegotiationSpecification{
-  trait VarDef
-  trait AgentDef
-  trait NegotiationDef
 }
 
 

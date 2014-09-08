@@ -7,3 +7,4 @@
 - [ ] remove debug outputs
 - [ ] timings from NegotiationControllerBuilder.buildAgents should ne configurable
 - [ ] whole negotiation definition should be using macros
+- [ ] macro should build NegotiationController for NegotiationControllerBuilder
