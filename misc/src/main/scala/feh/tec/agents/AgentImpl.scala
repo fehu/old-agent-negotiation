@@ -23,8 +23,9 @@ trait AgentImpl extends AgentCreation[DefaultNegotiatingLanguage]
     val rejectLimit = .9
     def unknownLimit = .2 // todo: should change with time
 
-    weighted(Some(false)) >= rejectLimit ||
-      weighted(None) <= unknownLimit && weighted(Some(false)) > .5
+    weighted(Some(false)).d != 0
+//    >= rejectLimit ||
+//      weighted(None) <= unknownLimit && weighted(Some(false)) > .5
   }
 
 }

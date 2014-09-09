@@ -143,7 +143,7 @@ object NegotiationControllerBuilder{
 
     val defaultTimeouts = Timeouts(
       resolveConflict = 30 millis,
-      agentCreation = 10 millis,
+      agentCreation = 30 millis,
       agentStartup = 30 millis
     )
 
@@ -216,6 +216,10 @@ abstract class GenericIteratingAgentCreation[Lang <: ProposalLanguage](args: Gen
   self: ProposalEngine.Iterating[Lang] =>
 
 
+  object DEBUG{
+    var Constraint = true
+  }
+
   def reportingTo = args.reportingTo
   def checkConstraintsRepeat = args.checkConstraintsRepeat
 
@@ -261,10 +265,10 @@ abstract class GenericIteratingAgentCreation[Lang <: ProposalLanguage](args: Gen
               case 6 => (args(0), args(1), args(2), args(3), args(4), args(5))
             }
 
-            test(arg)
+            val res = test(arg)
+            if(DEBUG.Constraint) log.info(s"Constraint($name) in $negId:\nover=$props\ndependsOn=$valsOf\narg=$arg\nres=$res")
+            res
           }
-
-
           Constraint(name, negId, over.map(_._2).toSet, dependsOn.map(_._2).toSet, f)
       }
 

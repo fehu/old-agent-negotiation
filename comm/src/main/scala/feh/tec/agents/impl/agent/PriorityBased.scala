@@ -2,11 +2,12 @@ package feh.tec.agents.impl.agent
 
 import java.util.UUID
 
-import akka.actor.ActorLogging
+import akka.actor.{Cancellable, ActorLogging}
 import akka.util.Timeout
 import feh.tec.agents.ConstraintsView.Constraint
 import feh.tec.agents._
 import AgentCreation.NegotiationInit
+import feh.tec.agents.impl.Agent.Status
 import feh.tec.agents.impl._
 import feh.tec.agents
 import feh.tec.agents.impl.view.{Priority, ExternalConstraints, Constraints, ConstraintsSatisfactionWithPriority}
@@ -52,7 +53,10 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
 
 
   override def processSys = super.processSys orElse{
-    case PriorityBased.CheckConstraints => negotiations.foreach(_.id |> checkConstraints)
+    case PriorityBased.CheckConstraints if status == Status.Working => negotiations.foreach(_.id |> checkConstraints)
+    case PriorityBased.CheckConstraints =>
+      checkConstraintsTimer.cancel()
+      checkConstraintsTimer = null
   }
 
   override def gatherInfo(msg: AbstractMessage) = {
@@ -76,12 +80,10 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
               }
           }
 
-          val maxPriority = constraintsSatisfactions.data.map(_._2._2._2).maxBy(_.get)
+          val maxPriority = constraintsSatisfactions.merge._2.data.map(_._2._2).maxBy(_.get)
 
           if(neg.currentPriority > maxPriority) return
 
-          val xx = constraintsSatisfactions.data.map(_._2._1)
-          log.info(s"currentProposal.id=${currentProposal.id}, xx=$xx")
           val weighted = viewsByMsgId.getOrElse(currentProposal.id, Map()).weight{
             case (ag, (opt, pr)) if neg.scope.contains(ag) && pr._2 > neg.currentPriority => opt
           }
@@ -89,7 +91,7 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
           log.info("weighted = " + weighted)
           log.info("viewsByMsgId = " + viewsByMsgId)
 
-          if(weighted.isEmpty) {
+          if(weighted.isEmpty || weighted.map(_._2).sum.d == 0) {
             spamProposal(neg)
             return
           }
@@ -105,13 +107,20 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
       }
   }
 
+  var checkConstraintsTimer: Cancellable = null
   def checkConstraintsRepeat: FiniteDuration
 
   override def startLife() = negotiations foreach {
     neg =>
       resetProposal(neg)
       spamProposal(neg)
-      scheduleCheckConstraints(checkConstraintsRepeat, checkConstraintsRepeat)
+      checkConstraintsTimer = scheduleCheckConstraints(checkConstraintsRepeat, checkConstraintsRepeat)
+  }
+
+  def resumeLife() = negotiations foreach {
+    neg =>
+      spamProposal(neg)
+      checkConstraintsTimer = scheduleCheckConstraints(checkConstraintsRepeat, checkConstraintsRepeat)
   }
 
   protected def spamProposal(neg: ANegotiation) = sendToAll(neg, neg.state.currentProposal.get)

@@ -7,34 +7,34 @@ import akka.pattern.ask
 import scala.concurrent.duration._
 
 object NQueen{
-//  val Size = 4
+  def spec(boardSize: Int) = dsl.spec(
+    new dsl.Negotiation {
 
-  def spec(boardSize: Int) = impl.NegotiationSpecification.build( new NegotiationSpecificationDSL {
-    var x = variable `with` domain (1 to boardSize)
-    var y = variable `with` domain (1 to boardSize)
+      var x = variable `with` domain (1 to boardSize)
+      var y = variable `with` domain (1 to boardSize)
 
-    def `queen's position` = negotiation over (x, y)
+      def `queen's position` = negotiation over (x, y)
 
-    def Queen = agent withRole "chess queen" that(
-      negotiates the `queen's position` `with` the.others and
-        hasConstraints(
-          "direct-line sight" |{
-            proposed(x) != valueOf(x) && proposed(y) != valueOf(y)
-          },
-          "diagonal-line sight" |{
-            proposed(x) != valueOf(y) && proposed(y) != valueOf(x)
-          }
+      def Queen = agent withRole "chess queen" that(
+        negotiates the `queen's position` `with` the.others and
+          hasConstraints(
+            "direct-line sight" |{
+              proposed(x) != valueOf(x) && proposed(y) != valueOf(y)
+            },
+            "diagonal-line sight" |{
+              proposed(x) - valueOf(x) != proposed(y) - valueOf(y)
+            }
+          )
         )
-      )
 
-    spawn agents(
-      Queen -> boardSize
-      )
+      spawn agents(
+        Queen -> boardSize
+        )
 
-    configure(
-      timeout.creation            <= 100.millis,
-      timeout.`resolve conflict`  <= 100.millis
-    )
+      configure(
+        timeout.creation            <= 100.millis,
+        timeout.`resolve conflict`  <= 100.millis
+      )
   })
 }
 

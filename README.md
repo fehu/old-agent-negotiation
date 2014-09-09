@@ -5,37 +5,38 @@ A Thesis Project in ITESM
 ### Negotiation Specification
 [Example](misc/src/main/scala/feh/tec/agents/NQueen.scala):
 ```
-class NQueenSpecification(boardSize: Int) extends impl.NegotiationSpecificationDSL{
+object NQueen{
+  def spec(boardSize: Int) = dsl.spec( 
+    new dsl.Negotiation {
+    
+      var x = variable `with` domain (1 to boardSize)
+      var y = variable `with` domain (1 to boardSize)
   
-  val x = variable `with` domain (1 to boardSize)
-  val y = variable `with` domain (1 to boardSize)
-
-  val `queen's position` = negotiation over (x, y)
-
-  val Queen = agent withRole "chess queen" that(
-    negotiates the `queen's position` `with` the.others and
-      hasConstraints(
-        "direct-line sight" |{
-          proposed(x) != valueOf(x) && proposed(y) != valueOf(y)
-        },
-        "diagonal-line sight" |{
-          proposed(x) != valueOf(y) && proposed(y) != valueOf(x)
-        }
+      def `queen's position` = negotiation over (x, y)
+  
+      def Queen = agent withRole "chess queen" that(
+        negotiates the `queen's position` `with` the.others and
+          hasConstraints(
+            "direct-line sight" |{
+              proposed(x) != valueOf(x) && proposed(y) != valueOf(y)
+            },
+            "diagonal-line sight" |{
+              proposed(x) - valueOf(x) != proposed(y) - valueOf(y)
+            }
+          )
+        )
+  
+      spawn agents(
+        Queen -> boardSize
+        )
+  
+      configure(
+        timeout.creation            <= 100.millis,
+        timeout.`resolve conflict`  <= 100.millis
       )
-    )
-
-  spawn agents(
-    Queen -> boardSize
-    )
-
-  configure(
-    timeout.creation            <= 100.millis,
-    timeout.`resolve conflict`  <= 100.millis
-    )
+  })
 }
 ```
-
-see also [ExtendedConstraintBuilder](macros/test-reports/feh.tec.agents.ExtendedConstraintBuilderSpec.md)
 
 ##### todo:
   * [coloring](coloring/todo.md)

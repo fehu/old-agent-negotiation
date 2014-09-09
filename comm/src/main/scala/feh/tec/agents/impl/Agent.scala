@@ -2,7 +2,7 @@ package feh.tec.agents.impl
 
 import java.util.UUID
 
-import akka.actor.ActorRef
+import akka.actor.{ActorLogging, ActorRef}
 import feh.tec.agents.Message.Response
 import feh.tec.agents.SystemMessage.{RefDemand, ScopeUpdate}
 import feh.tec.agents._
@@ -49,7 +49,7 @@ object Agent{
     var status: Status = Status.Created
   }
 
-  trait SystemSupport extends HasStatus with EssentialSystemSupport{
+  trait SystemSupport extends HasStatus with EssentialSystemSupport with AbstractAgent{
     self: SpeakingAgent[_] with AgentHelpers[_] =>
 
     def initReady_? = true
@@ -57,6 +57,11 @@ object Agent{
       if((status == Status.Created || status == Status.Initializing) && initReady_?) status = Status.Initialized
 
     def startLife()
+    def resumeLife()
+
+    override def receive =  ({
+      case msg if status != Status.Working && !msg.isInstanceOf[SystemMessage] => // do nothing
+    }: PartialFunction[Any, Unit]) orElse super.receive
 
     override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse {
 // Start messages
@@ -69,7 +74,16 @@ object Agent{
         sender() ! start.stillInitializing
         updateInitStatus()
       case start: SystemMessage.Start if status == Status.Working => sender ! start.alreadyRunning
-// ReportState Messages
+// Stop messages
+      case stop@SystemMessage.Stop() =>
+        status = Status.Stopped
+        sender ! stop.stopped
+// Resume messages
+      case resume@SystemMessage.Resume() if status == Status.Stopped =>
+        resumeLife()
+        status = Status.Working
+        sender ! resume.resumed
+// ReportState messages
       case req: AgentReports.ReportStates => sender ! req.response(getOpt _ andThen{ _.map{
         neg => (neg.priority, neg.currentValues.toMap, neg.scope, extractReportExtra(neg.id))
       }})

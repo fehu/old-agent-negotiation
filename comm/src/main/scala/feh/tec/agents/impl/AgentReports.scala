@@ -23,6 +23,7 @@ class ReportsPrinter extends SystemAgent with Service.Args0 with ActorLogging{
   val forwarding = mutable.HashSet.empty[AgentRef]
 
   override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse{
+    case SystemMessage.Start() => // do nothing
     case rep@AgentReports.StateReport(of, report, _) if !silent =>
       forwarding.foreach(_.ref ! rep)
       val sb = new StringBuilder

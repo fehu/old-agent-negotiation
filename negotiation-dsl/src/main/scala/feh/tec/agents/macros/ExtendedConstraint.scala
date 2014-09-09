@@ -6,7 +6,7 @@ import scala.language.experimental.macros
 
 class ExtendedConstraint[C <: whitebox.Context](val c: C) {
 
-  def replace(in: c.Tree): Replaced = {
+  def replace(in: c.Tree): Replacement = {
     import c.universe._
 
     val h = new Helper[c.type](c)
@@ -40,28 +40,20 @@ class ExtendedConstraint[C <: whitebox.Context](val c: C) {
         }
     })
 
-/*    def func_build(types: Map[c.Name, c.Type]) = Function(
+    def func(types: Map[String, c.Type]) = Function(
       args.toList map {
-        case (_, _, arg) => param(arg, types(arg))
-      },
-      transformed
-    )*/
-
-    def func = Function(
-      args.toList map {
-        case (_, _, arg) => param(arg, c.typeOf[Any])
+        case (_, name, arg) => param(arg, types(name))
       },
       transformed
     )
 
     val descr = args.toList map (Description.apply _).tupled
 
-    Replaced(descr, func)
+    Replacement(descr, func)
   }
 
   case class Description(tpe: String, varName: String, arg: c.TermName)
-                                                               // Map[arg, arg's type]
-//  case class Replacement(description: List[Description], build: Map[c.Name, c.Type] => c.Tree)
-  case class Replaced(description: List[Description], tree: c.Tree)
+                                                             // Map[var name, var's type]
+  case class Replacement(description: List[Description], build: Map[String, c.Type] => c.Tree)
 }
 

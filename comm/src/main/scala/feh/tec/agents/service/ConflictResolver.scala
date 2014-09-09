@@ -27,6 +27,7 @@ trait ConflictResolver extends AbstractAgent{
       looserReq._2 ! ConflictResolved(looserReq._1.id, won = false, winnerReq._1.value)
     case req@ResolveConflict(issue, _, opponent) =>
       conflicts += (req.requester, issue) -> (req, sender())
+    case SystemMessage.Start() => // do nothing
   }
 }
 

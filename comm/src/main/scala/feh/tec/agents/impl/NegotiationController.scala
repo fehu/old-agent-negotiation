@@ -25,7 +25,7 @@ object NegotiationController{
 
   case class Timeouts(resolveConflict: Timeout, agentCreation: Timeout, agentStartup: Timeout)
 
-  trait GenericBuilding extends NegotiationController with SystemAgent{
+  trait GenericBuilding extends NegotiationController with SystemAgent with ActorLogging{
     def role = Role
 
     implicit def acSys = context.system
@@ -48,17 +48,33 @@ object NegotiationController{
 
     def start() = {
       implicit def timeout = timeouts.agentStartup
-      systemAgents // init lazy
 
+      systemAgents map (_.ref ! SystemMessage.Start())
       agents map (_.ref ? SystemMessage.Start() |> (_.mapTo[SystemMessage] map handleStartup))
     }
 
-    def stop() = ???
+    def stop() = {
+      implicit def timeout = timeouts.agentStartup
+
+      agents map (_.ref ? SystemMessage.Stop() |> (_.mapTo[SystemMessage] map {
+        case SystemMessage.Stopped(_) => // it's ok
+      }))
+    }
+
+    def resume() = {
+      implicit def timeout = timeouts.agentStartup
+
+      agents map (_.ref ? SystemMessage.Resume() |> (_.mapTo[SystemMessage] map {
+        case SystemMessage.Resumed(_) => // it's ok
+      }))
+    }
 
     // todo: stop
     override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse{
-      case req@Request.AgentRefs() => sender() ! agents
-      case _: SystemMessage.Start => start()
+      case req@Request.AgentRefs()  => sender() ! agents
+      case SystemMessage.Start()    => start()
+      case SystemMessage.Resume()   => resume()
+      case SystemMessage.Stop()     => stop()
     }
 
     protected def getSystemAgent(role: Role) = systemAgents.filter(_.id.role == role).ensuring(_.size == 1).head

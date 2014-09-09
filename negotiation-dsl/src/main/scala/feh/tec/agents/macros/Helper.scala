@@ -56,7 +56,8 @@ class Helper[C <: whitebox.Context](val c: C){
     def isTheOneSearched_?(t: c.Tree, path: Seq[String]): Boolean = {
       PartialFunction.cond(path, t){
         case (p :: tail, Select(next, name)) if p == name.decodedName.toString => isTheOneSearched_?(next, tail)
-        case (p :: Nil, Ident(name)) if p == name.decodedName.toString => true
+        case (p :: tail, Select(next, name)) if name == typeNames.PACKAGE && p == "package"  => isTheOneSearched_?(next, tail)
+        case (p :: tail, Ident(name)) if p == name.decodedName.toString => true
         case (p :: Nil, This(name)) if p == name.decodedName.toString => true
       }
     }

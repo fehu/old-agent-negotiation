@@ -1,19 +1,22 @@
 package feh.tec.agents
 
-import java.awt.{Toolkit, Dimension}
-import java.util.Date
+import java.awt.Toolkit
 
+import akka.actor.ActorRef
 import feh.dsl.swing.SwingAppBuildingEnvironment
 import feh.tec.agents.Message.AutoId
 import feh.tec.agents.ReportArchiveGUI.ShowReports
-import feh.tec.agents.impl.AgentReports.{StateReportEntry, MessageReport, StateReport}
+import feh.tec.agents.impl.AgentReports.{MessageReport, StateReport, StateReportEntry}
 import feh.tec.agents.impl.{Agent, AgentReport, ReportArchive}
 import feh.util._
+
 import scala.collection.mutable
 import scala.concurrent.duration._
 
 // todo
 class ReportArchiveGUI extends ReportArchive with SwingAppBuildingEnvironment{
+
+  var controller: ActorRef = null
 
   lazy val states   = mutable.HashMap.empty[AgentRef, mutable.Buffer[StateReport]] withDefault(_ => mutable.Buffer.empty)
   lazy val messages = mutable.HashMap.empty[AgentRef, mutable.Buffer[MessageReport]] withDefault(_ => mutable.Buffer.empty)
@@ -38,7 +41,9 @@ class ReportArchiveGUI extends ReportArchive with SwingAppBuildingEnvironment{
 
   case object Upd extends SystemMessage{ def id = ??? }
 
-  override def processSys = super.processSys orElse{
+  override def processSys = ({
+    case start@SystemMessage.Start() =>
+      controller = sender()
     case ShowReports(agents, updFreq) =>
       gui = Some(new ReportsGui(agents))
       gui.get.start()
@@ -47,7 +52,7 @@ class ReportArchiveGUI extends ReportArchive with SwingAppBuildingEnvironment{
     case Upd =>
         lastSize ++= repSize
         gui foreach (_.updateForms())
-  }
+  }: PartialFunction[SystemMessage, Unit]) orElse super.processSys
 
   class ReportsGui(agents: Seq[AgentRef]) extends SwingAppFrame with Frame9PositionsLayoutBuilder{
 
@@ -59,7 +64,28 @@ class ReportArchiveGUI extends ReportArchive with SwingAppBuildingEnvironment{
         .asLayoutElem
     }
 
-    val layout: List[AbstractLayoutSetting] = place(tabs(_.Top, _.Scroll, lElems), "tabs") in theCenter
+    lazy val stopButton: DSLButtonBuilder = triggerFor{
+      controller ! SystemMessage.Stop()
+      stopButton.enabled = false
+      resumeButton.enabled = true
+    }.button("Stop")
+
+    lazy val resumeButton: DSLButtonBuilder = triggerFor{
+      controller ! SystemMessage.Resume()
+      stopButton.enabled = true
+      resumeButton.enabled = false
+    }.button("Resume").affect(_.enabled = false)
+
+    val buttonsPanel = panel.flow(_.Left)(stopButton -> "stop", resumeButton -> "resume")
+      .anchor(_.West)
+
+    val theTabs = tabs(_.Top, _.Scroll, lElems)
+      .maxXWeight.maxYWeight.fillBoth
+
+    val layout: List[AbstractLayoutSetting] = List(
+      place(theTabs, "tabs") in theCenter,
+      place(buttonsPanel, "buttons") in theNorth
+    )
 
     def stop() = ???
 

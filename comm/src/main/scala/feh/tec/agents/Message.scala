@@ -1,8 +1,8 @@
 package feh.tec.agents
 
 import java.util.UUID
-import feh.util._
-import feh.tec.agents.Message.{Response, AutoId}
+
+import feh.tec.agents.Message.AutoId
 
 sealed trait AbstractMessage{
   def id: Message.Id
@@ -43,6 +43,16 @@ object SystemMessage{
     case class StillInitializing protected[Start] (respondingTo: Message.Id) extends SystemMessage { def id = respondingTo }
     case class AlreadyRunning protected[Start] (respondingTo: Message.Id) extends SystemMessage { def id = respondingTo }
   }
+
+  case class Stop() extends SystemMessage with AutoId{
+    def stopped = Stopped(id)
+  }
+  case class Stopped(respondingTo: Message.Id)  extends SystemMessage { def id = respondingTo }
+
+  case class Resume() extends SystemMessage with AutoId{
+    def resumed = Resumed(id)
+  }
+  case class Resumed(respondingTo: Message.Id) extends SystemMessage { def id = respondingTo }
 
   trait ScopeUpdate extends SystemMessage{
     def negotiation: NegotiationId
