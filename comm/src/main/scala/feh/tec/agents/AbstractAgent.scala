@@ -83,8 +83,7 @@ trait NegotiatingAgent extends AbstractAgent{
 
 }
 
-trait SpeakingAgent[Lang <: Language]{
-  self: NegotiatingAgent =>
+trait SpeakingAgent[Lang <: Language] extends AbstractAgent{
 
   val lang: Lang
 
@@ -98,7 +97,6 @@ trait SpeakingAgent[Lang <: Language]{
 }
 
 trait ProposalBased[Lang <: ProposalLanguage] extends SpeakingAgent[Lang]{
-  self: NegotiatingAgent =>
 
   def createProposal(id: NegotiationId): Lang#Proposal
   def createRejected(id: NegotiationId): Lang#Rejected
@@ -112,19 +110,6 @@ trait ProposalBased[Lang <: ProposalLanguage] extends SpeakingAgent[Lang]{
     case msg: Lang#Proposal if lang.isProposal(msg)    => onProposal(msg)
     case msg: Lang#Accepted if lang.isAcceptance(msg)  => onAccepted(msg)
     case msg: Lang#Rejected if lang.isRejection(msg)   => onRejected(msg)
-  }
-}
-
-@deprecated("use PriorityBasedNegotiatingAgent instead")
-trait FallbackBackTracking[Lang <: BacktrackLanguage] extends ProposalBased[Lang]{
-  self: NegotiatingAgent =>
-
-  def createFallback(negotiation: Negotiation): Lang#Proposal
-
-  def onFallback(msg: Lang#Fallback)
-
-  override def process = super.process orElse  {
-    case msg: Lang#Fallback if lang.isFallback(msg) => onFallback(msg)
   }
 }
 

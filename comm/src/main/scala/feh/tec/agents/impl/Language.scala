@@ -88,7 +88,6 @@ object DefaultNegotiatingLanguage {
         case ProposalsSubj(issues, dsl.You)     => Message.Demand  (negId, issues)
         case Acceptation()                      => Message.Accepted(negId, currentMsg.id)
         case Rejection()                        => Message.Rejected(negId, currentMsg.id)
-        case dsl.Request(dsl.You, dsl.fallback) => Message.Fallback(negId)
       }}
 
     private def priorityOf(neg: NegotiationId) = 
@@ -100,7 +99,7 @@ object DefaultNegotiatingLanguage {
   object Static extends DefaultNegotiatingLanguage
 }
 
-class DefaultNegotiatingLanguage extends BacktrackLanguage with CounterProposalLanguage /*with feh.tec.agents.Language.Priority*/{
+class DefaultNegotiatingLanguage extends CounterProposalLanguage /*with feh.tec.agents.Language.Priority*/{
   type Msg = Message
 
   type Proposal = Message.Proposal
@@ -109,13 +108,9 @@ class DefaultNegotiatingLanguage extends BacktrackLanguage with CounterProposalL
 
 //  type CounterProposal = this.type
 
-  type Fallback = Message.Fallback
-
   def isMessage(any: Any)         = any.isInstanceOf[Msg]
   def isProposal(msg: Any)        = msg.isInstanceOf[Proposal]
   def isAcceptance(msg: Any)      = msg.isInstanceOf[Accepted]
   def isRejection(msg: Any)       = msg.isInstanceOf[Rejected]
   def isCounterProposal(msg: Any) = msg.isInstanceOf[CounterProposal]
-  def isFallback(msg: Any)        = msg.isInstanceOf[Fallback]
-
 }

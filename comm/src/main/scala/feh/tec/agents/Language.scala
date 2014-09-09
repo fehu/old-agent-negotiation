@@ -24,25 +24,6 @@ trait CounterProposalLanguage extends ProposalLanguage{
   def isCounterProposal(msg: Any): Boolean
 }
 
-@deprecated
-trait BacktrackLanguage extends ProposalLanguage{
-  type Fallback <: Msg
-
-  def isFallback(msg: Any): Boolean
-}
-
-object Language{
-/*
-  trait Priority{
-    self: Language =>
-
-    type Msg <: {
-      def priority: Priority
-    }
-  }
-*/
-}
-
 trait DataExtractor[Lang <: Language]{
   type Tpe
   def extract: PartialFunction[Message, Tpe]

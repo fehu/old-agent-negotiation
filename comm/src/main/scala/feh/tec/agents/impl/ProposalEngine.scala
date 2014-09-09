@@ -94,7 +94,7 @@ object ProposalEngine{
     }
   }
   
-  trait IteratingCurrentIssues[Lang <: ProposalLanguage] extends ProposalEngine[Lang]{ // todo
+  trait IteratingCurrentIssues[Lang <: ProposalLanguage] extends Iterating[Lang]{ // todo
     self: NegotiatingAgent with ProposalBased[Lang] =>
   } 
 }

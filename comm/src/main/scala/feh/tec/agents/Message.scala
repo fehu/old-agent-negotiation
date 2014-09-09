@@ -118,18 +118,4 @@ object Message{
     def messageType = "Demand"
     def asString = s"I want you to set values: $get, do you accept?"
   }
-
-  abstract class Fallback(val negotiation: NegotiationId)
-                         (implicit val sender: AgentRef, val priority: Priority) extends Message {
-    def messageType = "Fallback"
-    def asString = s"I ran out of possible variants, please fallback"
-  }
-
-  object Fallback{
-    def apply(negotiation: NegotiationId)(implicit sender: AgentRef, priority: Priority): Request with Fallback =
-      new Fallback(negotiation) with Request with AutoId
-    def inResponse(to: Message.Id, in: NegotiationId)(implicit sender: AgentRef, priority: Priority): Response with Fallback =
-      new Fallback(in) with Response with AutoId{ def respondingTo = to }
-  }
-
 }

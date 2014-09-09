@@ -24,7 +24,6 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   with impl.Agent.ProposalRegistering[Lang]
   with ProposalEngine[Lang]
   with PriorityBasedAgentViews
-  with NegotiationStateSupport
   with ViewUtils
   with ActorLogging
 {
