@@ -18,6 +18,7 @@ object  Build extends sbt.Build {
 //    scalacOptions ++= Seq("-explaintypes"),
 //    scalacOptions ++= Seq("-deprecation"),
 //    scalacOptions ++= Seq("-Ydebug"),
+//    scalacOptions ++= Seq("-Xlog-free-terms"),
     scalacOptions in (Compile, doc) ++= Seq("-diagrams", "-diagrams-debug")
 //     resolvers += Release.spray,
 //     mainClass in Compile := Some("")

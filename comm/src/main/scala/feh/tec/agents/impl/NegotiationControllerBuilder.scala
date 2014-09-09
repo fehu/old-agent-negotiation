@@ -21,7 +21,7 @@ import feh.util._
 import scala.reflect.ClassTag
 
 trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesInitialization]
-  extends agents.NegotiationControllerBuilder[NegotiationSpecificationAdapter, Control]
+  extends agents.NegotiationControllerBuilder[impl.NegotiationSpecification, Control]
 {
   import NegotiationSpecification._
 
@@ -40,9 +40,11 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
   def buildAgentsCount(defs: Seq[SpawnDef]) = defs.collect{ case SimpleSpawnDef(mp) => mp }.flatten.toMap
 
   protected def buildVars(defs: Seq[VarDef[_]]): Map[String, Var] = ???
-//  defs.map{
-//    case VarDef(name, domainDef) =>
-//      name -> (domainDef match {
+//    defs.map{
+//    case VarDef(name, GenericDomainDef(domain)) =>
+//      name -> new Var(name, dom.clazz.isInstance) with Domain.Range{ def domain = range }
+
+//      (domainDef match {
 //        case dom@DomainRange(range) => new Var(name, dom.clazz.isInstance) with Domain.Range{ def domain = range }
 //        case dom@DomainSet(set: Set[Any]) => new Var(name, dom.clazz.isInstance) with Domain.Small[Any]{ def domain = set }
 //      })
@@ -67,7 +69,7 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
             (negotiations(neg), (negId, competitors), constraints)
         }.unzip3
         val constraints = _constraints.flatten
-        val competitors = _competitors.toMap
+        val competitors = _competitors.toMap.mapValues{ case InterlocutorsByRoles(roles) => roles }
         val negExtracted = _negExtracted.toMap
 
         val domainIterators = negExtracted.flatMap(_._2._1).toSeq.zipMap(defaultDomainIterator).toMap
@@ -172,7 +174,7 @@ object NegotiationControllerBuilder{
       case (acc, ("retry startup", time)) => acc.copy(retryToStartAgent = time)
     }
 
-    def apply(v1: NegotiationSpecificationAdapter) = ??? /*{
+    def apply(v1: impl.NegotiationSpecification) = ??? /*{
       vars = buildVars(v1.variables)
       negotiations = buildNegotiations(v1.negotiations)
       agents = buildAgents(v1.agents)

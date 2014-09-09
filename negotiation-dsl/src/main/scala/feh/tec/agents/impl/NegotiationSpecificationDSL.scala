@@ -73,8 +73,8 @@ trait CreationSpecificationDSL{
     def <= (t: FiniteDuration): TimeoutDef
   }
 
-  protected type ConfDef
-  protected type TimeoutDef <: ConfDef
+  protected trait ConfDef
+  protected trait TimeoutDef extends ConfDef
 
   type ChooseTimeout = {
     def creation: TimeoutIdent

@@ -1,34 +1,6 @@
 package feh.tec.agents.impl
 
-import feh.tec.agents.{NegotiationSpecification => ANegotiationSpecification}
-
 import scala.concurrent.duration.FiniteDuration
-import scala.language.experimental.macros
-import scala.reflect.runtime.{universe => ru}
-
-
-class NegotiationSpecificationAdapter extends ANegotiationSpecification {
-  import NegotiationSpecification._
-  
-  type Config = {
-    def agentSpawn: Seq[SpawnDef]
-    def configs: Seq[ConfigureDef]
-  }
-
-  type VarDef = this.type
-
-  def negotiations = ???
-
-  def config = ???
-
-  def agents = ???
-
-  def variables = ???
-
-  type NegotiationDef = this.type
-  type AgentDef = this.type
-}
-
 
 class NegotiationSpecificationExample extends NegotiationSpecificationDSL{
 
@@ -43,7 +15,7 @@ class NegotiationSpecificationExample extends NegotiationSpecificationDSL{
 //  spawn agents(
 //    "ag-1" -> 10
 //    )
-  
+
 }
 
 class NegotiationSpecificationExample2 extends NegotiationSpecificationDSL{

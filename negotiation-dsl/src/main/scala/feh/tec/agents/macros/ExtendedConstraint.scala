@@ -4,100 +4,64 @@ import scala.reflect.macros.whitebox
 import scala.language.experimental.macros
 
 
-object ExtendedConstraint {
-/*
-  def impl[T: c.WeakTypeTag](c: whitebox.Context)(withWrapper: c.Expr[CW[T] => Boolean]): c.Expr[(T, T) => Boolean] = {
+class ExtendedConstraint[C <: whitebox.Context](val c: C) {
+
+  def replace(in: c.Tree): Replaced = {
     import c.universe._
 
-    def dsl = withWrapper.tree
-    val Function(List(ValDef(_, iParam, _, _)), body) = dsl
-    val IParam = iParam
+    val h = new Helper[c.type](c)
 
 
-    def transformTree(t: c.Tree, f: PartialFunction[c.Tree, c.Tree]): c.Tree = {
-      def transformIn = transformTree(_: c.Tree, f)
-      t match {
-        case tree if f isDefinedAt tree => f(tree)
-        case Function(params, body) => Function(params, transformIn(body))
-        case Select(qual, name) => Select(transformIn(qual), name)
-        case Apply(fun, args) => Apply(transformIn(fun), args.map(transformIn))
-        case TypeApply(fun, args) => TypeApply(transformIn(fun), args.map(transformIn))
-        case other => other
-      }
-    }
     
-    def proposalArgName = "$_proposal"
-    def proposalArg = Ident(TermName(proposalArgName))
+    def proposalArgName(s: String) = "$_proposal_" + s
+    def proposalArg(s: String) = TermName(proposalArgName(s))
     
-    def valueArgName = "$_value"
-    def valueArg = Ident(TermName(valueArgName))
-    
-    def replaceCBuildKey: PartialFunction[c.Tree, c.Tree] = {
-       case Select(Select(Select(Select(Select( Ident(
-              TermName("feh")),
-                TermName("tec") ),
-                  TermName("agents")
-                  ),TermName("impl")
-                    ),TermName("ExtendedConstraintBuilder")
-                      ),TermName("proposal")
-                        ) =>
-         proposalArg
-       case Select(Select(Select(Select(Select( Ident(
-              TermName("feh")
-              ),TermName("tec")
-                ),TermName("agents")
-                  ),TermName("impl")
-                    ),TermName("ExtendedConstraintBuilder")
-                      ),TermName("value")
-                        ) =>
-         valueArg
-    }
+    def valueArgName(s: String) = "$_value_" + s
+    def valueArg(s: String) = TermName(valueArgName(s))
 
-    val replacements = ({
-      case  Apply(
-              Select(
-                Ident(IParam),
-                TermName("apply")
-              ),
-              List(arg)
-            ) => replaceCBuildKey.lift(arg).getOrElse(arg)
-      case Apply(Apply( TypeApply(
-            Select(Select(Select(Select(Select(Select( Ident(
-              TermName("feh")),
-                TermName("tec")
-                ),TermName("agents")
-                  ),TermName("impl")
-                    ),TermName("ExtendedConstraintBuilder")
-                      ),TermName("my")
-                        ),TermName("current")
-            ),List(TypeTree())
-            ),List(Select(Select(Select(Select(Select(Ident(
-              TermName("feh")),
-                TermName("tec")
-                ),TermName("agents")
-                  ),TermName("impl")
-                    ),TermName("ExtendedConstraintBuilder")
-                      ),TermName("value")
-            ))),List(Ident(IParam))
+    def param(name: TermName, tpe: c.Type) = ValDef(Modifiers(Flag.PARAM), name, Ident(tpe.typeSymbol), EmptyTree)
+
+    var args: Seq[(String, String, TermName)] = Nil
+
+    val transformed = h.transform(in, {
+      case Apply(
+            TypeApply(Select(This(TypeName("$anon")), TermName(typeOfArg)), List(TypeTree())),
+            List(Select(This(TypeName("$anon")), TermName(term)))
           ) =>
-        valueArg
-    }: PartialFunction[c.Tree, c.Tree]) orElse replaceCBuildKey
+        typeOfArg match{
+          case "proposed" =>
+            val arg = proposalArg(term)
+            args :+= ("proposed", term, arg)
+            Ident(arg)
+          case "valueOf"  =>
+            val arg = valueArg(term)
+            args :+= ("valueOf", term, arg)
+            Ident(arg)
+        }
+    })
 
+/*    def func_build(types: Map[c.Name, c.Type]) = Function(
+      args.toList map {
+        case (_, _, arg) => param(arg, types(arg))
+      },
+      transformed
+    )*/
 
-    def param(name: String) = ValDef(Modifiers(Flag.PARAM), TermName(name), Ident(c.weakTypeOf[T].typeSymbol), EmptyTree)
-
-    val transformed = transformTree(body, replacements)
-
-    val func = Function(
-      List(param(proposalArgName), param(valueArgName)),
+    def func = Function(
+      args.toList map {
+        case (_, _, arg) => param(arg, c.typeOf[Any])
+      },
       transformed
     )
 
-    c.Expr[(T, T) => Boolean](func)
+    val descr = args.toList map (Description.apply _).tupled
+
+    Replaced(descr, func)
   }
-*/
 
-
-
+  case class Description(tpe: String, varName: String, arg: c.TermName)
+                                                               // Map[arg, arg's type]
+//  case class Replacement(description: List[Description], build: Map[c.Name, c.Type] => c.Tree)
+  case class Replaced(description: List[Description], tree: c.Tree)
 }
 
