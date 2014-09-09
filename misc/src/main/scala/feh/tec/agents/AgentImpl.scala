@@ -4,7 +4,6 @@ import akka.actor.ActorLogging
 import feh.tec.agents.impl.Agent.AgentReportingMessagesAndState
 import feh.tec.agents.impl._
 import feh.tec.agents.impl.agent.AgentCreation
-import feh.tec.agents.impl.view.CreateConstraintsHelper
 import feh.util.InUnitInterval
 
 trait AgentImpl extends AgentCreation[DefaultNegotiatingLanguage]
@@ -12,7 +11,6 @@ trait AgentImpl extends AgentCreation[DefaultNegotiatingLanguage]
   with DefaultNegotiatingLanguage.Builder
   with NegotiationSupport.Default
   with ProposalEngine.IteratingAllDomains[DefaultNegotiatingLanguage]
-  with CreateConstraintsHelper
 {
 
   type StateOfNegotiation = ProposalIteratorNegotiationState[DefaultNegotiatingLanguage]

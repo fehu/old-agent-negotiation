@@ -34,13 +34,16 @@ trait ConstraintsView extends InternalView{
 
   val aspect = "Constraints over " + constraints.map(_.over).mkString(", ")
 
-  def constraints: Set[Constraint[Var]]
+  def constraints: Set[Constraint]
 
-  def satisfies(issue: Var, value: Any): Boolean
+  def satisfy(issues: Map[Var, Any], values: Map[Var, Any]): Boolean
 }
 
 object ConstraintsView{
-  case class Constraint[V <: Var](over: V, in: NegotiationId, satisfies: V#Tpe => Boolean)
+  case class Constraint(name:String, in: NegotiationId,
+                        over: Set[Var], // the proposed variables
+                        dependsOn: Set[Var], // the negotiation variables
+                        satisfies: (Map[Var, Any], Map[Var, Any]) => Boolean) // (over, dependsOn) => Boolean
 }
 
 

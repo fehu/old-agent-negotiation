@@ -20,6 +20,7 @@ object Coloring{
   def negotiationId = NegotiationId("Graph Coloring")
 }
 
+/*
 class Coloring(uuid: UUID,
                negInit: Map[NegotiationId, NegotiationInit],
                val conflictResolver: AgentRef,
@@ -33,4 +34,4 @@ class Coloring(uuid: UUID,
   val constraints = Set( CreateConstraint.notEquals(Color, negotiationId) )
 
   def checkConstraintsRepeat = ???
-}
+}*/

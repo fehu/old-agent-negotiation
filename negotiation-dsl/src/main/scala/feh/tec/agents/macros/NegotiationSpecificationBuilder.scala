@@ -1,5 +1,6 @@
 package feh.tec.agents.macros
 
+import feh.tec.agents.impl.NegotiationSpecification.{GenericDomainDef, VarDef}
 import feh.tec.agents.impl.{NegotiationSpecification, NegotiationSpecificationDSL}
 import scala.reflect.internal.HasFlags
 import scala.reflect.macros.whitebox
@@ -22,8 +23,11 @@ object NegotiationSpecificationBuilder{
 
 //    def applications =
 
-    val vars = for ((name, domain) <- varsAndDomains) yield
-      q"""VarDef[Any](${name.decodedName.toString.trim}, GenericDomainDef(${c.Expr[Any](domain)}))"""
+    val vars = for ((name, tpe, domain, domainTpe) <- varsAndDomains) yield {
+      q"""val clazz = classOf[$tpe].asInstanceOf[Class[$tpe]]
+          VarDef[$tpe](${name.decodedName.toString.trim}, GenericDomainDef[$tpe, $domainTpe]($domain, clazz))
+          """
+    }
 
 
     val negotiations = for ((name, issues) <- negotiationsAndIssues) yield {
@@ -40,12 +44,12 @@ object NegotiationSpecificationBuilder{
               // todo: more cases
             }
             val constraints = constraintsRaw map{
-              case b.xc.Replaced(descr, func) =>
+              case (cName, b.xc.Replaced(descr, func)) =>
                 val descriptions = descr map {
                   case b.xc.Description(tpe, varName, arg) =>
                     q"""ConstraintParamDescription($tpe, $varName, ${arg.decodedName.toString})"""
                 }
-                q"""AgentConstraintDef(Seq(..$descriptions), $func.tupled.asInstanceOf[Product => Boolean])"""
+                q"""AgentConstraintDef($cName, Seq(..$descriptions), $func.tupled.asInstanceOf[Product => Boolean])"""
             }
 
             q"""AgentNegDef($neg, InterlocutorsByRoles($interlocutors), List(
@@ -63,9 +67,9 @@ object NegotiationSpecificationBuilder{
         def negotiations: Seq[NegotiationDef] = Seq(..$negotiations)
         def agents: Seq[AgentDef] = Seq(..$agents)
 
-        def spawns: SpawnDef = ???
-        def timings: TimingsDef = ???
-        def timeouts: TimeoutsDef = ???
+        def spawns: SpawnDef = null
+        def timings: TimingsDef = null
+        def timeouts: TimeoutsDef = null
       }
     """
 
@@ -105,16 +109,18 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
     }
   }
 
-  /** Seq(name -> domain) */
+  /** Seq( (name, type, domain, domain type) ) */
   def extractVars(definitions: Seq[(c.TermName, c.Tree)]) = definitions collect {
-    case (name, Apply(TypeApply(sel: Select, _), arg :: Nil)) if h.selects(sel, "$anon.variable.with") =>
-      val dom = arg match {
+    case (name, Apply(TypeApply(sel: Select, List(ttree@TypeTree())), arg :: Nil)) if h.selects(sel, "$anon.variable.with") =>
+      val (dom, domTpe) = arg match {
         case Apply(
               Select(This(TypeName("$anon")), TermName("domain")),
               List(domainDef)
-            ) => domainDef
+            ) =>
+          val dTpe = extractDomainType(domainDef)
+          domainDef -> dTpe
       }
-      name -> dom
+      (name, ttree.tpe, dom, domTpe)
   }
 
   /** Seq(name -> List(var)) */
@@ -122,7 +128,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
     case (name, Apply(sel: Select, vars)) if h.selects(sel, "$anon.negotiation.over") => name -> vars
   }
 
-  /**  Seq( (name, role, List[ExtendedConstraint#Replaced]) ) */
+  /**  Seq( (name, role, List[constraint name -> ExtendedConstraint#Replaced]) ) */
   def extractAgents(definitions: Seq[(c.TermName, c.Tree)]) = definitions collect{
     case (name, Apply(
                   Select(Apply(sel: Select, Literal(Constant(r: String)) :: Nil), TermName("that")),
@@ -164,10 +170,36 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
 
   protected def extractConstraintsDef(t: c.Tree) = t match {
     case Apply(
-    Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("VarDefConstraintBuilder")), List(TypeTree())), List(Literal(Constant(name: String)))), TermName("$bar")),
-    List( constraint )
-    ) => xc.replace(constraint)
+          Select(
+            Apply(
+              TypeApply(
+                Select(This(TypeName("$anon")), TermName("VarDefConstraintBuilder")),
+                List(TypeTree())
+              ),
+            List(Literal(Constant(name: String)))
+            ),
+          TermName("$bar")
+          ),
+          List( constraint )
+        ) => name -> xc.replace(constraint)
   }
 
+  protected def extractDomainType(t: c.Tree) = t match {
+    case Apply(
+          Select(
+            Apply(
+              Select(
+                _, //Select(This(TypeName("scala")), "Predef"),
+                TermName("intWrapper")
+                ),
+                _ //List(_)
+              ),
+              TermName("to")
+            ),
+            _ //List(_)
+          ) => c.typeOf[Range]
+    case other =>
+      c.abort(NoPosition, showRaw(other))
+  }
 
 }

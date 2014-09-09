@@ -16,8 +16,8 @@ object NegotiationSpecification{
 
   case class AgentDef(name: String, role: String, negotiations: Seq[AgentNegDef])
 
-  trait DomainDef[T] // todo
-  case class GenericDomainDef(domain: Any) extends DomainDef[Any]
+  trait DomainDef[T]
+  case class GenericDomainDef[T, D](domain: D, classOfT: Class[T]) extends DomainDef[T]
 
   sealed trait Interlocutors
   case class InterlocutorsByRoles(roles: Set[String]) extends Interlocutors
@@ -26,8 +26,8 @@ object NegotiationSpecification{
                          interlocutors: Interlocutors,
                          extra: Seq[AgentNegPartialDef])
 
-  case class AgentConstraintDef(v: Seq[ConstraintParamDescription], test: Product => Boolean)
-  case class AgentConstraintsDef(contraints: Seq[AgentConstraintDef]) extends AgentNegPartialDef
+  case class AgentConstraintDef(name: String, v: Seq[ConstraintParamDescription], test: Product => Boolean)
+  case class AgentConstraintsDef(constraints: Seq[AgentConstraintDef]) extends AgentNegPartialDef
 
   case class ConstraintParamDescription(tpe: String, varName: String, argName: String)
 

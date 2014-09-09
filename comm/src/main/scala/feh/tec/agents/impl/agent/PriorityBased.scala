@@ -42,12 +42,13 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   def scheduleCheckConstraints(init: FiniteDuration, delay: FiniteDuration) =
     context.system.scheduler.schedule(init, delay, self, PriorityBased.CheckConstraints)(context.system.dispatcher, self)
 
-  def constraints: Set[Constraint[Var]]
+  def constraints: Set[Constraint]
   protected def issuesExtractor: IssuesExtractor[Lang]
 
   protected def isFailure(neg: Negotiation, weighted: Map[Option[Boolean], InUnitInterval]): Boolean
 
-  def accept_?(prop: Lang#Proposal) = issuesExtractor.extract(prop) forall (proposalSatisfaction.satisfies _).tupled
+  def accept_?(prop: Lang#Proposal) =
+    proposalSatisfaction.satisfy(issuesExtractor.extract(prop), get(prop.negotiation).currentValues.toMap)
 
 
   override def processSys = super.processSys orElse{

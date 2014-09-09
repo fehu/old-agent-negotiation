@@ -5,6 +5,8 @@
 - [x] when creating negotiation scopes - filter same agent
 - [x] agents should report on messages sent 
 - [ ] remove debug outputs
-- [ ] timings from NegotiationControllerBuilder.buildAgents should ne configurable
-- [ ] whole negotiation definition should be using macros
+- [ ] timings from NegotiationControllerBuilder.buildAgents should be configurable
+- [x] whole negotiation definition should be using macros
 - [ ] macro should build NegotiationController for NegotiationControllerBuilder
+- [ ] merge negotiation-dsl into comm
+- [ ] spawn, timings and timeouts config

@@ -11,10 +11,9 @@ import feh.tec.agents._
 import feh.tec.agents.impl.Agent.{AgentReporting, Id}
 import feh.tec.agents.impl.NegotiationController.GenericStaticAgentsInit.Timings
 import feh.tec.agents.impl.NegotiationController.{Timeouts, GenericStaticInitArgs, GenericStaticAgentsInit, Counter}
-import feh.tec.agents.impl.NegotiationSpecification.{TimeoutsDef, TimingsDef}
+import feh.tec.agents.impl.NegotiationSpecification._
 import feh.tec.agents.impl.agent.AgentBuilder
 import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
-import feh.tec.agents.impl.view.CreateConstraintsHelper
 import scala.concurrent.duration._
 import feh.util._
 
@@ -39,16 +38,14 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
 
   def buildAgentsCount(defs: Seq[SpawnDef]) = defs.collect{ case SimpleSpawnDef(mp) => mp }.flatten.toMap
 
-  protected def buildVars(defs: Seq[VarDef[_]]): Map[String, Var] = ???
-//    defs.map{
-//    case VarDef(name, GenericDomainDef(domain)) =>
-//      name -> new Var(name, dom.clazz.isInstance) with Domain.Range{ def domain = range }
-
-//      (domainDef match {
-//        case dom@DomainRange(range) => new Var(name, dom.clazz.isInstance) with Domain.Range{ def domain = range }
-//        case dom@DomainSet(set: Set[Any]) => new Var(name, dom.clazz.isInstance) with Domain.Small[Any]{ def domain = set }
-//      })
-//  }.toMap
+  protected def buildVars(defs: Seq[VarDef[_]]): Map[String, Var] = defs.map{
+    case VarDef(name, GenericDomainDef(dom, clz)) =>
+      val clazz = replaceClass(clz)
+      name -> new Var(name, clazz.isInstance) {
+        type Domain = Any
+        def domain = dom
+      }
+  }.toMap
 
   protected def buildNegotiations(defs: Seq[NegotiationDef]): Map[String, (NegotiationId, (Set[Var], Priority => NegotiationInit))] =
     defs.map{
@@ -65,10 +62,12 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
         val (_negExtracted, _competitors, _constraints) = negs.map{
           case AgentNegDef(neg, competitors, extra) =>
             val (negId, negCreate) = negotiations(neg)
-            val constraints = ??? // todo
-            (negotiations(neg), (negId, competitors), constraints)
+            val constraints = extra.collect {
+              case AgentConstraintsDef(constr) => constr
+            }.flatten
+            (negotiations(neg), (negId, competitors), negId -> AgentConstraintsDef(constraints))
         }.unzip3
-        val constraints = _constraints.flatten
+        val constraints = _constraints.toMap
         val competitors = _competitors.toMap.mapValues{ case InterlocutorsByRoles(roles) => roles }
         val negExtracted = _negExtracted.toMap
 
@@ -86,17 +85,29 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
             conflictResolveTimeout = Timeout(30 millis), // todo
             Role(role),
             domainIterators.asInstanceOf[Map[Var, DomainIterator[Var#Domain, Var#Tpe]]],
-            constraints,
+            constraints, // Map[NegotiationId, AgentConstraintsDef]
             reportingTo = args.reportingTo,
             checkConstraintsRepeat = 1 second // todo
           )
       })
     }.toMap
 
-  protected def defaultDomainIterator(v: Var): DomainIterator[_, _] = v match {
-    case range: Domain.Range => new DomainIterator.Range()
-    case range: Domain.Small[_] => new DomainIterator.Generic[Any]
+  protected def defaultDomainIterator(v: Var): DomainIterator[_, _] = v.domain match {
+    case range: Range => new DomainIterator.Range()
+    case iterable: Iterable[_] => new DomainIterator.Generic[Any]
   }
+
+  protected def replaceClass(clazz: Class[_]) = clazz match{ // replace primitive type classes by the boxes
+    case c if c == classOf[Int] => classOf[Integer]
+    case c if c == classOf[Long] => classOf[java.lang.Long]
+    case c if c == classOf[Byte] => classOf[java.lang.Byte]
+    case c if c == classOf[Float] => classOf[java.lang.Float]
+    case c if c == classOf[Double] => classOf[java.lang.Double]
+    case c if c == classOf[Char] => classOf[Character]
+    case c if c == classOf[Boolean] => classOf[java.lang.Boolean]
+    case c => c
+  }
+
 }
 
 object NegotiationControllerBuilder{
@@ -174,13 +185,13 @@ object NegotiationControllerBuilder{
       case (acc, ("retry startup", time)) => acc.copy(retryToStartAgent = time)
     }
 
-    def apply(v1: impl.NegotiationSpecification) = ??? /*{
-      vars = buildVars(v1.variables)
+    def apply(v1: impl.NegotiationSpecification) = {
+      vars = buildVars(v1.variables.map{ case vd: VarDef[_] => vd })
       negotiations = buildNegotiations(v1.negotiations)
       agents = buildAgents(v1.agents)
-      agentsCount = buildAgentsCount(v1.config.agentSpawn)
-      timeouts = v1.config.configs.collect { case TimeoutsDef(t) => t }.flatten.toMap |> buildTimeouts
-      timings  = v1.config.configs.collect { case TimingsDef(t)  => t }.flatten.toMap |> buildTimings
+      agentsCount = Map("Queen" -> 4) //buildAgentsCount(v1.config.agentSpawn) todo
+      timeouts = buildTimeouts(Map()) //v1.config.configs.collect { case TimeoutsDef(t) => t }.flatten.toMap |> buildTimeouts
+      timings  = buildTimings(Map()) //v1.config.configs.collect { case TimingsDef(t)  => t }.flatten.toMap |> buildTimings
 
       val arg = GenericStaticInitArgs[DefaultBuildAgentArgs](
         systemAgentBuilders = systemAgents,
@@ -191,7 +202,7 @@ object NegotiationControllerBuilder{
       )
 
       acSys.actorOf(props(arg), "NegotiationController")
-    }*/
+    }
 
     protected def props(arg: GenericStaticInitArgs[DefaultBuildAgentArgs]) = Props(classOf[DefaultController], arg)
 
@@ -200,7 +211,7 @@ object NegotiationControllerBuilder{
 
 abstract class GenericIteratingAgentCreation[Lang <: ProposalLanguage](args: GenericIteratingAgentCreation.Args)
   extends agent.PriorityBasedCreation[Lang](args.uuid, args.negotiationInit, args.conflictResolver, args.conflictResolveTimeout)
-  with CreateConstraintsHelper with AgentReporting[Lang]
+  with AgentReporting[Lang]
 {
   self: ProposalEngine.Iterating[Lang] =>
 
@@ -211,7 +222,54 @@ abstract class GenericIteratingAgentCreation[Lang <: ProposalLanguage](args: Gen
   override lazy val id = Id.withName(role, args.uuid, args.name)
   lazy val role: Role = args.role
   def domainIterators = args.domainIterators
-  lazy val constraints = args.constraints.map(_(this)).toSet
+  lazy val constraints = args.constraints.flatMap{
+    case (negId, AgentConstraintsDef(cDefs)) =>
+      cDefs map {
+        case AgentConstraintDef(name, description, test) =>
+          val dz = description.zipWithIndex.map(_.swap)
+          val over = dz.collect{
+            case (i, ConstraintParamDescription("proposed", varName, _)) =>
+              i -> get(negId).currentValues.find(_._1.name == varName).get._1
+          }
+          val dependsOn = dz.collect{
+            case (i, ConstraintParamDescription("valueOf", varName, _)) =>
+              i -> get(negId).currentValues.find(_._1.name == varName).get._1
+          }
+
+          val f: (Map[Var, Any], Map[Var, Any]) => Boolean = (props, valsOf) => {
+            val iProps = props.map{
+              case (vr, vl) =>
+                val Some((i, _)) = over.find(_._2 == vr)
+                i -> vl
+            }
+
+            val iValsOf = valsOf.map{
+              case (vr, vl) =>
+                val Some((i, _)) = dependsOn.find(_._2 == vr)
+                i -> vl
+            }
+
+            val args = (iProps ++ iValsOf).ensuring(_.size == dz.size, "Wrong number of args for constraint")
+              .toSeq.sortBy(_._1).map(_._2)
+
+            val arg = dz.size match {
+              case 1 => Tuple1(args(0))
+              case 2 => (args(0), args(1))
+              case 3 => (args(0), args(1), args(2))
+              case 4 => (args(0), args(1), args(2), args(3))
+              case 5 => (args(0), args(1), args(2), args(3), args(4))
+              case 6 => (args(0), args(1), args(2), args(3), args(4), args(5))
+            }
+
+            test(arg)
+          }
+
+
+          Constraint(name, negId, over.map(_._2).toSet, dependsOn.map(_._2).toSet, f)
+      }
+
+
+  }.toSet
 
 }
 
@@ -223,7 +281,7 @@ object GenericIteratingAgentCreation{
                   conflictResolveTimeout: Timeout,
                   role: Role,
                   domainIterators: Map[Var, DomainIterator[Var#Domain, Var#Tpe]],
-                  constraints: Seq[CreateConstraintsHelper => Constraint[Var]],
+                  constraints: Map[NegotiationId, AgentConstraintsDef],
                   reportingTo: AgentRef,
                   checkConstraintsRepeat: FiniteDuration)
 

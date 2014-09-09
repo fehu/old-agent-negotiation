@@ -3,24 +3,16 @@ package feh.tec.agents.impl.view
 import feh.tec.agents.ConstraintsView.Constraint
 import feh.tec.agents.impl.Agent
 import feh.tec.agents.{NegotiationId, ConstraintsView, Var}
+import feh.util._
 
 /**
   */
-class Constraints(val constraints: Set[Constraint[Var]]) extends ConstraintsView{
-  protected val constraintsSearch = constraints.groupBy[Var](_.over)
+class Constraints(val constraints: Set[Constraint]) extends ConstraintsView{
+  protected val constraintsSearch = constraints.groupBy[Set[Var]](_.over)
 
-  def satisfies(issue: Var, value: Any) =
-    (true /: constraintsSearch.getOrElse(issue, Set())){
-      case (acc, Constraint(_, _, test)) => acc && issue.cast(value).exists(test)
+  def satisfy(issues: Map[Var, Any], values: Map[Var, Any]) =
+    (true /: constraintsSearch.getOrElse(issues.keySet, Set())){
+      case (acc, Constraint(_, _, _, depends, test)) =>
+        acc && test(issues, depends.zipMap(values).toMap)
     }
-}
-
-trait CreateConstraintsHelper{
-  self: Agent[_] =>
-
-  object CreateConstraint{
-    def equals(vr: Var, in: NegotiationId) = Constraint(vr, in, get(in).currentValues(vr) == )
-    def notEquals(vr: Var, in: NegotiationId) = Constraint(vr, in, get(in).currentValues(vr) != )
-  }
-
 }

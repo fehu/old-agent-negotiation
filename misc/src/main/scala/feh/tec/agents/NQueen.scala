@@ -1,7 +1,9 @@
 package feh.tec.agents
 
+import akka.actor.{Props, ActorSystem}
+import akka.util.Timeout
 import feh.tec.agents.impl._
-
+import akka.pattern.ask
 import scala.concurrent.duration._
 
 object NQueen{
@@ -37,23 +39,18 @@ object NQueen{
 }
 
 object NQueenApp extends App{
+  implicit val acSys = ActorSystem.create("NQueenApp")
 
   val spec = NQueen.spec(4)
 
-  println(spec)
-
-//  implicit val acSys = ActorSystem.create("NQueenApp")
-//  acSys.actorOf(Props(classOf[NQueenUserAgent]), "NQueenUserAgent")
+  acSys.actorOf(Props(classOf[NQueenUserAgent], spec), "NQueenUserAgent")
 }
 
-/*
-class NQueenUserAgent extends UserAgent{
+class NQueenUserAgent(spec: impl.NegotiationSpecification) extends UserAgent{
   def name = "user"
 
   implicit def acSys = context.system
   implicit def exContext = context.dispatcher
-
-  val spec = new NQueenSpecification(4)
 
   println("spec.variables = " + spec.variables)
   println("spec.negotiations = " + spec.negotiations)
@@ -79,4 +76,4 @@ class NQueenUserAgent extends UserAgent{
     agents => controller ! Controller.ShowReportsGui(agents, silence = true, updateFreq = 200 millis)
   }
 
-}*/
+}
