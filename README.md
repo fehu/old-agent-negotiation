@@ -38,6 +38,8 @@ object NQueen{
 }
 ```
 
+[API](http://fehu.github.io/agent-negotiation/unidoc/package.html)
+
 ##### todo:
   * [coloring](coloring/todo.md)
   * [comm](comm/todo.md)
