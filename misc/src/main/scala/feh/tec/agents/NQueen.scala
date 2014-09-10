@@ -57,7 +57,7 @@ class NQueenUserAgent(spec: impl.NegotiationSpecification) extends UserAgent{
   println("spec.agents = " + spec.agents)
   println("spec.config = " + spec.config)
 
-  val builder = new ControllerBuilder[GenericNegotiatingAgentImpl]
+  val builder = new ControllerBuilder[GenericNegotiatingAgent]
   val controller = builder(spec)
 
   println("builder.vars = " + builder.vars)
