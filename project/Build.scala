@@ -58,6 +58,7 @@ object  Build extends sbt.Build {
       val version = "1.3.1"
       lazy val json = "io.spray" %%  "spray-json" % version
       lazy val can = "io.spray" %% "spray-can" % version
+      lazy val websocket= "com.wandoulabs.akka" %% "spray-websocket" % "0.1.3"
     }
 
     object Tests{
@@ -101,7 +102,7 @@ object  Build extends sbt.Build {
       name := "agent-comm"
     }
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(comm, oldcomm, coloring, misc, webFrontend)
+   .aggregate(comm, oldcomm, coloring, misc, webFrontend, webBackend)
 
   lazy val comm = Project(
     id = "comm",
@@ -142,9 +143,15 @@ object  Build extends sbt.Build {
   lazy val webFrontend = Project(// libraryDependencies in build.sbt
     id = "web-frontend",
     base = file("web-frontend"),
-    settings = buildSettings ++ /*scalaJSSettings ++ */Seq(
-      resolvers += Snapshot.spray,
-      libraryDependencies ++= Seq()
+    settings = buildSettings
+  )
+
+  lazy val webBackend = Project(
+    id = "web-backend",
+    base = file("web-backend"),
+    settings = buildSettings ++ Seq(
+      resolvers ++= Seq(Snapshot.spray, Release.spray),
+      libraryDependencies ++= Seq(spray.websocket)
     )
   )
 
