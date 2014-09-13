@@ -1,18 +1,25 @@
+/* ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+                                                Chess Board
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## */
+
 table.chess-board {
-#    width: 300px;
-#    height: 300px;
+//    width: 300px;
+//    height: 300px;
 }
 
 .chess-board td, th{
     border:     1px solid #999;
     width:      80px;
     height:     80px;
+    text-align: center;
+    font-size:  large;
 }
 
 .chess-board .description{
     border:             0px;
     vertical-align:     middle;
     text-align:         center;
+    color:              rgb(90, 90, 90);
 }
 
 .chess-board tr:nth-child(2n+2) td:nth-child(2n+2) {
@@ -22,3 +29,83 @@ table.chess-board {
 .chess-board tr:nth-child(2n+3) td:nth-child(2n+3) {
     background-color:   #7E4D3F;
 }
+
+/* ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+                                                  Queen Info
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## */
+
+.queen-info{
+    float:              right;
+}
+
+.queen-info > div{
+    float:              left;
+    width:              150px;
+    border:             solid 1px;
+    border-radius:      10px;
+    margin-right:       3px;
+}
+
+.queen-info .name{
+    text-align:         center;
+    font-weight:        bold;
+}
+
+.queen-info .name b{
+    font-size:          larger;
+}
+
+.queen-info dt{
+    float:              left;
+    text-decoration:    underline;
+    margin-left:        5px;
+}
+
+.queen-info  dd{
+    text-align:         center;
+}
+
+/* ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+                                                  Queen Info - Active
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## */
+
+.queen-info .button{
+    text-align:         center;
+    color:              rgb(247, 237, 237);
+    background-color:   #7E4D3F;
+    border:             solid 2px #7E4D3F;
+    border-radius:      7px;
+}
+
+.queen-info .msg-sel{
+    margin-bottom:      0px;
+    font-size:          large;
+    vertical-align:     top;
+}
+
+.queen-info .msg-sel.l{
+    float:              left;
+    margin-left:        3px;
+
+}
+
+.queen-info .msg-sel.r{
+    float:              right;
+    margin-right:       3px;
+}
+
+.queen-info .msg-sel.l.selected {
+    color:              blue;
+}
+
+.queen-info .msg-sel.r.selected{
+    color:              green;
+}
+
+/* ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+                                                  Queen Info - Communications
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## */
+
+.queen-info .comm .l
+.queen-info .comm .r
+.queen-info .comm .messages

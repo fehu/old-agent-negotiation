@@ -8,12 +8,13 @@ object NQueenMessages extends WebSocketMessages{
 
 
   case class Queen(n: Int)
+  case class Init(queens: Seq[(Queen, String)]) extends Msg
   case class StateReport(of: Queen,
                          position: (Int, Int),
                          priority: Int,
                          proposalAcceptance: Seq[(Queen, Boolean)]
                           ) extends Msg
-  case class MessageSent(by: Queen, to: Queen, msg: Message) extends Msg
+  case class MessageReport(by: Queen, to: Queen, msg: Message) extends Msg
 
   case class Message(priority: Int, position: (Int, Int), tpe: MessageType)
   sealed trait MessageType

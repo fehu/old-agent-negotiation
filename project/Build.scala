@@ -146,7 +146,8 @@ object  Build extends sbt.Build {
     id = "web-frontend",
     base = file("web/frontend"),
     settings = buildSettings ++ Web.settings ++ Seq(
-      libraryDependencies ++= Seq(feh.util, scala.libAll)
+      libraryDependencies ++= Seq(feh.util, scala.libAll),
+      unmanagedSourceDirectories in Compile <+= (sourceDirectory in webCommon)
     )
   ) dependsOn webCommon
 

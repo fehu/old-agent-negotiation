@@ -4,7 +4,8 @@ import akka.actor.{ActorSystem, Props, ActorRef}
 import akka.io.Tcp.ConnectionClosed
 import feh.tec.web.common.WebSocketMessages
 import spray.can.Http
-import spray.can.websocket.frame.TextFrame
+import spray.can.websocket.UpgradedToWebSocket
+import spray.can.websocket.frame.{Frame, TextFrame}
 import spray.json.JsonFormat
 
 object WebSocketPushServer{
@@ -12,10 +13,10 @@ object WebSocketPushServer{
   case class Push(msg: WebSocketMessages#Msg, format: JsonFormat[WebSocketMessages#Msg])
 }
 
-class WebSocketPushServer extends WebSocketServer{
+class WebSocketPushServer(sendOnConnection: Option[Frame]) extends WebSocketServer{
   import WebSocketPushServer._
   
-  def workerFor(connection: ActorRef) = Props(new WebSocketPushWorker(connection, self))
+  def workerFor(connection: ActorRef) = Props(new WebSocketPushWorker(connection, self, sendOnConnection))
 
   override def receive: PartialFunction[Any, Unit] = super.receive orElse{
     case p: Push =>
@@ -25,14 +26,18 @@ class WebSocketPushServer extends WebSocketServer{
       workers -= sender()
       context stop sender()
   }
+
+
 }
 
-class WebSocketPushWorker(serverConnection: ActorRef, supervisor: ActorRef) extends WebSocketWorker(serverConnection){
+class WebSocketPushWorker(serverConnection: ActorRef, supervisor: ActorRef, sendOnConnection: Option[Frame])
+  extends WebSocketWorker(serverConnection)
+{
   import WebSocketPushServer._
 
   def businessLogic: Receive = {
     case Push(msg, format) => send(TextFrame(format.write(msg).toString()))
-
+    case UpgradedToWebSocket => sendOnConnection.foreach(send)
     case closed: ConnectionClosed => supervisor ! WorkerConnectionClosed(closed)
     case msg                      => log.info("message received: " + msg)
   }
@@ -43,7 +48,8 @@ class WebSocketPushServerInitialization(host: String, port: Int)
                                        (implicit val asys: ActorSystem) extends WebSocketServerInitialization
 {
   def bind = Http.Bind(server, host, port)
-  def serverProps = Props(new WebSocketPushServer)
+  def sendOnConnection: Option[Frame] = None
+  def serverProps() = Props(new WebSocketPushServer(sendOnConnection))
 
   bindTheServer()
 }
