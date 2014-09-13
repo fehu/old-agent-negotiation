@@ -217,7 +217,7 @@ abstract class GenericIteratingAgentCreation[Lang <: ProposalLanguage](args: Gen
 
 
   object DEBUG{
-    var Constraint = true
+    var Constraint = false
   }
 
   def reportingTo = args.reportingTo

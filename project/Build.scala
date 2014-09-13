@@ -131,11 +131,9 @@ object  Build extends sbt.Build {
     id = "misc",
     base = file("misc"),
     settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(
-        feh.dsl.swing
-      )
+      libraryDependencies ++= Seq()
     )
-  ) dependsOn comm
+  ) dependsOn (comm, webBackend)
 
 
   lazy val oldcomm = Project(

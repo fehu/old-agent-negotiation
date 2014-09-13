@@ -30,13 +30,7 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   def constraintsFilter: Message => Boolean = _ => true
   lazy val constraintsSatisfactions = new ConstraintsSatisfactionWithPriority(
     new ExternalConstraints(lang, constraintsFilter), new Priority(constraintsFilter))
-  {
-    override def process = {
-      case msg =>
-        log.info(s"process($msg)")
-        super.process(msg)
-    }
-  }
+
   lazy val proposalSatisfaction = new Constraints(constraints)
 
   def scheduleCheckConstraints(init: FiniteDuration, delay: FiniteDuration) =
@@ -56,11 +50,6 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
     case PriorityBased.CheckConstraints =>
       checkConstraintsTimer.cancel()
       checkConstraintsTimer = null
-  }
-
-  override def gatherInfo(msg: AbstractMessage) = {
-    log.info(s"gatherInfo($msg)")
-    super.gatherInfo(msg)
   }
 
   def checkConstraints(negId: NegotiationId): Unit = get(negId) |> {
@@ -87,16 +76,16 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
             case (ag, (opt, pr)) if neg.scope.contains(ag) && pr._2 > neg.currentPriority => opt
           }
 
-          log.info("weighted = " + weighted)
-          log.info("viewsByMsgId = " + viewsByMsgId)
+//          log.info("weighted = " + weighted)
+//          log.info("viewsByMsgId = " + viewsByMsgId)
 
           if(weighted.isEmpty || weighted.map(_._2).sum.d == 0) {
             spamProposal(neg)
             return
           }
 
-          log.info("constraintsSatisfactions.data = " + constraintsSatisfactions.data)
-          log.info("externalConstraints.data = " + constraintsSatisfactions.merge._1.data)
+//          log.info("constraintsSatisfactions.data = " + constraintsSatisfactions.data)
+//          log.info("externalConstraints.data = " + constraintsSatisfactions.merge._1.data)
 
           if(isFailure(neg, weighted))
             setNextProposal(neg)

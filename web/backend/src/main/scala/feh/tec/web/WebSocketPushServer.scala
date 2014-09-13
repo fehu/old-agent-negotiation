@@ -11,16 +11,19 @@ import spray.json.JsonFormat
 object WebSocketPushServer{
   protected[web] case class WorkerConnectionClosed(msg: ConnectionClosed)
   case class Push(msg: WebSocketMessages#Msg, format: JsonFormat[WebSocketMessages#Msg])
+  case class OnConnection(frame: Frame)
 }
 
-class WebSocketPushServer(sendOnConnection: Option[Frame]) extends WebSocketServer{
+class WebSocketPushServer extends WebSocketServer{
   import WebSocketPushServer._
-  
+
+  var sendOnConnection: Option[Frame] = None
+
   def workerFor(connection: ActorRef) = Props(new WebSocketPushWorker(connection, self, sendOnConnection))
 
   override def receive: PartialFunction[Any, Unit] = super.receive orElse{
+    case OnConnection(frame) => sendOnConnection = Option(frame)
     case p: Push =>
-      log.info(s"Pushing to workers $workers: ${p.msg}")
       workers foreach(_ forward p)
     case WorkerConnectionClosed(reason) =>
       workers -= sender()
@@ -48,8 +51,7 @@ class WebSocketPushServerInitialization(host: String, port: Int)
                                        (implicit val asys: ActorSystem) extends WebSocketServerInitialization
 {
   def bind = Http.Bind(server, host, port)
-  def sendOnConnection: Option[Frame] = None
-  def serverProps() = Props(new WebSocketPushServer(sendOnConnection))
+  def serverProps = Props(new WebSocketPushServer())
 
   bindTheServer()
 }

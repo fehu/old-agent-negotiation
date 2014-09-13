@@ -2,7 +2,7 @@ package feh.tec.agents.impl
 
 import java.util.UUID
 
-import akka.actor.ActorLogging
+import akka.actor.{ActorRef, ActorLogging}
 import feh.tec.agents.Message.AutoId
 import feh.tec.agents._
 import feh.tec.agents.impl.System.Service
@@ -13,19 +13,19 @@ import scala.collection.mutable
 case object ReportsPrinter extends SystemRole{
   val name = "ReportsPrinter"
 
-  case class Forward(to: AgentRef) extends SystemMessage with AutoId
+  case class Forward(to: ActorRef) extends SystemMessage with AutoId
   case class Silent(v: Boolean) extends SystemMessage with AutoId
 }
 class ReportsPrinter extends SystemAgent with Service.Args0 with ActorLogging{
   def role = ReportsPrinter
 
   var silent = false
-  val forwarding = mutable.HashSet.empty[AgentRef]
+  val forwarding = mutable.HashSet.empty[ActorRef]
 
   override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse{
     case SystemMessage.Start() => // do nothing
     case rep@AgentReports.StateReport(of, report, _) if !silent =>
-      forwarding.foreach(_.ref ! rep)
+      forwarding.foreach(_ ! rep)
       val sb = new StringBuilder
       sb ++= s"Report by $of:\n"
       report foreach {
@@ -37,12 +37,12 @@ class ReportsPrinter extends SystemAgent with Service.Args0 with ActorLogging{
       }
       log.info(sb.mkString)
     case rep: AgentReports.StateReport =>
-      forwarding.foreach(_.ref ! rep)
+      forwarding.foreach(_ ! rep)
     case rep@AgentReports.MessageReport(to, msg) if !silent=>
-      forwarding.foreach(_.ref ! rep)
+      forwarding.foreach(_ ! rep)
       log.info(s"Message $msg was sent by ${msg.sender} to $to")
     case rep: AgentReports.MessageReport =>
-      forwarding.foreach(_.ref ! rep)
+      forwarding.foreach(_ ! rep)
     case ReportsPrinter.Forward(to) =>
       log.info(s"Forwarding to $to registered")
       forwarding += to

@@ -39,9 +39,7 @@ trait ExternalViewSupport extends InfoGathering with ActorLogging{
   def filterIncoming: AbstractMessage => Boolean
 
   def gatherInfo(msg: AbstractMessage) = msg match{
-    case msg: Message if filterIncoming(msg) =>
-      log.info(s"gatherInfo($msg)")
-      externalViews.foreach(_.process.lift(msg))
+    case msg: Message if filterIncoming(msg) => externalViews.foreach(_.process.lift(msg))
     case other =>
   }
 }

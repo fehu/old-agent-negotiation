@@ -57,14 +57,17 @@ class NQueenUserAgent(spec: impl.NegotiationSpecification) extends UserAgent{
   println("spec.agents = " + spec.agents)
   println("spec.config = " + spec.config)
 
-  val builder = new ControllerBuilder[GenericNegotiatingAgent]
+  val builder: ControllerBuilder[_] = new ControllerBuilder[GenericNegotiatingAgent](WebSocketInterface(web.server))
+  lazy val web: NQueenWebSocketPushServerBuilder = new NQueenWebSocketPushServerBuilder("localhost", 8080,
+    negotiationId = builder.negotiations.head._2._1
+  )
   val controller = builder(spec)
-
+  
   println("builder.vars = " + builder.vars)
   println("builder.negotiations = " + builder.negotiations)
   println("builder.agents = " + builder.agents)
   println("builder.agentsCount = " + builder.agentsCount)
-
+  
   println("starting")
   controller ! SystemMessage.Start()
 
@@ -73,7 +76,7 @@ class NQueenUserAgent(spec: impl.NegotiationSpecification) extends UserAgent{
   def agFuture = (controller ? impl.NegotiationController.Request.AgentRefs()).mapTo[Seq[AgentRef]]
 
   agFuture.map{
-    agents => controller ! Controller.ShowReportsGui(agents, silence = true, updateFreq = 200 millis)
+    _ => {}
   }
 
 }

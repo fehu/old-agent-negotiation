@@ -21,6 +21,12 @@ object Agent{
   }
   object Id{
     def withName(role: Role, uuid: UUID, nme: String): IdNamed = new Id(role, uuid) with IdNamed{ def name = nme }
+
+    object named{
+      def unapply(id: Id): Option[(String, Role, UUID)] = PartialFunction.condOpt(id){
+        case named: IdNamed => (named.name, named.role, named.uuid)
+      }
+    }
   }
 
   trait EssentialSystemSupport{
@@ -172,6 +178,8 @@ object AgentRef{
       def id = _id
       def ref = _ref
     }
+
+  def unapply(ref: AgentRef): Option[(impl.Agent.Id, ActorRef)] = Some(ref.id -> ref.ref)
 }
 
 trait DynamicScopeSupport extends Agent.SystemSupport with NegotiatingAgent{

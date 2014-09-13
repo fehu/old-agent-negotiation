@@ -86,7 +86,6 @@ object ProposalEngine{
       issues =>
         neg.currentValues ++= issues
         val prop = createProposal(neg.id)
-        log.info(s"new proposal $prop")
         neg.state.currentProposal.foreach( _.id |> discardProposal )  // discard the old proposal in the register
         neg.state.currentProposal = Option(prop)                      // when a new one is set
         neg.state.currentProposalDate = Some(new Date())
