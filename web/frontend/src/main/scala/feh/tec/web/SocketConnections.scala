@@ -2,6 +2,8 @@ package feh.tec.web
 
 import org.scalajs.dom.{MessageEvent, WebSocket}
 
+import scala.scalajs.js
+
 trait SocketConnections {
   protected def sockets: Seq[WebSocket]
 
@@ -10,7 +12,7 @@ trait SocketConnections {
       case ev: MessageEvent => onMessage(ev.data)
     }: PartialFunction[MessageEvent, Unit]
   }
-  def onMessage: PartialFunction[Any, Unit]
+  def onMessage: PartialFunction[js.Any, Unit]
 
   setSocketsCallbacks()
 }

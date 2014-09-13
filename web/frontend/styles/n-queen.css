@@ -1,0 +1,24 @@
+table.chess-board {
+#    width: 300px;
+#    height: 300px;
+}
+
+.chess-board td, th{
+    border:     1px solid #999;
+    width:      80px;
+    height:     80px;
+}
+
+.chess-board .description{
+    border:             0px;
+    vertical-align:     middle;
+    text-align:         center;
+}
+
+.chess-board tr:nth-child(2n+2) td:nth-child(2n+2) {
+    background-color:   #7E4D3F;
+}
+
+.chess-board tr:nth-child(2n+3) td:nth-child(2n+3) {
+    background-color:   #7E4D3F;
+}

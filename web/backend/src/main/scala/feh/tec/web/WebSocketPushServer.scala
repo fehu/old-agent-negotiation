@@ -2,13 +2,14 @@ package feh.tec.web
 
 import akka.actor.{ActorSystem, Props, ActorRef}
 import akka.io.Tcp.ConnectionClosed
+import feh.tec.web.common.WebSocketMessages
 import spray.can.Http
-import spray.can.Http.Bind
 import spray.can.websocket.frame.TextFrame
+import spray.json.JsonFormat
 
 object WebSocketPushServer{
   protected[web] case class WorkerConnectionClosed(msg: ConnectionClosed)
-  case class Push(msg: String)
+  case class Push(msg: WebSocketMessages#Msg, format: JsonFormat[WebSocketMessages#Msg])
 }
 
 class WebSocketPushServer extends WebSocketServer{
@@ -30,7 +31,8 @@ class WebSocketPushWorker(serverConnection: ActorRef, supervisor: ActorRef) exte
   import WebSocketPushServer._
 
   def businessLogic: Receive = {
-    case Push(msg)                => send(TextFrame(msg))
+    case Push(msg, format) => send(TextFrame(format.write(msg).toString()))
+
     case closed: ConnectionClosed => supervisor ! WorkerConnectionClosed(closed)
     case msg                      => log.info("message received: " + msg)
   }

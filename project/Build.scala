@@ -28,14 +28,14 @@ object  Build extends sbt.Build {
 
   object Resolvers{
     object Release{
-      val sonatype = "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases"
-      val spray = "spray" at "http://repo.spray.io/"
+      lazy val sonatype = "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases"
+      lazy val spray = "spray" at "http://repo.spray.io/"
     }
 
     object Snapshot{
-      val sonatype = "Sonatype Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots"
-      val eulergui = "eulergui" at "http://eulergui.sourceforge.net/maven2"
-      val spray = "spray nightlies repo" at "http://nightlies.spray.io"
+      lazy val sonatype = "Sonatype Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots"
+      lazy val eulergui = "eulergui" at "http://eulergui.sourceforge.net/maven2"
+      lazy val spray = "spray nightlies repo" at "http://nightlies.spray.io"
     }
 
   }
@@ -48,6 +48,7 @@ object  Build extends sbt.Build {
       lazy val compiler = "org.scala-lang" % "scala-compiler" % ScalaVersion
       lazy val swing = "org.scala-lang" % "scala-swing" % ScalaVersion
       lazy val reflectApi = "org.scala-lang" % "scala-reflect" % ScalaVersion
+      lazy val libAll = "org.scala-lang" % "scala-library-all" % ScalaVersion // 2.11.x
     }
 
     object Apache{
@@ -55,9 +56,8 @@ object  Build extends sbt.Build {
     }
 
     object spray{
-      val version = "1.3.1"
-      lazy val json = "io.spray" %%  "spray-json" % version
-      lazy val can = "io.spray" %% "spray-can" % version
+      lazy val json = "io.spray" %%  "spray-json" % "1.2.6"
+      lazy val can = "io.spray" %% "spray-can" % "1.3.1"
       lazy val websocket= "com.wandoulabs.akka" %% "spray-websocket" % "0.1.3"
     }
 
@@ -140,19 +140,23 @@ object  Build extends sbt.Build {
     )
   ) dependsOn oldcomm
 
+  lazy val webCommon = Project("web-common", file("web/common"), settings = buildSettings)
+
   lazy val webFrontend = Project(// libraryDependencies in build.sbt
     id = "web-frontend",
-    base = file("web-frontend"),
-    settings = buildSettings
-  )
+    base = file("web/frontend"),
+    settings = buildSettings ++ Web.settings ++ Seq(
+      libraryDependencies ++= Seq(feh.util, scala.libAll)
+    )
+  ) dependsOn webCommon
 
   lazy val webBackend = Project(
     id = "web-backend",
-    base = file("web-backend"),
+    base = file("web/backend"),
     settings = buildSettings ++ Seq(
       resolvers ++= Seq(Snapshot.spray, Release.spray),
-      libraryDependencies ++= Seq(spray.websocket)
+      libraryDependencies ++= Seq(spray.websocket, spray.json)
     )
-  )
+  ) dependsOn webCommon
 
 }
