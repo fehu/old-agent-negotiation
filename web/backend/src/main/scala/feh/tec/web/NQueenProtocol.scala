@@ -1,5 +1,6 @@
 package feh.tec.web
 
+import feh.tec.web.common.NQueenMessages
 import feh.tec.web.common.NQueenMessages._
 import spray.json._
 
@@ -18,6 +19,16 @@ object NQueenProtocol extends DefaultJsonProtocol{
   implicit lazy val InitFormat: JsonFormat[Init] = new NamedFormat(jsonFormat1(Init)){}
   implicit lazy val StateReportFormat: JsonFormat[StateReport] = new NamedFormat(jsonFormat4(StateReport)){}
 
+  implicit object CanBulkFormat extends RootJsonFormat[CanBulk] {
+    def write(obj: NQueenMessages.CanBulk): JsValue = obj match {
+      case state: StateReport => StateReportFormat.write(state)
+      case msg: MessageReport => MessageSentFormat.write(msg)
+    }
+    def read(json: JsValue): NQueenMessages.CanBulk = ???
+  }
+
+  implicit lazy val BulkReportFormat: JsonFormat[BulkReport] = new NamedFormat(jsonFormat1(BulkReport)) {}
+
   implicit object MessageTypeFormat extends RootJsonFormat[MessageType]{
     def write(obj: MessageType): JsValue = obj match {
       case Proposal   => JsString("Proposal")
@@ -27,7 +38,7 @@ object NQueenProtocol extends DefaultJsonProtocol{
     def read(json: JsValue): MessageType = ???
   }
 
-  implicit object messageFormat extends NamedFormat(jsonFormat3(Message))
-  implicit object messageSentFormat extends NamedFormat(jsonFormat3(MessageReport))
+  implicit lazy val MessageFormat: JsonFormat[Message] = new NamedFormat(jsonFormat3(Message)){}
+  implicit lazy val MessageSentFormat: JsonFormat[MessageReport] = new NamedFormat(jsonFormat3(MessageReport)){}
 
 }

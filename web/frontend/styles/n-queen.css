@@ -7,7 +7,7 @@ table.chess-board {
 //    height: 300px;
 }
 
-.chess-board td, th{
+.chess-board td, .chess-board th{
     border:     1px solid #999;
     width:      80px;
     height:     80px;
@@ -106,6 +106,53 @@ table.chess-board {
                                                   Queen Info - Communications
 ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## */
 
-.queen-info .comm .l
-.queen-info .comm .r
-.queen-info .comm .messages
+.queen-comm{
+    width:          750px;
+    border:         solid 1px darkgrey;
+    border-radius:  15px;Q
+    margin-top:     10px;
+}
+
+.queen-comm .l {
+    color:              blue;
+    text-align:         left;
+}
+.queen-comm .r{
+    color:              green;
+    text-align:         right;
+}
+.queen-comm .l, .queen-comm .r {
+    width:              5%;
+    background-color:   white;
+}
+.queen-comm .messages {
+    width:              80%;
+    margin-left:        auto;
+    margin-right:       auto;
+}
+
+.queen-comm .messages .message{
+    text-align: center;
+}
+
+.queen-comm .messages th{
+    height:             35px;
+//    background:         #7E4D3F;
+}
+
+.queen-comm .messages tr[to=left] {
+    background-color:       rgb(79, 201, 79);
+}
+
+.queen-comm .messages tr[to=right] {
+     background-color:      rgb(111, 111, 233);
+ }
+
+.queen-comm .messages td.l
+.queen-comm .messages td.priority
+.queen-comm .messages td.position
+.queen-comm .messages td.type
+.queen-comm .messages td.r
+
+
+//.queen-comm .messages .message .priority

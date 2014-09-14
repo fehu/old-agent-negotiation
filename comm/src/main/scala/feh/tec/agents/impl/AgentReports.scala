@@ -10,58 +10,78 @@ import feh.util._
 
 import scala.collection.mutable
 
-case object ReportsPrinter extends SystemRole{
-  val name = "ReportsPrinter"
+object ReportArchive extends SystemRole{ 
+  val name = "ReportArchive"
 
   case class Forward(to: ActorRef) extends SystemMessage with AutoId
-  case class Silent(v: Boolean) extends SystemMessage with AutoId
-}
-class ReportsPrinter extends SystemAgent with Service.Args0 with ActorLogging{
-  def role = ReportsPrinter
-
-  var silent = false
-  val forwarding = mutable.HashSet.empty[ActorRef]
-
-  override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse{
-    case SystemMessage.Start() => // do nothing
-    case rep@AgentReports.StateReport(of, report, _) if !silent =>
-      forwarding.foreach(_ ! rep)
-      val sb = new StringBuilder
-      sb ++= s"Report by $of:\n"
-      report foreach {
-        case (negId, AgentReports.StateReportEntry(p, v, s, extra)) =>
-          sb ++= (" "*12 + s"priority: $p\n")
-          sb ++= (" "*12 + s"  values: $v\n")
-          sb ++= (" "*12 + s"   scope: $s")
-          if(extra.isDefined) sb ++= ("\n" + " "*12 + s"   extra: ${extra.get}")
-      }
-      log.info(sb.mkString)
-    case rep: AgentReports.StateReport =>
-      forwarding.foreach(_ ! rep)
-    case rep@AgentReports.MessageReport(to, msg) if !silent=>
-      forwarding.foreach(_ ! rep)
-      log.info(s"Message $msg was sent by ${msg.sender} to $to")
-    case rep: AgentReports.MessageReport =>
-      forwarding.foreach(_ ! rep)
-    case ReportsPrinter.Forward(to) =>
-      log.info(s"Forwarding to $to registered")
-      forwarding += to
-    case ReportsPrinter.Silent(v) => silent = v
-  }
+  case class BulkAndForward(to: ActorRef) extends SystemMessage with AutoId
+  case class BulkReports protected[ReportArchive] (reports: List[AgentReport]) extends SystemMessage with AutoId
+  case class Print(v: Boolean) extends SystemMessage with AutoId
 }
 
-object ReportArchive extends SystemRole{ val name = "ReportArchive" }
-abstract class ReportArchive extends SystemAgent with Service.Args0 with ActorLogging {
+abstract class ReportArchive extends SystemAgent with Service.Args0 with ReportsPrinter{
   def role = ReportArchive
 
-  def reports: Map[AgentRef, Seq[AgentReport]]
+  def reports: Map[AgentRef, List[AgentReport]]
 
   def newReport(rep: AgentReport)
 
   override def processSys = super.processSys orElse{
-    case rep: AgentReport => newReport(rep)
+    case SystemMessage.Start() => // do nothing
+    case rep: AgentReport =>
+      newReport(rep)
+      forwarding.foreach(_ ! rep)
+      printAgentReport(rep)
+    case ReportArchive.Forward(to) => forwarding += to
+    case ReportArchive.BulkAndForward(to) =>
+      forwarding += to
+      to ! ReportArchive.BulkReports(reports.values.flatten.toList)
+    case ReportArchive.Print(v) => printing = v
+  }
+
+}
+
+class ReportArchiveImpl extends ReportArchive{
+  protected val _reports = mutable.LinkedHashMap.empty[AgentRef, mutable.Buffer[AgentReport]]
+  def reports: Map[AgentRef, List[AgentReport]] = _reports.mapValues(_.toList).toMap
+
+  def newReport(rep: AgentReport): Unit = _reports.getOrElse(rep.of, createNewEntry(rep)) += rep
+
+  private def createNewEntry(rep: AgentReport) = {
+    val buff = mutable.Buffer.empty[AgentReport]
+    _reports += rep.of -> buff
+    buff
   }
 }
+
+
+trait ReportsPrinter extends ActorLogging{
+  self: ReportArchive =>
+
+
+  var printing = false
+  val forwarding = mutable.HashSet.empty[ActorRef]
+
+  def printAgentReport(rep: AgentReport) = if(printing) {
+    rep match{
+      case AgentReports.StateReport(of, report, _) =>
+        val sb = new StringBuilder
+        sb ++= s"Report by $of:\n"
+        report foreach {
+          case (negId, AgentReports.StateReportEntry(p, v, s, extra)) =>
+            sb ++= (" "*12 + s"priority: $p\n")
+            sb ++= (" "*12 + s"  values: $v\n")
+            sb ++= (" "*12 + s"   scope: $s")
+            if(extra.isDefined) sb ++= ("\n" + " "*12 + s"   extra: ${extra.get}")
+        }
+        log.info(sb.mkString)
+      case AgentReports.MessageReport(to, msg) =>
+        log.info(s"Message $msg was sent by ${msg.sender} to $to")
+    }
+
+  }
+}
+
 
 trait AgentReport extends SystemMessage{
   def of: AgentRef

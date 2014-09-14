@@ -6,16 +6,16 @@ import feh.tec.agents.impl.AgentReports.StateReportEntry
 import feh.tec.agents.impl.NegotiationController.GenericStaticInitArgs
 import feh.tec.agents.impl.NegotiationControllerBuilder.DefaultBuildAgentArgs
 import feh.tec.agents.impl._
-import feh.tec.web.common.NQueenMessages.Init
 import feh.tec.web.{WebSocketPushServerInitialization, WebSocketServerInitialization, NQueenProtocol, WebSocketPushServer}
 import feh.tec.web.WebSocketPushServer.Push
 import feh.tec.web.common.{WebSocketMessages, NQueenMessages}
-import spray.can.Http.Bind
 import spray.can.websocket.frame.{TextFrame, Frame}
 import spray.json.JsonFormat
 import scala.collection.mutable
+import scala.concurrent.duration.FiniteDuration
 import scala.reflect.ClassTag
 import spray.json._
+import scala.concurrent.duration._
 
 class ControllerBuilder[AgImpl <: GenericIteratingAgentCreation[_]](web: => WebSocketInterface)
                        (implicit acSys: ActorSystem, defaultAgentImplementation: ClassTag[AgImpl])
@@ -39,14 +39,16 @@ class Controller(arg: GenericStaticInitArgs[DefaultBuildAgentArgs], web: WebSock
 
   override def start() = {
     super.start()
-    reportingTo.ref ! ReportsPrinter.Forward(web.ref)
-    reportingTo.ref ! ReportsPrinter.Silent(true)
-    web.ref ! WebSocketPushServer.OnConnection(TextFrame(initMessage.toJson.toString()))
+
+    web.ref ! WebSocketPushServer.OnConnection(List(
+      Left(TextFrame(initMessage.toJson.toString())),
+      Right(() => reportingTo.ref ! ReportArchive.BulkAndForward(web.ref))
+    ))
   }
 
 }
 
-class NQueenWebSocketPushServer(neg: NegotiationId)
+class NQueenWebSocketPushServer(neg: NegotiationId, rescheduleUnfoundMsg: FiniteDuration, unfoundMsgRetries: Int)
   extends WebSocketPushServer
 {
   import NQueenProtocol._
@@ -64,15 +66,56 @@ class NQueenWebSocketPushServer(neg: NegotiationId)
   def push[Msg <: NQueenMessages.Msg : JsonFormat](msg: Msg) =
     Push(msg, implicitly[JsonFormat[Msg]].asInstanceOf[JsonFormat[WebSocketMessages#Msg]])
 
-  override def receive = super.receive orElse{
-    case AgentReports.StateReport(ref, entries, _) if entries contains neg =>
-      val q = indexMap.getOrElse(ref, addNewIndex(ref))
-      val StateReportEntry(priority, vals, scope, extra) = entries(neg)
-      def getPos(nme: String) = vals.find(_._1.name == nme).get._2.asInstanceOf[Int]
-      val position = getPos("x") -> getPos("y")
-      val report = NQueenMessages.StateReport(q, position, priority.get, Nil)
+  protected val proposalsMap = mutable.HashMap.empty[Message.Id, (Int, Int)]
+  protected val rescheduelCount = mutable.HashMap.empty[Message.Id, Int]
 
-      super.receive(push(report))
+  protected def reportToBulkable(report: AgentReport): Option[NQueenMessages.CanBulk] = {
+
+    def getPos(vals: Map[Var, Any], nme: String) = vals.find(_._1.name == nme).get._2.asInstanceOf[Int]
+
+    report match {
+      case AgentReports.StateReport(ref, entries, _) =>
+        val q = indexMap.getOrElse(ref, addNewIndex(ref))
+        val StateReportEntry(priority, vals, scope, extra) = entries(neg)
+        val position = getPos(vals, "x") -> getPos(vals, "y")
+        Some(NQueenMessages.StateReport(q, position, priority.get, Nil))
+      case rep@AgentReports.MessageReport(_to, msg) =>
+        val by = indexMap.getOrElse(rep.msg.sender, addNewIndex(rep.msg.sender))
+        val to = indexMap.getOrElse(_to, addNewIndex(_to))
+        val message = msg match{
+          case prop@Message.Proposal(_, vals) =>
+            val position = getPos(vals, "x") -> getPos(vals, "y")
+//            log.info(s"Proposal ${prop.id}")
+            proposalsMap += prop.id -> position
+            Some(NQueenMessages.Message(prop.priority.get, position, NQueenMessages.Proposal))
+          case acc@Message.Accepted(_, offer) if proposalsMap contains offer =>
+            Some(NQueenMessages.Message(acc.priority.get, proposalsMap(offer), NQueenMessages.Acceptance))
+          case rej@Message.Rejected(_, offer) if proposalsMap contains offer =>
+            Some(NQueenMessages.Message(rej.priority.get, proposalsMap(offer), NQueenMessages.Rejection))
+          case acc@Message.Accepted(_, offer) =>
+            if(rescheduelCount.get(offer).exists(_ >= unfoundMsgRetries)) sys.error(s"no offer $offer found for $acc")
+            rescheduelCount(offer) = rescheduelCount.getOrElse(offer, 0) + 1
+            context.system.scheduler.scheduleOnce(rescheduleUnfoundMsg, self, acc)(context.dispatcher)
+            None
+          case rej@Message.Rejected(_, offer) =>
+            if(rescheduelCount.get(offer).exists(_ >= unfoundMsgRetries)) sys.error(s"no offer $offer found for $rej")
+            rescheduelCount(offer) = rescheduelCount.getOrElse(offer, 0) + 1
+            context.system.scheduler.scheduleOnce(rescheduleUnfoundMsg, self, rej)(context.dispatcher)
+            None
+        }
+        message map (NQueenMessages.MessageReport(by, to, _))
+    }
+  }
+  
+  override def receive = super.receive orElse{
+    case rep@AgentReports.StateReport(_, entries, _) if entries contains neg =>
+      reportToBulkable(rep) map (frame => super.receive(push(frame)))
+    case rep@AgentReports.MessageReport(_, msg) if msg.negotiation == neg =>
+      reportToBulkable(rep) map (frame => super.receive(push(frame)))
+    case ReportArchive.BulkReports(reports) =>
+      log.info("ReportArchive.BulkReports")
+      val bulk = NQueenMessages.BulkReport(reports flatMap reportToBulkable)
+      super.receive(push(bulk))
   }
 }
 
@@ -80,5 +123,5 @@ class NQueenWebSocketPushServerBuilder(host: String, port: Int, negotiationId: N
                                       (implicit asys: ActorSystem)
   extends WebSocketPushServerInitialization(host, port)
 {
-  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId))
+  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, 5 millis, 5))
 }

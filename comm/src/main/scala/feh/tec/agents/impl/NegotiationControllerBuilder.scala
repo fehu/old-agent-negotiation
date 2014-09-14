@@ -160,7 +160,7 @@ object NegotiationControllerBuilder{
 
     def systemAgents: Map[(AgentBuilder[Ag, Arg], ClassTag[Ag]) forSome {type Ag <: AbstractAgent; type Arg <: Product}, Int] = Map(
       (AgentBuilder.SystemArgs0Service, scala.reflect.classTag[System.ConflictResolver]) -> 1,
-      (AgentBuilder.SystemArgs0Service, scala.reflect.classTag[ReportsPrinter]) -> 1
+      (AgentBuilder.SystemArgs0Service, scala.reflect.classTag[ReportArchiveImpl]) -> 1
     )
 
     private def agentsToAgentInits = agents.toSeq map{

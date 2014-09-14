@@ -11,18 +11,18 @@ import spray.json.JsonFormat
 object WebSocketPushServer{
   protected[web] case class WorkerConnectionClosed(msg: ConnectionClosed)
   case class Push(msg: WebSocketMessages#Msg, format: JsonFormat[WebSocketMessages#Msg])
-  case class OnConnection(frame: Frame)
+  case class OnConnection(frames: List[Either[Frame, () => Any]])
 }
 
 class WebSocketPushServer extends WebSocketServer{
   import WebSocketPushServer._
 
-  var sendOnConnection: Option[Frame] = None
+  var sendOnConnection: Option[List[Either[Frame, () => Any]]] = None
 
   def workerFor(connection: ActorRef) = Props(new WebSocketPushWorker(connection, self, sendOnConnection))
 
   override def receive: PartialFunction[Any, Unit] = super.receive orElse{
-    case OnConnection(frame) => sendOnConnection = Option(frame)
+    case OnConnection(frames) => sendOnConnection = Option(frames)
     case p: Push =>
       workers foreach(_ forward p)
     case WorkerConnectionClosed(reason) =>
@@ -33,14 +33,19 @@ class WebSocketPushServer extends WebSocketServer{
 
 }
 
-class WebSocketPushWorker(serverConnection: ActorRef, supervisor: ActorRef, sendOnConnection: Option[Frame])
+class WebSocketPushWorker(serverConnection: ActorRef,
+                          supervisor: ActorRef,
+                          sendOnConnection: Option[List[Either[Frame, () => Any]]])
   extends WebSocketWorker(serverConnection)
 {
   import WebSocketPushServer._
 
   def businessLogic: Receive = {
     case Push(msg, format) => send(TextFrame(format.write(msg).toString()))
-    case UpgradedToWebSocket => sendOnConnection.foreach(send)
+    case UpgradedToWebSocket => sendOnConnection.foreach(_ foreach {
+      case Left(frame) => send(frame)
+      case Right(func) => func()
+    })
     case closed: ConnectionClosed => supervisor ! WorkerConnectionClosed(closed)
     case msg                      => log.info("message received: " + msg)
   }

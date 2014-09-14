@@ -1,0 +1,3 @@
+- [ ] do not guard equal reports/messages (multiple timestamps)
+- [ ] clear messages with passage of time
+- [ ] use timestamps guarded on report creation, instead of the own

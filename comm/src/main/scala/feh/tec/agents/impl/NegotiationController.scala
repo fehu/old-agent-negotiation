@@ -44,7 +44,7 @@ object NegotiationController{
     }
 
     def conflictResolver = getSystemAgent(ConflictResolver.Role)
-    def reportingTo = getSystemAgent(ReportsPrinter)
+    def reportingTo = getSystemAgent(ReportArchive)
 
     def start() = {
       implicit def timeout = timeouts.agentStartup

@@ -10,3 +10,4 @@
 - [ ] macro should build NegotiationController for NegotiationControllerBuilder
 - [ ] merge negotiation-dsl into comm
 - [ ] spawn, timings and timeouts config
+- [ ] guard timestamp on report creation
