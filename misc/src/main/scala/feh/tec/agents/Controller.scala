@@ -2,7 +2,7 @@ package feh.tec.agents
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import feh.tec.agents.impl.Agent.Id
-import feh.tec.agents.impl.AgentReports.StateReportEntry
+import feh.tec.agents.impl.AgentReports.{ZeroTime, TimeDiffUndefined, StateReportEntry}
 import feh.tec.agents.impl.NegotiationController.GenericStaticInitArgs
 import feh.tec.agents.impl.NegotiationControllerBuilder.DefaultBuildAgentArgs
 import feh.tec.agents.impl._
@@ -63,6 +63,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId, rescheduleUnfoundMsg: Finite
       q
   }
 
+  val zeroTime = ZeroTime()
   def push[Msg <: NQueenMessages.Msg : JsonFormat](msg: Msg) =
     Push(msg, implicitly[JsonFormat[Msg]].asInstanceOf[JsonFormat[WebSocketMessages#Msg]])
 
@@ -74,12 +75,12 @@ class NQueenWebSocketPushServer(neg: NegotiationId, rescheduleUnfoundMsg: Finite
     def getPos(vals: Map[Var, Any], nme: String) = vals.find(_._1.name == nme).get._2.asInstanceOf[Int]
 
     report match {
-      case AgentReports.StateReport(ref, entries, _) =>
+      case AgentReports.StateReport(ref, entries, time, _) =>
         val q = indexMap.getOrElse(ref, addNewIndex(ref))
         val StateReportEntry(priority, vals, scope, extra) = entries(neg)
         val position = getPos(vals, "x") -> getPos(vals, "y")
-        Some(NQueenMessages.StateReport(q, position, priority.get, Nil))
-      case rep@AgentReports.MessageReport(_to, msg) =>
+        Some(NQueenMessages.StateReport(q, position, priority.get, Nil, time.diff))
+      case rep@AgentReports.MessageReport(_to, msg, at) =>
         val by = indexMap.getOrElse(rep.msg.sender, addNewIndex(rep.msg.sender))
         val to = indexMap.getOrElse(_to, addNewIndex(_to))
         val message = msg match{
@@ -103,15 +104,15 @@ class NQueenWebSocketPushServer(neg: NegotiationId, rescheduleUnfoundMsg: Finite
             context.system.scheduler.scheduleOnce(rescheduleUnfoundMsg, self, rej)(context.dispatcher)
             None
         }
-        message map (NQueenMessages.MessageReport(by, to, _))
+        message map (NQueenMessages.MessageReport(by, to, _, at.diff))
     }
   }
-  
+
   override def receive = super.receive orElse{
-    case rep@AgentReports.StateReport(_, entries, _) if entries contains neg =>
-      reportToBulkable(rep) map (frame => super.receive(push(frame)))
-    case rep@AgentReports.MessageReport(_, msg) if msg.negotiation == neg =>
-      reportToBulkable(rep) map (frame => super.receive(push(frame)))
+    case rep@AgentReports.StateReport(_, entries, TimeDiffUndefined, _) if entries contains neg =>
+      reportToBulkable(rep.copy(at = zeroTime.diff)) map (frame => super.receive(push(frame)))
+    case rep@AgentReports.MessageReport(_, msg, TimeDiffUndefined) if msg.negotiation == neg =>
+      reportToBulkable(rep.copy(at = zeroTime.diff)) map (frame => super.receive(push(frame)))
     case ReportArchive.BulkReports(reports) =>
       log.info("ReportArchive.BulkReports")
       val bulk = NQueenMessages.BulkReport(reports flatMap reportToBulkable)

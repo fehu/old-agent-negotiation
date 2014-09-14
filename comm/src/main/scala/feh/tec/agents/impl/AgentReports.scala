@@ -1,10 +1,11 @@
 package feh.tec.agents.impl
 
-import java.util.UUID
+import java.util.{Date, UUID}
 
 import akka.actor.{ActorRef, ActorLogging}
 import feh.tec.agents.Message.AutoId
 import feh.tec.agents._
+import feh.tec.agents.impl.AgentReports.TimeDiff
 import feh.tec.agents.impl.System.Service
 import feh.util._
 
@@ -64,7 +65,7 @@ trait ReportsPrinter extends ActorLogging{
 
   def printAgentReport(rep: AgentReport) = if(printing) {
     rep match{
-      case AgentReports.StateReport(of, report, _) =>
+      case AgentReports.StateReport(of, report, _, _) =>
         val sb = new StringBuilder
         sb ++= s"Report by $of:\n"
         report foreach {
@@ -75,7 +76,7 @@ trait ReportsPrinter extends ActorLogging{
             if(extra.isDefined) sb ++= ("\n" + " "*12 + s"   extra: ${extra.get}")
         }
         log.info(sb.mkString)
-      case AgentReports.MessageReport(to, msg) =>
+      case AgentReports.MessageReport(to, msg, _) =>
         log.info(s"Message $msg was sent by ${msg.sender} to $to")
     }
 
@@ -85,31 +86,47 @@ trait ReportsPrinter extends ActorLogging{
 
 trait AgentReport extends SystemMessage{
   def of: AgentRef
+  def at: TimeDiff
 }
 
 object AgentReports{
+  case class ZeroTime(date: Date = new Date){
+    def diff = TimeDiff( (java.lang.System.currentTimeMillis() - date.getTime).toInt )
+  }
+
+  case class TimeDiff(diff: Int)
+
+  object TimeDiffUndefined extends TimeDiff(-1){
+    def unapply(diff: TimeDiff): Boolean = diff.diff == -1
+  }
 
   case class ReportStates(of: NegotiationId*) extends SystemMessage with AutoId{
     def response(f: NegotiationId => Option[(Priority, Map[Var, Any], Set[AgentRef], Option[Any])])(implicit responding: AgentRef) =
       of.zipMap(f).map {
         case (negId, Some(t)) => negId -> StateReportEntry.tupled(t)
         case (negId, None)    => negId -> null
-      }.toMap |> (StateReport(responding, _, id))
+      }.toMap |> (StateReport(responding, _, TimeDiffUndefined, id))
   }
 
   case class ReportAllStates() extends SystemMessage with AutoId{
     def response(res: Map[NegotiationId, (Priority, Map[Var, Any], Set[AgentRef], Option[Any])])(implicit responding: AgentRef) =
       res.map {
         case (negId, (p, v, s, e)) => negId -> StateReportEntry(p, v, s, e)
-      }.toMap |> (StateReport(responding, _, id))
+      }.toMap |> (StateReport(responding, _, TimeDiffUndefined, id))
   }
 
-  case class StateReport(of: AgentRef, report: Map[NegotiationId, StateReportEntry], id: Message.Id = UUID.randomUUID()) extends AgentReport
+  case class StateReport(of: AgentRef,
+                         report: Map[NegotiationId, StateReportEntry],
+                         at: TimeDiff,
+                         id: Message.Id = UUID.randomUUID()
+                          ) extends AgentReport
+
   case class StateReportEntry(priority: Priority,
                               vals: Map[Var, Any],
                               scope: Set[AgentRef],
                               extra: Option[Any])
 
-  case class MessageReport(to: AgentRef, msg: Language#Msg) extends AgentReport with AutoId { def of = msg.sender }
+  case class MessageReport(to: AgentRef, msg: Language#Msg, at: TimeDiff)
+    extends AgentReport with AutoId { def of = msg.sender }
 
 }

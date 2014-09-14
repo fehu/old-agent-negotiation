@@ -58,7 +58,7 @@ object QueenInfo{
 class QueenInfo(name: String, val n: Int, selection: QueenInfo.Selection){
 
   def updateState(state: StateReport) = state match {
-    case StateReport(Queen(q), pos, pr, _) =>
+    case StateReport(Queen(q), pos, pr, _, _) =>
       sel.queenInfo(q) children ".priority" children "dd" text pr.toString
       sel.queenInfo(q) children ".position" children "dd" text pos.toString
   }
@@ -122,9 +122,10 @@ class QueensCommunications(archive: ReportArchive){
   protected def clearMessages() = jQuery(".queen-comm .message") remove()
 
   protected def createMessageRow(report: MessageReport, dir: String) = report match {
-    case MessageReport(_, _, Message(priority, position, tpe)) =>
+    case MessageReport(_, _, Message(priority, position, tpe), time) =>
       s"""<tr class="message" to="$dir">
          |  <td class="l">${ if(dir == "left") genArrow(dir) else "" }</td>
+         |  <td class="time">$time</td>
          |  <td class="priority">$priority</td>
          |  <td class="position">$position</td>
          |  <td class="type">$tpe</td>
@@ -173,6 +174,7 @@ class QueensCommunications(archive: ReportArchive){
        |  <table class="messages">
        |    <tr>
        |      <th class="l"/>
+       |      <th class="time">millis of neg.</th>
        |      <th class="priority">priority</th>
        |      <th class="position">position</th>
        |      <th class="type">type</th>

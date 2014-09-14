@@ -82,7 +82,8 @@ trait NQueenSocketListener extends SocketConnections{
         priority = json.priority.asInstanceOf[Int],
         proposalAcceptance = json.proposalAcceptance.asInstanceOf[js.Array[js.Array[_]]].map(
           (x: js.Array[_]) => Queen(x(0).asInstanceOf[js.Dynamic].n.asInstanceOf[Int]) -> x(1).asInstanceOf[Boolean]
-        )
+        ),
+        at = json.at.asInstanceOf[Int]
       )
     case "MessageReport" =>
       MessageReport(
@@ -92,7 +93,8 @@ trait NQueenSocketListener extends SocketConnections{
           case "Proposal"   => Proposal
           case "Acceptance" => Acceptance
           case "Rejection"  => Rejection
-        })
+        }),
+        at = json.at.asInstanceOf[Int]
       )
   }
 
@@ -100,20 +102,17 @@ trait NQueenSocketListener extends SocketConnections{
 }
 
 class ReportArchive(queens: Set[Int]){
-  protected def report(state: StateReport, time: Long): Unit = {
-    _states(state.of.n) += state -> time
+  def report(state: StateReport): Unit = {
+    _states(state.of.n) += state -> state.at
     _onNewState   foreach (_.apply(state))
   }
-  protected def report(msg: MessageReport, time: Long): Unit = {
-    _messages(msg.by.n) += msg -> time
+  def report(msg: MessageReport): Unit = {
+    _messages(msg.by.n) += msg -> msg.at
     _onNewMessage foreach (_.apply(msg))
   }
-
-  def report(state: StateReport): Unit  = report(state, System.currentTimeMillis())
-  def report(msg: MessageReport): Unit  = report(msg, System.currentTimeMillis())
-  def report(msg: BulkReport): Unit = msg.messages.zipWithIndex foreach {
-    case (rep: StateReport, i)    => report(rep, i.toLong)
-    case (rep: MessageReport, i)  => report(rep, i.toLong)
+  def report(msg: BulkReport): Unit = msg.messages foreach {
+    case rep: StateReport    => report(rep)
+    case rep: MessageReport  => report(rep)
   }
 
   def states(i: Int)                              = _states(i).sortBy(_._2).map(_._1).toList

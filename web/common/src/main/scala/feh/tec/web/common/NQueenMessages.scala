@@ -2,7 +2,9 @@ package feh.tec.web.common
 
 trait WebSocketMessages{
   trait Msg
-  trait CanBulk extends Msg
+  trait CanBulk extends Msg {
+    def at: Int // time from negotiation start in ms
+  }
 }
 
 object NQueenMessages extends WebSocketMessages{
@@ -13,9 +15,10 @@ object NQueenMessages extends WebSocketMessages{
   case class StateReport(of: Queen,
                          position: (Int, Int),
                          priority: Int,
-                         proposalAcceptance: Seq[(Queen, Boolean)]
+                         proposalAcceptance: Seq[(Queen, Boolean)],
+                         at: Int // system time in millis
                           ) extends CanBulk
-  case class MessageReport(by: Queen, to: Queen, msg: Message) extends CanBulk
+  case class MessageReport(by: Queen, to: Queen, msg: Message, at: Int) extends CanBulk
   case class BulkReport(messages: Seq[CanBulk]) extends Msg
 
   case class Message(priority: Int, position: (Int, Int), tpe: MessageType)

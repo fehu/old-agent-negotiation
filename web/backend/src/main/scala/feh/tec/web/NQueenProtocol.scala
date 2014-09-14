@@ -17,7 +17,7 @@ object NQueenProtocol extends DefaultJsonProtocol{
   
   implicit object QueenFormat extends NamedFormat(jsonFormat1(Queen))
   implicit lazy val InitFormat: JsonFormat[Init] = new NamedFormat(jsonFormat1(Init)){}
-  implicit lazy val StateReportFormat: JsonFormat[StateReport] = new NamedFormat(jsonFormat4(StateReport)){}
+  implicit lazy val StateReportFormat: JsonFormat[StateReport] = new NamedFormat(jsonFormat5(StateReport)){}
 
   implicit object CanBulkFormat extends RootJsonFormat[CanBulk] {
     def write(obj: NQueenMessages.CanBulk): JsValue = obj match {
@@ -39,6 +39,6 @@ object NQueenProtocol extends DefaultJsonProtocol{
   }
 
   implicit lazy val MessageFormat: JsonFormat[Message] = new NamedFormat(jsonFormat3(Message)){}
-  implicit lazy val MessageSentFormat: JsonFormat[MessageReport] = new NamedFormat(jsonFormat3(MessageReport)){}
+  implicit lazy val MessageSentFormat: JsonFormat[MessageReport] = new NamedFormat(jsonFormat4(MessageReport)){}
 
 }
