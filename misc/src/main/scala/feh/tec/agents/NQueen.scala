@@ -22,7 +22,7 @@ object NQueen{
               proposed(x) != valueOf(x) && proposed(y) != valueOf(y)
             },
             "diagonal-line sight" |{
-              proposed(x) - valueOf(x) != proposed(y) - valueOf(y)
+              (proposed(x) - valueOf(x)).abs != (proposed(y) - valueOf(y)).abs
             }
           )
         )
