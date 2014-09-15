@@ -4,7 +4,7 @@ A Thesis Project in ITESM
 
 -[Project API](http://fehu.github.io/agent-negotiation/unidoc/package.html)-
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
--[Building Project](README.md#compiling-the-project)-
+-[Building Project](#compiling-the-project)-
 
 ##### todo:
   * [coloring](coloring/todo.md)
