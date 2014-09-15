@@ -1,10 +1,12 @@
 package feh.tec.web.util
 
+import feh.tec.web.gen.TemplatesToGenerate
+
 import scala.xml.Xhtml
 import feh.util.file._
 import feh.util._
 
-/** Generates templates registered in `TemplatesToGenerate`, copy them and css associated to target */
+/** Generates templates registered in [[TemplatesToGenerate]], copy them and css associated to target */
 object PackTemplates extends App {
   val basedir = args(0)
   val target = args(1)

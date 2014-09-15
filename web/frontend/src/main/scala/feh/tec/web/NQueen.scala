@@ -1,18 +1,12 @@
 package feh.tec.web
 
-import com.typesafe.config.ConfigFactory
 import feh.tec.web.common.NQueenMessages._
-import feh.tec.web.common.WebsocketConf
-import feh.tec.web.util.GenTemplate
-import feh.util.PathSelector
-import feh.util.file._
 import org.scalajs.dom.{WebSocket, document}
 import org.scalajs.jquery.jQuery
 import scala.collection.mutable
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 import scala.scalajs.js.{JSApp, JSON}
-import scala.xml.NodeSeq
 
 object NQueen extends JSApp with NQueenSocketListener{
   lazy val wsUrl = jQuery("head meta[ws]").attr("ws")
@@ -54,18 +48,6 @@ object NQueen extends JSApp with NQueenSocketListener{
   def bulkReport(report: BulkReport): Any = reportArchive.report(report)
 }
 
-class NQueenTemplate extends GenTemplate("n-queen", GenTemplate.classOf(NQueen)) with WebsocketConf{
-  override def templateBody: NodeSeq =
-    <div containerFor="chess-board"/> :: <div containerFor="queen-info"/> :: Nil
-
-  override def templateHead: NodeSeq = <meta ws={readWsConfig()} ></meta>
-
-  override def css: PathSelector = "n-queen".p.selectAll()
-
-  protected def readWsConfig(): String = wsConf.front.url("n-queen")
-
-//  protected lazy val conf = ConfigFactory.load("websocket.conf")
-}
 
 trait NQueenSocketListener extends SocketConnections{
 

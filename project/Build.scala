@@ -4,6 +4,7 @@ import sbtunidoc.Plugin._
 import org.sbtidea.SbtIdeaPlugin._
 import scala.scalajs.sbtplugin._
 import ScalaJSPlugin._
+import UnidocKeys._
 
 object  Build extends sbt.Build {
 
@@ -13,7 +14,7 @@ object  Build extends sbt.Build {
   import Resolvers._
   import Dependencies._
 
-  val buildSettings = Defaults.defaultSettings ++ Seq (
+  val buildSettings = Defaults.coreDefaultSettings ++ Seq (
     organization  := "feh.agents",
     version       := Version,
     scalaVersion  := ScalaVersion,
@@ -109,9 +110,14 @@ object  Build extends sbt.Build {
   lazy val root = Project(
     id = "root",
     base = file("."),
-    settings = buildSettings ++ unidocSettings ++ {
-      name := "agent-comm"
-    }
+    settings = buildSettings ++ unidocSettings ++ Seq(
+      name := "agent-comm",
+      unidocScopeFilter in (ScalaUnidoc, unidoc) := {
+        (unidocScopeFilter in (ScalaUnidoc, unidoc)).value --
+          ScopeFilter( inProjects(webFrontend), inConfigurations(Compile) ) ||
+          ScopeFilter( inProjects(webFrontend), inConfigurations(Sources) )
+      }
+    )
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
    .aggregate(comm, oldcomm, coloring, misc, webFrontend, webBackend, negDSL)
 

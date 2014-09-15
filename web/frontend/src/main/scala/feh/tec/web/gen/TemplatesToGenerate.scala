@@ -1,6 +1,6 @@
-package feh.tec.web.util
+package feh.tec.web.gen
 
-import feh.tec.web.NQueenTemplate
+import feh.tec.web.util.GenTemplate
 
 
 object TemplatesToGenerate {
