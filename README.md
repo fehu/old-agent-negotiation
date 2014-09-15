@@ -1,6 +1,6 @@
 Negotiating Agents
 ===
-A Thesis Project in ITESM
+A Thesis Project at *Monterrey Institute of Technology and Higher Education* ([ITESM](http:/itesm.mx/))
 
 -[Project API](http://fehu.github.io/agent-negotiation/unidoc/package.html)-
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
