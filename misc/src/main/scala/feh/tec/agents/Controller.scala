@@ -63,7 +63,6 @@ class NQueenWebSocketPushServer(neg: NegotiationId, rescheduleUnfoundMsg: Finite
       q
   }
 
-  val zeroTime = ZeroTime()
   def push[Msg <: NQueenMessages.Msg : JsonFormat](msg: Msg) =
     Push(msg, implicitly[JsonFormat[Msg]].asInstanceOf[JsonFormat[WebSocketMessages#Msg]])
 
@@ -109,10 +108,10 @@ class NQueenWebSocketPushServer(neg: NegotiationId, rescheduleUnfoundMsg: Finite
   }
 
   override def receive = super.receive orElse{
-    case rep@AgentReports.StateReport(_, entries, TimeDiffUndefined, _) if entries contains neg =>
-      reportToBulkable(rep.copy(at = zeroTime.diff)) map (frame => super.receive(push(frame)))
-    case rep@AgentReports.MessageReport(_, msg, TimeDiffUndefined) if msg.negotiation == neg =>
-      reportToBulkable(rep.copy(at = zeroTime.diff)) map (frame => super.receive(push(frame)))
+    case rep@AgentReports.StateReport(_, entries, _, _) if entries contains neg =>
+      reportToBulkable(rep) map (frame => super.receive(push(frame)))
+    case rep@AgentReports.MessageReport(_, msg, _) if msg.negotiation == neg =>
+      reportToBulkable(rep) map (frame => super.receive(push(frame)))
     case ReportArchive.BulkReports(reports) =>
       log.info("ReportArchive.BulkReports")
       val bulk = NQueenMessages.BulkReport(reports flatMap reportToBulkable)

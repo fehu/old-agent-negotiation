@@ -5,7 +5,7 @@ import java.util.{Date, UUID}
 import akka.actor.{ActorRef, ActorLogging}
 import feh.tec.agents.Message.AutoId
 import feh.tec.agents._
-import feh.tec.agents.impl.AgentReports.TimeDiff
+import feh.tec.agents.impl.AgentReports.{ZeroTime, TimeDiff}
 import feh.tec.agents.impl.System.Service
 import feh.util._
 
@@ -23,13 +23,16 @@ object ReportArchive extends SystemRole{
 abstract class ReportArchive extends SystemAgent with Service.Args0 with ReportsPrinter{
   def role = ReportArchive
 
+  val zeroTime = ZeroTime()
+
   def reports: Map[AgentRef, List[AgentReport]]
 
   def newReport(rep: AgentReport)
 
   override def processSys = super.processSys orElse{
     case SystemMessage.Start() => // do nothing
-    case rep: AgentReport =>
+    case _rep: AgentReport =>
+      val rep = if(_rep.at.undefined) _rep.updTime(zeroTime.diff) else _rep
       newReport(rep)
       forwarding.foreach(_ ! rep)
       printAgentReport(rep)
@@ -39,7 +42,6 @@ abstract class ReportArchive extends SystemAgent with Service.Args0 with Reports
       to ! ReportArchive.BulkReports(reports.values.flatten.toList)
     case ReportArchive.Print(v) => printing = v
   }
-
 }
 
 class ReportArchiveImpl extends ReportArchive{
@@ -87,6 +89,8 @@ trait ReportsPrinter extends ActorLogging{
 trait AgentReport extends SystemMessage{
   def of: AgentRef
   def at: TimeDiff
+
+  def updTime(time: TimeDiff): AgentReport
 }
 
 object AgentReports{
@@ -94,9 +98,13 @@ object AgentReports{
     def diff = TimeDiff( (java.lang.System.currentTimeMillis() - date.getTime).toInt )
   }
 
-  case class TimeDiff(diff: Int)
+  case class TimeDiff(diff: Int){
+    def defined = true
+    final def undefined = !defined
+  }
 
   object TimeDiffUndefined extends TimeDiff(-1){
+    override def defined = false
     def unapply(diff: TimeDiff): Boolean = diff.diff == -1
   }
 
@@ -120,6 +128,9 @@ object AgentReports{
                          at: TimeDiff,
                          id: Message.Id = UUID.randomUUID()
                           ) extends AgentReport
+  {
+    def updTime(time: TimeDiff) = copy(at = time)
+  }
 
   case class StateReportEntry(priority: Priority,
                               vals: Map[Var, Any],
@@ -127,6 +138,10 @@ object AgentReports{
                               extra: Option[Any])
 
   case class MessageReport(to: AgentRef, msg: Language#Msg, at: TimeDiff)
-    extends AgentReport with AutoId { def of = msg.sender }
+    extends AgentReport with AutoId
+  {
+    def of = msg.sender
+    def updTime(time: TimeDiff) = copy(at = time)
+  }
 
 }

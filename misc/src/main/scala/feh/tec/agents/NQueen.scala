@@ -4,6 +4,7 @@ import akka.actor.{Props, ActorSystem}
 import akka.util.Timeout
 import feh.tec.agents.impl._
 import akka.pattern.ask
+import feh.tec.web.common.WebsocketConf
 import scala.concurrent.duration._
 
 object NQueen{
@@ -46,7 +47,7 @@ object NQueenApp extends App{
   acSys.actorOf(Props(classOf[NQueenUserAgent], spec), "NQueenUserAgent")
 }
 
-class NQueenUserAgent(spec: impl.NegotiationSpecification) extends UserAgent{
+class NQueenUserAgent(spec: impl.NegotiationSpecification) extends UserAgent with WebsocketConf{
   def name = "user"
 
   implicit def acSys = context.system
@@ -58,7 +59,12 @@ class NQueenUserAgent(spec: impl.NegotiationSpecification) extends UserAgent{
   println("spec.config = " + spec.config)
 
   val builder: ControllerBuilder[_] = new ControllerBuilder[GenericNegotiatingAgent](WebSocketInterface(web.server))
-  lazy val web: NQueenWebSocketPushServerBuilder = new NQueenWebSocketPushServerBuilder("localhost", 8080,
+
+  if(wsConf.secure("n-queen")) sys.error("wss not supported")
+
+  lazy val web: NQueenWebSocketPushServerBuilder = new NQueenWebSocketPushServerBuilder(
+    wsConf.back.host("n-queen"),
+    wsConf.back.port("n-queen"),
     negotiationId = builder.negotiations.head._2._1
   )
   val controller = builder(spec)

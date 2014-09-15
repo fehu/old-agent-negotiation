@@ -1,42 +1,44 @@
 package feh.tec.web.util
 
-import feh.tec.web.NQueen
-import feh.util.FileUtils._
-import feh.util._
+import java.io.File
+import feh.util.{AbsolutePath, Path, PathSelector}
+import feh.util.file._
 import scala.reflect._
 import scala.scalajs.js.JSApp
-import scala.xml.{Node, Xhtml, NodeSeq}
+import scala.xml.{Node, NodeSeq}
 
 
 object GenTemplate{
-
+  def classOf[T <: JSApp: ClassTag](t: => T) = classTag[T].runtimeClass.asInstanceOf[Class[JSApp]]
 }
 
 class GenTemplate(val name: String, main: Class[JSApp]){
   def templateBody: NodeSeq = Nil
   def templateHead: NodeSeq = Nil
+  def css: PathSelector = PathSelector.empty
 
-  def template: Node =
+  def template(cssPaths: Seq[Path], jsPaths: Seq[Path]): Node =
     <html>
       <head>
         <meta charset="UTF-8">
           <title> __set me!__ </title>
         </meta>
-        <link rel="stylesheet" type="text/css" href={"../styles/" + name + ".css"}/>
+        {cssPaths map genCssLink}
         {templateHead}
       </head>
       <body>
-        <!-- Include Scala.js compiled code -->
-        <script type="text/javascript" src={jsPath("fastopt")}></script>
-        <!-- Include JavaScript dependencies -->
-        <script type="text/javascript" src={jsPath("jsdeps")}></script>
+        <!-- Include Scala.js compiled code and dependencies -->
+        {jsPaths map genJsImport}
         <!-- Run App -->
         <script type="text/javascript"> {fixedName(main)}.main(); </script>
         {templateBody}
       </body>
     </html>
 
-  protected def jsPath(nme: String): String = s"../target/scala-2.11/web-frontend-$nme.js"
+  def cssFiles(basedir: AbsolutePath) = (basedir / "styles" / css ).get[(Path, File)]
+
+  protected def genCssLink(path: Path) = <link rel="stylesheet" type="text/css" href={path.toString}/>
+  protected def genJsImport(path: Path) = <script type="text/javascript" src={path.toString}></script>
 
   private def fixedName(main: Class[JSApp]) = main.getName match {
     case obj if obj endsWith "$" => obj.dropRight(1) + "()"
@@ -44,18 +46,3 @@ class GenTemplate(val name: String, main: Class[JSApp]){
   }
 }
 
-
-object GenTemplates extends App{
-  def clazz[T <: JSApp: ClassTag](t: => T) = classTag[T].runtimeClass.asInstanceOf[Class[JSApp]]
-
-  val templates: List[GenTemplate] =
-    new GenTemplate("n-queen", clazz(NQueen)) :: Nil
-//    "n-queen" -> clazz(NQueen)
-
-  val base = args(0)
-
-  templates.zipMap(Xhtml toXhtml _.template).foreach{
-    case (gen, xml) => file(base / "templates" / (gen.name + ".html")).createIfNotExists().get
-      .withOutputStream(File.write.utf8(xml), append = false)
-  }
-}

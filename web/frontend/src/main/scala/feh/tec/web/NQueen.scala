@@ -1,15 +1,21 @@
 package feh.tec.web
 
+import com.typesafe.config.ConfigFactory
 import feh.tec.web.common.NQueenMessages._
+import feh.tec.web.common.WebsocketConf
+import feh.tec.web.util.GenTemplate
+import feh.util.PathSelector
+import feh.util.file._
 import org.scalajs.dom.{WebSocket, document}
 import org.scalajs.jquery.jQuery
 import scala.collection.mutable
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 import scala.scalajs.js.{JSApp, JSON}
+import scala.xml.NodeSeq
 
 object NQueen extends JSApp with NQueenSocketListener{
-  def host = "ws://localhost:8080"
+  lazy val wsUrl = jQuery("head meta[ws]").attr("ws")
   def main() = {}
 
   protected var chessBoard: ChessBoard = null
@@ -27,11 +33,15 @@ object NQueen extends JSApp with NQueenSocketListener{
     )
     queensInfo = queens.map{ case (i, name) => i -> new QueenInfo(name, i, selection) }.toMap
 
-    jQuery(document.body) append s"""<div class="queen-info">${queensInfo.map(_._2.infoList).mkString("\n")}</div>"""
+    val containerForInfo  = jQuery("[containerFor=queen-info]")
+    val containerForBoard = jQuery("[containerFor=chess-board]")
+
+    containerForInfo append s"""<div class="queen-info">${queensInfo.map(_._2.infoList).mkString("\n")}</div>"""
+
     queensInfo.foreach(_._2.setCallbacks())
 
-    jQuery(document.body) append chessBoard.create
-    jQuery(document.body) append communications.create
+    jQuery(containerForBoard) append chessBoard.create
+    jQuery(containerForInfo) append communications.create
 
     reportArchive.onNewState{ (s: StateReport) =>
       chessBoard.updatePositions(s)
@@ -44,12 +54,24 @@ object NQueen extends JSApp with NQueenSocketListener{
   def bulkReport(report: BulkReport): Any = reportArchive.report(report)
 }
 
+class NQueenTemplate extends GenTemplate("n-queen", GenTemplate.classOf(NQueen)) with WebsocketConf{
+  override def templateBody: NodeSeq =
+    <div containerFor="chess-board"/> :: <div containerFor="queen-info"/> :: Nil
+
+  override def templateHead: NodeSeq = <meta ws={readWsConfig()} ></meta>
+
+  override def css: PathSelector = "n-queen".p.selectAll()
+
+  protected def readWsConfig(): String = wsConf.front.url("n-queen")
+
+//  protected lazy val conf = ConfigFactory.load("websocket.conf")
+}
 
 trait NQueenSocketListener extends SocketConnections{
 
-  def host: String
+  def wsUrl: String
 
-  protected lazy val sockets = new WebSocket(host) :: Nil
+  protected lazy val sockets = new WebSocket(wsUrl) :: Nil
 
   def initNegotiationInfo(queens: Map[Int, String]): Any
   def stateReport(report: StateReport): Any

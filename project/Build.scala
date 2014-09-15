@@ -58,6 +58,10 @@ object  Build extends sbt.Build {
       lazy val libAll = "org.scala-lang" % "scala-library-all" % ScalaVersion // 2.11.x
     }
 
+    object typesafe{
+      lazy val config = "com.typesafe" % "config" % "1.2.1"
+    }
+
     object Apache{
       lazy val ioCommons = "commons-io" % "commons-io" % "2.4"
     }
@@ -87,7 +91,7 @@ object  Build extends sbt.Build {
 
 
     object feh{
-      lazy val util = "feh.util" %% "util" % "1.0.4"
+      lazy val util = "feh.util" %% "util" % "1.0.5"
 
       object utils{
         lazy val compiler = "feh.util" %% "scala-compiler-utils" % "0.1"
@@ -157,12 +161,17 @@ object  Build extends sbt.Build {
     )
   ) dependsOn oldcomm
 
-  lazy val webCommon = Project("web-common", file("web/common"), settings = buildSettings)
+  lazy val webCommon = Project("web-common", file("web/common"),
+    settings = buildSettings ++ Seq(
+      libraryDependencies += typesafe.config
+    )
+  )
 
   lazy val webFrontend = Project(// libraryDependencies in build.sbt
     id = "web-frontend",
     base = file("web/frontend"),
-    settings = buildSettings ++ Web.settings ++ Seq(
+    settings = buildSettings ++ Web.frontend ++ Seq(
+      Web.packDir := file("web/packed"),
       libraryDependencies ++= Seq(feh.util, scala.libAll),
       unmanagedSourceDirectories in Compile <+= (sourceDirectory in webCommon)
     )
@@ -171,9 +180,9 @@ object  Build extends sbt.Build {
   lazy val webBackend = Project(
     id = "web-backend",
     base = file("web/backend"),
-    settings = buildSettings ++ Seq(
+    settings = buildSettings ++ Web.backend ++ Seq(
       resolvers ++= Seq(Snapshot.spray, Release.spray),
-      libraryDependencies ++= Seq(spray.websocket, spray.json)
+      libraryDependencies ++= Seq(feh.util, spray.websocket, spray.json)
     )
   ) dependsOn webCommon
 
