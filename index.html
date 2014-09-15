@@ -9,9 +9,24 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+
+    <script>
+        function writeCurrentState(elem){
+            var q = $('.chess-board', frames['n-queen-frame'].document).length > 0;
+            console.log(q);
+            var txt = q ? "" :  "No connection";
+            $(elem).text(txt);
+        }
+
+        function reloadIFrame(frame){
+            $(frame).prop('contentWindow').location.reload();
+        }
+    </script>
 
     <title>Agent Negotiation by fehu</title>
   </head>
@@ -36,6 +51,13 @@
 <p>In this project a framework for defining and performing agent negotiations is developed.
 The goal is implementing a negotiation over school/university schedule.</p>
 
+<div>
+    <span id="n-queen-state"></span>
+    <span class="button"
+          onclick="reloadIFrame('#n-queen-frame'); writeCurrentState('#n-queen-state')">
+        Reload N-Queen Negotiation Visualization
+    </span>
+</div>
 
         </section>
 
@@ -58,6 +80,24 @@ The goal is implementing a negotiation over school/university schedule.</p>
         </aside>
       </div>
     </div>
+
+  <iframe id="n-queen-frame" name="n-queen-frame" src="apps/n-queen.html"></iframe>
+
+    <script> writeCurrentState('#n-queen-state') </script>
+<!--  <script>
+    $().ready(function () {
+    $("#n-queen-frame").load(function () { //The function below executes once the iframe has finished loading
+            frames['n-queen-frame'].setTimeout(
+                writeCurrentState("#n-queen-state", $('.chess-board', frames['n-queen-frame'].document).length > 0),
+                1000
+            )
+
+
+//            writeCurrentState("#n-queen-state", $('.chess-board', frames['n-queen-frame'].document).length > 0);
+        })
+    })
+
+</script>-->
 
   </body>
 </html>

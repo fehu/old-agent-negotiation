@@ -50,7 +50,11 @@
           <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
-        </div></div>
+        </div><div class="toggleContainer block diagram-container" id="content-diagram-container">
+                <span class="toggle diagram-link">Content Hierarchy</span>
+                <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#diagrams" target="_blank" class="diagram-help">Learn more about scaladoc diagrams</a>
+                <div class="diagram" id="content-diagram"><svg class="package-diagram" id="graph239" viewBox="0.00 0.00 130.00 96.00" height="96pt" width="130pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 92)" class="graph" id="graph1"><polygon points="-4,5 -4,-92 127,-92 127,5 -4,5" stroke="white" fill="white"></polygon><!-- node0 --><g class="node object" id="graph239_0"><a xlink:title="feh.tec.agents.impl.AgentReports.TimeDiffUndefined" xlink:href="AgentReports$$TimeDiffUndefined$.html#inheritance-diagram"><polygon points="122.25,-26 -0.25,-26 -0.25,-0 122.25,-0 122.25,-26" stroke="#102966" fill="#3556a7"></polygon><image xlink:href="../../../../lib/object_diagram.png" y="-21" x="10" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-11" x="32" text-anchor="start">TimeDiffUndefined</text></a></g><!-- node1 --><g class="node class" id="graph239_1"><a xlink:title="feh.tec.agents.impl.AgentReports.TimeDiff" xlink:href="AgentReports$$TimeDiff.html#inheritance-diagram"><polygon points="101,-88 21,-88 21,-62 101,-62 101,-88" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../lib/class_diagram.png" y="-83" x="31" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-73" x="53" text-anchor="start">TimeDiff</text></a></g><!-- node1&#45;&gt;node0 --><g class="edge inheritance" id="graph239_1_0"><a xlink:title="TimeDiffUndefined is a subtype of TimeDiff"><path d="M61,-56.6826C61,-46.8961 61,-34.9026 61,-26.1238" stroke="#d4d4d4" fill="none"></path><polygon points="59.2501,-56.8581 61,-61.8581 62.7501,-56.8581 59.2501,-56.8581" stroke="#d4d4d4" fill="none"></polygon></a></g></g></svg></div>
+              </div></div>
         
 
       <div id="mbrsel">
@@ -98,7 +102,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="AgentReports$$MessageReport.html"><span class="name">MessageReport</span></a><span class="params">(<span name="to">to: <a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a></span>, <span name="msg">msg: <a href="../Language.html#Msg&lt;:feh.tec.agents.Message" class="extmbr" name="feh.tec.agents.Language.Msg">Msg</a></span>)</span><span class="result"> extends <a href="AgentReport.html" class="extype" name="feh.tec.agents.impl.AgentReport">AgentReport</a> with <a href="../Message$$AutoId.html" class="extype" name="feh.tec.agents.Message.AutoId">AutoId</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="AgentReports$$MessageReport.html"><span class="name">MessageReport</span></a><span class="params">(<span name="to">to: <a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a></span>, <span name="msg">msg: <a href="../Language.html#Msg&lt;:feh.tec.agents.Message" class="extmbr" name="feh.tec.agents.Language.Msg">Msg</a></span>, <span name="at">at: <a href="AgentReports$$TimeDiff.html" class="extype" name="feh.tec.agents.impl.AgentReports.TimeDiff">TimeDiff</a></span>)</span><span class="result"> extends <a href="AgentReport.html" class="extype" name="feh.tec.agents.impl.AgentReport">AgentReport</a> with <a href="../Message$$AutoId.html" class="extype" name="feh.tec.agents.Message.AutoId">AutoId</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../../index.html#feh.tec.agents.impl.AgentReports$@MessageReportextendsAgentReportwithMessage.AutoIdwithProductwithSerializable" title="Permalink" target="_top">
@@ -149,7 +153,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="AgentReports$$StateReport.html"><span class="name">StateReport</span></a><span class="params">(<span name="of">of: <a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a></span>, <span name="report">report: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../NegotiationId.html" class="extype" name="feh.tec.agents.NegotiationId">NegotiationId</a>, <a href="AgentReports$$StateReportEntry.html" class="extype" name="feh.tec.agents.impl.AgentReports.StateReportEntry">StateReportEntry</a>]</span>, <span name="id">id: <a href="../Message$.html#Id=java.util.UUID" class="extmbr" name="feh.tec.agents.Message.Id">Id</a> = <span class="symbol">UUID.randomUUID()</span></span>)</span><span class="result"> extends <a href="AgentReport.html" class="extype" name="feh.tec.agents.impl.AgentReport">AgentReport</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="AgentReports$$StateReport.html"><span class="name">StateReport</span></a><span class="params">(<span name="of">of: <a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a></span>, <span name="report">report: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../NegotiationId.html" class="extype" name="feh.tec.agents.NegotiationId">NegotiationId</a>, <a href="AgentReports$$StateReportEntry.html" class="extype" name="feh.tec.agents.impl.AgentReports.StateReportEntry">StateReportEntry</a>]</span>, <span name="at">at: <a href="AgentReports$$TimeDiff.html" class="extype" name="feh.tec.agents.impl.AgentReports.TimeDiff">TimeDiff</a></span>, <span name="id">id: <a href="../Message$.html#Id=java.util.UUID" class="extmbr" name="feh.tec.agents.Message.Id">Id</a> = <span class="symbol">UUID.randomUUID()</span></span>)</span><span class="result"> extends <a href="AgentReport.html" class="extype" name="feh.tec.agents.impl.AgentReport">AgentReport</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../../index.html#feh.tec.agents.impl.AgentReports$@StateReportextendsAgentReportwithProductwithSerializable" title="Permalink" target="_top">
@@ -170,6 +174,40 @@
       </span>
       </h4><span class="permalink">
       <a href="../../../../index.html#feh.tec.agents.impl.AgentReports$@StateReportEntryextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.tec.agents.impl.AgentReports.TimeDiff" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TimeDiffextendsProductwithSerializable"></a>
+      <a id="TimeDiff:TimeDiff"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="AgentReports$$TimeDiff.html"><span class="name">TimeDiff</span></a><span class="params">(<span name="diff">diff: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.AgentReports$@TimeDiffextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.tec.agents.impl.AgentReports.ZeroTime" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ZeroTimeextendsProductwithSerializable"></a>
+      <a id="ZeroTime:ZeroTime"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="AgentReports$$ZeroTime.html"><span class="name">ZeroTime</span></a><span class="params">(<span name="date">date: <span class="extype" name="java.util.Date">Date</span> = <span class="symbol">new Date</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.AgentReports$@ZeroTimeextendsProductwithSerializable" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -232,6 +270,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="feh.tec.agents.impl.AgentReports.TimeDiffUndefined" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TimeDiffUndefined"></a>
+      <a id="TimeDiffUndefined:TimeDiffUndefined"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="AgentReports$$TimeDiffUndefined$.html"><span class="name">TimeDiffUndefined</span></a><span class="result"> extends <a href="AgentReports$$TimeDiff.html" class="extype" name="feh.tec.agents.impl.AgentReports.TimeDiff">TimeDiff</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.AgentReports$@TimeDiffUndefined" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>

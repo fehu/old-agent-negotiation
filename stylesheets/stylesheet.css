@@ -232,7 +232,33 @@ form {
   padding: 20px;
   
 }
+/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
+span.button{
+    background: #2F72C8;
+    color: #fff;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#n-queen-state{
+    color: red;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+#n-queen-frame{
+    display: block;
+    width: 90%;
+    height: 600px;
+    margin-left: auto;
+    margin-right: auto;
+//    border: dotted;
+//    border-color: #7E4D3F;
+//    border-radius: 20px;
+}
 
 /* GENERAL ELEMENT TYPE STYLES */
 
