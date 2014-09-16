@@ -2,20 +2,19 @@ package feh.tec.agents
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import feh.tec.agents.impl.Agent.Id
-import feh.tec.agents.impl.AgentReports.{ZeroTime, TimeDiffUndefined, StateReportEntry}
+import feh.tec.agents.impl.AgentReports.StateReportEntry
 import feh.tec.agents.impl.NegotiationController.GenericStaticInitArgs
 import feh.tec.agents.impl.NegotiationControllerBuilder.DefaultBuildAgentArgs
 import feh.tec.agents.impl._
-import feh.tec.web.{WebSocketPushServerInitialization, WebSocketServerInitialization, NQueenProtocol, WebSocketPushServer}
 import feh.tec.web.WebSocketPushServer.Push
-import feh.tec.web.common.{WebSocketMessages, NQueenMessages}
-import spray.can.websocket.frame.{TextFrame, Frame}
-import spray.json.JsonFormat
+import feh.tec.web.common.{NQueenMessages, WebSocketMessages}
+import feh.tec.web.{WebSocketPushServer, WebSocketPushServerInitialization}
+import spray.can.websocket.frame.TextFrame
+import spray.json.{JsonFormat, _}
+
 import scala.collection.mutable
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.{FiniteDuration, _}
 import scala.reflect.ClassTag
-import spray.json._
-import scala.concurrent.duration._
 
 class ControllerBuilder[AgImpl <: GenericIteratingAgentCreation[_]](web: => WebSocketInterface)
                        (implicit acSys: ActorSystem, defaultAgentImplementation: ClassTag[AgImpl])
@@ -30,7 +29,7 @@ case class WebSocketInterface(ref: ActorRef)
 class Controller(arg: GenericStaticInitArgs[DefaultBuildAgentArgs], web: WebSocketInterface)
   extends NegotiationControllerBuilder.DefaultController(arg)
 {
-  import NQueenProtocol._
+  import feh.tec.web.NQueenProtocol._
 
   protected lazy val RefNameRegex = """(.+)\-(\d+)""".r
   def initMessage = NQueenMessages.Init(agents.map{
@@ -48,10 +47,13 @@ class Controller(arg: GenericStaticInitArgs[DefaultBuildAgentArgs], web: WebSock
 
 }
 
-class NQueenWebSocketPushServer(neg: NegotiationId, rescheduleUnfoundMsg: FiniteDuration, unfoundMsgRetries: Int)
+class NQueenWebSocketPushServer(neg: NegotiationId, 
+                                rescheduleUnfoundMsg: FiniteDuration, 
+                                unfoundMsgRetries: Int,
+                                flushFrequency: FiniteDuration)
   extends WebSocketPushServer
 {
-  import NQueenProtocol._
+  import feh.tec.web.NQueenProtocol._
 
   protected lazy val indexMap = mutable.HashMap.empty[AgentRef, NQueenMessages.Queen]
 
@@ -107,21 +109,35 @@ class NQueenWebSocketPushServer(neg: NegotiationId, rescheduleUnfoundMsg: Finite
     }
   }
 
+  def scheduleFlush() = context.system.scheduler.schedule(flushFrequency, flushFrequency, self, FlushReports)(context.dispatcher)
+  protected case object FlushReports
+  
+  protected lazy val reportsBuff = mutable.Buffer.empty[AgentReport]
+  
   override def receive = super.receive orElse{
+    // guard the reports until
     case rep@AgentReports.StateReport(_, entries, _, _) if entries contains neg =>
-      reportToBulkable(rep) map (frame => super.receive(push(frame)))
+      reportsBuff += rep.copy(report = Map(neg -> entries(neg)))
     case rep@AgentReports.MessageReport(_, msg, _) if msg.negotiation == neg =>
-      reportToBulkable(rep) map (frame => super.receive(push(frame)))
+      reportsBuff += rep
+    // this one is sent on connection; should be passed intact
     case ReportArchive.BulkReports(reports) =>
-      log.info("ReportArchive.BulkReports")
       val bulk = NQueenMessages.BulkReport(reports flatMap reportToBulkable)
       super.receive(push(bulk))
+    // bulk send buff contents and clear  
+    case FlushReports =>
+      val bulk = NQueenMessages.BulkReport(reportsBuff.toList flatMap reportToBulkable)
+      log.info(s"bulk = $bulk")
+      reportsBuff.clear()
+      super.receive(push(bulk))
   }
+
+  scheduleFlush()
 }
 
 class NQueenWebSocketPushServerBuilder(host: String, port: Int, negotiationId: NegotiationId)
                                       (implicit asys: ActorSystem)
   extends WebSocketPushServerInitialization(host, port)
 {
-  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, 5 millis, 5))
+  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, 5 millis, 5, 500 millis)) // todo: should be configurable
 }

@@ -1,5 +1,6 @@
-- [ ] do not guard equal reports/messages (multiple timestamps)
-- [ ] clear messages with passage of time
+- [ ] ? do not guard equal reports/messages (multiple timestamps)
+- [ ] ? clear messages with passage of time
 - [x] use timestamps guarded on report creation, instead of the own
 - [x] use ScalaTags
-- [ ] the reports must be sent in bulk in a fixed interval
+- [x] the reports must be sent in bulk in a fixed interval
+- [ ] the reports should be stored on server-side as dictionaries { rep.id:  rep }

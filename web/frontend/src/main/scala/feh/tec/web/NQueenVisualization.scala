@@ -37,7 +37,7 @@ class ChessBoard(size: Int) {
   protected val placedQueens = mutable.HashMap.empty[Int, (Int, Int)] // queen's number -> position
 
 
-  def updatePositions(state: StateReport): Any = updatePositions(Map(state.of.n -> state.position))
+  def updatePositions(state: StateReport): Any = updatePositions(Map(state.by.n -> state.position))
   def updatePositions(posUpdate: Map[Int, (Int, Int)]): Any = {
     if (posUpdate.forall(upd => placedQueens.exists(upd ==))) return {}
     placedQueens ++= posUpdate.toSeq
@@ -148,30 +148,30 @@ class QueensCommunications(archive: ReportArchive){
      """.stripMargin
   }
 
-  protected def appendMessage(report: MessageReport, left: Queen, right: Queen): Any ={
-    val dir = PartialFunction.condOpt(report.by -> report.to){
-      case (`left`, `right`)  => "right"
-      case (`right`, `left`)  => "left"
+  protected def appendMessages(reports: Map[Int, List[MessageReport]], left: Queen, right: Queen): Any =
+    reports.flatMap(_._2) map{
+      report =>
+        val dir = PartialFunction.condOpt(report.by -> report.to){
+          case (`left`, `right`)  => "right"
+          case (`right`, `left`)  => "left"
+        }
+        dir map {
+          sel.communications children ".messages" children "tbody" append createMessageRow(report, _)
+        }
     }
-    dir map {
-      sel.communications children ".messages" children "tbody" append createMessageRow(report, _)
-    }
 
-  }
+  protected def genUpdateMessageFunc(left: Queen, right: Queen) = appendMessages(_: Map[Int, List[MessageReport]], left, right)
 
-  protected def genUpdateMessageFunc(left: Queen, right: Queen) = appendMessage(_: MessageReport, left, right)
-
-  protected def updateMessages(left: Queen, right: Queen): Any ={
-//    println("updateMessages")
+  protected def updateMessages(left: Queen, right: Queen) ={
     clearOnNewMessage()
     val msgs = archive.messages(Set(left.n, right.n))
     updateMessage = Option(genUpdateMessageFunc(left, right))
-    archive.onNewMessage(updateMessage.get)
-    msgs foreach updateMessage.get
+    archive.onNewMessages(updateMessage.get)
+    updateMessage.get(msgs.groupBy(_.by.n))
   }
 
-  protected def clearOnNewMessage() = updateMessage foreach archive.rmOnNewMessage
-  protected var updateMessage: Option[js.Function1[MessageReport, Any]] = None
+  protected def clearOnNewMessage() = updateMessage foreach archive.rmOnNewMessagesCallback
+  protected var updateMessage: Option[js.Function1[Map[Int, List[MessageReport]], Any]] = None
 
   def create =
     s"""<div class="queen-comm">

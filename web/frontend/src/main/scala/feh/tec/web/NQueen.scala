@@ -37,14 +37,15 @@ object NQueen extends JSApp with NQueenSocketListener{
     jQuery(containerForBoard) append chessBoard.create
     jQuery(containerForInfo) append communications.create
 
-    reportArchive.onNewState{ (s: StateReport) =>
-      chessBoard.updatePositions(s)
-      queensInfo.foreach(_._2.updateState(s))
+    reportArchive.onNewStates{ (reps: Map[Int, List[StateReport]]) =>
+      val latest = reps.mapValues(_.maxBy(_.at))
+      chessBoard updatePositions latest.mapValues(_.position)
+      queensInfo.foreach{
+        case (i, q) => latest.get(i) foreach q.updateState
+      }
     }
   }
 
-  def stateReport(report: StateReport) = reportArchive.report(report)
-  def messageReport(report: MessageReport): Any = reportArchive.report(report)
   def bulkReport(report: BulkReport): Any = reportArchive.report(report)
 }
 
@@ -56,8 +57,6 @@ trait NQueenSocketListener extends SocketConnections{
   protected lazy val sockets = new WebSocket(wsUrl) :: Nil
 
   def initNegotiationInfo(queens: Map[Int, String]): Any
-  def stateReport(report: StateReport): Any
-  def messageReport(report: MessageReport): Any
   def bulkReport(report: BulkReport): Any
 
   def onMessage: PartialFunction[js.Any, Unit] = {
@@ -65,23 +64,24 @@ trait NQueenSocketListener extends SocketConnections{
       val json = JSON.parse(msg)
 //      global.console.log(json)
       json.$t.asInstanceOf[String] match {
-        case "StateReport"   => stateReport(getBulkable(json).get.asInstanceOf[StateReport])
-        case "MessageReport" => messageReport(getBulkable(json).get.asInstanceOf[MessageReport])
         case "Init" =>
           val queensInit = json.queens.asInstanceOf[js.Array[js.Array[_]]].map(
             (arr: js.Array[_]) =>
               arr(0).asInstanceOf[js.Dynamic].n.asInstanceOf[Int] -> arr(1).asInstanceOf[String]
           )
           initNegotiationInfo(queensInit.toMap)
-        case "BulkReport" =>
-          bulkReport(BulkReport(json.messages.asInstanceOf[js.Array[js.Dynamic]].flatMap( getBulkable(_: js.Dynamic) )))
+        // ignore empty
+        case "BulkReport" if ! json.messages.asInstanceOf[js.Array[_]].isEmpty =>
+          val bulkable = json.messages.asInstanceOf[js.Array[js.Dynamic]].flatMap( getBulkable(_: js.Dynamic) )
+          bulkReport(BulkReport(bulkable))
+        case "BulkReport" => // do nothing
       }
   }
 
   protected def getBulkable(json: js.Dynamic) = PartialFunction.condOpt(json.$t.asInstanceOf[String]){
     case "StateReport" =>
       StateReport(
-        of = Queen(json.of.n.asInstanceOf[Int]),
+        by = Queen(json.by.n.asInstanceOf[Int]),
         position = getPosition(json),
         priority = json.priority.asInstanceOf[Int],
         proposalAcceptance = json.proposalAcceptance.asInstanceOf[js.Array[js.Array[_]]].map(
@@ -106,31 +106,32 @@ trait NQueenSocketListener extends SocketConnections{
 }
 
 class ReportArchive(queens: Set[Int]){
-  def report(state: StateReport): Unit = {
-    _states(state.of.n) += state -> state.at
-    _onNewState   foreach (_.apply(state))
+
+  def report(msg: BulkReport): Unit = {
+    val grouped_s =
+      msg.messages.toList.withFilter(_.isInstanceOf[StateReport]).map(_.asInstanceOf[StateReport]).groupBy(_.by.n)
+
+    val grouped_m =
+      msg.messages.toList.withFilter(_.isInstanceOf[MessageReport]).map(_.asInstanceOf[MessageReport]).groupBy(_.by.n)
+
+    grouped_s foreach{ case (i, rep) => _states(i) ++= rep }
+    grouped_m foreach{ case (i, rep) => _messages(i) ++= rep }
+
+    _onNewMessages foreach (_(grouped_m))
+    _onNewStates foreach (_(grouped_s))
   }
-  def report(msg: MessageReport): Unit = {
-    _messages(msg.by.n) += msg -> msg.at
-    _onNewMessage foreach (_.apply(msg))
-  }
-  def report(msg: BulkReport): Unit = msg.messages foreach {
-    case rep: StateReport    => report(rep)
-    case rep: MessageReport  => report(rep)
-  }
 
-  def states(i: Int)                              = _states(i).sortBy(_._2).map(_._1).toList
-  def messages(i: Int): List[MessageReport]       = _messages(i).sortBy(_._2).map(_._1).toList
-  def messages(i: Set[Int]): List[MessageReport]  = _messages.filterKeys(i.contains).values.flatten
-                                                      .toList.sortBy(_._2).map(_._1)
+  def states(i: Int)                              = _states(i).toList
+  def messages(i: Int): List[MessageReport]       = _messages(i).toList
+  def messages(i: Set[Int]): List[MessageReport]  = _messages.filterKeys(i.contains).values.flatten.toList
 
-  def onNewState(func: js.Function1[StateReport, Any]): Unit     = { _onNewState += func }
-  def onNewMessage(func: js.Function1[MessageReport, Any]): Unit = { _onNewMessage += func }
-  def rmOnNewMessage(func: js.Function1[MessageReport, Any]): Unit = { _onNewMessage -= func }
+  def onNewStates(byQueen: js.Function1[Map[Int, List[StateReport]], Any]): Unit     = { _onNewStates += byQueen }
+  def onNewMessages(byQueen: js.Function1[Map[Int, List[MessageReport]], Any]): Unit = { _onNewMessages += byQueen }
+  def rmOnNewMessagesCallback(func: js.Function1[Map[Int, List[MessageReport]], Any]): Unit = { _onNewMessages -= func }
 
-  protected val _states   = queens.map{ q => q -> mutable.Buffer.empty[(StateReport, Long)]   }.toMap
-  protected val _messages = queens.map{ q => q -> mutable.Buffer.empty[(MessageReport, Long)] }.toMap
+  protected val _states   = queens.map{ q => q -> mutable.Buffer.empty[StateReport]   }.toMap
+  protected val _messages = queens.map{ q => q -> mutable.Buffer.empty[MessageReport] }.toMap
 
-  protected val _onNewState   = mutable.Buffer.empty[js.Function1[StateReport, Any]]
-  protected val _onNewMessage = mutable.Buffer.empty[js.Function1[MessageReport, Any]]
+  protected val _onNewStates   = mutable.Buffer.empty[js.Function1[Map[Int, List[StateReport]], Any]]
+  protected val _onNewMessages = mutable.Buffer.empty[js.Function1[Map[Int, List[MessageReport]], Any]]
 }
