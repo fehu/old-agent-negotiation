@@ -103,6 +103,10 @@ object  Build extends sbt.Build {
         lazy val graphviz = "feh.dsl" %% "graphviz" % "0.1"
       }
     }
+
+    object js{
+      lazy val jquery = "org.webjars" % "jquery" % "2.1.1"
+    }
   }
 
   // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
@@ -180,6 +184,7 @@ object  Build extends sbt.Build {
       Web.packDir := file("web/packed"),
       libraryDependencies ++= Seq(feh.util, scala.libAll),
       unmanagedSourceDirectories in Compile <+= (sourceDirectory in webCommon)
+
     )
   ) dependsOn webCommon
 

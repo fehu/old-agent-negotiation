@@ -21,7 +21,7 @@ object NQueen extends JSApp with NQueenSocketListener{
   def initNegotiationInfo(queens: Map[Int, String]): Any = {
     reportArchive = new ReportArchive(queens.keySet)
     chessBoard = new ChessBoard(queens.size)
-    communications = new QueensCommunications(reportArchive)
+    communications = new QueensCommunicationsTableSorter(reportArchive)
     selection = new QueenInfo.Selection(
       s => (communications.update _).tupled apply s.queens(queens(s.left.get), queens(s.right.get))
     )

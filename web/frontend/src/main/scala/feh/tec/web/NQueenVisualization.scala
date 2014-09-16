@@ -5,6 +5,9 @@ import org.scalajs.jquery._
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 import scala.collection.mutable
+import scala.scalajs.js.annotation.JSExport
+import scalatags.Text.all._
+import Utils._
 
 object NQueenTemplates{
 
@@ -106,10 +109,10 @@ class QueenInfo(name: String, val n: Int, selection: QueenInfo.Selection){
 class QueensCommunications(archive: ReportArchive){
 
   def update(left: (Queen, String), right: (Queen, String)) = {
-    println("upd!!!")
+//    println("upd!!!")
     def upd(p: (Queen, String), s: String) = {
       val ss = jQuery(".queen-comm .messages th" + s) //sel.communications children ".messages" children ("th" + s) children ".name"
-      global.console.log(ss.get())
+//      global.console.log(ss.get())
       ss text ( p._2 + "-" + p._1.n )
     }
 
@@ -151,17 +154,18 @@ class QueensCommunications(archive: ReportArchive){
       case (`right`, `left`)  => "left"
     }
     dir map {
-      sel.communications children ".messages" append createMessageRow(report, _)
+      sel.communications children ".messages" children "tbody" append createMessageRow(report, _)
     }
 
   }
 
+  protected def genUpdateMessageFunc(left: Queen, right: Queen) = appendMessage(_: MessageReport, left, right)
 
   protected def updateMessages(left: Queen, right: Queen): Any ={
 //    println("updateMessages")
     clearOnNewMessage()
     val msgs = archive.messages(Set(left.n, right.n))
-    updateMessage = Option(appendMessage(_: MessageReport, left, right))
+    updateMessage = Option(genUpdateMessageFunc(left, right))
     archive.onNewMessage(updateMessage.get)
     msgs foreach updateMessage.get
   }
@@ -171,16 +175,76 @@ class QueensCommunications(archive: ReportArchive){
 
   def create =
     s"""<div class="queen-comm">
-       |  <table class="messages">
-       |    <tr>
-       |      <th class="l"/>
-       |      <th class="time">millis of neg.</th>
-       |      <th class="priority">priority</th>
-       |      <th class="position">position</th>
-       |      <th class="type">type</th>
-       |      <th class="r"/>
-       |    </tr>
+       |  <table class="messages tablesorter">
+       |    <thead>
+       |      <tr>
+       |        <th class="l"/>
+       |        <th class="time">millis of neg.</th>
+       |        <th class="priority">priority</th>
+       |        <th class="position">position</th>
+       |        <th class="type">type</th>
+       |        <th class="r"/>
+       |      </tr>
+       |    </thead>
+       |    <tbody/>
+       |    $bottomFooter
        |  </table>
        |</div>
      """.stripMargin
+
+  protected def bottomFooter =
+    tfoot(
+      tr(
+        th(),
+        th("colspan".attr := 4,
+          button(`class` := "btn first",  i(`class` := "icon-step-backward glyphicon glyphicon-step-backward")),
+          button(`class` := "btn prev",   i(`class` := "icon-arrow-left glyphicon glyphicon-backward")),
+          span(`class` := "pagedisplay"),
+          button(`class` := "btn next",   i(`class` := "icon-arrow-right glyphicon glyphicon-forward")),
+          button(`class` := "btn last",   i(`class` := "icon-step-forward glyphicon glyphicon-step-forward")),
+          select(`class` := "pagesize input-mini", title := "Select page size",
+            option("selected".attr := "selected", value := 10, 10),
+            option(value := 20, 20),
+            option(value := 30, 30),
+            option(value := 50, 50)
+          ),
+          select(`class` := "pagenum input-mini", title := "Select page number")
+        ),
+        th()
+      )
+    )
+}
+
+class QueensCommunicationsTableSorter(archive: ReportArchive) extends QueensCommunications(archive){
+
+  protected def updateTableSorter() = jQuery(".queen-comm .messages").trigger("update")
+
+  override protected def updateMessages(left: Queen, right: Queen) =
+    super.updateMessages(left, right) $ updateTableSorter()
+
+
+  override protected def genUpdateMessageFunc(left: Queen, right: Queen) =
+    super.genUpdateMessageFunc(left, right) andThen{ _ $ updateTableSorter() }
+
+  override def create = super.create + "\n" +
+    script("$().ready(function(){ feh.tec.web.QueensCommunicationsTableSorter().init() })").toString()
+
+}
+
+@JSExport("feh.tec.web.QueensCommunicationsTableSorter")
+object QueensCommunicationsTableSorter{
+  @JSExport
+  def init(): Unit = {
+    jQuery("table.messages").asInstanceOf[js.Dynamic]
+      .tablesorter(js.Dictionary(
+        "theme" -> "blue",
+        //      "headerTemplate" -> "{content}", // {icon}
+        "widgets" -> js.Array("filter", "zebra")
+      ))
+      .tablesorterPager(js.Dictionary(
+        "container" ->  jQuery(".ts-pager"),
+        "cssGoto" -> ".pagenum",
+        "output" -> "{startRow} - {endRow} / {filteredRows} ({totalRows})"
+      ))
+  }
 }

@@ -5,10 +5,11 @@ import scala.scalajs.sbtplugin.ScalaJSPlugin.ScalaJSKeys._
 object Web{
 
   lazy val frontend = Seq(
-    packTemplates <<= (fullOptJS in Compile, packageJSDependencies in Compile,
+    packTemplates <<= (fastOptJS in Compile, packageJSDependencies in Compile,
                         fullClasspath in Compile, streams, runner, baseDirectory, packDir) map {
-      (fullOptJS, jsDep, cp, str, runner, base, dir) =>
-        val params = Seq(base.toString, dir.toString, jsDep.getPath) ++ fullOptJS.ncjsCode.map(_.path)
+      (compileJs, jsDep, cp, str, runner, base, dir) =>
+//        val params = Seq(base.toString, dir.toString, jsDep.getPath) ++ compileJs.ncjsCode.map(_.path)
+        val params = Seq(base.toString, dir.toString, jsDep.getPath) ++ compileJs.cijsCode.map(_.path)
         runner.run("feh.tec.web.util.PackTemplates", cp.map(_.data), params, str.log)
     },
     cleanTemplates := IO.delete(packDir.value)
