@@ -169,6 +169,23 @@ aside a.noDwButton {
   background: #2F72C8;
 }
 
+aside .button.sub{
+  width: 102px;
+  height: 25px;
+  
+  margin-top: 1px;
+  margin-left: 15px;
+  padding-top: 4px;
+  padding-left: 20px;
+  
+  font-size: 18px;
+  border-radius: 10px;
+}
+
+aside .button.has-sub{
+  margin-bottom: 2px;
+}
+
 code, pre {
   font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
   color: #222;
