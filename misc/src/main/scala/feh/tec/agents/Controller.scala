@@ -82,7 +82,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
         val StateReportEntry(priority, vals, scope, extra) = entries(neg)
         val position = getPos(vals, "x") -> getPos(vals, "y")
         Some(NQueenMessages.StateReport(q, position, priority.get, Nil, time.diff))
-      case rep@AgentReports.MessageReport(_to, msg, at) =>
+      case rep@AgentReports.MessageReport(_to, msg, at, extra) =>
         val by = indexMap.getOrElse(rep.msg.sender, addNewIndex(rep.msg.sender))
         val to = indexMap.getOrElse(_to, addNewIndex(_to))
         val message = msg match{
@@ -106,7 +106,11 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
             context.system.scheduler.scheduleOnce(rescheduleUnfoundMsg, self, rej)(context.dispatcher)
             None
         }
-        message map (NQueenMessages.MessageReport(by, to, _, at.diff))
+        val newExtra = extra collectFirst {
+          case AgentReports.WeightReport(weighted) =>
+            NQueenMessages.ReportWeight(weighted.mapValues(_.d).toList)
+        }
+        message map (NQueenMessages.MessageReport(by, to, _, at.diff, newExtra))
     }
   }
 
@@ -119,7 +123,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
     // guard the reports until
     case rep@AgentReports.StateReport(_, entries, _, _) if entries contains neg =>
       reportsBuff += rep.copy(report = Map(neg -> entries(neg)))
-    case rep@AgentReports.MessageReport(_, msg, _) if msg.negotiation == neg =>
+    case rep@AgentReports.MessageReport(_, msg, _, _) if msg.negotiation == neg =>
       reportsBuff += rep
     // this one is sent on connection; should be passed intact
     case ReportArchive.BulkReports(reports) =>

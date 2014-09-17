@@ -2,6 +2,7 @@ package feh.tec.agents
 
 import akka.actor.ActorLogging
 import feh.tec.agents.impl.Agent.AgentReportingMessagesAndState
+import feh.tec.agents.impl.AgentReports.WeightReport
 import feh.tec.agents.impl._
 import feh.tec.agents.impl.agent.GenericIteratingAgentCreation
 import feh.util.InUnitInterval
@@ -14,9 +15,10 @@ class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
   with AgentReportingMessagesAndState[DefaultNegotiatingLanguage]
   with ActorLogging
 {
-  type StateOfNegotiation = ProposalIteratorNegotiationState[DefaultNegotiatingLanguage]
+  type StateOfNegotiation = ProposalIteratorNegotiationState[DefaultNegotiatingLanguage] with ProposalViewState
 
-  def newNegotiationState(of: Negotiation): StateOfNegotiation = new StateOfNegotiation{ def negotiation = of }
+  def newNegotiationState(of: Negotiation): StateOfNegotiation =
+    new ProposalIteratorNegotiationState[DefaultNegotiatingLanguage] with ProposalViewState{ def negotiation = of }
 
   // should change with time
   protected def isFailure(neg: Negotiation, weighted: Map[Option[Boolean], InUnitInterval]) = {
@@ -30,6 +32,7 @@ class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
 
   log.info(s"I'm created! $id" )
 
-  override protected def extractReportExtra(negId: NegotiationId) = getOpt(negId).flatMap(_.state.currentProposal)
-
+  override protected def extractStateReportExtra(negId: NegotiationId) = getOpt(negId).flatMap(_.state.currentProposal)
+  override protected def extractMessageReportExtra(msg: DefaultNegotiatingLanguage#Msg) =
+    get(msg.negotiation).state.lastWeightedProposal map WeightReport
 }

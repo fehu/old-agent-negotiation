@@ -30,6 +30,10 @@ trait ProposalIteratorNegotiationState[Lang <: ProposalLanguage] extends Proposa
   var currentIterator: Option[Iterator[Map[Var, Any]]] = None
 }
 
+trait ProposalViewState extends NegotiationState{
+  var lastWeightedProposal: Option[Map[Option[Boolean], InUnitInterval]] = None
+}
+
 object ProposalEngine{
   trait Iterating[Lang <: ProposalLanguage] extends ProposalEngine[Lang]{
     self: NegotiatingAgent with ProposalBased[Lang] =>

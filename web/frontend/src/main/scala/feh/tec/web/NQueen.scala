@@ -1,7 +1,7 @@
 package feh.tec.web
 
 import feh.tec.web.common.NQueenMessages._
-import org.scalajs.dom.{WebSocket, document}
+import org.scalajs.dom.WebSocket
 import org.scalajs.jquery.jQuery
 import scala.collection.mutable
 import scala.scalajs.js
@@ -98,8 +98,17 @@ trait NQueenSocketListener extends SocketConnections{
           case "Acceptance" => Acceptance
           case "Rejection"  => Rejection
         }),
-        at = json.at.asInstanceOf[Int]
+        at = json.at.asInstanceOf[Int],
+        extra = getMessageReportExtra(json.extra)
       )
+  }
+
+  protected def getMessageReportExtra(json: js.Dynamic): Option[MessageExtraReport] = json match {
+    case j if j.isInstanceOf[js.prim.Undefined] => None
+    case weighted if json.weight != js.undefined => Option(ReportWeight(
+      json.weight.asInstanceOf[js.Array[js.Array[_]]].map{
+        (arr: js.Array[_]) => Some(arr(0).asInstanceOf[Boolean]) -> arr(1).asInstanceOf[Double]
+      }))
   }
 
   private def getPosition(dyn: js.Dynamic) = dyn.position.asInstanceOf[js.Array[Int]](0) -> dyn.position.asInstanceOf[js.Array[Int]](1)

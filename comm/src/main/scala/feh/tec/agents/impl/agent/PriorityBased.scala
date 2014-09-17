@@ -27,6 +27,10 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   with ViewUtils
   with ActorLogging
 {
+
+
+  type StateOfNegotiation <: ProposalNegotiationState[Lang] with ProposalViewState
+
   def constraintsFilter: Message => Boolean = _ => true
   lazy val constraintsSatisfactions = new ConstraintsSatisfactionWithPriority(
     new ExternalConstraints(lang, constraintsFilter), new Priority(constraintsFilter))
@@ -75,6 +79,7 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
           val weighted = viewsByMsgId.getOrElse(currentProposal.id, Map()).weight{
             case (ag, (opt, pr)) if neg.scope.contains(ag) && pr._2 > neg.currentPriority => opt
           }
+          neg.state.lastWeightedProposal = Some(weighted)
 
 //          log.info("weighted = " + weighted)
 //          log.info("viewsByMsgId = " + viewsByMsgId)

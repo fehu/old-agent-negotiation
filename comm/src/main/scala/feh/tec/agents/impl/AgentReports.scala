@@ -78,8 +78,8 @@ trait ReportsPrinter extends ActorLogging{
             if(extra.isDefined) sb ++= ("\n" + " "*12 + s"   extra: ${extra.get}")
         }
         log.info(sb.mkString)
-      case AgentReports.MessageReport(to, msg, _) =>
-        log.info(s"Message $msg was sent by ${msg.sender} to $to")
+      case AgentReports.MessageReport(to, msg, _, extra) =>
+        log.info(s"Message $msg was sent by ${msg.sender} to $to" + extra.map("; extra: " +).getOrElse(""))
     }
 
   }
@@ -137,11 +137,14 @@ object AgentReports{
                               scope: Set[AgentRef],
                               extra: Option[Any])
 
-  case class MessageReport(to: AgentRef, msg: Language#Msg, at: TimeDiff)
+  case class MessageReport(to: AgentRef, msg: Language#Msg, at: TimeDiff, extra: Option[MessageReportExtra])
     extends AgentReport with AutoId
   {
     def of = msg.sender
     def updTime(time: TimeDiff) = copy(at = time)
   }
 
+  trait MessageReportExtra
+
+  case class WeightReport(weighted: Map[Option[Boolean], InUnitInterval]) extends MessageReportExtra
 }

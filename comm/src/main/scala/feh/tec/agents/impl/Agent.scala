@@ -6,7 +6,7 @@ import akka.actor.{ActorLogging, ActorRef}
 import feh.tec.agents.Message.Response
 import feh.tec.agents.SystemMessage.{RefDemand, ScopeUpdate}
 import feh.tec.agents._
-import feh.tec.agents.impl.AgentReports.TimeDiffUndefined
+import feh.tec.agents.impl.AgentReports.{MessageReportExtra, TimeDiffUndefined}
 import feh.tec.agents.impl.Language.dsl._
 import feh.tec.agents.impl.Negotiation.DynamicScope
 import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
@@ -92,19 +92,19 @@ object Agent{
         sender ! resume.resumed
 // ReportState messages
       case req: AgentReports.ReportStates => sender ! req.response(getOpt _ andThen{ _.map{
-        neg => (neg.priority, neg.currentValues.toMap, neg.scope, extractReportExtra(neg.id))
+        neg => (neg.priority, neg.currentValues.toMap, neg.scope, extractStateReportExtra(neg.id))
       }})
       case req: AgentReports.ReportAllStates => sender ! reportAllStates(req.id)
     }
 
     protected def reportAllStates(id: UUID = UUID.randomUUID()) = {
       val negs = negotiations.map{
-        neg => neg.id -> AgentReports.StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, extractReportExtra(neg.id))
+        neg => neg.id -> AgentReports.StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, extractStateReportExtra(neg.id))
       }.toMap
       AgentReports.StateReport(ref, negs, TimeDiffUndefined)
     }
 
-    protected def extractReportExtra(negId: NegotiationId): Option[Any] = None
+    protected def extractStateReportExtra(negId: NegotiationId): Option[Any] = None
   }
 
   /** Registers proposals sent using AgentRef.! method to provide `expectingResponse` method of [[ProposalRegister]],
@@ -161,10 +161,11 @@ object Agent{
     self: NegotiatingAgent with AgentHelpers[Lang] =>
 
     protected def buildReports = (msg, to) =>  Set(
-      AgentReports.MessageReport(to, msg, TimeDiffUndefined),
+      AgentReports.MessageReport(to, msg, TimeDiffUndefined, extractMessageReportExtra(msg)),
       reportAllStates()
     )
 
+    protected def extractMessageReportExtra(msg: Lang#Msg): Option[MessageReportExtra] = None
   }
 }
 

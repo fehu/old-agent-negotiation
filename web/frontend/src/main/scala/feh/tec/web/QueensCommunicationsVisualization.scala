@@ -2,9 +2,10 @@ package feh.tec.web
 
 import Utils._
 import NQueenTemplates._
-import feh.tec.web.common.NQueenMessages.{Message, MessageReport, Queen}
+import feh.tec.web.common.NQueenMessages._
 import org.scalajs.jquery._
 import scala.scalajs.js
+import scala.scalajs.js.Dynamic
 import scala.scalajs.js.annotation.JSExport
 import scalatags.Text.all._
 
@@ -27,17 +28,31 @@ class QueensCommunications(archive: ReportArchive){
   protected def clearMessages() = jQuery(".queen-comm .message") remove()
 
   protected def createMessageRow(report: MessageReport, dir: String) = report match {
-    case MessageReport(_, _, Message(priority, position, tpe), time) =>
+    case MessageReport(_, _, Message(priority, position, tpe), time, extra) =>
       s"""<tr class="message" to="$dir">
          |  <td class="l">${ if(dir == "left") genArrow(dir) else "" }</td>
          |  <td class="time">$time</td>
          |  <td class="priority">$priority</td>
          |  <td class="position">$position</td>
          |  <td class="type">$tpe</td>
+         |  <td class="weighted">${extractExtraWeighted(extra)}</td>
          |  <td class="r">${ if(dir == "right") genArrow(dir) else "" }</td>
          |</tr>
        """.stripMargin
   }
+
+  protected def extractExtraWeighted(extra: Option[MessageExtraReport]) = extra.collectFirst{
+    case ReportWeight(weight) if weight.size == 1 =>
+      weight.head._2*100 + "% " + { if(weight.head._1.get) "acceptance" else "rejection" }
+    case ReportWeight(weight) if weight.size == 2 && weight.forall(_._2 == 0) =>
+      unknownSpan
+    case ReportWeight(weight) =>
+      val wm = weight.toMap
+      span(`class` := "acceptance", s"acceptance: ${wm(Some(true))  *100}%").toString() +
+      span(`class` := "rejection",  s"rejection:  ${wm(Some(false)) *100}%").toString()
+  }.getOrElse(unknownSpan)
+
+  private def unknownSpan = span(`class` := "unknown", "unknown").toString()
 
   protected def genArrow(dir: String) = {
     s"""<svg width="75px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -84,7 +99,8 @@ class QueensCommunications(archive: ReportArchive){
        |        <th class="time">millis of neg.</th>
        |        <th class="priority">priority</th>
        |        <th class="position">position</th>
-       |        <th class="type filter-select" data-placeholder="Select message type">type</th>
+       |        <th class="type" data-placeholder="Select">type</th>
+       |        <th class="weighted" data-placeholder="Select">weighted</th>
        |        <th class="r filter-false"/>
        |      </tr>
        |    </thead>
@@ -98,7 +114,7 @@ class QueensCommunications(archive: ReportArchive){
     tfoot(
       tr(
         th(`class` := "l"),
-        th("colspan".attr := 4, `class` := "ts-pager form-horizontal",
+        th("colspan".attr := 5, `class` := "ts-pager form-horizontal",
           button(`class` := "btn first", `type` := "button",
             i(`class` := "icon-step-backward glyphicon glyphicon-step-backward")),
           button(`class` := "btn prev", `type` := "button",
@@ -142,17 +158,36 @@ object QueensCommunicationsTableSorter{
   @JSExport
   def init(): Unit = {
     jQuery("table.messages").asInstanceOf[js.Dynamic]
-      .tablesorter(js.Dictionary(
-      "theme" -> "jui",
-      //        "headerTemplate" -> "{content} {icon}",
-      "widthFixed" -> true,
-      "widgets" -> js.Array("filter", "zebra"),
-      "sortList" -> js.Array(js.Array(1, 0))
-    ))
+      .tablesorter{js.Dictionary(
+        "theme" -> "jui",
+        "headers" -> js.Dictionary(
+          "5" -> js.Dictionary(
+            "sorter" -> false,
+            "filter" -> true
+          )
+        ),
+        "widthFixed" -> true,
+        "widgets" -> js.Array("filter", "zebra"),
+        "sortList" -> js.Array(js.Array(1, 0)),
+        "widgetOptions" -> js.Dictionary(
+          "uitheme" -> "jui",
+          "filter_functions" -> filterFunctions
+        )
+      )}
       .tablesorterPager(js.Dictionary(
-      "container" ->  jQuery(".ts-pager"),
-      "cssGoto" -> ".pagenum",
-      "output" -> "{startRow} - {endRow} / {filteredRows} ({totalRows})"
-    ))
+        "container" ->  jQuery(".ts-pager"),
+        "cssGoto" -> ".pagenum",
+        "output" -> "{startRow} - {endRow} / {filteredRows} ({totalRows})"
+      ))
   }
+
+  def filterFunctions =
+    js.Dictionary(
+      "4" -> true,
+      "5" -> js.Dictionary(
+        "acceptance"  -> (((e: js.String, n: js.Any, f: js.String, i: js.Number) => e contains "acceptance" ): js.Function),
+        "rejection"   -> (((e: js.String, n: js.Any, f: js.String, i: js.Number) => e contains "rejection" ): js.Function),
+        "unknown"     -> (((e: js.String, n: js.Any, f: js.String, i: js.Number) => e contains "unknown" ): js.Function)
+      )
+    )
 }

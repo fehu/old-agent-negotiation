@@ -27,7 +27,7 @@ object NQueenMessages extends WebSocketMessages{
     def reportsState = true
     def reportsMessage = false
   }
-  case class MessageReport(by: Queen, to: Queen, msg: Message, at: Int) extends CanBulk
+  case class MessageReport(by: Queen, to: Queen, msg: Message, at: Int, extra: Option[MessageExtraReport]) extends CanBulk
   {
     def reportsState = false
     def reportsMessage = true
@@ -40,4 +40,7 @@ object NQueenMessages extends WebSocketMessages{
   case object Acceptance extends MessageType
   case object Rejection extends MessageType
 
+  trait MessageExtraReport
+  
+  case class ReportWeight(weight: Seq[(Option[Boolean], Double)]) extends MessageExtraReport
 }
