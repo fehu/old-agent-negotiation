@@ -16,6 +16,7 @@ class GenTemplate(val name: String, main: Class[JSApp]){
   def templateBody: NodeSeq = Nil
   def templateHead: NodeSeq = Nil
   def css: PathSelector = PathSelector.empty
+  def includeStyleResources = PathSelector.empty
 
   def template(cssPaths: Seq[Path], jsPaths: Seq[Path]): Node =
     <html>

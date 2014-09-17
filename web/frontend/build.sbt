@@ -13,7 +13,8 @@ skip in packageJSDependencies := false
 
 jsDependencies ++= Seq(
   js.jquery      / "jquery.js",
-  ProvidedJS / "jquery.tablesorter.js" dependsOn "jquery.js",
-  ProvidedJS / "jquery.tablesorter.widgets.js" dependsOn "jquery.tablesorter.js",
-  ProvidedJS / "jquery.tablesorter.pager.js" dependsOn "jquery.tablesorter.widgets.js"
+  js.bootstrap   / "bootstrap.js",
+  ProvidedJS / "jquery.tablesorter.js"            dependsOn "jquery.js",
+  ProvidedJS / "jquery.tablesorter.widgets.js"    dependsOn "jquery.tablesorter.js",
+  ProvidedJS / "jquery.tablesorter.pager.js"      dependsOn "jquery.tablesorter.widgets.js"
 )

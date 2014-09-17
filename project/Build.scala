@@ -106,6 +106,7 @@ object  Build extends sbt.Build {
 
     object js{
       lazy val jquery = "org.webjars" % "jquery" % "2.1.1"
+      lazy val bootstrap = "org.webjars" % "bootstrap" % "3.2.0"
     }
   }
 

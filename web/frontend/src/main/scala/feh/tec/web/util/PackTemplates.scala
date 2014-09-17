@@ -21,7 +21,7 @@ object PackTemplates extends App {
       val xml = Xhtml toXhtml gen.template(cssFiles.map(_._1), js.map(_.name.p))
 
       File(target / (gen.name + ".html"))
-        .withOutputStream(File.write.utf8(xml), append = false)
+        .withOutputStream(File.write.utf8(xml))
 
       cssFiles map {
         case (path, file) => file.cp(target / path, overwrite = true)
@@ -29,6 +29,10 @@ object PackTemplates extends App {
 
       js foreach{
         path => path.file.cp(target / path.name, overwrite = true)
+      }
+
+      (basedir / "styles" / gen.includeStyleResources).get[(Path, File)] foreach{
+        case (path, file) => file.cp(target / path.drop(basedir / "styles"))
       }
   }
 }
