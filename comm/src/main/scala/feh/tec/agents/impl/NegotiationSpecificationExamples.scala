@@ -1,8 +1,10 @@
 package feh.tec.agents.impl
 
+import feh.tec.agents.spec.dsl.NegotiationSpecification
+
 import scala.concurrent.duration.FiniteDuration
 
-class NegotiationSpecificationExample extends NegotiationSpecificationDSL{
+class NegotiationSpecificationExample extends NegotiationSpecification{
 
   define variable "v1" `with` domain (1 to 10)
   define variable "v2" `with` domain ( Set('A', 'B', 'C') )
@@ -18,7 +20,7 @@ class NegotiationSpecificationExample extends NegotiationSpecificationDSL{
 
 }
 
-class NegotiationSpecificationExample2 extends NegotiationSpecificationDSL{
+class NegotiationSpecificationExample2 extends NegotiationSpecification{
 
 
   val v1 = variable `with` domain (1 to 10)

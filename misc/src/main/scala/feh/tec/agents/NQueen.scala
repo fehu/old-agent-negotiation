@@ -4,6 +4,7 @@ import akka.actor.{Props, ActorSystem}
 import akka.util.Timeout
 import feh.tec.agents.impl._
 import akka.pattern.ask
+import feh.tec.agents.spec.dsl
 import feh.tec.web.common.WebsocketConf
 import scala.concurrent.duration._
 
@@ -47,16 +48,16 @@ object NQueenApp extends App{
   acSys.actorOf(Props(classOf[NQueenUserAgent], spec), "NQueenUserAgent")
 }
 
-class NQueenUserAgent(spec: impl.NegotiationSpecification) extends UserAgent with WebsocketConf{
+class NQueenUserAgent(nspec: spec.NegotiationSpecification) extends UserAgent with WebsocketConf{
   def name = "user"
 
   implicit def acSys = context.system
   implicit def exContext = context.dispatcher
 
-  println("spec.variables = " + spec.variables)
-  println("spec.negotiations = " + spec.negotiations)
-  println("spec.agents = " + spec.agents)
-  println("spec.config = " + spec.config)
+  println("spec.variables = " + nspec.variables)
+  println("spec.negotiations = " + nspec.negotiations)
+  println("spec.agents = " + nspec.agents)
+  println("spec.config = " + nspec.config)
 
   val builder: ControllerBuilder[_] = new ControllerBuilder[GenericNegotiatingAgent](WebSocketInterface(web.server))
 
@@ -67,7 +68,7 @@ class NQueenUserAgent(spec: impl.NegotiationSpecification) extends UserAgent wit
     wsConf.back.port("n-queen"),
     negotiationId = builder.negotiations.head._2._1
   )
-  val controller = builder(spec)
+  val controller = builder(nspec)
   
   println("builder.vars = " + builder.vars)
   println("builder.negotiations = " + builder.negotiations)

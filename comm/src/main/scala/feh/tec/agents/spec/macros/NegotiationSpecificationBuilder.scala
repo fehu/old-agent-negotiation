@@ -1,21 +1,23 @@
-package feh.tec.agents.macros
+package feh.tec.agents.spec.macros
 
-import feh.tec.agents.impl.NegotiationSpecification.{GenericDomainDef, VarDef}
-import feh.tec.agents.impl.{NegotiationSpecification, NegotiationSpecificationDSL}
+import feh.tec.agents.spec
+
 import scala.reflect.internal.HasFlags
 import scala.reflect.macros.whitebox
+//import scala.language.experimental.macros
 
 object NegotiationSpecificationBuilder{
 
-  def build(c: whitebox.Context)(dsl: c.Expr[NegotiationSpecificationDSL]): c.Expr[NegotiationSpecification] = {
+  def build(c: whitebox.Context)(dsl: c.Expr[spec.dsl.NegotiationSpecification]): c.Expr[spec.NegotiationSpecification] = {
     import c.universe._
 
     val h = new Helper[c.type](c)
     val b = new NegotiationSpecificationBuilder[c.type](c)
 
     def KnownDSLNames = Set(
-      "feh.tec.agents.impl.NegotiationSpecificationDSL",
-      "feh.tec.agents.dsl.package.Negotiation"
+      "feh.tec.agents.spec.dsl.NegotiationSpecification",
+      "feh.tec.agents.spec.dsl.package.Negotiation",
+      "package.Negotiation"
     )
 
     val definitions = b.extractDefinitions(dsl.tree, KnownDSLNames)
@@ -63,9 +65,9 @@ object NegotiationSpecificationBuilder{
       q"""AgentDef(${name.decodedName.toString}, $role, Seq(..$n))"""
     }
 
-    val spec = q"""
-      new feh.tec.agents.impl.NegotiationSpecification {
-        import feh.tec.agents.impl.NegotiationSpecification._
+    val specTree = q"""
+      new feh.tec.agents.spec.NegotiationSpecification {
+        import feh.tec.agents.spec.NegotiationSpecification._
 
         def variables: Seq[VarDef] = Seq(..$vars)
         def negotiations: Seq[NegotiationDef] = Seq(..$negotiations)
@@ -86,9 +88,9 @@ object NegotiationSpecificationBuilder{
 //            "\n\tAGENTS\n"        + (agents mkString "\n")
 
 
-    c.Expr[NegotiationSpecification](
+    c.Expr[spec.NegotiationSpecification](
 //      q"""{ println($s);  $spec }"""
-      spec
+      specTree
     )
 
   }
@@ -109,6 +111,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
     }
     val Some(defBody) = h.extractOne(root, {
       case cd@ClassDef(_, _, _, Template(parents, _, body)) if extends_?(parents) => body
+      case unknown: ClassDef => c.abort(NoPosition, unknown.toString())
     })
 
     defBody.collect{
@@ -127,7 +130,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
 //      Template(
 //        List(
 //          TypeTree(),
-//          TypeTree().setOriginal(Select(Select(Ident(feh.tec.agents.dsl), feh.tec.agents.dsl.package), TypeName("Negotiation")))
+//          TypeTree().setOriginal(Select(Select(Ident(feh.tec.agents.dsl), package), TypeName("Negotiation")))
 //        ),
 //        noSelfType, List(DefDef(Modifiers(), termNames.CONSTRUCTOR, List(), List(List()), TypeTree(), Block(List(Apply(Select(Super(This(TypeName("$anon")), typeNames.EMPTY), termNames.CONSTRUCTOR), List())), Literal(Constant(())))), ValDef(Modifiers(PRIVATE | MUTABLE | LOCAL), TermName("x "), TypeTree(), Apply(TypeApply(Select(Select(This(TypeName("$anon")), TermName("variable")), TermName("with")), List(TypeTree())), List(Apply(Select(This(TypeName("$anon")), TermName("domain")), List(Apply(Select(Apply(Select(Select(This(TypeName("scala")), scala.Predef), TermName("intWrapper")), List(Literal(Constant(1)))), TermName("to")), List(Ident(TermName("boardSize"))))))))), DefDef(Modifiers(PRIVATE | METHOD | ACCESSOR | TRANS_FLAG), TermName("x"), List(), List(), TypeTree(), Select(This(TypeName("$anon")), TermName("x "))), DefDef(Modifiers(PRIVATE | METHOD | ACCESSOR | TRANS_FLAG), TermName("x_$eq"), List(), List(List(ValDef(Modifiers(PARAM | SYNTHETIC), TermName("x$1"), TypeTree(), EmptyTree))), TypeTree(), Assign(Select(This(TypeName("$anon")), TermName("x ")), Ident(TermName("x$1")))), ValDef(Modifiers(PRIVATE | MUTABLE | LOCAL), TermName("y "), TypeTree(), Apply(TypeApply(Select(Select(This(TypeName("$anon")), TermName("variable")), TermName("with")), List(TypeTree())), List(Apply(Select(This(TypeName("$anon")), TermName("domain")), List(Apply(Select(Apply(Select(Select(This(TypeName("scala")), scala.Predef), TermName("intWrapper")), List(Literal(Constant(1)))), TermName("to")), List(Ident(TermName("boardSize"))))))))), DefDef(Modifiers(PRIVATE | METHOD | ACCESSOR | TRANS_FLAG), TermName("y"), List(), List(), TypeTree(), Select(This(TypeName("$anon")), TermName("y "))), DefDef(Modifiers(PRIVATE | METHOD | ACCESSOR | TRANS_FLAG), TermName("y_$eq"), List(), List(List(ValDef(Modifiers(PARAM | SYNTHETIC), TermName("x$1"), TypeTree(), EmptyTree))), TypeTree(), Assign(Select(This(TypeName("$anon")), TermName("y ")), Ident(TermName("x$1")))), DefDef(Modifiers(), TermName("queen$u0027s$u0020position"), List(), List(), TypeTree(), Apply(Select(Select(This(TypeName("$anon")), TermName("negotiation")), TermName("over")), List(Select(This(TypeName("$anon")), TermName("x")), Select(This(TypeName("$anon")), TermName("y"))))), DefDef(Modifiers(), TermName("Queen"), List(), List(), TypeTree(), Apply(Select(Apply(Select(Select(This(TypeName("$anon")), TermName("agent")), TermName("withRole")), List(Literal(Constant("chess queen")))), TermName("that")), List(Apply(Select(Apply(Apply(TypeApply(Select(Apply(Select(Select(This(TypeName("$anon")), TermName("negotiates")), TermName("the")), List(Select(This(TypeName("$anon")), TermName("queen$u0027s$u0020position")))), TermName("with")), List(TypeTree())), List(Select(Select(This(TypeName("$anon")), TermName("the")), TermName("others")))), List(Select(This(TypeName("$anon")), TermName("TheRestOfSelectsInterlocutors")))), TermName("and")), List(Apply(Select(This(TypeName("$anon")), TermName("hasConstraints")), List(Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("VarDefConstraintBuilder")), List(TypeTree())), List(Literal(Constant("direct-line sight")))), TermName("$bar")), List(Apply(Select(Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("proposed")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("x")))), TermName("$bang$eq")), List(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("valueOf")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("x")))))), TermName("$amp$amp")), List(Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("proposed")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("y")))), TermName("$bang$eq")), List(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("valueOf")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("y")))))))))), Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("VarDefConstraintBuilder")), List(TypeTree())), List(Literal(Constant("diagonal-line sight")))), TermName("$bar")), List(Apply(Select(Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("proposed")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("x")))), TermName("$minus")), List(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("valueOf")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("x")))))), TermName("$bang$eq")), List(Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("proposed")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("y")))), TermName("$minus")), List(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("valueOf")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("y"))))))))))))))))), Apply(Select(Select(This(TypeName("$anon")), TermName("spawn")), TermName("agents")), List(Apply(TypeApply(Select(Apply(TypeApply(Select(Select(This(TypeName("scala")), scala.Predef), TermName("ArrowAssoc")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("Queen")))), TermName("$minus$greater")), List(TypeTree())), List(Ident(TermName("boardSize")))))), Apply(Select(This(TypeName("$anon")), TermName("configure")), List(Apply(Select(Select(Select(This(TypeName("$anon")), TermName("timeout")), TermName("creation")), TermName("$less$eq")), List(Select(Apply(Select(Select(Select(Select(Ident(scala), scala.concurrent), scala.concurrent.duration), scala.concurrent.duration.package), TermName("DurationInt")), List(Literal(Constant(100)))), TermName("millis")))), Apply(Select(Select(Select(This(TypeName("$anon")), TermName("timeout")), TermName("resolve$u0020conflict")), TermName("$less$eq")), List(Select(Apply(Select(Select(Select(Select(Ident(scala), scala.concurrent), scala.concurrent.duration), scala.concurrent.duration.package), TermName("DurationInt")), List(Literal(Constant(100)))), TermName("millis")))))))))), Apply(Select(New(Ident(TypeName("$anon"))), termNames.CONSTRUCTOR), List()))
 

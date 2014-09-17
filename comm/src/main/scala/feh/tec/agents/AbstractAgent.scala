@@ -92,7 +92,7 @@ trait SpeakingAgent[Lang <: Language] extends AbstractAgent{
 
   def lifeCycle: PartialFunction[AbstractMessage, Unit] = {
     case sys: SystemMessage => processSys(sys)
-    case msg: Lang#Msg if lang.isMessage(msg) => process(msg)
+    case msg if lang.isMessage(msg) => process(msg.asInstanceOf[Lang#Msg])
   }
 }
 
@@ -107,9 +107,9 @@ trait ProposalBased[Lang <: ProposalLanguage] extends SpeakingAgent[Lang]{
   def onAccepted: PartialFunction[Lang#Accepted, Unit]
 
   def process = {// type test might fail
-    case msg: Lang#Proposal if lang.isProposal(msg)    => onProposal(msg)
-    case msg: Lang#Accepted if lang.isAcceptance(msg)  => onAccepted(msg)
-    case msg: Lang#Rejected if lang.isRejection(msg)   => onRejected(msg)
+    case msg if lang.isProposal(msg)    => onProposal(msg.asInstanceOf[Lang#Proposal])
+    case msg if lang.isAcceptance(msg)  => onAccepted(msg.asInstanceOf[Lang#Accepted])
+    case msg if lang.isRejection(msg)   => onRejected(msg.asInstanceOf[Lang#Rejected])
   }
 }
 

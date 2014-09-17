@@ -1,8 +1,8 @@
-package feh.tec.agents.impl
+package feh.tec.agents.impl.agent
 
 import java.util.UUID
 
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{ActorSystem, Props}
 import akka.util.Timeout
 import feh.tec.agents
 import feh.tec.agents.ConstraintsView.Constraint
@@ -10,19 +10,18 @@ import feh.tec.agents.NegotiationController.ScopesInitialization
 import feh.tec.agents._
 import feh.tec.agents.impl.Agent.{AgentReporting, Id}
 import feh.tec.agents.impl.NegotiationController.GenericStaticAgentsInit.Timings
-import feh.tec.agents.impl.NegotiationController.{Timeouts, GenericStaticInitArgs, GenericStaticAgentsInit, Counter}
-import feh.tec.agents.impl.NegotiationSpecification._
-import feh.tec.agents.impl.agent.AgentBuilder
+import feh.tec.agents.impl.NegotiationController.{Counter, GenericStaticAgentsInit, GenericStaticInitArgs, Timeouts}
 import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
-import scala.concurrent.duration._
+import feh.tec.agents.impl.{ProposalEngine, NegotiationController, ReportArchiveImpl, System}
+import feh.tec.agents.spec.NegotiationSpecification._
 import feh.util._
 
+import scala.concurrent.duration._
 import scala.reflect.ClassTag
 
 trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesInitialization]
-  extends agents.NegotiationControllerBuilder[impl.NegotiationSpecification, Control]
+  extends agents.NegotiationControllerBuilder[spec.NegotiationSpecification, Control]
 {
-  import NegotiationSpecification._
 
   type BuildAgentArgs <: Product{
     def priorityByNeg: NegotiationId => Int
@@ -185,7 +184,7 @@ object NegotiationControllerBuilder{
       case (acc, ("retry startup", time)) => acc.copy(retryToStartAgent = time)
     }
 
-    def apply(v1: impl.NegotiationSpecification) = {
+    def apply(v1: spec.NegotiationSpecification) = {
       vars = buildVars(v1.variables.map{ case vd: VarDef[_] => vd })
       negotiations = buildNegotiations(v1.negotiations)
       agents = buildAgents(v1.agents)
@@ -210,7 +209,7 @@ object NegotiationControllerBuilder{
 }
 
 abstract class GenericIteratingAgentCreation[Lang <: ProposalLanguage](args: GenericIteratingAgentCreation.Args)
-  extends agent.PriorityBasedCreation[Lang](args.uuid, args.negotiationInit, args.conflictResolver, args.conflictResolveTimeout)
+  extends PriorityBasedCreation[Lang](args.uuid, args.negotiationInit, args.conflictResolver, args.conflictResolveTimeout)
   with AgentReporting[Lang]
 {
   self: ProposalEngine.Iterating[Lang] =>

@@ -1,4 +1,4 @@
-package feh.tec.agents.macros
+package feh.tec.agents.spec.macros
 
 import scala.reflect.macros.whitebox
 
@@ -42,6 +42,8 @@ class Helper[C <: whitebox.Context](val c: C){
   def selects(in: c.Tree, what: String): Boolean = {
 
     val w = what.split('.').reverse.toList
+
+//    c.info(NoPosition, showRaw(in), true)
 
     def rec(t: c.Tree): Boolean = {
       PartialFunction.cond(t) {

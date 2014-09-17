@@ -1,10 +1,7 @@
-package feh.tec.agents.impl
+package feh.tec.agents.spec.dsl
 
-import scala.concurrent.duration.FiniteDuration
-import scala.language.experimental.macros
-
-trait NegotiationSpecificationDSL extends ConstraintsSpecificationDSL with CreationSpecificationDSL{
-  import NegotiationSpecification._
+trait NegotiationSpecification extends ConstraintsSpecification with CreationSpecification{
+  import feh.tec.agents.spec.NegotiationSpecification._
 
   type ChooseVarDomain = {
     def `with`[T](domain: DomainDef[T]): AbstractVarDef[T]
@@ -50,7 +47,7 @@ trait NegotiationSpecificationDSL extends ConstraintsSpecificationDSL with Creat
 
   case object neighbours
   protected case object TheOthers
-  def the: { 
+  def the: {
     def others: TheOthers.type
   } = stub
 
@@ -62,51 +59,4 @@ trait NegotiationSpecificationDSL extends ConstraintsSpecificationDSL with Creat
 
 
   protected def stub = sys.error("this method should never be called")
-}
-
-trait CreationSpecificationDSL{
-  self: NegotiationSpecificationDSL =>
-
-  import NegotiationSpecification._
-
-  protected type TimeoutIdent = {
-    def <= (t: FiniteDuration): TimeoutDef
-  }
-
-  protected trait ConfDef
-  protected trait TimeoutDef extends ConfDef
-
-  type ChooseTimeout = {
-    def creation: TimeoutIdent
-    def startup: TimeoutIdent
-    def `resolve conflict`: TimeoutIdent
-  }
-  
-  def spawn:{
-    def agents(count: (AgentDef, Int))
-    def agents(count: (String, Int))
-    def agent(ag: AgentDef)
-  } = stub
-  
-  def configure(c: ConfDef*) = stub
-  def timeout: ChooseTimeout = stub
-
-  implicit class TimingDefWrapper(f: ChooseTimeout => TimeoutIdent){
-    def >>(time: FiniteDuration): TimeoutDef = stub
-  }
-}
-
-trait ConstraintsSpecificationDSL{
-  self:  NegotiationSpecificationDSL =>
-
-  import NegotiationSpecification._
-
-  def proposed[T] (vr: AbstractVarDef[T]): T = stub
-  def valueOf[T]  (vr: AbstractVarDef[T]): T = stub
-
-
-  implicit class VarDefConstraintBuilder[T](name: String){
-    def |(withWrapper: Boolean): AgentConstraint = stub
-  }
-
 }

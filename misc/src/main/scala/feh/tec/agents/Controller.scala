@@ -4,7 +4,8 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import feh.tec.agents.impl.Agent.Id
 import feh.tec.agents.impl.AgentReports.StateReportEntry
 import feh.tec.agents.impl.NegotiationController.GenericStaticInitArgs
-import feh.tec.agents.impl.NegotiationControllerBuilder.DefaultBuildAgentArgs
+import feh.tec.agents.impl.agent.{GenericIteratingAgentCreation, NegotiationControllerBuilder}
+import NegotiationControllerBuilder.DefaultBuildAgentArgs
 import feh.tec.agents.impl._
 import feh.tec.web.WebSocketPushServer.Push
 import feh.tec.web.common.{NQueenMessages, WebSocketMessages}

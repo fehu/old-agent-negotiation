@@ -1,0 +1,35 @@
+package feh.tec.agents.spec.dsl
+
+import scala.concurrent.duration.FiniteDuration
+
+trait CreationSpecification{
+  self: NegotiationSpecification =>
+
+  import feh.tec.agents.spec.NegotiationSpecification._
+
+  protected type TimeoutIdent = {
+    def <= (t: FiniteDuration): TimeoutDef
+  }
+
+  protected trait ConfDef
+  protected trait TimeoutDef extends ConfDef
+
+  type ChooseTimeout = {
+    def creation: TimeoutIdent
+    def startup: TimeoutIdent
+    def `resolve conflict`: TimeoutIdent
+  }
+
+  def spawn:{
+    def agents(count: (AgentDef, Int))
+    def agents(count: (String, Int))
+    def agent(ag: AgentDef)
+  } = stub
+
+  def configure(c: ConfDef*) = stub
+  def timeout: ChooseTimeout = stub
+
+  implicit class TimingDefWrapper(f: ChooseTimeout => TimeoutIdent){
+    def >>(time: FiniteDuration): TimeoutDef = stub
+  }
+}

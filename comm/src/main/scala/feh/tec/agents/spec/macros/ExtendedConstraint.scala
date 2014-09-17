@@ -1,8 +1,6 @@
-package feh.tec.agents.macros
+package feh.tec.agents.spec.macros
 
 import scala.reflect.macros.whitebox
-import scala.language.experimental.macros
-
 
 class ExtendedConstraint[C <: whitebox.Context](val c: C) {
 

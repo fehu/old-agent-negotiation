@@ -8,6 +8,6 @@
 - [ ] timings from NegotiationControllerBuilder.buildAgents should be configurable
 - [x] whole negotiation definition should be using macros
 - [ ] macro should build NegotiationController for NegotiationControllerBuilder
-- [ ] merge negotiation-dsl into comm
+- [x] merge negotiation-dsl into comm
 - [ ] spawn, timings and timeouts config
-- [ ] guard timestamp on report creation - the difference between negotiation start and the current moment
+- [x] guard timestamp on report creation - the difference between negotiation start and the current moment

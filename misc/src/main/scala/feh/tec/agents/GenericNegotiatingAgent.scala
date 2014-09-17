@@ -3,10 +3,11 @@ package feh.tec.agents
 import akka.actor.ActorLogging
 import feh.tec.agents.impl.Agent.AgentReportingMessagesAndState
 import feh.tec.agents.impl._
+import feh.tec.agents.impl.agent.GenericIteratingAgentCreation
 import feh.util.InUnitInterval
 
 class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
-  extends impl.GenericIteratingAgentCreation[DefaultNegotiatingLanguage](arg)
+  extends GenericIteratingAgentCreation[DefaultNegotiatingLanguage](arg)
   with DefaultNegotiatingLanguage.Builder
   with NegotiationSupport.Default
   with ProposalEngine.IteratingAllDomains[DefaultNegotiatingLanguage]

@@ -124,21 +124,13 @@ object  Build extends sbt.Build {
       }
     )
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(comm, oldcomm, coloring, misc, webFrontend, webBackend, negDSL)
+   .aggregate(comm, oldcomm, coloring, misc, webFrontend, webBackend)
 
   lazy val comm = Project(
     id = "comm",
     base = file("comm"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(akka, feh.util, scala.reflectApi)
-    )
-  ) dependsOn negDSL
-
-  lazy val negDSL: Project = Project(
-    "negotiation-dsl",
-    file("negotiation-dsl"),
-    settings = buildSettings ++ testSettings ++ Seq(
-      libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-reflect" % _)
     )
   )
 

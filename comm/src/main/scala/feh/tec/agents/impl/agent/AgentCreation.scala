@@ -7,7 +7,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import feh.tec.agents.SystemMessage.RefDemand
 import feh.tec.agents._
-import feh.tec.agents.impl.{Agent, GenericIteratingAgentCreation}
+import feh.tec.agents.impl.Agent
 import feh.util._
 
 import scala.concurrent.Await

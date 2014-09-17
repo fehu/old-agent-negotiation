@@ -1,9 +1,7 @@
-package feh.tec.agents.impl
+package feh.tec.agents.spec
 
-import scala.concurrent.duration.FiniteDuration
-import feh.tec.agents.{NegotiationSpecification => ANegotiationSpecification}
 import feh.tec.agents
-import scala.language.experimental.macros
+import scala.concurrent.duration.FiniteDuration
 
 object NegotiationSpecification{
   sealed trait AbstractVarDef[T]
@@ -21,7 +19,7 @@ object NegotiationSpecification{
 
   sealed trait Interlocutors
   case class InterlocutorsByRoles(roles: Set[String]) extends Interlocutors
-  
+
   case class AgentNegDef(negotiation: String,
                          interlocutors: Interlocutors,
                          extra: Seq[AgentNegPartialDef])
@@ -60,10 +58,12 @@ object NegotiationSpecification{
     }
   }
 
-  def build(dsl: NegotiationSpecificationDSL): NegotiationSpecification = macro agents.macros.NegotiationSpecificationBuilder.build
+  import scala.language.experimental.macros
+
+  def build(dsl: agents.spec.dsl.NegotiationSpecification): NegotiationSpecification = macro agents.spec.macros.NegotiationSpecificationBuilder.build
 }
 
-trait NegotiationSpecification extends ANegotiationSpecification{
+trait NegotiationSpecification extends agents.NegotiationSpecification{
   type VarDef = NegotiationSpecification.AbstractVarDef[_]
   type NegotiationDef = NegotiationSpecification.NegotiationDef
   type AgentDef = NegotiationSpecification.AgentDef

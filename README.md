@@ -100,6 +100,16 @@ To do the last one, execute `gen-nginx-ws` in `project web-backend`, it will cre
 
 In the **frontend**, the web-socket configuration file is used on template generation (the url is embedded in html and read by the script on startup).
 
+For local development set 
+```
+  front{
+    host:   localhost
+    port:   8081                // as in `back`
+    path:   /                   // no path
+  }
+```
+This way the frontend web-socket will connect directly to the project's [spray-can](https://github.com/spray/spray-can) server, with no need for *nginx* setup. 
+
 #### Frontend Generation
 
 The front-end consists of
