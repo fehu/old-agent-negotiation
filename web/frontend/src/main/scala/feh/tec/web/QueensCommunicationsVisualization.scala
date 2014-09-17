@@ -159,7 +159,7 @@ class QueensCommunications(archive: ReportArchive){
     updateMessage.get(msgs.groupBy(_.by.n))
   }
 
-  protected def clearOnNewMessage() = updateMessage foreach archive.rmOnNewMessagesCallbackosdo
+  protected def clearOnNewMessage() = updateMessage foreach archive.rmOnNewMessagesCallback
   protected var updateMessage: Option[js.Function1[Map[Int, List[MessageReport]], Any]] = None
 }
 

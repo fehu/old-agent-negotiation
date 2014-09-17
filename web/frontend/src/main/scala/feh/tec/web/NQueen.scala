@@ -130,23 +130,24 @@ class ReportArchive(queens: Set[Int]){
     val grouped_m =
       msg.messages.toList.withFilter(_.isInstanceOf[MessageReport]).map(_.asInstanceOf[MessageReport]).groupBy(_.by.n)
 
-    grouped_s foreach{ case (i, rep) => _states(i) ++= rep }
-    grouped_m foreach{ case (i, rep) => _messages(i) ++= rep }
+
+    grouped_s foreach{ case (i, reps) => _states(i)   ++= grouped_s(i).map( rep => rep.id -> rep ).toMap  }
+    grouped_m foreach{ case (i, reps) => _messages(i) ++= grouped_m(i).map( rep => rep.id -> rep ).toMap }
 
     _onNewMessages foreach (_(grouped_m))
     _onNewStates foreach (_(grouped_s))
   }
 
-  def states(i: Int)                              = _states(i).toList
-  def messages(i: Int): List[MessageReport]       = _messages(i).toList
-  def messages(i: Set[Int]): List[MessageReport]  = _messages.filterKeys(i.contains).values.flatten.toList
+  def states(i: Int)                              = _states(i).values.toList
+  def messages(i: Int): List[MessageReport]       = _messages(i).values.toList
+  def messages(i: Set[Int]): List[MessageReport]  = _messages.filterKeys(i.contains).values.flatMap(_.values).toList
 
   def onNewStates(byQueen: js.Function1[Map[Int, List[StateReport]], Any]): Unit     = { _onNewStates += byQueen }
   def onNewMessages(byQueen: js.Function1[Map[Int, List[MessageReport]], Any]): Unit = { _onNewMessages += byQueen }
   def rmOnNewMessagesCallback(func: js.Function1[Map[Int, List[MessageReport]], Any]): Unit = { _onNewMessages -= func }
 
-  protected val _states   = queens.map{ q => q -> mutable.Buffer.empty[StateReport]   }.toMap
-  protected val _messages = queens.map{ q => q -> mutable.Buffer.empty[MessageReport] }.toMap
+  protected val _states   = queens.map{ q => q -> mutable.Map.empty[(Int, Queen), StateReport]   }.toMap
+  protected val _messages = queens.map{ q => q -> mutable.Map.empty[String, MessageReport] }.toMap
 
   protected val _onNewStates   = mutable.Buffer.empty[js.Function1[Map[Int, List[StateReport]], Any]]
   protected val _onNewMessages = mutable.Buffer.empty[js.Function1[Map[Int, List[MessageReport]], Any]]

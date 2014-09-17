@@ -1,9 +1,7 @@
-- [ ] ? do not guard equal reports/messages (multiple timestamps)
-- [ ] ? clear messages with passage of time
 - [x] use timestamps guarded on report creation, instead of the own
 - [x] use ScalaTags
 - [x] the reports must be sent in bulk in a fixed interval
-- [ ] the reports should be stored on server-side as dictionaries { rep.id:  rep }
+- [x] the reports should be stored on server-side as dictionaries { rep.id:  rep }
 - [x] responses should be grouped by proposals
 - [ ] cache constructed rows
 - [ ] responses that are processed before the corresponding proposal should not be discarded
