@@ -82,6 +82,8 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
           neg.state.lastWeightedProposal = Some(weighted)
 
 //          log.info("weighted = " + weighted)
+//          log.info("currentProposalDate = " + neg.state.currentProposalDate.map(_.getTime))
+//          log.info("weighted = " + weighted)
 //          log.info("viewsByMsgId = " + viewsByMsgId)
 
           if(weighted.isEmpty || weighted.map(_._2).sum.d == 0) {

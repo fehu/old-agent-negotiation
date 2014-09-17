@@ -20,7 +20,7 @@ trait ViewUtils {
   def weight[I <: Iterable[T], T, K](what: I, select: PartialFunction[T, K]): Map[K, InUnitInterval] = {
     val size = what.size
     val grouped = what.groupBy(select.orElse{ case _ => null.asInstanceOf[K] }) - null.asInstanceOf[K]
-    grouped.mapValues(it => InUnitInterval(it.size / size))
+    grouped.mapValues(it => InUnitInterval(it.size.toDouble / size))
   }
 
   implicit class ExternalDataMapWrapper[V](map: Map[AgentRef, V]){

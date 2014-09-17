@@ -3,13 +3,67 @@ package feh.tec.web
 import Utils._
 import NQueenTemplates._
 import feh.tec.web.common.NQueenMessages._
+import org.scalajs.dom.Element
 import org.scalajs.jquery._
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSExport
 import scalatags.Text.all._
 
 class QueensCommunications(archive: ReportArchive){
+
+  def create =
+  div(`class` := "queen-comm",
+    table( `class` := "messages tablesorter",
+      thead(
+        tr(
+          th(`class` := "l            filter-false group-false"),
+          th(`class` := "proposal     filter-false group-word ",                                        "Proposal"),
+          th(`class` := "time                      group-false",                                        "Time"    ),
+          th(`class` := "priority                  group-false",                                        "Priority"),
+          th(`class` := "position                  group-false",                                        "Position"),
+          th(`class` := "type                      group-false", "data-placeholder".attr := "Select",   "Type"    ),
+          th(`class` := "weighted                  group-false", "data-placeholder".attr := "Select",   "Weighted"),
+          th(`class` := "r            filter-false group-false")
+        )
+      ),
+      tbody(),
+      bottomFooter
+    )
+
+  ).toString()
+
+  protected def bottomFooter =
+    tfoot(
+      tr(
+        th(`class` := "l"),
+        th("colspan".attr := 6, `class` := "ts-pager form-horizontal",
+          button(`class` := "btn first", `type` := "button",
+            i(`class` := "icon-step-backward glyphicon glyphicon-step-backward")),
+
+          button(`class` := "btn prev", `type` := "button",
+            i(`class` := "icon-arrow-left glyphicon glyphicon-backward")),
+
+          span(`class` := "pagedisplay"),
+
+          button(`class` := "btn next", `type` := "button",
+            i(`class` := "icon-arrow-right glyphicon glyphicon-forward")),
+
+          button(`class` := "btn last", `type` := "button",
+            i(`class` := "icon-step-forward glyphicon glyphicon-step-forward")),
+
+          select(`class` := "pagesize input-mini", title := "Select page size",
+            option("selected".attr := "selected", value := 10, 10),
+            option(value := 20, 20),
+            option(value := 30, 30),
+            option(value := 50, 50)
+          ),
+          select(`class` := "pagenum input-mini", title := "Select page number")
+        ),
+        th(`class` := "r")
+      )
+    )
 
   def update(left: (Queen, String), right: (Queen, String)) = {
     //    println("upd!!!")
@@ -29,30 +83,37 @@ class QueensCommunications(archive: ReportArchive){
 
   protected def createMessageRow(report: MessageReport, dir: String) = report match {
     case MessageReport(_, _, Message(id, priority, content), time, extra) =>
-      s"""<tr class="message" to="$dir">
-         |  <td class="l">${ if(dir == "left") genArrow(dir) else "" }</td>
-         |  <td class="time">$time</td>
-         |  <td class="priority">$priority</td>
-         |  <td class="position">todo</td>
-         |  <td class="type">todo</td>
-         |  <td class="weighted">${extractExtraWeighted(extra)}</td>
-         |  <td class="r">${ if(dir == "right") genArrow(dir) else "" }</td>
-         |</tr>
-       """.stripMargin
+      val (proposal, pos, tpe, clazz, isProp) = content match {
+        case Proposal(pos) => (id, pos, "Proposal", " proposal-msg", true)
+        case Response(prop, tpe) => (prop, "", tpe.toString, " tablesorter-childRow", false)
+      }
+      val row = tr(
+            `class` := "message" + clazz, "to".attr := dir,
+        td( `class` := "l",           raw(if(dir == "left") genArrow(dir) else "")),
+        td( `class` := "proposal",    proposal),
+        td( `class` := "time",        time),
+        td( `class` := "priority",    priority),
+        td( `class` := "position",    pos.toString),
+        td( `class` := "type",        tpe),
+        td( `class` := "weighted",    extractExtraWeighted(extra)),
+        td( `class` := "r",           raw(if(dir == "right") genArrow(dir) else ""))
+      )
+      (row.toString(), proposal, isProp)
   }
 
   protected def extractExtraWeighted(extra: Option[MessageExtraReport]) = extra.collectFirst{
     case ReportWeight(weight) if weight.size == 1 =>
-      weight.head._2*100 + "% " + { if(weight.head._1.get) "acceptance" else "rejection" }
+      span(weight.head._2*100 + "% " + { if(weight.head._1.get) "acceptance" else "rejection" }) :: Nil
     case ReportWeight(weight) if weight.size == 2 && weight.forall(_._2 == 0) =>
-      unknownSpan
+      unknownSpan :: Nil
     case ReportWeight(weight) =>
       val wm = weight.toMap
-      span(`class` := "acceptance", s"acceptance: ${wm(Some(true))  *100}%").toString() +
-      span(`class` := "rejection",  s"rejection:  ${wm(Some(false)) *100}%").toString()
-  }.getOrElse(unknownSpan)
+      wm.get(Some(true)).map { w => span(`class` := "acceptance", s"acceptance: ${w*100}%") }.getOrElse(raw("")) ::
+      wm.get(Some(false)).map{ w => span(`class` := "rejection",  s"rejection:  ${w*100}%") }.getOrElse(raw("")) ::
+      wm.get(None).map       { w => span(`class` := "rejection",  s"unknown:    ${w*100}%") }.getOrElse(raw("")) :: Nil
+  }.getOrElse(unknownSpan :: Nil)
 
-  private def unknownSpan = span(`class` := "unknown", "unknown").toString()
+  private def unknownSpan = span(`class` := "unknown", "unknown")
 
   protected def genArrow(dir: String) = {
     s"""<svg width="75px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -68,12 +129,23 @@ class QueensCommunications(archive: ReportArchive){
   protected def appendMessages(reports: Map[Int, List[MessageReport]], left: Queen, right: Queen): Any =
     reports.flatMap(_._2) map{
       report =>
-        val dir = PartialFunction.condOpt(report.by -> report.to){
+        val dirOpt = PartialFunction.condOpt(report.by -> report.to){
           case (`left`, `right`)  => "right"
           case (`right`, `left`)  => "left"
         }
-        dir map {
-          sel.communications children ".messages" children "tbody" append createMessageRow(report, _)
+
+        dirOpt map {
+          dir =>
+            val (row, prop, isProp) = createMessageRow(report, dir)
+
+            if (isProp) jQuery(".queen-comm .messages tbody") append row
+            else {
+              val target = jQuery(".queen-comm .messages tr.proposal-msg").has(s"""td.proposal:contains("$prop")""")
+              jQuery(row).insertAfter(target).children("td").hide()
+
+//              Dynamic.global.console.log(qres)
+//              qres.hide()
+            }
         }
     }
 
@@ -87,54 +159,8 @@ class QueensCommunications(archive: ReportArchive){
     updateMessage.get(msgs.groupBy(_.by.n))
   }
 
-  protected def clearOnNewMessage() = updateMessage foreach archive.rmOnNewMessagesCallback
+  protected def clearOnNewMessage() = updateMessage foreach archive.rmOnNewMessagesCallbackosdo
   protected var updateMessage: Option[js.Function1[Map[Int, List[MessageReport]], Any]] = None
-
-  def create =
-    s"""<div class="queen-comm">
-       |  <table class="messages tablesorter">
-       |    <thead>
-       |      <tr>
-       |        <th class="l filter-false"/>
-       |        <th class="time">millis of neg.</th>
-       |        <th class="priority">priority</th>
-       |        <th class="position">position</th>
-       |        <th class="type" data-placeholder="Select">type</th>
-       |        <th class="weighted" data-placeholder="Select">weighted</th>
-       |        <th class="r filter-false"/>
-       |      </tr>
-       |    </thead>
-       |    <tbody/>
-       |    $bottomFooter
-       |  </table>
-       |</div>
-     """.stripMargin
-
-  protected def bottomFooter =
-    tfoot(
-      tr(
-        th(`class` := "l"),
-        th("colspan".attr := 5, `class` := "ts-pager form-horizontal",
-          button(`class` := "btn first", `type` := "button",
-            i(`class` := "icon-step-backward glyphicon glyphicon-step-backward")),
-          button(`class` := "btn prev", `type` := "button",
-            i(`class` := "icon-arrow-left glyphicon glyphicon-backward")),
-          span(`class` := "pagedisplay"),
-          button(`class` := "btn next", `type` := "button",
-            i(`class` := "icon-arrow-right glyphicon glyphicon-forward")),
-          button(`class` := "btn last", `type` := "button",
-            i(`class` := "icon-step-forward glyphicon glyphicon-step-forward")),
-          select(`class` := "pagesize input-mini", title := "Select page size",
-            option("selected".attr := "selected", value := 10, 10),
-            option(value := 20, 20),
-            option(value := 30, 30),
-            option(value := 50, 50)
-          ),
-          select(`class` := "pagenum input-mini", title := "Select page number")
-        ),
-        th(`class` := "r")
-      )
-    )
 }
 
 class QueensCommunicationsTableSorter(archive: ReportArchive) extends QueensCommunications(archive){
@@ -160,31 +186,55 @@ object QueensCommunicationsTableSorter{
     jQuery("table.messages").asInstanceOf[js.Dynamic]
       .tablesorter{js.Dictionary(
         "theme" -> "jui",
+        "sortList" -> js.Array(js.Array(2, 0)),
         "headers" -> js.Dictionary(
-          "5" -> js.Dictionary(
+          "6" -> js.Dictionary(
             "sorter" -> false,
             "filter" -> true
           )
         ),
         "widthFixed" -> true,
-        "widgets" -> js.Array("filter", "zebra"),
-        "sortList" -> js.Array(js.Array(1, 0)),
-        "widgetOptions" -> js.Dictionary(
-          "uitheme" -> "jui",
-          "filter_functions" -> filterFunctions
-        )
+        "widgets" -> js.Array("filter", "zebra", "group"),
+        "widgetOptions" -> ((filterWidgetOptions ++ groupWidgetOptions).toJSDictionary)
       )}
       .tablesorterPager(js.Dictionary(
         "container" ->  jQuery(".ts-pager"),
         "cssGoto" -> ".pagenum",
         "output" -> "{startRow} - {endRow} / {filteredRows} ({totalRows})"
       ))
+
+    js.eval(
+      """  $('.tablesorter').delegate('.message .proposal', 'click' ,function(){
+        |    $(this).closest('tr').nextUntil('tr:not(.tablesorter-childRow)').find('td').toggle();
+        |    return false;
+        |  });
+      """.stripMargin)
   }
+
+  def filterWidgetOptions = js.Dictionary(
+    "uitheme" -> "jui",
+    "filter_functions" -> filterFunctions
+  )
+  def groupWidgetOptions = js.Dictionary(
+    "group_collapsible" -> true,
+    "group_collapsed"   -> false,
+    "group_count"       -> false,
+    "filter_childRows"  -> true
+//    "textSorter"        -> sorterFunctions
+//    "group_saveGroups"  -> true,
+//    "filter_childRows"  -> true
+  )
+
+  def sorterFunctions = js.Dictionary(
+    "3" -> { (a: js.Number, b: js.Number, direction: js.Boolean, column: js.Number, table: Element) =>
+
+    }
+  )
 
   def filterFunctions =
     js.Dictionary(
-      "4" -> true,
-      "5" -> js.Dictionary(
+      "5" -> true,
+      "6" -> js.Dictionary(
         "acceptance"  -> (((e: js.String, n: js.Any, f: js.String, i: js.Number) => e contains "acceptance" ): js.Function),
         "rejection"   -> (((e: js.String, n: js.Any, f: js.String, i: js.Number) => e contains "rejection" ): js.Function),
         "unknown"     -> (((e: js.String, n: js.Any, f: js.String, i: js.Number) => e contains "unknown" ): js.Function)

@@ -16,5 +16,6 @@ jsDependencies ++= Seq(
   js.bootstrap   / "bootstrap.js",
   ProvidedJS / "jquery.tablesorter.js"            dependsOn "jquery.js",
   ProvidedJS / "jquery.tablesorter.widgets.js"    dependsOn "jquery.tablesorter.js",
-  ProvidedJS / "jquery.tablesorter.pager.js"      dependsOn "jquery.tablesorter.widgets.js"
+  ProvidedJS / "jquery.tablesorter.pager.js"      dependsOn "jquery.tablesorter.widgets.js",
+  ProvidedJS / "widget-grouping.js"               dependsOn "jquery.tablesorter.widgets.js"
 )
