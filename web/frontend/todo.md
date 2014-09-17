@@ -5,3 +5,4 @@
 - [x] the reports must be sent in bulk in a fixed interval
 - [ ] the reports should be stored on server-side as dictionaries { rep.id:  rep }
 - [ ] responses should be grouped by proposals
+- [ ] cache constructed rows

@@ -49,8 +49,6 @@ class Controller(arg: GenericStaticInitArgs[DefaultBuildAgentArgs], web: WebSock
 }
 
 class NQueenWebSocketPushServer(neg: NegotiationId, 
-                                rescheduleUnfoundMsg: FiniteDuration, 
-                                unfoundMsgRetries: Int,
                                 flushFrequency: FiniteDuration)
   extends WebSocketPushServer
 {
@@ -69,42 +67,29 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
   def push[Msg <: NQueenMessages.Msg : JsonFormat](msg: Msg) =
     Push(msg, implicitly[JsonFormat[Msg]].asInstanceOf[JsonFormat[WebSocketMessages#Msg]])
 
-  protected val proposalsMap = mutable.HashMap.empty[Message.Id, (Int, Int)]
-  protected val rescheduelCount = mutable.HashMap.empty[Message.Id, Int]
-
   protected def reportToBulkable(report: AgentReport): Option[NQueenMessages.CanBulk] = {
 
     def getPos(vals: Map[Var, Any], nme: String) = vals.find(_._1.name == nme).get._2.asInstanceOf[Int]
+    def getPosXY(vals: Map[Var, Any]) = getPos(vals, "x") -> getPos(vals, "y")
 
     report match {
       case AgentReports.StateReport(ref, entries, time, _) =>
         val q = indexMap.getOrElse(ref, addNewIndex(ref))
         val StateReportEntry(priority, vals, scope, extra) = entries(neg)
-        val position = getPos(vals, "x") -> getPos(vals, "y")
-        Some(NQueenMessages.StateReport(q, position, priority.get, Nil, time.diff))
+        Some(NQueenMessages.StateReport(q, getPosXY(vals), priority.get, Nil, time.diff))
       case rep@AgentReports.MessageReport(_to, msg, at, extra) =>
         val by = indexMap.getOrElse(rep.msg.sender, addNewIndex(rep.msg.sender))
         val to = indexMap.getOrElse(_to, addNewIndex(_to))
+        def buildMessage(content: NQueenMessages.type => NQueenMessages.MessageContent) =
+          NQueenMessages.Message(msg.id.toString, msg.priority, content(NQueenMessages))
+
         val message = msg match{
           case prop@Message.Proposal(_, vals) =>
-            val position = getPos(vals, "x") -> getPos(vals, "y")
-//            log.info(s"Proposal ${prop.id}")
-            proposalsMap += prop.id -> position
-            Some(NQueenMessages.Message(prop.priority.get, position, NQueenMessages.Proposal))
-          case acc@Message.Accepted(_, offer) if proposalsMap contains offer =>
-            Some(NQueenMessages.Message(acc.priority.get, proposalsMap(offer), NQueenMessages.Acceptance))
-          case rej@Message.Rejected(_, offer) if proposalsMap contains offer =>
-            Some(NQueenMessages.Message(rej.priority.get, proposalsMap(offer), NQueenMessages.Rejection))
+            Some(buildMessage(_.Proposal(getPosXY(vals))))
           case acc@Message.Accepted(_, offer) =>
-            if(rescheduelCount.get(offer).exists(_ >= unfoundMsgRetries)) sys.error(s"no offer $offer found for $acc")
-            rescheduelCount(offer) = rescheduelCount.getOrElse(offer, 0) + 1
-            context.system.scheduler.scheduleOnce(rescheduleUnfoundMsg, self, acc)(context.dispatcher)
-            None
-          case rej@Message.Rejected(_, offer) =>
-            if(rescheduelCount.get(offer).exists(_ >= unfoundMsgRetries)) sys.error(s"no offer $offer found for $rej")
-            rescheduelCount(offer) = rescheduelCount.getOrElse(offer, 0) + 1
-            context.system.scheduler.scheduleOnce(rescheduleUnfoundMsg, self, rej)(context.dispatcher)
-            None
+            Some(buildMessage(_.Response(offer, _.Acceptance)))
+          case rej@Message.Rejected(_, offer)  =>
+            Some(buildMessage(_.Response(offer, _.Rejection)))
         }
         val newExtra = extra collectFirst {
           case AgentReports.WeightReport(weighted) =>
@@ -144,5 +129,5 @@ class NQueenWebSocketPushServerBuilder(host: String, port: Int, negotiationId: N
                                       (implicit asys: ActorSystem)
   extends WebSocketPushServerInitialization(host, port)
 {
-  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, 5 millis, 5, 500 millis)) // todo: should be configurable
+  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, 500 millis)) // todo: should be configurable
 }

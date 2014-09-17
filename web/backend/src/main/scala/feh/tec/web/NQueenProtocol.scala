@@ -31,7 +31,6 @@ object NQueenProtocol extends DefaultJsonProtocol{
 
   implicit object MessageTypeFormat extends RootJsonFormat[MessageType]{
     def write(obj: MessageType): JsValue = obj match {
-      case Proposal   => JsString("Proposal")
       case Acceptance => JsString("Acceptance")
       case Rejection  => JsString("Rejection")
     }
@@ -39,8 +38,21 @@ object NQueenProtocol extends DefaultJsonProtocol{
   }
 
   implicit object MessageExtraReportFormat extends RootJsonFormat[MessageExtraReport]{
+    lazy val ReportWeightFormat = new NamedFormat[ReportWeight](jsonFormat1(ReportWeight)) {}
+
     def write(obj: MessageExtraReport) = obj match{
-      case rep@ReportWeight(weight) => jsonFormat1(ReportWeight).write(rep)
+      case rep@ReportWeight(weight) => ReportWeightFormat.write(rep)
+    }
+    def read(json: JsValue) = ???
+  }
+
+  implicit object MessageContent extends RootJsonFormat[MessageContent]{
+    lazy val ProposalFormat = new NamedFormat[Proposal](jsonFormat1(Proposal)) {}
+    lazy val ResponseFormat = new NamedFormat[Response](jsonFormat2(Response(_: String, _: MessageType))) {}
+
+    def write(obj: MessageContent) = obj match {
+      case prop: Proposal => ProposalFormat.write(prop)
+      case resp: Response => ResponseFormat.write(resp)
     }
     def read(json: JsValue) = ???
   }

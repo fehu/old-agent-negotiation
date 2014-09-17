@@ -93,19 +93,26 @@ trait NQueenSocketListener extends SocketConnections{
       MessageReport(
         by = Queen(json.by.n.asInstanceOf[Int]),
         to = Queen(json.to.n.asInstanceOf[Int]),
-        msg = Message(json.msg.priority.asInstanceOf[Int], getPosition(json.msg), json.msg.tpe.asInstanceOf[String] match {
-          case "Proposal"   => Proposal
-          case "Acceptance" => Acceptance
-          case "Rejection"  => Rejection
-        }),
+        msg = Message(
+          id = json.msg.id.asInstanceOf[String],
+          priority = json.msg.priority.asInstanceOf[Int],
+          content = json.msg.content.$t.asInstanceOf[String] match{
+            case "Proposal" => Proposal(getPosition(json.msg.content))
+            case "Response" => Response(json.msg.content.proposal.asInstanceOf[String],
+                                        json.msg.content.tpe.asInstanceOf[String] match{
+                                            case "Acceptance" => Acceptance
+                                            case "Rejection"  => Rejection
+                                        })
+          }
+        ),
         at = json.at.asInstanceOf[Int],
         extra = getMessageReportExtra(json.extra)
       )
   }
 
   protected def getMessageReportExtra(json: js.Dynamic): Option[MessageExtraReport] = json match {
-    case j if j.isInstanceOf[js.prim.Undefined] => None
-    case weighted if json.weight != js.undefined => Option(ReportWeight(
+    case j if js.isUndefined(j)=> None
+    case weighted if !js.isUndefined(json.weight) => Option(ReportWeight(
       json.weight.asInstanceOf[js.Array[js.Array[_]]].map{
         (arr: js.Array[_]) => Some(arr(0).asInstanceOf[Boolean]) -> arr(1).asInstanceOf[Double]
       }))
