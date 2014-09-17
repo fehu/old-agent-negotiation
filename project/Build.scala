@@ -118,9 +118,7 @@ object  Build extends sbt.Build {
     settings = buildSettings ++ unidocSettings ++ Seq(
       name := "agent-comm",
       unidocScopeFilter in (ScalaUnidoc, unidoc) := {
-        (unidocScopeFilter in (ScalaUnidoc, unidoc)).value --
-          ScopeFilter( inProjects(webFrontend), inConfigurations(Compile) ) ||
-          ScopeFilter( inProjects(webFrontend), inConfigurations(Sources) )
+        (unidocScopeFilter in (ScalaUnidoc, unidoc)).value -- ScopeFilter( inProjects(webFrontend), inConfigurations(Compile) )
       }
     )
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)

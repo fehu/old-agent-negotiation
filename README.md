@@ -119,9 +119,7 @@ The front-end consists of
 * the associated [css](web/frontend/styles/n-queen)
 
 Both [generation and packing](web/frontend/src/main/scala/feh/tec/web/util/PackTemplates.scala) are done by `pack-templates` sbt task in `project web-frontend`, the output directory is defined by `Web.packDir` setting key 
-(`web/packed` by default).
-
-There is also `clean-templates` task defined.
+(`web/packed` by default). To package fully optimized js, execute `pack-templates-opt`. There is also `clean-templates` task defined.
 
 ## Compiling the Project
 
