@@ -4,5 +4,6 @@
 - [x] use ScalaTags
 - [x] the reports must be sent in bulk in a fixed interval
 - [ ] the reports should be stored on server-side as dictionaries { rep.id:  rep }
-- [ ] responses should be grouped by proposals
+- [x] responses should be grouped by proposals
 - [ ] cache constructed rows
+- [ ] responses that are processed before the corresponding proposal should not be discarded
