@@ -21,7 +21,7 @@ object NQueen extends JSApp with NQueenSocketListener{
   def initNegotiationInfo(queens: Map[Int, String]): Any = {
     reportArchive = new ReportArchive(queens.keySet)
     chessBoard = new ChessBoard(queens.size)
-    communications = new QueensCommunicationsTableSorter(reportArchive)
+    communications = new QueensCommunications(reportArchive)
     selection = new QueenInfo.Selection(
       s => (communications.update _).tupled apply s.queens(queens(s.left.get), queens(s.right.get))
     )
@@ -35,7 +35,7 @@ object NQueen extends JSApp with NQueenSocketListener{
     queensInfo.foreach(_._2.setCallbacks())
 
     jQuery(containerForBoard) append chessBoard.create
-    jQuery(containerForInfo) append communications.create
+    jQuery(containerForInfo) append communications.create.toString()
 
     reportArchive.onNewStates{ (reps: Map[Int, List[StateReport]]) =>
       val latest = reps.mapValues(_.maxBy(_.at))
@@ -130,24 +130,24 @@ class ReportArchive(queens: Set[Int]){
     val grouped_m =
       msg.messages.toList.withFilter(_.isInstanceOf[MessageReport]).map(_.asInstanceOf[MessageReport]).groupBy(_.by.n)
 
-
-    grouped_s foreach{ case (i, reps) => _states(i)   ++= grouped_s(i).map( rep => rep.id -> rep ).toMap  }
-    grouped_m foreach{ case (i, reps) => _messages(i) ++= grouped_m(i).map( rep => rep.id -> rep ).toMap }
+    grouped_s foreach{ case (i, reps) => _states(i)   ++= reps}
+    grouped_m foreach{ case (i, reps) => _messages(i) ++= reps}
 
     _onNewMessages foreach (_(grouped_m))
     _onNewStates foreach (_(grouped_s))
   }
 
-  def states(i: Int)                              = _states(i).values.toList
-  def messages(i: Int): List[MessageReport]       = _messages(i).values.toList
-  def messages(i: Set[Int]): List[MessageReport]  = _messages.filterKeys(i.contains).values.flatMap(_.values).toList
+  def states(i: Int)                             = _states(i).toSet
+  def messages: Map[Int, List[MessageReport]]    = _messages.mapValues(_.toList.sortBy(_.at))
+  def messages(i: Int): List[MessageReport]      = _messages(i).toList.sortBy(_.at)
+  def messages(i: Set[Int]): List[MessageReport] = _messages.filterKeys(i.contains).values.flatten.toList.sortBy(_.at)
 
   def onNewStates(byQueen: js.Function1[Map[Int, List[StateReport]], Any]): Unit     = { _onNewStates += byQueen }
   def onNewMessages(byQueen: js.Function1[Map[Int, List[MessageReport]], Any]): Unit = { _onNewMessages += byQueen }
   def rmOnNewMessagesCallback(func: js.Function1[Map[Int, List[MessageReport]], Any]): Unit = { _onNewMessages -= func }
 
-  protected val _states   = queens.map{ q => q -> mutable.Map.empty[(Int, Queen), StateReport]   }.toMap
-  protected val _messages = queens.map{ q => q -> mutable.Map.empty[String, MessageReport] }.toMap
+  protected val _states   = queens.map{ q => q -> mutable.Set.empty[StateReport]   }.toMap
+  protected val _messages = queens.map{ q => q -> mutable.Set.empty[MessageReport] }.toMap
 
   protected val _onNewStates   = mutable.Buffer.empty[js.Function1[Map[Int, List[StateReport]], Any]]
   protected val _onNewMessages = mutable.Buffer.empty[js.Function1[Map[Int, List[MessageReport]], Any]]

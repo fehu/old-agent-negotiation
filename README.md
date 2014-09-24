@@ -110,6 +110,12 @@ For local development set
 ```
 This way the frontend web-socket will connect directly to the project's [spray-can](https://github.com/spray/spray-can) server, with no need for *nginx* setup. 
 
+### Visualisation Verification
+
+To verify the accordance of the reports received by the front-end, run the following commands in *[javascript console](http://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers) of your browser*: 
+ * table rows cache consistency: `QueensCommunications().diffArchiveAndCache(queens_array)`, where `queens_array` is an array with queen numbers, for example `[1, 2, 3, 4]`
+ * current communication visualisation consistency: `QueensCommunications().diffArchiveAndTheTable(q1, q2)`, where `q1` and `q2` are the numbers of the two queens, whose communications are currently shown 
+
 #### Frontend Generation
 
 The front-end consists of

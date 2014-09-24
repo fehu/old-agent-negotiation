@@ -11,6 +11,14 @@
 
 .tablesorter-filter-row .disabled {display: none}
 
+.tablesorter tr.proposal-msg {
+    font-weight: bold;
+    color: indigo;
+}
+
+.tablesorter tr.proposal-msg.tablesorter-hasChildRow{
+    cursor: pointer;
+}
 
 .tablesorter-header {
     background-color: #7E4D3F;

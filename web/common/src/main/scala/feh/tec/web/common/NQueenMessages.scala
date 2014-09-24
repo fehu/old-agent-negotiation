@@ -40,7 +40,9 @@ object NQueenMessages extends WebSocketMessages{
   }
   case class BulkReport(messages: Seq[CanBulk]) extends Msg
 
-  case class Message(id: String, priority: Int, content: MessageContent)
+  case class Message(id: String, priority: Int, content: MessageContent){
+    def isProposal = content.isInstanceOf[Proposal]
+  }
   sealed trait MessageContent
   case class Proposal(position: (Int, Int)) extends MessageContent
   case class Response(proposal: String, tpe: MessageType) extends MessageContent

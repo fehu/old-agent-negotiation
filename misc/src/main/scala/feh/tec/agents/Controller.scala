@@ -42,7 +42,11 @@ class Controller(arg: GenericStaticInitArgs[DefaultBuildAgentArgs], web: WebSock
 
     web.ref ! WebSocketPushServer.OnConnection(List(
       Left(TextFrame(initMessage.toJson.toString())),
-      Right(() => reportingTo.ref ! ReportArchive.BulkAndForward(web.ref))
+      Right(() => {
+        reportingTo.ref ! ReportArchive.BulkAndForward(web.ref)
+//        reportingTo.ref ! ReportArchive.Print(true)
+
+      })
     ))
   }
 

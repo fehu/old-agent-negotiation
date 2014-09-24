@@ -1,7 +1,7 @@
 - [x] use timestamps guarded on report creation, instead of the own
 - [x] use ScalaTags
 - [x] the reports must be sent in bulk in a fixed interval
-- [x] the reports should be stored on server-side as dictionaries { rep.id:  rep }
+- [x] the reports should be stored on server-side as sets (to avoid duplicates, that are quite possible)
 - [x] responses should be grouped by proposals
-- [ ] cache constructed rows
-- [ ] responses that are processed before the corresponding proposal should not be discarded
+- [x] cache constructed rows
+- [x] responses that are processed before the corresponding proposal should not be discarded
