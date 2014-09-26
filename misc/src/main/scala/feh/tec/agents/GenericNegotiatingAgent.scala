@@ -35,4 +35,10 @@ class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
   override protected def extractStateReportExtra(negId: NegotiationId) = getOpt(negId).flatMap(_.state.currentProposal)
   override protected def extractMessageReportExtra(msg: DefaultNegotiatingLanguage#Msg) =
     get(msg.negotiation).state.lastWeightedProposal map WeightReport
+
+  protected def priorityConflictMsg(causedBy: Message) = {
+    implicit def priority = get(causedBy.negotiation).priority
+    Message.PriorityConflict(causedBy.negotiation)
+  }
+  protected def isPriorityConflict(msg: DefaultNegotiatingLanguage#Msg) = msg.isInstanceOf[Message.PriorityConflict]
 }

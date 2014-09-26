@@ -1,7 +1,5 @@
 package feh.tec.agents.impl
 
-import java.util.concurrent.TimeoutException
-
 import akka.pattern.ask
 import akka.util.Timeout
 import feh.tec.agents.service.ConflictResolver.{ConflictResolved, ResolveConflict}
@@ -27,15 +25,32 @@ trait PriorityBasedAgent[Lang <: ProposalLanguage] extends Agent[Lang]
   /** blocking until resolved
     */
   def resolvePriorityConflict(causedBy: Message) = {
-    implicit def timeout = conflictResolveTimeout
-    val req = ResolveConflict("priority", causedBy.negotiation, causedBy.sender)
-    Await.ready(conflictResolver.ref ? req, timeout.duration*2).value.get match {
-      case Success(ConflictResolved(req.id, won, _)) => won
-      case Failure(_: TimeoutException) => true
-    }
+    causedBy.sender ! priorityConflictMsg(causedBy)
+    askConflictResolver(causedBy)
   }
 
-  lazy val behaviourOnProposal = new PriorityBasedBacktrackBehaviour[Lang#Proposal]{
+  protected def askConflictResolver(causedBy: Message) ={
+    val req = ResolveConflict("priority", causedBy.negotiation, causedBy.sender)
+    implicit def timeout = conflictResolveTimeout
+    Await.ready(conflictResolver.ref ? req, timeout.duration*2).value.get match {
+      case Success(ConflictResolved(req.id, won, _)) => won
+//      case Failure(_: TimeoutException) => true
+    }
+
+  }
+
+  protected def priorityConflictMsg(causedBy: Message): Lang#Conflict
+  protected def isPriorityConflict(msg: Lang#Msg): Boolean
+
+
+  override def process = super.process orElse{
+    case priorityConflict if isPriorityConflict(priorityConflict) =>
+      askConflictResolver(priorityConflict)
+  }
+
+  protected def spamProposal(neg: ANegotiation)
+
+  lazy val behaviourOnProposal = new PriorityBasedOnProposalBehaviour[Lang#Proposal]{
     def disputeOverPriorityWon(msg: Lang#Msg) = {
       risePriority(msg.negotiation)
       act(msg.asInstanceOf[Lang#Proposal])
@@ -43,12 +58,15 @@ trait PriorityBasedAgent[Lang <: ProposalLanguage] extends Agent[Lang]
     def disputeOverPriorityLost(msg: Lang#Msg) = {} // do nothing
     def act(prop: Lang#Proposal) =
       prop.sender ! (if(accept_?(prop)) createAccepted(prop.negotiation) else createRejected(prop.negotiation))
+
+    def reassessTheProposal(msg: Lang#Msg) = spamProposal(get(msg.negotiation))
   }
 
   lazy val behaviourOnRejection = new PriorityBasedBacktrackBehaviour[Lang#Rejected] {
     def disputeOverPriorityWon(msg: Lang#Msg) = {
       risePriority(msg.negotiation)
-      checkConstraints(msg.negotiation)
+      spamProposal(get(msg.negotiation))
+//      checkConstraints(msg.negotiation)
     }
     def disputeOverPriorityLost(msg: Lang#Msg) = checkConstraints(msg.negotiation)
     def act(on: Lang#Rejected) = checkConstraints(on.negotiation)
@@ -57,16 +75,19 @@ trait PriorityBasedAgent[Lang <: ProposalLanguage] extends Agent[Lang]
   lazy val behaviourOnAcceptance = new PriorityBasedBacktrackBehaviour[Lang#Accepted] {
     def disputeOverPriorityWon(msg: Lang#Msg) = {
       risePriority(msg.negotiation)
-      checkConstraints(msg.negotiation)
+      spamProposal(get(msg.negotiation))
+//      checkConstraints(msg.negotiation)
     }
     def disputeOverPriorityLost(msg: Lang#Msg) = checkConstraints(msg.negotiation)
     def act(on: Lang#Accepted) = checkConstraints(on.negotiation)
-  } 
+  }
 
-  private def risePriority(negId: NegotiationId) = {
+  protected def risePriority(negId: NegotiationId) = {
     val neg = get(negId)
     neg.currentPriority = new Priority(neg.currentPriority.get + 1)
+    updateProposal(neg)
   }
+  protected def updateProposal(neg: ANegotiation): Lang#Proposal
 }
 
 trait PriorityBasedAgentViews extends ExternalViewSupport{

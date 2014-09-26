@@ -59,6 +59,7 @@ object ProposalEngine{
     protected def iteratorForNegotiation(ng: Negotiation) = {
       val dItByVar = ng.currentValues.keys.toSeq.zipMap(domainIterators)
       val domains = dItByVar.map(_._1.domain)
+      log.info(s"iteratorForNegotiation domains: $domains")
       val it = () => DomainIterator overSeq dItByVar.map(_._2) apply domains
       val vars = dItByVar.map(_._1)
       val i2i: Seq[Any] => Map[Var, Any] = seq => {
@@ -89,11 +90,15 @@ object ProposalEngine{
     def setNextProposal(neg: ANegotiation) = nextIssues(neg).map{
       issues =>
         neg.currentValues ++= issues
-        val prop = createProposal(neg.id)
-        neg.state.currentProposal.foreach( _.id |> discardProposal )  // discard the old proposal in the register
-        neg.state.currentProposal = Option(prop)                      // when a new one is set
-        neg.state.currentProposalDate = Some(new Date())
-        prop
+        updateProposal(neg)
+    }
+
+    protected def updateProposal(neg: ANegotiation) = {
+      val prop = createProposal(neg.id)
+      neg.state.currentProposal.foreach( _.id |> discardProposal )  // discard the old proposal in the register
+      neg.state.currentProposal = Option(prop)                      // when a new one is set
+      neg.state.currentProposalDate = Some(new Date())
+      prop
     }
   }
   

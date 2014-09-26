@@ -73,25 +73,24 @@ class QueensCommunications(archive: ReportArchive) extends QueensCommunicationsA
 
     jQuery(".queen-comm .messages tbody") append proposals.map(setDir).mkString
 
-    if(responses.isEmpty) return
-
-    responses foreach{
+    if(responses.nonEmpty) responses foreach{
       case (prop, resps) => jQuery(s"tr.proposal-msg[proposal=$prop]") after resps.map(this setDir _._2).mkString
     }
+
     updateTableSorter()
   }
 
-  protected def filterMessages: ReportRow => Boolean = row => PartialFunction.cond(row.from -> row.to)(withLRQ(true, true))
+  protected def filterMessages: ReportRow => Boolean = row => PartialFunction.cond(row.from -> row.to)(matchQueensFromTo(true, true))
 //    row.from == leftQueen && row.to == rightQueen || row.to == leftQueen && row.from == rightQueen
 
   protected def setDir(row: ReportRow) = {
-    val dir = withLRQ("left", "right")(row.from -> row.to)
+    val dir = matchQueensFromTo("left", "right")(row.from -> row.to)
     row.tag("to".attr := dir)
   }
 
-  private def withLRQ[R](caseLeft: R, caseRight: R): PartialFunction[(Queen, Queen), R] = {
-    case (lq, rq) if lq == leftQueen && rq == rightQueen  => caseLeft
-    case (rq, lq) if lq == leftQueen && rq == rightQueen  => caseRight
+  private def matchQueensFromTo[R](caseLeft: R, caseRight: R): PartialFunction[(Queen, Queen), R] = {
+    case (from, to) if to == leftQueen && from == rightQueen  => caseLeft
+    case (from, to) if to == rightQueen && from == leftQueen  => caseRight
   }
 
   case class ReportRow(tag: Text.Tag, from: Queen, to: Queen, id: String, isProposal: Boolean)

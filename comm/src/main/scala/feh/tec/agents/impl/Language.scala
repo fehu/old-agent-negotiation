@@ -102,6 +102,8 @@ object DefaultNegotiatingLanguage {
 class DefaultNegotiatingLanguage extends CounterProposalLanguage /*with feh.tec.agents.Language.Priority*/{
   type Msg = Message
 
+  type Conflict = Message.Conflict
+
   type Proposal = Message.Proposal
   type Accepted = Message.Accepted
   type Rejected = Message.Rejected

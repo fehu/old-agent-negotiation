@@ -21,9 +21,6 @@ trait Message extends AbstractMessage{
 
   override def toString = s"$messageType: $asString (${sender.id}, $priority})"
 
-  /** The message's priority is higher than scope's
-    */
-  def ?>(implicit thatPriority: Priority) = this.priority.get > thatPriority.get
 }
 
 protected[agents] trait SystemMessage extends AbstractMessage
@@ -80,6 +77,9 @@ object Message{
   trait Response extends Message{
     def respondingTo: Message.Id
   }
+  trait Conflict extends Message{
+    def messageType = "Conflict"
+  }
 
   case class Accepted(negotiation: NegotiationId, offer: Message.Id)
                      (implicit val sender: AgentRef, val priority: Priority)
@@ -118,4 +118,11 @@ object Message{
     def messageType = "Demand"
     def asString = s"I want you to set values: $get, do you accept?"
   }
+
+  case class PriorityConflict(negotiation: NegotiationId)
+                             (implicit val sender: AgentRef, val priority: Priority) extends Conflict with AutoId
+  {
+    def asString = "I'm in conflict with your priority, address the conflict resolver!"
+  }
+
 }

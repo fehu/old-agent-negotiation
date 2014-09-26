@@ -94,6 +94,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
             Some(buildMessage(_.Response(offer, _.Acceptance)))
           case rej@Message.Rejected(_, offer)  =>
             Some(buildMessage(_.Response(offer, _.Rejection)))
+          case conflict: Message.Conflict => None // todo
         }
         val newExtra = extra collectFirst {
           case AgentReports.WeightReport(weighted) =>

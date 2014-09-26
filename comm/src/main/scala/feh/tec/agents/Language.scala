@@ -8,7 +8,11 @@ trait Language {
   def isMessage(any: Any): Boolean
 }
 
-trait ProposalLanguage extends Language{
+trait ConflictLanguage extends Language{
+  type Conflict <: Msg
+}
+
+trait ProposalLanguage extends ConflictLanguage{
   type Proposal <: Msg
   type Rejected <: Msg with Response
   type Accepted <: Msg with Response

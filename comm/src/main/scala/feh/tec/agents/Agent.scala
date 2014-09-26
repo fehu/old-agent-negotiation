@@ -1,5 +1,6 @@
 package feh.tec.agents
 
+import akka.actor.ActorLogging
 import feh.util.AbstractScopedState
 
 trait AgentHelpers[Lang <: Language]{
@@ -45,9 +46,9 @@ trait AgentHelpers[Lang <: Language]{
 
 
 trait PriorityBasedNegotiatingAgent[Lang <: ProposalLanguage]
-  extends NegotiatingAgent with ProposalBased[Lang] with AgentHelpers[Lang] with ProposalRegister[Lang]
+  extends NegotiatingAgent with ProposalBased[Lang] with AgentHelpers[Lang] with ProposalRegister[Lang] with ActorLogging
 {
-  def behaviourOnProposal: PriorityBasedBacktrackBehaviour[Lang#Proposal]
+  def behaviourOnProposal: PriorityBasedOnProposalBehaviour[Lang#Proposal]
   def behaviourOnRejection: PriorityBasedBacktrackBehaviour[Lang#Rejected]
   def behaviourOnAcceptance: PriorityBasedBacktrackBehaviour[Lang#Accepted]
 
@@ -61,34 +62,39 @@ trait PriorityBasedNegotiatingAgent[Lang <: ProposalLanguage]
     def act(on: Msg)
   }
 
+  trait PriorityBasedOnProposalBehaviour[Msg <: Lang#Msg] extends PriorityBasedBacktrackBehaviour[Msg]{
+    def reassessTheProposal(msg: Lang#Msg)
+  }
+
   def onProposal = {
-    case prop if testMsg(prop, _ == _) =>
+    case prop if comparePriorityOfMsgAndMine(prop, _ == _) =>
       if( resolvePriorityConflict(prop) ) behaviourOnProposal.disputeOverPriorityWon(prop)
       else behaviourOnProposal.disputeOverPriorityLost(prop)
-    case prop if testMsg(prop, _ < _) =>
+    case prop if comparePriorityOfMsgAndMine(prop, _ < _) =>
       behaviourOnProposal act prop
-    case prop if testMsg(prop, _ > _) => // ignore
+    case prop if comparePriorityOfMsgAndMine(prop, _ > _) =>
+      behaviourOnProposal reassessTheProposal prop
   }
   def onRejected = {
-    case msg if testMsg(msg, _ == _) && expectingResponse(msg) =>
+    case msg if comparePriorityOfMsgAndMine(msg, _ == _) && expectingResponse(msg) =>
       if( resolvePriorityConflict(msg) ) behaviourOnRejection.disputeOverPriorityWon(msg)
       else behaviourOnRejection.disputeOverPriorityLost(msg)
-    case msg if testMsg(msg, _ > _) && expectingResponse(msg) =>
+    case msg if comparePriorityOfMsgAndMine(msg, _ > _) && expectingResponse(msg) =>
       behaviourOnRejection act msg
-    case msg if testMsg(msg, _ < _) || ! expectingResponse(msg) => // ignore
+    case msg if comparePriorityOfMsgAndMine(msg, _ < _) || ! expectingResponse(msg) => // ignore
   }
 
   def onAccepted = {
-    case msg if testMsg(msg, _ == _) && expectingResponse(msg) =>
+    case msg if comparePriorityOfMsgAndMine(msg, _ == _) && expectingResponse(msg) =>
       if( resolvePriorityConflict(msg) ) behaviourOnAcceptance.disputeOverPriorityWon(msg)
       else behaviourOnAcceptance.disputeOverPriorityLost(msg)
-    case msg if testMsg(msg, _ > _) && expectingResponse(msg) =>
+    case msg if comparePriorityOfMsgAndMine(msg, _ > _) && expectingResponse(msg) =>
       behaviourOnAcceptance act msg
-    case msg if testMsg(msg, _ < _) || ! expectingResponse(msg) => // ignore
+    case msg if comparePriorityOfMsgAndMine(msg, _ < _) || ! expectingResponse(msg) => // ignore
   }
 
-  private def testMsg(msg: Message,
-                      comparePriority: (Priority, Priority) => Boolean) =
+  private def comparePriorityOfMsgAndMine(msg: Message,
+                                          comparePriority: (Priority, Priority) => Boolean) =
     comparePriority(msg.priority, get(msg.negotiation).priority)
 
 }

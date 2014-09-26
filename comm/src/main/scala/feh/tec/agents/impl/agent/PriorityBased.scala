@@ -58,48 +58,46 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
 
   def checkConstraints(negId: NegotiationId): Unit = get(negId) |> {
     neg =>
-      neg.state.currentProposal map {
-        currentProposal =>
-          val viewsByMsgId = constraintsSatisfactions.data.regroupSeq{
-            case (_mp, _pr) =>
-              // null tests
-              val mp = Option(_mp)
-              val pr = Option(_pr) //Message.Id, Option[Boolean]
+      val currentProposal = neg.state.currentProposal.get
+      val viewsByMsgId = constraintsSatisfactions.data.regroupSeq{
+        case (_mp, _pr) =>
+          // null tests
+          val mp = Option(_mp)
+          val pr = Option(_pr) //Message.Id, Option[Boolean]
 
 
-              mp.map(_.toSeq).getOrElse(Nil).map{
-                case (msgId, opt) => msgId -> (opt -> (negId -> pr.map(_._2).getOrElse(null.asInstanceOf[agents.Priority])))
-              }
+          mp.map(_.toSeq).getOrElse(Nil).map{
+            case (msgId, opt) => msgId -> (opt -> (negId -> pr.map(_._2).getOrElse(null.asInstanceOf[agents.Priority])))
           }
+      }
 
-          val maxPriority = constraintsSatisfactions.merge._2.data.map(_._2._2).maxBy(_.get)
+      val maxPriority = constraintsSatisfactions.merge._2.data.map(_._2._2).maxBy(_.get)
 
-          if(neg.currentPriority > maxPriority) return
+      if(neg.currentPriority > maxPriority) return
 
-          val weighted = viewsByMsgId.getOrElse(currentProposal.id, Map()).weight{
-            case (ag, (opt, pr)) if neg.scope.contains(ag) && pr._2 > neg.currentPriority => opt
-          }
-          neg.state.lastWeightedProposal = Some(weighted)
+      val weighted = viewsByMsgId.getOrElse(currentProposal.id, Map()).weight{
+        case (ag, (opt, pr)) if neg.scope.contains(ag) && pr._2 > neg.currentPriority => opt
+      }
+      neg.state.lastWeightedProposal = Some(weighted)
 
 //          log.info("weighted = " + weighted)
 //          log.info("currentProposalDate = " + neg.state.currentProposalDate.map(_.getTime))
 //          log.info("weighted = " + weighted)
 //          log.info("viewsByMsgId = " + viewsByMsgId)
 
-          if(weighted.isEmpty || weighted.map(_._2).sum.d == 0) {
-            spamProposal(neg)
-            return
-          }
+      if(weighted.isEmpty || weighted.map(_._2).sum.d == 0) {
+        spamProposal(neg)
+        return
+      }
 
 //          log.info("constraintsSatisfactions.data = " + constraintsSatisfactions.data)
 //          log.info("externalConstraints.data = " + constraintsSatisfactions.merge._1.data)
 
-          if(isFailure(neg, weighted))
-            setNextProposal(neg)
-              .map( _ => spamProposal _ )
-              .getOrElse( noMoreProposals _ )
-              .apply(neg)
-      }
+      if(isFailure(neg, weighted))
+        setNextProposal(neg)
+          .map( _ => spamProposal _ )
+          .getOrElse( noMoreProposals _ )
+          .apply(neg)
   }
 
   var checkConstraintsTimer: Cancellable = null
@@ -124,6 +122,7 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
     .data.filter(_._2._1 == negId).map(_._2._2).maxBy(_.get)
 
   protected def noMoreProposals(neg: ANegotiation) = {
+    log.info("noMoreProposals")
     neg.currentPriority = maxPriority(neg.id).raise()
     resetProposal(neg)
     spamProposal(neg)

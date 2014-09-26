@@ -11,3 +11,4 @@
 - [x] merge negotiation-dsl into comm
 - [ ] spawn, timings and timeouts config
 - [x] guard timestamp on report creation - the difference between negotiation start and the current moment
+- [ ] conflict reports

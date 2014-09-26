@@ -69,7 +69,6 @@ object DomainIterator{
 
   def overSeq[D, T](di: Seq[DomainIterator[D, T]]): DomainIterator[Seq[D], Seq[T]] = new DomainIterator[Seq[D], Seq[T]] {
     def apply(v1: Seq[D]) = new Iterator[Seq[T]]{
-      val v = v1
       val iteratorCreation = di.zip(v1)
         .map { case (domIt, domain) => () => domIt(domain)}
         .zipWithIndex.map(_.swap).toMap
@@ -77,7 +76,7 @@ object DomainIterator{
       
       val currentValues = mutable.HashMap.empty[Int, T]
 
-      def hasNext = iterators.last._2.hasNext
+      def hasNext = iterators.exists(_._2.hasNext)
 
       var isFirstTime = true
 
@@ -86,13 +85,13 @@ object DomainIterator{
           for(i <- 0 until di.length) nextValue(i)
           isFirstTime = false
         }
-        else nextValue(di.length-1)
+        else nextValue(0)
 
         currentValues.values.toSeq
       }
 
       protected def nextValue(i: Int): Unit =
-        if(i < 0) throw new NoSuchElementException
+        if(i == di.length) {} //throw new NoSuchElementException
         else if(iterators(i).hasNext){
           currentValues(i) = iterators(i).next()
         }
@@ -100,7 +99,7 @@ object DomainIterator{
           val it = iteratorCreation(i)()
           iterators(i) = it
           currentValues(i) = it.next()
-          nextValue(i-1)
+          nextValue(i+1)
         }
     }
   }
