@@ -6,6 +6,8 @@ import akka.actor.ActorLogging
 import feh.tec.agents._
 import feh.util._
 
+import scala.collection.mutable
+
 /** Handles updates of negotiation values and `currentProposal` state
  *  actual proposal creation is defined in [[feh.tec.agents.ProposalBased]]
  */
@@ -24,6 +26,7 @@ trait ProposalEngine[Lang <: ProposalLanguage] extends NegotiationStateSupport{
 trait ProposalNegotiationState[Lang <: ProposalLanguage] extends NegotiationState{
   var currentProposal: Option[Lang#Proposal] = None
   var currentProposalDate: Option[Date] = None
+  var currentProposalUnconditionallyAccepted = false
 }
 
 trait ProposalIteratorNegotiationState[Lang <: ProposalLanguage] extends ProposalNegotiationState[Lang]{
@@ -93,16 +96,47 @@ object ProposalEngine{
         updateProposal(neg)
     }
 
+    protected def issuesExtractor: IssuesExtractor[Lang]
+
     protected def updateProposal(neg: ANegotiation) = {
+      val old = neg.state.currentProposal
       val prop = createProposal(neg.id)
       neg.state.currentProposal.foreach( _.id |> discardProposal )  // discard the old proposal in the register
       neg.state.currentProposal = Option(prop)                      // when a new one is set
       neg.state.currentProposalDate = Some(new Date())
+      if(! old.exists(prop => issuesExtractor.extract(prop) == neg.currentValues.toMap )) neg.state.currentProposalUnconditionallyAccepted = false
       prop
     }
   }
   
   trait IteratingCurrentIssues[Lang <: ProposalLanguage] extends Iterating[Lang]{ // todo
     self: NegotiatingAgent with ProposalBased[Lang] =>
-  } 
+  }
+
+  /** Guards values configuration that were proved failure and avoids them in the future */
+  trait LearningFromMistakes[Lang <: ProposalLanguage] extends ProposalEngine[Lang]{
+    self: NegotiatingAgent with ProposalBased[Lang] with ActorLogging=>
+    
+    protected lazy val failedValueConfigurations = negotiations.map{ neg => neg.id -> mutable.HashSet.empty[Map[Var, Any]] }.toMap
+    
+    def guardFailedValueConfiguration(neg: Negotiation): Unit =
+      failedValueConfigurations(neg.id) += neg.currentValues.toMap
+
+    def provenFailure(neg: Negotiation)(configuration: Map[Var, Any]) = 
+      failedValueConfigurations(neg.id) contains configuration
+
+    def notProvenFailure(neg: Negotiation)(configuration: Map[Var, Any]) = !provenFailure(neg)(configuration)
+  }
+
+  /** Avoids value configurations proven failure */
+  trait IteratingAllDomainsLearningFromMistakes[Lang <: ProposalLanguage] 
+    extends IteratingAllDomains[Lang] with LearningFromMistakes[Lang]
+  {
+    self: NegotiatingAgent with ProposalBased[Lang] with ProposalRegister[Lang] =>
+    
+    override protected def nextIssues(neg: Negotiation) = neg.state.currentIterator flatMap {
+      _.filter(notProvenFailure(neg)).inCase(_.hasNext).map(_.next())
+    }
+  }
+  
 }

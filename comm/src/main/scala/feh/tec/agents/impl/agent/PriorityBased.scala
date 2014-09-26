@@ -23,6 +23,7 @@ object PriorityBased{
 trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
   with impl.Agent.ProposalRegistering[Lang]
   with ProposalEngine[Lang]
+  with ProposalEngine.LearningFromMistakes[Lang]
   with PriorityBasedAgentViews
   with ViewUtils
   with ActorLogging
@@ -73,7 +74,10 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
 
       val maxPriority = constraintsSatisfactions.merge._2.data.map(_._2._2).maxBy(_.get)
 
-      if(neg.currentPriority > maxPriority) return
+      if(neg.currentPriority > maxPriority) {
+        markAccepted(neg)
+        return
+      }
 
       val weighted = viewsByMsgId.getOrElse(currentProposal.id, Map()).weight{
         case (ag, (opt, pr)) if neg.scope.contains(ag) && pr._2 > neg.currentPriority => opt
@@ -93,12 +97,18 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
 //          log.info("constraintsSatisfactions.data = " + constraintsSatisfactions.data)
 //          log.info("externalConstraints.data = " + constraintsSatisfactions.merge._1.data)
 
-      if(isFailure(neg, weighted))
+      if(isFailure(neg, weighted)){
+        if(markedAccepted(neg)) guardFailedValueConfiguration(neg)
         setNextProposal(neg)
           .map( _ => spamProposal _ )
           .getOrElse( noMoreProposals _ )
           .apply(neg)
+      }
   }
+
+
+  def markAccepted(neg: ANegotiation) = neg.state.currentProposalUnconditionallyAccepted = true
+  def markedAccepted(neg: ANegotiation) = neg.state.currentProposalUnconditionallyAccepted
 
   var checkConstraintsTimer: Cancellable = null
   def checkConstraintsRepeat: FiniteDuration

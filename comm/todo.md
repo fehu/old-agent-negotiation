@@ -12,3 +12,4 @@
 - [ ] spawn, timings and timeouts config
 - [x] guard timestamp on report creation - the difference between negotiation start and the current moment
 - [ ] conflict reports
+- [ ] share failed values configuration knowledge between agents with the same role

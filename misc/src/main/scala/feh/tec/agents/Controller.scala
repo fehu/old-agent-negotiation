@@ -122,7 +122,6 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
     // bulk send buff contents and clear  
     case FlushReports =>
       val bulk = NQueenMessages.BulkReport(reportsBuff.toList flatMap reportToBulkable)
-      log.info(s"bulk = $bulk")
       reportsBuff.clear()
       super.receive(push(bulk))
   }

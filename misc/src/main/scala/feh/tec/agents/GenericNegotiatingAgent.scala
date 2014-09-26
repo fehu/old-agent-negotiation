@@ -11,7 +11,7 @@ class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
   extends GenericIteratingAgentCreation[DefaultNegotiatingLanguage](arg)
   with DefaultNegotiatingLanguage.Builder
   with NegotiationSupport.Default
-  with ProposalEngine.IteratingAllDomains[DefaultNegotiatingLanguage]
+  with ProposalEngine.IteratingAllDomainsLearningFromMistakes[DefaultNegotiatingLanguage]
   with AgentReportingMessagesAndState[DefaultNegotiatingLanguage]
   with ActorLogging
 {

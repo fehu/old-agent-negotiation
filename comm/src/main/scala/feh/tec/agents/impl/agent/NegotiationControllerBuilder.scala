@@ -86,14 +86,17 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
             domainIterators.asInstanceOf[Map[Var, DomainIterator[Var#Domain, Var#Tpe]]],
             constraints, // Map[NegotiationId, AgentConstraintsDef]
             reportingTo = args.reportingTo,
-            checkConstraintsRepeat = 1 second // todo
+            checkConstraintsRepeat = 200 millis // todo
           )
       })
     }.toMap
 
-  protected def defaultDomainIterator(v: Var): DomainIterator[_, _] = v.domain match {
-    case range: Range => new DomainIterator.Range()
-    case iterable: Iterable[_] => new DomainIterator.Generic[Any]
+  protected def defaultDomainIterator(v: Var): DomainIterator[_, _] = {
+    val straightForward = v.domain match {
+      case range: Range => new DomainIterator.Range()
+      case iterable: Iterable[_] => new DomainIterator.Generic[Any]
+    }
+    DomainIterator.Random(straightForward)
   }
 
   protected def replaceClass(clazz: Class[_]) = clazz match{ // replace primitive type classes by the boxes

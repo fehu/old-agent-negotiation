@@ -1,6 +1,7 @@
 package feh.tec.agents
 
 import scala.collection.{IterableLike, mutable}
+import feh.util._
 
 abstract class Var(val name: String, testType: Any => Boolean){
   type Tpe
@@ -31,14 +32,17 @@ object Domain{
 
 trait DomainIterator[-Domain, +T] extends (Domain => Iterator[T])
 
+trait StraightForwardDomainIterator[-Domain, +T] extends DomainIterator[Domain, T]
+trait RandomOrderDomainIterator[-Domain, +T] extends DomainIterator[Domain, T]
+
 object DomainIterator{
   class Range(min: Int = Int.MinValue, max: Int = Int.MaxValue, step: Int = 1)
-    extends DomainIterator[scala.collection.immutable.Range, Int]
+    extends StraightForwardDomainIterator[scala.collection.immutable.Range, Int]
   {
     def apply(v1: scala.collection.immutable.Range) = v1.dropWhile(_ < min).by(step).takeWhile(_ < max).iterator
   }
   
-  class Generic[T] extends DomainIterator[IterableLike[T, _], T]{
+  class Generic[T] extends StraightForwardDomainIterator[IterableLike[T, _], T]{
     def apply(v1: IterableLike[T, _]) = new Iterator[T]{
       val it = v1.iterator
 
@@ -47,8 +51,8 @@ object DomainIterator{
     }
   }
 
-  def zip[D1, T1, D2, T2](it1: DomainIterator[D1, T1], it2: DomainIterator[D2, T2]): DomainIterator[(D1, D2), (T1, T2)] =
-    new DomainIterator[(D1, D2), (T1, T2)] {
+  def zip[D1, T1, D2, T2](it1: DomainIterator[D1, T1], it2: DomainIterator[D2, T2]) =
+    new StraightForwardDomainIterator[(D1, D2), (T1, T2)] {
       def apply(v1: (D1, D2)) = new Iterator[(T1, T2)]{
         val i1 = it1(v1._1)
         var i2 = it2(v1._2)
@@ -67,7 +71,7 @@ object DomainIterator{
       }
     }
 
-  def overSeq[D, T](di: Seq[DomainIterator[D, T]]): DomainIterator[Seq[D], Seq[T]] = new DomainIterator[Seq[D], Seq[T]] {
+  def overSeq[D, T](di: Seq[DomainIterator[D, T]]) = new StraightForwardDomainIterator[Seq[D], Seq[T]] {
     def apply(v1: Seq[D]) = new Iterator[Seq[T]]{
       val iteratorCreation = di.zip(v1)
         .map { case (domIt, domain) => () => domIt(domain)}
@@ -104,4 +108,15 @@ object DomainIterator{
     }
   }
 
+  object Random{
+    def apply[D, T](dit: DomainIterator[D, T]) = dit match{
+      case rand: RandomOrderDomainIterator[D, T] => rand
+      case _ => new RandomOrderDomainIterator[D, T] {
+        def apply(v1: D) = {
+          val underlying = dit(v1)
+          underlying.toSeq.randomOrder().iterator
+        }
+      }
+    }
+  }
 }
