@@ -75,7 +75,7 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
       val maxPriority = constraintsSatisfactions.merge._2.data.map(_._2._2).maxBy(_.get)
 
       if(neg.currentPriority > maxPriority) {
-        markAccepted(neg)
+        markUncondAccepted(neg)
         return
       }
 
@@ -98,17 +98,21 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
 //          log.info("externalConstraints.data = " + constraintsSatisfactions.merge._1.data)
 
       if(isFailure(neg, weighted)){
-        if(markedAccepted(neg)) guardFailedValueConfiguration(neg)
+        if(markedUncondAccepted(neg)) guardFailedValueConfiguration(neg)
         setNextProposal(neg)
           .map( _ => spamProposal _ )
           .getOrElse( noMoreProposals _ )
           .apply(neg)
       }
+      else markAccepted(neg)
   }
 
-
-  def markAccepted(neg: ANegotiation) = neg.state.currentProposalUnconditionallyAccepted = true
-  def markedAccepted(neg: ANegotiation) = neg.state.currentProposalUnconditionallyAccepted
+  def markAccepted(neg: ANegotiation) = neg.currentValuesAcceptance = true
+  def markUncondAccepted(neg: ANegotiation) = {
+    markAccepted(neg)
+    neg.state.currentProposalUnconditionallyAccepted = true
+  }
+  def markedUncondAccepted(neg: ANegotiation) = neg.state.currentProposalUnconditionallyAccepted
 
   var checkConstraintsTimer: Cancellable = null
   def checkConstraintsRepeat: FiniteDuration

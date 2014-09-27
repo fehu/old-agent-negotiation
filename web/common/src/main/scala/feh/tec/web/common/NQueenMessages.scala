@@ -24,6 +24,7 @@ object NQueenMessages extends WebSocketMessages{
                          priority: Int,
                          proposalAcceptance: Seq[(Queen, Boolean)],
                          at: Int // system time in millis
+//                         acceptance: Boolean todo
                           ) extends CanBulk
   {
     def reportsState = true

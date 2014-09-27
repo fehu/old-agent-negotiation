@@ -56,8 +56,18 @@ object AgentBuilder{
   implicit lazy val PriorityBased = PriorityBasedCreation.Builder
   implicit lazy val GenericIterating = GenericIteratingAgentCreation.Builder
 
-  trait SystemArgs0Service extends AgentBuilder[impl.System.Service.Args0 with AbstractAgent, Tuple0]
-  implicit object SystemArgs0Service extends SystemArgs0Service
+  trait SystemArgs0ServiceBuilder extends AgentBuilder[impl.System.Service.Args0 with AbstractAgent, Tuple0]
+  object SystemArgs0ServiceBuilder extends SystemArgs0ServiceBuilder
+
+  trait SystemArgs1ServiceBuilder[T] extends AgentBuilder[impl.System.Service.Args1[T] with AbstractAgent, Tuple1[T]]
+  object SystemArgs1ServiceBuilder {
+    def apply[T] = new SystemArgs1ServiceBuilder[T]{}
+  }
+
+  trait SystemArgs2ServiceBuilder[T1, T2] extends AgentBuilder[impl.System.Service.Args2[T1, T2] with AbstractAgent, (T1, T2)]
+  object SystemArgs2ServiceBuilder {
+    def apply[T1, T2] = new SystemArgs2ServiceBuilder[T1, T2]{}
+  }
 
 }
 

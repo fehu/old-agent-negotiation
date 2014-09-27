@@ -50,6 +50,8 @@ trait Negotiation{
   def scope: Set[AgentRef]
 
   val currentValues: mutable.HashMap[Var, Any]
+
+  var currentValuesAcceptance: Boolean
 }
 
 trait WeakCommitmentNegotiation extends Negotiation{

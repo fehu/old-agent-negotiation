@@ -2,89 +2,15 @@ package feh.tec.agents.impl
 
 import java.util.{Date, UUID}
 
-import akka.actor.{ActorRef, ActorLogging}
+import akka.actor.{ActorLogging, ActorRef}
 import feh.tec.agents.Message.AutoId
+import feh.tec.agents.SystemMessage.NegotiationFinished
 import feh.tec.agents._
-import feh.tec.agents.impl.AgentReports.{ZeroTime, TimeDiff}
-import feh.tec.agents.impl.System.Service
+import feh.tec.agents.impl.AgentReports.{StateReport, TimeDiff}
 import feh.util._
 
 import scala.collection.mutable
-
-object ReportArchive extends SystemRole{ 
-  val name = "ReportArchive"
-
-  case class Forward(to: ActorRef) extends SystemMessage with AutoId
-  case class BulkAndForward(to: ActorRef) extends SystemMessage with AutoId
-  case class BulkReports protected[ReportArchive] (reports: List[AgentReport]) extends SystemMessage with AutoId
-  case class Print(v: Boolean) extends SystemMessage with AutoId
-}
-
-abstract class ReportArchive extends SystemAgent with Service.Args0 with ReportsPrinter{
-  def role = ReportArchive
-
-  val zeroTime = ZeroTime()
-
-  def reports: Map[AgentRef, List[AgentReport]]
-
-  def newReport(rep: AgentReport)
-
-  override def processSys = super.processSys orElse{
-    case SystemMessage.Start() => // do nothing
-    case _rep: AgentReport =>
-      val rep = if(_rep.at.undefined) _rep.updTime(zeroTime.diff) else _rep
-      newReport(rep)
-      forwarding.foreach(_ ! rep)
-      printAgentReport(rep)
-    case ReportArchive.Forward(to) => forwarding += to
-    case ReportArchive.BulkAndForward(to) =>
-      forwarding += to
-      to ! ReportArchive.BulkReports(reports.values.flatten.toList)
-    case ReportArchive.Print(v) => printing = v
-  }
-}
-
-class ReportArchiveImpl extends ReportArchive{
-  protected val _reports = mutable.LinkedHashMap.empty[AgentRef, mutable.Buffer[AgentReport]]
-  def reports: Map[AgentRef, List[AgentReport]] = _reports.mapValues(_.toList).toMap
-
-  def newReport(rep: AgentReport): Unit = _reports.getOrElse(rep.of, createNewEntry(rep)) += rep
-
-  private def createNewEntry(rep: AgentReport) = {
-    val buff = mutable.Buffer.empty[AgentReport]
-    _reports += rep.of -> buff
-    buff
-  }
-}
-
-
-trait ReportsPrinter extends ActorLogging{
-  self: ReportArchive =>
-
-
-  var printing = false
-  val forwarding = mutable.HashSet.empty[ActorRef]
-
-  def printAgentReport(rep: AgentReport) = if(printing) {
-    rep match{
-      case AgentReports.StateReport(of, report, _, _) =>
-        val sb = new StringBuilder
-        sb ++= s"Report by $of:\n"
-        report foreach {
-          case (negId, AgentReports.StateReportEntry(p, v, s, extra)) =>
-            sb ++= (" "*12 + s"priority: $p\n")
-            sb ++= (" "*12 + s"  values: $v\n")
-            sb ++= (" "*12 + s"   scope: $s")
-            if(extra.isDefined) sb ++= ("\n" + " "*12 + s"   extra: ${extra.get}")
-        }
-        log.info(sb.mkString)
-      case AgentReports.MessageReport(to, msg, _, extra) =>
-        log.info(s"Message $msg was sent by ${msg.sender} to $to" + extra.map("; extra: " +).getOrElse(""))
-    }
-
-  }
-}
-
+import scala.concurrent.duration.FiniteDuration
 
 trait AgentReport extends SystemMessage{
   def of: AgentRef
@@ -109,17 +35,17 @@ object AgentReports{
   }
 
   case class ReportStates(of: NegotiationId*) extends SystemMessage with AutoId{
-    def response(f: NegotiationId => Option[(Priority, Map[Var, Any], Set[AgentRef], Option[Any])])(implicit responding: AgentRef) =
+    def response(f: NegotiationId => Option[StateReportEntry])(implicit responding: AgentRef) =
       of.zipMap(f).map {
-        case (negId, Some(t)) => negId -> StateReportEntry.tupled(t)
+        case (negId, Some(t)) => negId -> t
         case (negId, None)    => negId -> null
       }.toMap |> (StateReport(responding, _, TimeDiffUndefined, id))
   }
 
   case class ReportAllStates() extends SystemMessage with AutoId{
-    def response(res: Map[NegotiationId, (Priority, Map[Var, Any], Set[AgentRef], Option[Any])])(implicit responding: AgentRef) =
+    def response(res: Map[NegotiationId, AgentReports.type => StateReportEntry])(implicit responding: AgentRef) =
       res.map {
-        case (negId, (p, v, s, e)) => negId -> StateReportEntry(p, v, s, e)
+        case (negId, build) => negId -> build(AgentReports)
       }.toMap |> (StateReport(responding, _, TimeDiffUndefined, id))
   }
 
@@ -135,6 +61,7 @@ object AgentReports{
   case class StateReportEntry(priority: Priority,
                               vals: Map[Var, Any],
                               scope: Set[AgentRef],
+                              currentValuesAcceptance: Boolean,
                               extra: Option[Any])
 
   case class MessageReport(to: AgentRef, msg: Language#Msg, at: TimeDiff, extra: Option[MessageReportExtra])
@@ -147,4 +74,56 @@ object AgentReports{
   trait MessageReportExtra
 
   case class WeightReport(weighted: Map[Option[Boolean], InUnitInterval]) extends MessageReportExtra
+}
+
+trait ReportsRegister extends SystemAgent{
+  def newReport(rep: AgentReport)
+}
+
+object ReportsRegister{
+  case class ControlAcceptanceCheck(of: NegotiationId) extends SystemMessage with AutoId
+
+  trait ControlNotifier{
+    def controller: AgentRef
+
+    def notifyController(msg: SystemMessage) = controller.ref ! msg
+  }
+
+  trait NegotiationSuccessWatcher extends ReportsRegister with ControlNotifier with ActorLogging{
+
+    def controlAcceptanceCheckDelay: FiniteDuration
+
+    protected val acceptanceRegister = mutable.HashMap.empty[(AgentRef, NegotiationId), Boolean]
+
+    abstract override def newReport(rep: AgentReport) = {
+      super.newReport(rep)
+      registerAcceptance(rep)
+      val check = checkAcceptance()
+      log.info("checkAcceptance = " + check)
+      check.withFilter(_._2) foreach (scheduleControlAcceptanceCheck _).compose(_._1)
+    }
+
+    override def processSys = super.processSys orElse {
+      case ControlAcceptanceCheck(neg) => if(checkAcceptance(neg)) notifyController(NegotiationFinished(neg))
+    }
+
+    protected def registerAcceptance(rep: AgentReport) = rep match {
+      case StateReport(ag, reps, _, _) => reps.foreach{
+        case (neg, entry) => acceptanceRegister += (ag, neg) -> entry.currentValuesAcceptance        
+      }
+      case _ =>
+    }
+
+    protected def checkAcceptance(): Map[NegotiationId, Boolean] = acceptanceRegister.groupBy(_._1._2) mapValues {
+        _.values.reduceLeftOption(_ && _) getOrElse false
+      }
+    protected def checkAcceptance(neg: NegotiationId): Boolean = acceptanceRegister.withFilter(_._1._2 == neg)
+      .map(_._2).reduceLeftOption(_ && _) getOrElse false
+
+    protected def scheduleControlAcceptanceCheck(of: NegotiationId) = {
+      log.info("scheduleControlAcceptanceCheck")
+      context.system.scheduler
+        .scheduleOnce(controlAcceptanceCheckDelay, self, ControlAcceptanceCheck(of))(context.dispatcher)
+    }
+  }
 }

@@ -104,7 +104,10 @@ object ProposalEngine{
       neg.state.currentProposal.foreach( _.id |> discardProposal )  // discard the old proposal in the register
       neg.state.currentProposal = Option(prop)                      // when a new one is set
       neg.state.currentProposalDate = Some(new Date())
-      if(! old.exists(prop => issuesExtractor.extract(prop) == neg.currentValues.toMap )) neg.state.currentProposalUnconditionallyAccepted = false
+      if(! old.exists(prop => issuesExtractor.extract(prop) == neg.currentValues.toMap )) {
+        neg.state.currentProposalUnconditionallyAccepted = false
+        neg.currentValuesAcceptance = false
+      }
       prop
     }
   }

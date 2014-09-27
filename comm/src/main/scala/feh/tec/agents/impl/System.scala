@@ -24,6 +24,7 @@ object System {
 
     trait Args0 extends ArgsArity{ self: AbstractAgent => }
     trait Args1[T] extends ArgsArity{ self: AbstractAgent => }
+    trait Args2[T1, T2] extends ArgsArity{ self: AbstractAgent => }
   }
 
   def conflictResolver = Props(classOf[ConflictResolver])

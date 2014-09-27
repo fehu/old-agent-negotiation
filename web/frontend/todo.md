@@ -6,3 +6,4 @@
 - [x] cache constructed rows
 - [x] responses that are processed before the corresponding proposal should not be discarded
 - [ ] conflict reports
+- [ ] acceptance in StateReport

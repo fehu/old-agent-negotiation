@@ -63,6 +63,7 @@ object SystemMessage{
 
   case class RefDemand() extends SystemMessage with AutoId
 
+  case class NegotiationFinished(neg: NegotiationId) extends SystemMessage with AutoId
 }
 
 object Message{

@@ -43,6 +43,7 @@ class DynamicScopeNegotiation(val id: NegotiationId,
 {
   implicit var currentPriority: Priority = initPriority
   val currentValues: mutable.HashMap[Var, Any] = mutable.HashMap(vars.toSeq.map(_ -> null): _*)
+  var currentValuesAcceptance = false
 
   protected val _scope = mutable.HashSet.empty[AgentRef]
 

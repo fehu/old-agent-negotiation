@@ -79,7 +79,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
     report match {
       case AgentReports.StateReport(ref, entries, time, _) =>
         val q = indexMap.getOrElse(ref, addNewIndex(ref))
-        val StateReportEntry(priority, vals, scope, extra) = entries(neg)
+        val StateReportEntry(priority, vals, scope, acceptance, extra) = entries(neg)
         Some(NQueenMessages.StateReport(q, getPosXY(vals), priority.get, Nil, time.diff))
       case rep@AgentReports.MessageReport(_to, msg, at, extra) =>
         val by = indexMap.getOrElse(rep.msg.sender, addNewIndex(rep.msg.sender))

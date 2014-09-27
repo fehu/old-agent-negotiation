@@ -2,18 +2,20 @@ package feh.tec.agents.impl
 
 import java.util.UUID
 
-import akka.actor.ActorLogging
+import akka.actor.{ActorRef, ActorLogging}
 import akka.pattern.ask
 import akka.util.Timeout
 import feh.tec.agents.Message.AutoId
 import feh.tec.agents.NegotiationController.ScopesInitialization
 import feh.tec.agents._
-import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
+import feh.tec.agents.impl.NegotiationController.GenericStaticAgentsInit.Timings
+import feh.tec.agents.impl.System.Service
+import feh.tec.agents.impl.agent.AgentBuilder.{SystemArgs2ServiceBuilder, SystemArgs0ServiceBuilder}
 import feh.tec.agents.impl.agent.{AgentBuilder, Tuple0}
 import feh.tec.agents.service.ConflictResolver
 import feh.util._
 import scala.collection.mutable
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{FiniteDuration, Duration}
 import scala.reflect.ClassTag
 
 object NegotiationController{
@@ -25,23 +27,46 @@ object NegotiationController{
 
   case class Timeouts(resolveConflict: Timeout, agentCreation: Timeout, agentStartup: Timeout)
 
-  trait GenericBuilding extends NegotiationController with SystemAgent with ActorLogging{
-    def role = Role
+  
+  
+  /** System Agent Service Builder */
+  trait SystemServiceBuilding{
+    sysAgent: SystemAgent =>
 
     implicit def acSys = context.system
-    implicit def exContext = context.dispatcher
 
-    def timeouts: Timeouts
     protected def systemAgentBuilders: Map[(AgentBuilder[Ag, Arg], ClassTag[Ag]) forSome {type Ag <: AbstractAgent; type Arg <: Product}, Int]
-
-    def handleStartup: PartialFunction[SystemMessage, Unit]
+    def timeouts: Timeouts
+    def timings: Timings
 
     lazy val systemAgents = {
       systemAgentBuilders.toSeq.par.flatMap{
-        case (Tuple2(b: AgentBuilder.SystemArgs0Service, cTag), count) =>
+        case (Tuple2(b: SystemArgs0ServiceBuilder, cTag), count) =>
           for(_ <- 1 to count) yield b.create(Tuple0, extracting = true)(cTag, implicitly, timeouts.agentCreation)
+        case (Tuple2(b: SystemArgs2ServiceBuilder[Any, Any], cTag), count) =>
+          val build = systemArgs2Service(b -> cTag)
+          for(_ <- 1 to count) yield build()
       }.toList
     }
+
+    protected def systemArgs2Service: PartialFunction[(SystemArgs2ServiceBuilder[Any, Any], ClassTag[_ <:AbstractAgent]), () => AgentRef] = {
+      case (b, cTag) if cTag.runtimeClass == classOf[ReportRegisterImpl] => reportRegisterImpl(b, cTag)
+    }
+
+    private def reportRegisterImpl(b: SystemArgs2ServiceBuilder[Any, Any], cTag: ClassTag[_ <:AbstractAgent]) = {
+      val builder = b.asInstanceOf[SystemArgs2ServiceBuilder[FiniteDuration, AgentRef]]
+      val tag = cTag.asInstanceOf[ClassTag[Service.Args2[FiniteDuration, AgentRef] with AbstractAgent]]
+      val args = timings.controlAcceptanceCheckDelay -> ref
+      () => builder.create(args, extracting = true)(tag, implicitly, timeouts.agentCreation)
+    }
+  }
+  
+  trait NegotiationControllerBase extends NegotiationController with SystemAgent with SystemServiceBuilding with ActorLogging{
+    def role = Role
+
+    implicit def exContext = context.dispatcher
+
+    def handleStartup: PartialFunction[SystemMessage, Unit]
 
     def conflictResolver = getSystemAgent(ConflictResolver.Role)
     def reportingTo = getSystemAgent(ReportArchive)
@@ -95,47 +120,11 @@ object NegotiationController{
   }
 
   trait PriorityAssignation{
-    self: GenericBuilding =>
+    self: NegotiationControllerBase =>
 
     def startingPriority: Priority
 
     lazy val assigningPriority = new Counter[NegotiationId, Priority](startingPriority, _.raise())
-  }
-
-
-  /** all agent are created in the beginning, therefore 'static' */
-  @deprecated("does not support scopes!")
-  class StaticAgentsInit(protected val systemAgentBuilders: Map[(Tuple2[AgentBuilder[Ag, Arg], ClassTag[Ag]]) forSome {type Ag <: AbstractAgent; type Arg <: Product}, Int],
-                         agentBuilders: Map[AgentBuilder[_, _], (Map[NegotiationId, Set[Var]], Int)],
-                         val timeouts: Timeouts)
-  extends GenericBuilding
-  {
-    lazy val agents = {
-      implicit def timeout = timeouts.agentCreation
-
-      agentBuilders.toSeq.par.flatMap{
-        case (b@AgentBuilder.Default, (issuesByNeg, count)) =>
-          val init = issuesByNeg.mapValues(negotiationInit)
-          for(_ <- 1 to count) yield b.create((UUID.randomUUID(), init), extracting = true)
-        case (b@AgentBuilder.PriorityBased, (issuesByNeg, count)) =>
-          val init = issuesByNeg.mapValues(negotiationInit)
-          for(_ <- 1 to count) yield
-            b.create((UUID.randomUUID(), init, conflictResolver, timeouts.resolveConflict), extracting = true)
-      }.toList
-    }
-
-    def handleStartup: PartialFunction[SystemMessage, Unit] = {
-      case _: SystemMessage.Start.Started => // it's ok
-    }
-
-    protected def negotiationInit(issues: Set[Var]) = NegotiationInit(nextPriority(), issues)
-
-    protected def nextPriority() = {
-      val c = priorityCount
-      priorityCount += 1
-      new Priority(c)
-    }
-    private var priorityCount = 0
   }
 
 
@@ -147,7 +136,9 @@ object NegotiationController{
                                                actorName: String,
                                                scopes: Map[NegotiationId, Set[String]],
                                                count: Int)
-    case class Timings(retryToStartAgent: Duration)
+    case class Timings(retryToStartAgent: FiniteDuration,
+                       checkConstraintsRepeat: FiniteDuration,
+                       controlAcceptanceCheckDelay: FiniteDuration)
   }
 
   case class GenericStaticInitArgs[BuildAgentArgs](
@@ -159,7 +150,7 @@ object NegotiationController{
                                                     )
 
   abstract class GenericStaticAgentsInit[BuildAgentArgs](arg: GenericStaticInitArgs[BuildAgentArgs])
-    extends GenericBuilding with ScopesInitialization with PriorityAssignation with ActorLogging
+    extends NegotiationControllerBase with ScopesInitialization with PriorityAssignation with ActorLogging
   {
     import GenericStaticAgentsInit._
 
@@ -167,6 +158,7 @@ object NegotiationController{
 
     def systemAgentBuilders = arg.systemAgentBuilders
     def timeouts = arg.timeouts
+    def timings = arg.timings
 
     lazy val agentsInfo = arg.agentBuilders.flatMap{
       case init@AgentInit(cTag, builder, bArgs, actorName, scopes, count) =>

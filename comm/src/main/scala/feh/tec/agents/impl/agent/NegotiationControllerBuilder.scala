@@ -2,7 +2,7 @@ package feh.tec.agents.impl.agent
 
 import java.util.UUID
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.util.Timeout
 import feh.tec.agents
 import feh.tec.agents.ConstraintsView.Constraint
@@ -12,7 +12,7 @@ import feh.tec.agents.impl.Agent.{AgentReporting, Id}
 import feh.tec.agents.impl.NegotiationController.GenericStaticAgentsInit.Timings
 import feh.tec.agents.impl.NegotiationController.{Counter, GenericStaticAgentsInit, GenericStaticInitArgs, Timeouts}
 import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
-import feh.tec.agents.impl.{ProposalEngine, NegotiationController, ReportArchiveImpl, System}
+import feh.tec.agents.impl.{ProposalEngine, NegotiationController, ReportRegisterImpl, System}
 import feh.tec.agents.spec.NegotiationSpecification._
 import feh.util._
 
@@ -34,6 +34,8 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
   def negotiations: Map[String, (NegotiationId, (Set[Var], Priority => NegotiationInit))]
   def agents: Map[String, (Map[NegotiationId, Set[String]], AgentBuilder[_ <: AbstractAgent, Args], BuildAgentArgs => Args) forSome { type Args <: Product }]
   def agentsCount: Map[String, Int]
+  def timeouts: Timeouts
+  def timings: Timings
 
   def buildAgentsCount(defs: Seq[SpawnDef]) = defs.collect{ case SimpleSpawnDef(mp) => mp }.flatten.toMap
 
@@ -81,12 +83,12 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
               case (negId, (vars, negInit)) => negId -> negInit(new Priority(args.priorityByNeg(negId)))
             },
             args.conflictResolver,
-            conflictResolveTimeout = Timeout(30 millis), // todo
+            conflictResolveTimeout = timeouts.resolveConflict,
             Role(role),
             domainIterators.asInstanceOf[Map[Var, DomainIterator[Var#Domain, Var#Tpe]]],
             constraints, // Map[NegotiationId, AgentConstraintsDef]
             reportingTo = args.reportingTo,
-            checkConstraintsRepeat = 200 millis // todo
+            checkConstraintsRepeat = timings.checkConstraintsRepeat
           )
       })
     }.toMap
@@ -150,7 +152,9 @@ object NegotiationControllerBuilder{
     )
 
     val defaultTimings = Timings(
-      retryToStartAgent = 50 millis
+      retryToStartAgent = 50 millis,
+      checkConstraintsRepeat = 200 millis,
+      controlAcceptanceCheckDelay = 1 second
     )
 
     var vars: Map[String, Var] = null
@@ -161,8 +165,8 @@ object NegotiationControllerBuilder{
     var timings: Timings = null
 
     def systemAgents: Map[(AgentBuilder[Ag, Arg], ClassTag[Ag]) forSome {type Ag <: AbstractAgent; type Arg <: Product}, Int] = Map(
-      (AgentBuilder.SystemArgs0Service, scala.reflect.classTag[System.ConflictResolver]) -> 1,
-      (AgentBuilder.SystemArgs0Service, scala.reflect.classTag[ReportArchiveImpl]) -> 1
+      (AgentBuilder.SystemArgs0ServiceBuilder, scala.reflect.classTag[System.ConflictResolver]) -> 1,
+      (AgentBuilder.SystemArgs2ServiceBuilder[FiniteDuration, ActorRef], scala.reflect.classTag[ReportRegisterImpl.Service]) -> 1
     )
 
     private def agentsToAgentInits = agents.toSeq map{

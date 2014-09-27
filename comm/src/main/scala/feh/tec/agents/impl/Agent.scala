@@ -6,7 +6,7 @@ import akka.actor.{ActorLogging, ActorRef}
 import feh.tec.agents.Message.Response
 import feh.tec.agents.SystemMessage.{RefDemand, ScopeUpdate}
 import feh.tec.agents._
-import feh.tec.agents.impl.AgentReports.{MessageReportExtra, TimeDiffUndefined}
+import feh.tec.agents.impl.AgentReports.{StateReportEntry, MessageReportExtra, TimeDiffUndefined}
 import feh.tec.agents.impl.Language.dsl._
 import feh.tec.agents.impl.Negotiation.DynamicScope
 import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
@@ -91,15 +91,23 @@ object Agent{
         status = Status.Working
         sender ! resume.resumed
 // ReportState messages
-      case req: AgentReports.ReportStates => sender ! req.response(getOpt _ andThen{ _.map{
-        neg => (neg.priority, neg.currentValues.toMap, neg.scope, extractStateReportExtra(neg.id))
-      }})
+      case req: AgentReports.ReportStates => sender ! req.response( negId => getOpt(negId) map {
+        neg =>
+          StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, neg.currentValuesAcceptance, extractStateReportExtra(neg.id))
+      }
+
+      )
+
+//        getOpt _ andThen{ _.map{
+//        neg => //()
+//      }})
       case req: AgentReports.ReportAllStates => sender ! reportAllStates(req.id)
     }
 
     protected def reportAllStates(id: UUID = UUID.randomUUID()) = {
       val negs = negotiations.map{
-        neg => neg.id -> AgentReports.StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, extractStateReportExtra(neg.id))
+        neg => neg.id ->
+          StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, neg.currentValuesAcceptance, extractStateReportExtra(neg.id))
       }.toMap
       AgentReports.StateReport(ref, negs, TimeDiffUndefined)
     }
