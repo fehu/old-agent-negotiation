@@ -22,14 +22,7 @@ class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
     new ProposalIteratorNegotiationState[DefaultNegotiatingLanguage] with ProposalViewState{ def negotiation = of }
 
   // should change with time
-  protected def isFailure(neg: Negotiation, weighted: Map[Option[Boolean], InUnitInterval]) = {
-//    val rejectLimit = .9
-//    def unknownLimit = .2 // todo: should change with time
-
-    weighted.get(Some(false)).nonEmpty
-//      .exists(_ >= rejectLimit)  ||
-//      weighted.get(None).exists(_ <= unknownLimit) && weighted.get(Some(false)).exists(_ > .5)
-  }
+  protected def isFailure(neg: Negotiation, weighted: Map[Option[Boolean], InUnitInterval]) = weighted.get(Some(false)).nonEmpty
 
   log.info(s"I'm created! $id" )
 
