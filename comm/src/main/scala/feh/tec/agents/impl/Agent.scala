@@ -94,22 +94,19 @@ object Agent{
       case req: AgentReports.ReportStates => sender ! req.response( negId => getOpt(negId) map {
         neg =>
           StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, neg.currentValuesAcceptance, extractStateReportExtra(neg.id))
-      }
-
-      )
-
-//        getOpt _ andThen{ _.map{
-//        neg => //()
-//      }})
+        })
       case req: AgentReports.ReportAllStates => sender ! reportAllStates(req.id)
     }
 
-    protected def reportAllStates(id: UUID = UUID.randomUUID()) = {
-      val negs = negotiations.map{
+    protected def reportStates(of: NegotiationId, id: UUID = UUID.randomUUID()) = reportStatesInner(negotiations.find(_.id == of), id)
+    protected def reportAllStates(id: UUID = UUID.randomUUID()) = reportStatesInner(negotiations, id)
+
+    private def reportStatesInner(negs: Iterable[Negotiation], id: UUID) = {
+      val negReps = negs.map{
         neg => neg.id ->
           StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, neg.currentValuesAcceptance, extractStateReportExtra(neg.id))
       }.toMap
-      AgentReports.StateReport(ref, negs, TimeDiffUndefined)
+      AgentReports.StateReport(ref, negReps, TimeDiffUndefined)
     }
 
     protected def extractStateReportExtra(negId: NegotiationId): Option[Any] = None
@@ -170,7 +167,7 @@ object Agent{
 
     protected def buildReports = (msg, to) =>  Set(
       AgentReports.MessageReport(to, msg, TimeDiffUndefined, extractMessageReportExtra(msg)),
-      reportAllStates()
+      reportStates(msg.negotiation)
     )
 
     protected def extractMessageReportExtra(msg: Lang#Msg): Option[MessageReportExtra] = None

@@ -23,8 +23,8 @@ object NQueenMessages extends WebSocketMessages{
                          position: (Int, Int),
                          priority: Int,
                          proposalAcceptance: Seq[(Queen, Boolean)],
-                         at: Int // system time in millis
-//                         acceptance: Boolean todo
+                         at: Int, // system time in millis
+                         acceptanceFlag: Boolean
                           ) extends CanBulk
   {
     def reportsState = true
@@ -58,4 +58,6 @@ object NQueenMessages extends WebSocketMessages{
   trait MessageExtraReport
   
   case class ReportWeight(weight: Seq[(Option[Boolean], Double)]) extends MessageExtraReport
+
+  case object NegotiationFinished extends Msg
 }

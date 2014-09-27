@@ -1,5 +1,6 @@
 package feh.tec.web
 
+import feh.tec.web.NQueenTemplates.QueenAcceptanceFlagStyles
 import feh.tec.web.common.NQueenMessages._
 import org.scalajs.dom.WebSocket
 import org.scalajs.jquery.jQuery
@@ -34,6 +35,7 @@ object NQueen extends JSApp with NQueenSocketListener{
 
     queensInfo.foreach(_._2.setCallbacks())
 
+    jQuery("head") append QueenAcceptanceFlagStyles.generate(queens.size)
     jQuery(containerForBoard) append chessBoard.create
     jQuery(containerForInfo) append communications.create.toString()
 
@@ -74,7 +76,8 @@ trait NQueenSocketListener extends SocketConnections{
         case "BulkReport" if ! json.messages.asInstanceOf[js.Array[_]].isEmpty =>
           val bulkable = json.messages.asInstanceOf[js.Array[js.Dynamic]].flatMap( getBulkable(_: js.Dynamic) )
           bulkReport(BulkReport(bulkable))
-        case "BulkReport" => // do nothing
+        case "BulkReport" =>
+        case "NegotiationFinished" => js.eval("alert('Negotiation Finished')")
       }
   }
 
@@ -87,7 +90,8 @@ trait NQueenSocketListener extends SocketConnections{
         proposalAcceptance = json.proposalAcceptance.asInstanceOf[js.Array[js.Array[_]]].map(
           (x: js.Array[_]) => Queen(x(0).asInstanceOf[js.Dynamic].n.asInstanceOf[Int]) -> x(1).asInstanceOf[Boolean]
         ),
-        at = json.at.asInstanceOf[Int]
+        at = json.at.asInstanceOf[Int],
+        acceptanceFlag = json.acceptanceFlag.asInstanceOf[Boolean]
       )
     case "MessageReport" =>
       MessageReport(

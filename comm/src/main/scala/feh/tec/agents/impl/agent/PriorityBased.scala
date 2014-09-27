@@ -107,7 +107,12 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
       else markAccepted(neg)
   }
 
-  def markAccepted(neg: ANegotiation) = neg.currentValuesAcceptance = true
+  def markAccepted(neg: ANegotiation) = {
+    val old = neg.currentValuesAcceptance
+    neg.currentValuesAcceptance = true
+    // reassure
+    if(!old) spamProposal(neg)
+  }
   def markUncondAccepted(neg: ANegotiation) = {
     markAccepted(neg)
     neg.state.currentProposalUnconditionallyAccepted = true

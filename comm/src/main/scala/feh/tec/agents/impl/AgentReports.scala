@@ -98,9 +98,7 @@ object ReportsRegister{
     abstract override def newReport(rep: AgentReport) = {
       super.newReport(rep)
       registerAcceptance(rep)
-      val check = checkAcceptance()
-      log.info("checkAcceptance = " + check)
-      check.withFilter(_._2) foreach (scheduleControlAcceptanceCheck _).compose(_._1)
+      checkAcceptance().withFilter(_._2) foreach (scheduleControlAcceptanceCheck _).compose(_._1)
     }
 
     override def processSys = super.processSys orElse {
@@ -120,10 +118,7 @@ object ReportsRegister{
     protected def checkAcceptance(neg: NegotiationId): Boolean = acceptanceRegister.withFilter(_._1._2 == neg)
       .map(_._2).reduceLeftOption(_ && _) getOrElse false
 
-    protected def scheduleControlAcceptanceCheck(of: NegotiationId) = {
-      log.info("scheduleControlAcceptanceCheck")
-      context.system.scheduler
-        .scheduleOnce(controlAcceptanceCheckDelay, self, ControlAcceptanceCheck(of))(context.dispatcher)
-    }
+    protected def scheduleControlAcceptanceCheck(of: NegotiationId) = context.system.scheduler
+      .scheduleOnce(controlAcceptanceCheckDelay, self, ControlAcceptanceCheck(of))(context.dispatcher)
   }
 }

@@ -90,10 +90,15 @@ object ProposalEngine{
     }
 
     /** sets next values set from the common domain and updates proposal */
-    def setNextProposal(neg: ANegotiation) = nextIssues(neg).map{
-      issues =>
-        neg.currentValues ++= issues
-        updateProposal(neg)
+    def setNextProposal(neg: ANegotiation) = {
+      neg.state.currentProposalUnconditionallyAccepted = false
+      neg.currentValuesAcceptance = false
+
+      nextIssues(neg).map{
+        issues =>
+          neg.currentValues ++= issues
+          updateProposal(neg)
+      }
     }
 
     protected def issuesExtractor: IssuesExtractor[Lang]
@@ -104,10 +109,6 @@ object ProposalEngine{
       neg.state.currentProposal.foreach( _.id |> discardProposal )  // discard the old proposal in the register
       neg.state.currentProposal = Option(prop)                      // when a new one is set
       neg.state.currentProposalDate = Some(new Date())
-      if(! old.exists(prop => issuesExtractor.extract(prop) == neg.currentValues.toMap )) {
-        neg.state.currentProposalUnconditionallyAccepted = false
-        neg.currentValuesAcceptance = false
-      }
       prop
     }
   }

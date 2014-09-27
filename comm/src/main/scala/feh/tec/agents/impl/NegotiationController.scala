@@ -74,6 +74,7 @@ object NegotiationController{
     def start() = {
       implicit def timeout = timeouts.agentStartup
 
+      negotiationFinished.clear()
       systemAgents map (_.ref ! SystemMessage.Start())
       agents map (_.ref ? SystemMessage.Start() |> (_.mapTo[SystemMessage] map handleStartup))
     }
@@ -94,12 +95,20 @@ object NegotiationController{
       }))
     }
 
+    protected lazy val negotiationFinished = mutable.HashMap.empty[NegotiationId, Boolean].withDefaultValue(false)
+    
+    def negotiationIsFinished(neg: NegotiationId)
+
     // todo: stop
     override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse{
-      case req@Request.AgentRefs()  => sender() ! agents
-      case SystemMessage.Start()    => start()
-      case SystemMessage.Resume()   => resume()
-      case SystemMessage.Stop()     => stop()
+      case req@Request.AgentRefs()            => sender() ! agents
+      case SystemMessage.Start()              => start()
+      case SystemMessage.Resume()             => resume()
+      case SystemMessage.Stop()               => stop()
+      case SystemMessage.NegotiationFinished(neg) if !negotiationFinished(neg) =>
+        negotiationFinished += neg -> true
+        negotiationIsFinished(neg)
+      case _: SystemMessage.NegotiationFinished =>
     }
 
     protected def getSystemAgent(role: Role) = systemAgents.filter(_.id.role == role).ensuring(_.size == 1).head

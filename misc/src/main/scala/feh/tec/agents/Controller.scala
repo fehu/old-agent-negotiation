@@ -50,6 +50,10 @@ class Controller(arg: GenericStaticInitArgs[DefaultBuildAgentArgs], web: WebSock
     ))
   }
 
+  override def negotiationIsFinished(neg: NegotiationId) = {
+    super.negotiationIsFinished(neg)
+    web.ref ! SystemMessage.NegotiationFinished(neg)
+  }
 }
 
 class NQueenWebSocketPushServer(neg: NegotiationId, 
@@ -80,7 +84,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
       case AgentReports.StateReport(ref, entries, time, _) =>
         val q = indexMap.getOrElse(ref, addNewIndex(ref))
         val StateReportEntry(priority, vals, scope, acceptance, extra) = entries(neg)
-        Some(NQueenMessages.StateReport(q, getPosXY(vals), priority.get, Nil, time.diff))
+        Some(NQueenMessages.StateReport(q, getPosXY(vals), priority.get, Nil, time.diff, acceptance))
       case rep@AgentReports.MessageReport(_to, msg, at, extra) =>
         val by = indexMap.getOrElse(rep.msg.sender, addNewIndex(rep.msg.sender))
         val to = indexMap.getOrElse(_to, addNewIndex(_to))
@@ -108,7 +112,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
   protected case object FlushReports
   
   protected lazy val reportsBuff = mutable.Buffer.empty[AgentReport]
-  
+
   override def receive = super.receive orElse{
     // guard the reports until
     case rep@AgentReports.StateReport(_, entries, _, _) if entries contains neg =>
@@ -124,6 +128,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
       val bulk = NQueenMessages.BulkReport(reportsBuff.toList flatMap reportToBulkable)
       reportsBuff.clear()
       super.receive(push(bulk))
+    case fin: SystemMessage.NegotiationFinished => super.receive(push(NQueenMessages.NegotiationFinished))
   }
 
   scheduleFlush()
@@ -133,5 +138,5 @@ class NQueenWebSocketPushServerBuilder(host: String, port: Int, negotiationId: N
                                       (implicit asys: ActorSystem)
   extends WebSocketPushServerInitialization(host, port)
 {
-  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, 500 millis)) // todo: should be configurable
+  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, 250 millis)) // todo: should be configurable
 }

@@ -136,6 +136,8 @@ object NegotiationControllerBuilder{
       reportingTo,
       countByRole = roleCounter.next
     )
+
+    def negotiationIsFinished(neg: NegotiationId) = log.info("Negotiation Finished")
   }
 
 
@@ -146,9 +148,9 @@ object NegotiationControllerBuilder{
     type BuildAgentArgs = DefaultBuildAgentArgs
 
     val defaultTimeouts = Timeouts(
-      resolveConflict = 30 millis,
-      agentCreation = 30 millis,
-      agentStartup = 30 millis
+      resolveConflict = 50 millis,
+      agentCreation = 50 millis,
+      agentStartup = 50 millis
     )
 
     val defaultTimings = Timings(

@@ -3,6 +3,8 @@ package feh.tec.web
 import feh.tec.web.common.NQueenMessages.{Queen, StateReport}
 import org.scalajs.jquery._
 import scala.collection.mutable
+import scalatags.Text.short._
+import scalatags.Text.{tags, tags2}
 
 
 object NQueenTemplates{
@@ -13,6 +15,22 @@ object NQueenTemplates{
     def communications      = jQuery(".queen-comm")
   }
 
+  object QueenAcceptanceFlagStyles{
+    def id(i: Int) = s"style-acceptance-flag-$i"
+
+    def generate(n: Int) = (
+      for (i <- 1 to n)
+        yield tags2.style(
+          *.`type`  := "text/css",
+          *.disabled  := true,
+          *.id      := id(i),
+          raw(
+            s"""
+              |.queen-$i .name { color: green; }
+            """.stripMargin)
+        )
+      ).mkString("\n")
+  }
 }
 
 import feh.tec.web.NQueenTemplates._
@@ -37,10 +55,12 @@ class ChessBoard(size: Int) {
   def updatePositions(posUpdate: Map[Int, (Int, Int)]): Any = {
     if (posUpdate.forall(upd => placedQueens.exists(upd ==))) return {}
     placedQueens ++= posUpdate.toSeq
-    val newLabels = placedQueens.groupBy(_._2).mapValues(_.keySet).mapValues(_.mkString(",")).withDefaultValue("")
+    val newLabels = placedQueens.groupBy(_._2)
+      .mapValues(_.keySet.map(i =>
+        tags.span(*.`class` := s"queen-$i", tags.span(*.`class` := "name", i))
+      ).mkString(",")).withDefaultValue("")
     for(i <- 1 to size; j <- 1 to size) {
-      val l = newLabels.getOrElse(i -> j, "")
-      jQuery(s".chess-board tr:nth-child(${i+1}) td:nth-child(${j+1})") text l
+      jQuery(s".chess-board tr:nth-child(${i+1}) td:nth-child(${j+1})") html newLabels.getOrElse(i -> j, "")
     }
   }
 }
@@ -57,9 +77,11 @@ object QueenInfo{
 class QueenInfo(name: String, val n: Int, selection: QueenInfo.Selection){
 
   def updateState(state: StateReport) = state match {
-    case StateReport(Queen(q), pos, pr, _, _) =>
+    case StateReport(Queen(q), pos, pr, _, _, acceptFlag) =>
       sel.queenInfo(q) children ".priority" children "dd" text pr.toString
       sel.queenInfo(q) children ".position" children "dd" text pos.toString
+
+      jQuery("#" + QueenAcceptanceFlagStyles.id(q)).prop("disabled", !acceptFlag)
   }
 
   def updateSelection() = for(i <- 1 to n ){
