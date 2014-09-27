@@ -5,14 +5,16 @@ import java.util.UUID
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.util.Timeout
 import feh.tec.agents
+import feh.tec.agents.AgentRef
 import feh.tec.agents.ConstraintsView.Constraint
 import feh.tec.agents.NegotiationController.ScopesInitialization
 import feh.tec.agents._
 import feh.tec.agents.impl.Agent.{AgentReporting, Id}
+import feh.tec.agents.impl.NegotiationController
 import feh.tec.agents.impl.NegotiationController.GenericStaticAgentsInit.Timings
 import feh.tec.agents.impl.NegotiationController.{Counter, GenericStaticAgentsInit, GenericStaticInitArgs, Timeouts}
 import feh.tec.agents.impl.agent.AgentCreation.NegotiationInit
-import feh.tec.agents.impl.{ProposalEngine, NegotiationController, ReportRegisterImpl, System}
+import feh.tec.agents.impl._
 import feh.tec.agents.spec.NegotiationSpecification._
 import feh.util._
 
@@ -25,9 +27,11 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
 
   type BuildAgentArgs <: Product{
     def priorityByNeg: NegotiationId => Int
+    def countByRole: String => Int
+
     def conflictResolver: AgentRef
     def reportingTo: AgentRef
-    def countByRole: String => Int
+    def knowledgeShare: AgentRef
   }
 
   def vars: Map[String, Var]
@@ -88,7 +92,8 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
             domainIterators.asInstanceOf[Map[Var, DomainIterator[Var#Domain, Var#Tpe]]],
             constraints, // Map[NegotiationId, AgentConstraintsDef]
             reportingTo = args.reportingTo,
-            checkConstraintsRepeat = timings.checkConstraintsRepeat
+            checkConstraintsRepeat = timings.checkConstraintsRepeat,
+            knowledgeShare = args.knowledgeShare
           )
       })
     }.toMap
@@ -117,9 +122,10 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
 object NegotiationControllerBuilder{
 
   case class DefaultBuildAgentArgs(priorityByNeg: NegotiationId => Int,
+                                   countByRole: String => Int,
                                    conflictResolver: AgentRef,
                                    reportingTo: AgentRef,
-                                   countByRole: String => Int)
+                                   knowledgeShare: AgentRef)
 
 
 
@@ -132,9 +138,10 @@ object NegotiationControllerBuilder{
 
     protected def buildAgentArgs = DefaultBuildAgentArgs(
       priorityByNeg = negId => assigningPriority.next(negId),
+      countByRole = roleCounter.next,
       conflictResolver,
       reportingTo,
-      countByRole = roleCounter.next
+      knowledgeShare
     )
 
     override def negotiationIsFinished(neg: NegotiationId) = {
@@ -171,7 +178,8 @@ object NegotiationControllerBuilder{
 
     def systemAgents: Map[(AgentBuilder[Ag, Arg], ClassTag[Ag]) forSome {type Ag <: AbstractAgent; type Arg <: Product}, Int] = Map(
       (AgentBuilder.SystemArgs0ServiceBuilder, scala.reflect.classTag[System.ConflictResolver]) -> 1,
-      (AgentBuilder.SystemArgs2ServiceBuilder[FiniteDuration, ActorRef], scala.reflect.classTag[ReportRegisterImpl.Service]) -> 1
+      (AgentBuilder.SystemArgs2ServiceBuilder[FiniteDuration, ActorRef], scala.reflect.classTag[ReportRegisterImpl.Service]) -> 1,
+      (AgentBuilder.SystemArgs0ServiceBuilder, scala.reflect.classTag[KnowledgeSharing.Service]) -> 1
     )
 
     private def agentsToAgentInits = agents.toSeq map{
@@ -237,6 +245,7 @@ abstract class GenericIteratingAgentCreation[Lang <: ProposalLanguage](args: Gen
   override lazy val id = Id.withName(role, args.uuid, args.name)
   lazy val role: Role = args.role
   def domainIterators = args.domainIterators
+  
   lazy val constraints = args.constraints.flatMap{
     case (negId, AgentConstraintsDef(cDefs)) =>
       cDefs map {
@@ -298,7 +307,8 @@ object GenericIteratingAgentCreation{
                   domainIterators: Map[Var, DomainIterator[Var#Domain, Var#Tpe]],
                   constraints: Map[NegotiationId, AgentConstraintsDef],
                   reportingTo: AgentRef,
-                  checkConstraintsRepeat: FiniteDuration)
+                  checkConstraintsRepeat: FiniteDuration,
+                  knowledgeShare: AgentRef)
 
   object Builder extends AgentBuilder[GenericIteratingAgentCreation[_], Args]
 }

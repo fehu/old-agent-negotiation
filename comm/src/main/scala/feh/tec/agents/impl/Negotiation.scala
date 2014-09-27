@@ -56,6 +56,8 @@ class DynamicScopeNegotiation(val id: NegotiationId,
     case ScopeUpdate.NewAgents(refs, neg) if neg == id => _scope ++= refs
     case ScopeUpdate.RmAgents(refs, neg)  if neg == id => _scope --= refs
   }
+
+  def resetPriority() = currentPriority = initPriority
 }
 
 abstract class NegotiationException(msg: String) extends Exception(msg)

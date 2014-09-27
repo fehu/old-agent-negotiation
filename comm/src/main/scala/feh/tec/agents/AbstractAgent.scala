@@ -46,6 +46,7 @@ trait Negotiation{
 
   def priority = currentPriority
   implicit var currentPriority: Priority
+  def resetPriority()
 
   def scope: Set[AgentRef]
 
@@ -68,6 +69,7 @@ trait Role {
   }
 
   override def toString = s"Role($name)"
+  override def hashCode = toString.hashCode
 }
 
 object Role{

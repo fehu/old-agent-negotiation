@@ -3,7 +3,10 @@ package feh.tec.agents.impl
 import java.util.Date
 
 import akka.actor.ActorLogging
+import feh.tec.agents.Message.AutoId
 import feh.tec.agents._
+import feh.tec.agents.impl.Agent.SystemSupport
+import feh.tec.agents.impl.ProposalEngine.SharingKnowledge.ConfigurationProvenFailure
 import feh.util._
 
 import scala.collection.mutable
@@ -136,11 +139,30 @@ object ProposalEngine{
   trait IteratingAllDomainsLearningFromMistakes[Lang <: ProposalLanguage] 
     extends IteratingAllDomains[Lang] with LearningFromMistakes[Lang]
   {
-    self: NegotiatingAgent with ProposalBased[Lang] with ProposalRegister[Lang] =>
+    self: NegotiatingAgent with ProposalBased[Lang] with ProposalRegister[Lang] with SpeakingAgent[_] with AgentHelpers[_] =>
     
     override protected def nextIssues(neg: Negotiation) = neg.state.currentIterator flatMap {
       _.filter(notProvenFailure(neg)).inCase(_.hasNext).map(_.next())
     }
   }
-  
+
+
+  object SharingKnowledge{
+    case class ConfigurationProvenFailure(neg: NegotiationId, config: Map[Var, Any], sender: Agent.Id) extends SystemMessage with AutoId
+  }
+
+  trait SharingKnowledge[Lang <: ProposalLanguage] extends LearningFromMistakes[Lang] with SystemSupport{
+    self: NegotiatingAgent with ProposalBased[Lang] with ActorLogging with SpeakingAgent[_] with AgentHelpers[_] =>
+
+    def knowledgeShare: AgentRef
+
+    override def guardFailedValueConfiguration(neg: Negotiation) = {
+      super.guardFailedValueConfiguration(neg)
+      knowledgeShare.ref ! ConfigurationProvenFailure(neg.id, neg.currentValues.toMap, ref.id)
+    }
+
+    override def processSys = super.processSys orElse{
+      case ConfigurationProvenFailure(neg, config, _) => failedValueConfigurations(neg) += config
+    }
+  }
 }

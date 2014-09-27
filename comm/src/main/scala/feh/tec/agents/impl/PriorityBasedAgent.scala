@@ -50,7 +50,7 @@ trait PriorityBasedAgent[Lang <: ProposalLanguage] extends Agent[Lang]
 
   protected def spamProposal(neg: ANegotiation)
 
-  lazy val behaviourOnProposal = new PriorityBasedOnProposalBehaviour[Lang#Proposal]{
+  class OnProposalBehaviour extends PriorityBasedOnProposalBehaviour[Lang#Proposal]{
     def disputeOverPriorityWon(msg: Lang#Msg) = {
       risePriority(msg.negotiation)
       act(msg.asInstanceOf[Lang#Proposal])
@@ -61,6 +61,8 @@ trait PriorityBasedAgent[Lang <: ProposalLanguage] extends Agent[Lang]
 
     def reassessTheProposal(msg: Lang#Msg) = spamProposal(get(msg.negotiation))
   }
+
+  lazy val behaviourOnProposal = new OnProposalBehaviour
 
   lazy val behaviourOnRejection = new PriorityBasedBacktrackBehaviour[Lang#Rejected] {
     def disputeOverPriorityWon(msg: Lang#Msg) = {

@@ -14,6 +14,7 @@ class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
   with ProposalEngine.IteratingAllDomainsLearningFromMistakes[DefaultNegotiatingLanguage]
   with AgentReportingMessagesAndState[DefaultNegotiatingLanguage]
   with ActorLogging
+//  with ProposalEngine.SharingKnowledge[DefaultNegotiatingLanguage]
 {
   type StateOfNegotiation = ProposalIteratorNegotiationState[DefaultNegotiatingLanguage] with ProposalViewState
 
@@ -41,4 +42,13 @@ class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
     Message.PriorityConflict(causedBy.negotiation)
   }
   protected def isPriorityConflict(msg: DefaultNegotiatingLanguage#Msg) = msg.isInstanceOf[Message.PriorityConflict]
+
+  def knowledgeShare = arg.knowledgeShare
+
+  def resetIterator(negId: NegotiationId) = {
+    val neg = get(negId)
+    val vals = neg.currentValues.toMap
+    val it = newIterator(negId)
+    neg.state.currentIterator = Some(it)
+  }
 }

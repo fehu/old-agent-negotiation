@@ -57,6 +57,39 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
       checkConstraintsTimer = null
   }
 
+
+  def resetIterator(negId: NegotiationId)
+  def resetIteratorIfNewTopPriority(msg: Lang#Msg) = {
+    if(lastOnProposalMaxPriority.exists(msg.priority > _)) resetIterator(msg.negotiation)
+    lastOnProposalMaxPriority = Some(maxPriority)
+  }
+  
+  protected var lastOnProposalMaxPriority: Option[agents.Priority] = None
+  
+  override lazy val behaviourOnProposal = new OnProposalBehaviour{
+    override def act(prop: Lang#Proposal) = {
+      resetIteratorIfNewTopPriority(prop)
+      super.act(prop)
+    }
+
+    override def disputeOverPriorityWon(msg: Lang#Msg) = {
+      resetIteratorIfNewTopPriority(msg)
+      super.disputeOverPriorityWon(msg)
+    }
+
+    override def disputeOverPriorityLost(msg: Lang#Msg) = {
+      resetIteratorIfNewTopPriority(msg)
+      super.disputeOverPriorityLost(msg)
+    }
+
+    override def reassessTheProposal(msg: Lang#Msg) = {
+      resetIteratorIfNewTopPriority(msg)
+      super.reassessTheProposal(msg)
+    }
+  }
+
+  def maxPriority = constraintsSatisfactions.merge._2.data.map(_._2._2).maxBy(_.get)
+
   def checkConstraints(negId: NegotiationId): Unit = get(negId) |> {
     neg =>
       val currentProposal = neg.state.currentProposal.get
@@ -71,8 +104,6 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
             case (msgId, opt) => msgId -> (opt -> (negId -> pr.map(_._2).getOrElse(null.asInstanceOf[agents.Priority])))
           }
       }
-
-      val maxPriority = constraintsSatisfactions.merge._2.data.map(_._2._2).maxBy(_.get)
 
       if(neg.currentPriority > maxPriority) {
         markUncondAccepted(neg)
@@ -124,11 +155,37 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
 
   override def startLife() = negotiations foreach {
     neg =>
+
+//      val before = "="*3 + " BEFORE " + "="*3
+
+//      log.info(s"$before externalViews: $externalViews")
+//      log.info(s"$before failedValueConfigurations: $failedValueConfigurations")
+//      log.info(s"$before proposalsWithoutResponse: $proposalsWithoutResponse")
+//      log.info(s"$before neg.state.lastWeightedProposal: ${neg.state.lastWeightedProposal}")
+//      log.info(s"$before neg.priority: ${neg.priority}")
+//      log.info(s"$before neg.currentValue: ${neg.currentValues}")
+//      log.info(s"$before neg.state.currentProposal: ${neg.state.currentProposal}")
+
       externalViews.foreach(_.reset())
-      failedValueConfigurations.mapValues(_.clear())
+      failedValueConfigurations.foreach(_._2.clear())
+      proposalsWithoutResponse.clear()
+
+      neg.state.lastWeightedProposal = None
+      neg.resetPriority()
+
       resetProposal(neg)
       spamProposal(neg)
       checkConstraintsTimer = scheduleCheckConstraints(checkConstraintsRepeat, checkConstraintsRepeat)
+
+//      val after = "="*3 + " AFTER " + "="*3
+
+//      log.info(s"$after externalViews: $externalViews")
+//      log.info(s"$after failedValueConfigurations: $failedValueConfigurations")
+//      log.info(s"$after proposalsWithoutResponse: $proposalsWithoutResponse")
+//      log.info(s"$after neg.state.lastWeightedProposal: ${neg.state.lastWeightedProposal}")
+//      log.info(s"$after neg.priority: ${neg.priority}")
+//      log.info(s"$after neg.currentValue: ${neg.currentValues}")
+//      log.info(s"$after neg.state.currentProposal: ${neg.state.currentProposal}")
   }
 
   def resumeLife() = negotiations foreach {

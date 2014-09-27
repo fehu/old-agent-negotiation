@@ -1,21 +1,21 @@
 package feh.tec.agents.impl
 
-import java.util.UUID
-
-import akka.actor.{ActorRef, ActorLogging}
+import akka.actor.ActorLogging
 import akka.pattern.ask
 import akka.util.Timeout
 import feh.tec.agents.Message.AutoId
 import feh.tec.agents.NegotiationController.ScopesInitialization
+import feh.tec.agents.SystemMessage.ScopeUpdate
 import feh.tec.agents._
 import feh.tec.agents.impl.NegotiationController.GenericStaticAgentsInit.Timings
 import feh.tec.agents.impl.System.Service
-import feh.tec.agents.impl.agent.AgentBuilder.{SystemArgs2ServiceBuilder, SystemArgs0ServiceBuilder}
+import feh.tec.agents.impl.agent.AgentBuilder.{SystemArgs0ServiceBuilder, SystemArgs2ServiceBuilder}
 import feh.tec.agents.impl.agent.{AgentBuilder, Tuple0}
 import feh.tec.agents.service.ConflictResolver
 import feh.util._
+
 import scala.collection.mutable
-import scala.concurrent.duration.{FiniteDuration, Duration}
+import scala.concurrent.duration.FiniteDuration
 import scala.reflect.ClassTag
 
 object NegotiationController{
@@ -70,6 +70,7 @@ object NegotiationController{
 
     def conflictResolver = getSystemAgent(ConflictResolver.Role)
     def reportingTo = getSystemAgent(ReportArchive)
+    def knowledgeShare = getSystemAgent(KnowledgeSharing.Role)
 
     def restart() = {
       negotiationFinished.clear()
@@ -165,7 +166,7 @@ object NegotiationController{
   abstract class GenericStaticAgentsInit[BuildAgentArgs](arg: GenericStaticInitArgs[BuildAgentArgs])
     extends NegotiationControllerBase with ScopesInitialization with PriorityAssignation with ActorLogging
   {
-    import GenericStaticAgentsInit._
+    import feh.tec.agents.impl.NegotiationController.GenericStaticAgentsInit._
 
     protected def buildAgentArgs: BuildAgentArgs
 
@@ -193,6 +194,7 @@ object NegotiationController{
 
     override def start(): Unit = {
       systemAgents; agents // init lazy
+      knowledgeShare.ref ! ScopeUpdate.NewScope(agents.toSet, null)
       arg.negotiationIds foreach updateScopes
       super.start()
     }

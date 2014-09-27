@@ -12,8 +12,8 @@
 - [ ] spawn, timings and timeouts config
 - [x] guard timestamp on report creation - the difference between negotiation start and the current moment
 - [ ] conflict reports
-- [ ] share failed values configuration knowledge between agents with the same role
-- [ ] domain iterator must be reset when a new top-priority agent arises
+- [ ] share failed values configuration knowledge between agents with the same role (for by-var negotiation)
+- [x] domain iterator must be reset when a new top-priority agent arises
 - [ ] fix: deadlocks possible if 3 or more agents have same priority
 - [ ] proposal change must consider the acceptance percentage
 - [ ] throw exception if all domain values have been proven failure  
