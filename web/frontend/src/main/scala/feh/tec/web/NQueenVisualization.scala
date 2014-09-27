@@ -1,8 +1,11 @@
 package feh.tec.web
 
 import feh.tec.web.common.NQueenMessages.{Queen, StateReport}
+import scalajs.js
+import org.scalajs.dom
 import org.scalajs.jquery._
 import scala.collection.mutable
+import scala.scalajs.js.annotation.JSExport
 import scalatags.Text.short._
 import scalatags.Text.{tags, tags2}
 
@@ -31,6 +34,29 @@ object NQueenTemplates{
         )
       ).mkString("\n")
   }
+}
+
+class NQueenRestart{
+  def negotiationFinishedAndWillRestart(delay: Int) = {
+    NQueen.sel.containerForBoard append restartHtml(delay).toString()
+  }
+  def restart() = dom.window.location.reload()
+
+  private def restartHtml(countdown: Int) = tags.span(
+    *.`class` := "restart-negotiation",
+    "The negotiation is finished!", tags.br, "It will restart approximately in ", tags.span(*.`class` := "countdown"), " seconds",
+    tags.script(raw(s"NQueenRestart().countdown($countdown)"))
+  )
+}
+
+@JSExport
+object NQueenRestart{
+  @JSExport
+  def countdown(startingWith: js.Number): Unit ={
+    jQuery(".restart-negotiation .countdown") text (startingWith / 1000).toInt.toString
+    dom.window.setTimeout((i: Int) => countdown(i), 1000, startingWith-1000)
+  }
+
 }
 
 import feh.tec.web.NQueenTemplates._

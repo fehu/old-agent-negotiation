@@ -1,3 +1,4 @@
+- [ ] design ...
 - [x] use timestamps guarded on report creation, instead of the own
 - [x] use ScalaTags
 - [x] the reports must be sent in bulk in a fixed interval

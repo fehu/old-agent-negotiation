@@ -11,3 +11,14 @@
     width:          50%;
     margin-right:   5%;
 }
+
+.restart-negotiation {
+    color: green;
+    font-size: x-large;
+    margin: 30px;
+}
+
+.restart-negotiation .countdown{
+    font-weight: bold;
+    color: brown;
+}
