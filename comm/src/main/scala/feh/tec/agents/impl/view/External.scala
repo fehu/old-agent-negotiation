@@ -11,6 +11,8 @@ import scala.collection.mutable
 trait ExternalViewImpl extends ExternalView{
   protected lazy val _data = mutable.HashMap.empty[AgentRef, Data]
   def data = _data.toMap
+
+  def reset() = _data.clear()
 }
 
 /** Gathers priority from all messages */
@@ -54,7 +56,7 @@ class ExternalConstraints[Lang <: ProposalLanguage](lang: Lang,
   private def addData(sender: AgentRef, id: UUID, v: Option[Boolean]) =
     _data.getOrElse(sender, mutable.HashMap.empty[Message.Id, Option[Boolean]] //.withDefaultValue(None)
       .$$(_data += sender -> _)) += id -> v
-//    _data.getOrElseUpdate(msg.sender, mutable.HashMap.empty.withDefaultValue(None)) += msg.id -> v
 
   def discard(id: Id) = _data.foreach(_._2.remove(id))
+  def reset() = _data.clear()
 }

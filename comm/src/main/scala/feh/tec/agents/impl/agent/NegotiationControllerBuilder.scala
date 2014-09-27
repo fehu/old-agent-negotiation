@@ -137,7 +137,10 @@ object NegotiationControllerBuilder{
       countByRole = roleCounter.next
     )
 
-    def negotiationIsFinished(neg: NegotiationId) = log.info("Negotiation Finished")
+    override def negotiationIsFinished(neg: NegotiationId) = {
+      super.negotiationIsFinished(neg)
+      log.info("Negotiation Finished")
+    }
   }
 
 

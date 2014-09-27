@@ -78,6 +78,7 @@ trait NQueenSocketListener extends SocketConnections{
           bulkReport(BulkReport(bulkable))
         case "BulkReport" =>
         case "NegotiationFinished" => js.eval("alert('Negotiation Finished')")
+        case "NegotiationFinishedAutoRestart" => println("NegotiationFinishedAutoRestart")
       }
   }
 

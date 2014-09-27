@@ -59,7 +59,7 @@ class NQueenUserAgent(nspec: spec.NegotiationSpecification) extends UserAgent wi
   println("spec.agents = " + nspec.agents)
   println("spec.config = " + nspec.config)
 
-  val builder: ControllerBuilder[_] = new ControllerBuilder[GenericNegotiatingAgent](WebSocketInterface(web.server))
+  val builder: ControllerBuilder[_] = new ControllerBuilder[GenericNegotiatingAgent](WebSocketInterface(web.server), 5 seconds)
 
   if(wsConf.secure("n-queen")) sys.error("wss not supported")
 

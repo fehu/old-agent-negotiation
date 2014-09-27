@@ -28,6 +28,8 @@ sealed trait ViewMerge extends ExternalView{
 //      sys.error("_data = " + data)
   }
 
+  def reset() = mergeSet.foreach(_.reset())
+
   protected def getData[V <: ExternalView](select: Merge => V)(implicit ref: AgentRef): V#Data =
     select(merge).data.getOrElse(ref, null.asInstanceOf[V#Data])
 

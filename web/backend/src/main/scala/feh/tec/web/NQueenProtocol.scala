@@ -14,28 +14,27 @@ object NQueenProtocol extends DefaultJsonProtocol{
     }
     def read(json: JsValue): T = ???
   }
+
+  abstract class WriteOnlyFormat[T](writef: T => JsValue)extends RootJsonFormat[T]{
+    def write(obj: T) = writef(obj)
+    def read(json: JsValue) = ???
+  }
   
   implicit object QueenFormat extends NamedFormat(jsonFormat1(Queen))
   implicit lazy val InitFormat: JsonFormat[Init] = new NamedFormat(jsonFormat1(Init)){}
   implicit lazy val StateReportFormat: JsonFormat[StateReport] = new NamedFormat(jsonFormat6(StateReport)){}
 
-  implicit object CanBulkFormat extends RootJsonFormat[CanBulk] {
-    def write(obj: NQueenMessages.CanBulk): JsValue = obj match {
-      case state: StateReport => StateReportFormat.write(state)
-      case msg: MessageReport => MessageSentFormat.write(msg)
-    }
-    def read(json: JsValue): NQueenMessages.CanBulk = ???
-  }
+  implicit object CanBulkFormat extends WriteOnlyFormat[CanBulk] ({
+    case state: StateReport => StateReportFormat.write(state)
+    case msg: MessageReport => MessageSentFormat.write(msg)
+  })
 
   implicit lazy val BulkReportFormat: JsonFormat[BulkReport] = new NamedFormat(jsonFormat1(BulkReport)) {}
 
-  implicit object MessageTypeFormat extends RootJsonFormat[MessageType]{
-    def write(obj: MessageType): JsValue = obj match {
+  implicit object MessageTypeFormat extends WriteOnlyFormat[MessageType]({
       case Acceptance => JsString("Acceptance")
       case Rejection  => JsString("Rejection")
-    }
-    def read(json: JsValue): MessageType = ???
-  }
+  })
 
   implicit object MessageExtraReportFormat extends RootJsonFormat[MessageExtraReport]{
     lazy val ReportWeightFormat = new NamedFormat[ReportWeight](jsonFormat1(ReportWeight)) {}
@@ -60,8 +59,14 @@ object NQueenProtocol extends DefaultJsonProtocol{
   implicit lazy val MessageFormat: JsonFormat[Message] = new NamedFormat(jsonFormat3(Message)){}
   implicit lazy val MessageSentFormat: JsonFormat[MessageReport] = new NamedFormat(jsonFormat5(MessageReport)){}
 
-  implicit object NegotiationFinishedFormat extends JsonFormat[NegotiationFinished.type]{
-    def write(obj: NegotiationFinished.type) = JsObject("$t" -> JsString("NegotiationFinished"))
-    def read(json: JsValue) = ???
-  }
+  implicit object NegotiationFinishedFormat extends WriteOnlyFormat[NegotiationFinished.type](
+    _ => JsObject("$t" -> JsString("NegotiationFinished"))
+  )
+
+  implicit object RestartFormat extends WriteOnlyFormat[Restart.type](
+    _ => JsObject("$t" -> JsString("Restart"))
+  )
+
+  implicit lazy val NegotiationFinishedAutoRestartFormat =
+    new NamedFormat[NegotiationFinishedAutoRestart](jsonFormat1(NegotiationFinishedAutoRestart)) {}
 }

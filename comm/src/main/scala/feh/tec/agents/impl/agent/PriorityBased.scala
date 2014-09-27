@@ -124,6 +124,8 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
 
   override def startLife() = negotiations foreach {
     neg =>
+      externalViews.foreach(_.reset())
+      failedValueConfigurations.mapValues(_.clear())
       resetProposal(neg)
       spamProposal(neg)
       checkConstraintsTimer = scheduleCheckConstraints(checkConstraintsRepeat, checkConstraintsRepeat)

@@ -4,6 +4,8 @@ import java.util.UUID
 
 import feh.tec.agents.Message.AutoId
 
+import scala.concurrent.duration.Duration
+
 sealed trait AbstractMessage{
   def id: Message.Id
 }
@@ -64,6 +66,7 @@ object SystemMessage{
   case class RefDemand() extends SystemMessage with AutoId
 
   case class NegotiationFinished(neg: NegotiationId) extends SystemMessage with AutoId
+  case class NegotiationFinishedAutoRestart(neg: NegotiationId, restartingIn: Duration) extends SystemMessage with AutoId
 }
 
 object Message{

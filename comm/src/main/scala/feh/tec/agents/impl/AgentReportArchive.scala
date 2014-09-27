@@ -21,12 +21,14 @@ object ReportArchive extends SystemRole{
 abstract class ReportArchive extends ReportsRegister with ReportsPrinter{
   def role = ReportArchive
 
-  val zeroTime = ZeroTime()
+  def zeroTime: ZeroTime
 
   def reports: Map[AgentRef, List[AgentReport]]
 
+  def start()
+
   override def processSys = super.processSys orElse{
-    case SystemMessage.Start() => // do nothing
+    case SystemMessage.Start() => start()
     case _rep: AgentReport =>
       val rep = if(_rep.at.undefined) _rep.updTime(zeroTime.diff) else _rep
       newReport(rep)
@@ -81,6 +83,13 @@ class ArchiveRegisterImpl extends ReportArchive {
     _reports += rep.of -> buff
     buff
   }
+
+  var zeroTime = ZeroTime()
+
+  def start() = {
+    _reports.clear()
+    zeroTime = ZeroTime()
+  }
 }
 
 object ArchiveRegisterImpl{
@@ -89,6 +98,12 @@ object ArchiveRegisterImpl{
 
 class ReportRegisterImpl(val controlAcceptanceCheckDelay: FiniteDuration, val controller: AgentRef)
   extends ArchiveRegisterImpl with ReportsRegister.NegotiationSuccessWatcher
+{
+  override def start() = {
+    super.start()
+    acceptanceRegister.clear()
+  }
+}
 
 object ReportRegisterImpl{
   type Service = ReportRegisterImpl with Service.Args2[FiniteDuration, ActorRef]

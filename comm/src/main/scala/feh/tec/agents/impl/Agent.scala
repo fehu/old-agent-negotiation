@@ -72,7 +72,8 @@ object Agent{
 
     override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse {
 // Start messages
-      case start: SystemMessage.Start if status == Status.Initialized || status == Status.Created && initReady_? =>
+      case start: SystemMessage.Start if status == Status.Initialized || status == Status.Created && initReady_? ||
+                     /* -- Restart -- */ status == Status.Stopped =>
         startLife()
         status = Status.Working
         sender() ! start.done

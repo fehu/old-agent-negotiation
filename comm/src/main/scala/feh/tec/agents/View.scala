@@ -24,6 +24,8 @@ trait ExternalView extends View{
   def data: Map[AgentRef, Data]
 
   def process: PartialFunction[Message, Unit]
+
+  def reset()
 }
 
 /** A view over own constraints

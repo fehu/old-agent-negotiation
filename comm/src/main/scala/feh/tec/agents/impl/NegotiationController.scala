@@ -71,10 +71,14 @@ object NegotiationController{
     def conflictResolver = getSystemAgent(ConflictResolver.Role)
     def reportingTo = getSystemAgent(ReportArchive)
 
+    def restart() = {
+      negotiationFinished.clear()
+    }
+
     def start() = {
       implicit def timeout = timeouts.agentStartup
 
-      negotiationFinished.clear()
+      if(negotiationFinished.nonEmpty) restart()
       systemAgents map (_.ref ! SystemMessage.Start())
       agents map (_.ref ? SystemMessage.Start() |> (_.mapTo[SystemMessage] map handleStartup))
     }
@@ -97,7 +101,7 @@ object NegotiationController{
 
     protected lazy val negotiationFinished = mutable.HashMap.empty[NegotiationId, Boolean].withDefaultValue(false)
     
-    def negotiationIsFinished(neg: NegotiationId)
+    def negotiationIsFinished(neg: NegotiationId) = stop()
 
     // todo: stop
     override def processSys: PartialFunction[SystemMessage, Unit] = super.processSys orElse{
