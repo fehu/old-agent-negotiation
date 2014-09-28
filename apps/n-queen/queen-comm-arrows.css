@@ -1,0 +1,11 @@
+.queen-comm tr[to="left"] td.l{
+    background: url("data:image/svg+xml;utf8,<svg width='75px' height='16px' version='1.1' xmlns='http://www.w3.org/2000/svg'><rect x='5' y='6' width='65' height='4' stroke='black' fill='black' stroke-width='1'/><path d='M  0 8, L  0 7, L 10 0, V 16, Z'/></svg>");
+    background-repeat: no-repeat;
+    background-color: white;
+}
+
+.queen-comm tr[to="right"] td.r{
+    background: url("data:image/svg+xml;utf8,<svg width='75px' height='16px' version='1.1' xmlns='http://www.w3.org/2000/svg'><rect x='5' y='6' width='65' height='4' stroke='black' fill='black' stroke-width='1'/><path d='M 75 8, L 75 7, L 65 0, V 16, Z'/></svg>");
+    background-repeat: no-repeat;
+    background-color: white;
+}

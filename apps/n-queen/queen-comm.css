@@ -44,11 +44,15 @@
      background-color:      rgb(111, 111, 233);
  }
 
-.queen-comm .messages td.l
-.queen-comm .messages td.priority
-.queen-comm .messages td.position
-.queen-comm .messages td.type
-.queen-comm .messages td.r
+.queen-comm .messages td {
+    vertical-align: middle;
+}
 
 
-//.queen-comm .messages .message .priority
+.queen-comm td.weighted .acceptance, .queen-comm td.weighted .rejection{
+    display: inline-block;
+}
+
+.queen-comm td.weighted .unknown{
+    color: whitesmoke;
+}

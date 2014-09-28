@@ -1,9 +1,9 @@
 <!DOCTYPE html >
 <html>
         <head>
-          <title>StaticAgentsInit - feh.tec.agents.impl.NegotiationController.StaticAgentsInit</title>
-          <meta name="description" content="StaticAgentsInit - feh.tec.agents.impl.NegotiationController.StaticAgentsInit" />
-          <meta name="keywords" content="StaticAgentsInit feh.tec.agents.impl.NegotiationController.StaticAgentsInit" />
+          <title>ReportRegisterImpl - feh.tec.agents.impl.ReportRegisterImpl</title>
+          <meta name="description" content="ReportRegisterImpl - feh.tec.agents.impl.ReportRegisterImpl" />
+          <meta name="keywords" content="ReportRegisterImpl feh.tec.agents.impl.ReportRegisterImpl" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
@@ -16,7 +16,7 @@
       <script type="text/javascript">
          if(top === self) {
             var url = '../../../../index.html';
-            var hash = 'feh.tec.agents.impl.NegotiationController$$StaticAgentsInit';
+            var hash = 'feh.tec.agents.impl.ReportRegisterImpl';
             var anchor = window.location.hash;
             var anchor_opt = '';
             if (anchor.length >= 1)
@@ -28,10 +28,10 @@
         </head>
         <body class="type">
       <div id="definition">
-        <img src="../../../../lib/class_big.png" />
-        <p id="owner"><a href="../../../package.html" class="extype" name="feh">feh</a>.<a href="../../package.html" class="extype" name="feh.tec">tec</a>.<a href="../package.html" class="extype" name="feh.tec.agents">agents</a>.<a href="package.html" class="extype" name="feh.tec.agents.impl">impl</a>.<a href="NegotiationController$.html" class="extype" name="feh.tec.agents.impl.NegotiationController">NegotiationController</a></p>
-        <h1>StaticAgentsInit</h1> <span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit" title="Permalink" target="_top">
+        <a href="ReportRegisterImpl$.html" title="Go to companion"><img src="../../../../lib/class_to_object_big.png" /></a>
+        <p id="owner"><a href="../../../package.html" class="extype" name="feh">feh</a>.<a href="../../package.html" class="extype" name="feh.tec">tec</a>.<a href="../package.html" class="extype" name="feh.tec.agents">agents</a>.<a href="package.html" class="extype" name="feh.tec.agents.impl">impl</a></p>
+        <h1><a href="ReportRegisterImpl$.html" title="Go to companion">ReportRegisterImpl</a></h1> <span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -43,20 +43,17 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name deprecated" title="Deprecated: does not support scopes!">StaticAgentsInit</span><span class="result"> extends <a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a></span>
+        <span class="name">ReportRegisterImpl</span><span class="result"> extends <a href="ArchiveRegisterImpl.html" class="extype" name="feh.tec.agents.impl.ArchiveRegisterImpl">ArchiveRegisterImpl</a> with <a href="ReportsRegister$$NegotiationSuccessWatcher.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">NegotiationSuccessWatcher</a></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>all agent are created in the beginning, therefore 'static'</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
-                <span class="name">@deprecated</span>
-              
-        </dd><dt>Deprecated</dt><dd class="cmt"><p>does not support scopes!</p></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a>, <span class="extype" name="akka.actor.ActorLogging">ActorLogging</span>, <a href="SystemAgent.html" class="extype" name="feh.tec.agents.impl.SystemAgent">SystemAgent</a>, <a href="Agent$$EssentialSystemSupport.html" class="extype" name="feh.tec.agents.impl.Agent.EssentialSystemSupport">EssentialSystemSupport</a>, <a href="../NegotiationController.html" class="extype" name="feh.tec.agents.NegotiationController">agents.NegotiationController</a>, <a href="../AbstractAgent.html" class="extype" name="feh.tec.agents.AbstractAgent">AbstractAgent</a>, <span class="extype" name="akka.actor.Actor">Actor</span>, <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="ReportsRegister$$NegotiationSuccessWatcher.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">NegotiationSuccessWatcher</a>, <a href="ReportsRegister$$ControlNotifier.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.ControlNotifier">ControlNotifier</a>, <a href="ArchiveRegisterImpl.html" class="extype" name="feh.tec.agents.impl.ArchiveRegisterImpl">ArchiveRegisterImpl</a>, <a href="ReportArchive.html" class="extype" name="feh.tec.agents.impl.ReportArchive">ReportArchive</a>, <a href="ReportsPrinter.html" class="extype" name="feh.tec.agents.impl.ReportsPrinter">ReportsPrinter</a>, <span class="extype" name="akka.actor.ActorLogging">ActorLogging</span>, <a href="ReportsRegister.html" class="extype" name="feh.tec.agents.impl.ReportsRegister">ReportsRegister</a>, <a href="SystemAgent.html" class="extype" name="feh.tec.agents.impl.SystemAgent">SystemAgent</a>, <a href="Agent$$EssentialSystemSupport.html" class="extype" name="feh.tec.agents.impl.Agent.EssentialSystemSupport">EssentialSystemSupport</a>, <a href="../AbstractAgent.html" class="extype" name="feh.tec.agents.AbstractAgent">AbstractAgent</a>, <span class="extype" name="akka.actor.Actor">Actor</span>, <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block diagram-container" id="inheritance-diagram-container">
                 <span class="toggle diagram-link">Type Hierarchy</span>
                 <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#diagrams" target="_blank" class="diagram-help">Learn more about scaladoc diagrams</a>
-                <div class="diagram" id="inheritance-diagram"><svg class="class-diagram" id="graph209" viewBox="0.00 0.00 172.00 120.00" height="120pt" width="172pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 116)" class="graph" id="graph1"><polygon points="-4,5 -4,-116 169,-116 169,5 -4,5" stroke="white" fill="white"></polygon><g class="cluster" id="graph2"></g><g class="cluster" id="graph3"></g><!-- node0 --><g class="node this class" id="graph209_0"><a xlink:title="feh.tec.agents.impl.NegotiationController.StaticAgentsInit (this class)" xlink:href="#inheritance-diagram"><polygon points="139.25,-50 24.75,-50 24.75,-24 139.25,-24 139.25,-50" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../lib/class_diagram.png" y="-45" x="35" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-35" x="57" text-anchor="start">StaticAgentsInit</text></a></g><!-- node1 --><g class="node trait" id="graph209_1"><a xlink:title="feh.tec.agents.impl.NegotiationController.GenericBuilding" xlink:href="NegotiationController$$GenericBuilding.html#inheritance-diagram"><polygon points="139,-112 25,-112 25,-86 139,-86 139,-112" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../lib/trait_diagram.png" y="-107" x="35" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-97" x="57" text-anchor="start">GenericBuilding</text></a></g><!-- node1&#45;&gt;node0 --><g class="edge inheritance" id="graph209_1_0"><a xlink:title="StaticAgentsInit is a subtype of GenericBuilding"><path d="M82,-80.6826C82,-70.8961 82,-58.9026 82,-50.1238" stroke="#d4d4d4" fill="none"></path><polygon points="80.2501,-80.8581 82,-85.8581 83.7501,-80.8581 80.2501,-80.8581" stroke="#d4d4d4" fill="none"></polygon></a></g></g></svg></div>
+                <div class="diagram" id="inheritance-diagram"><svg class="class-diagram" id="graph206" viewBox="0.00 0.00 325.00 120.00" height="120pt" width="325pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 116)" class="graph" id="graph1"><polygon points="-4,5 -4,-116 322,-116 322,5 -4,5" stroke="white" fill="white"></polygon><g class="cluster" id="graph2"></g><g class="cluster" id="graph3"></g><!-- node0 --><g class="node this class" id="graph206_0"><a xlink:title="feh.tec.agents.impl.ReportRegisterImpl (this class)" xlink:href="#inheritance-diagram"><polygon points="213,-50 85,-50 85,-24 213,-24 213,-50" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../lib/class_diagram.png" y="-45" x="95" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-35" x="117" text-anchor="start">ReportRegisterImpl</text></a></g><!-- node1 --><g class="node class" id="graph206_1"><a xlink:title="feh.tec.agents.impl.ArchiveRegisterImpl" xlink:href="ArchiveRegisterImpl.html#inheritance-diagram"><polygon points="130.25,-112 -0.25,-112 -0.25,-86 130.25,-86 130.25,-112" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../lib/class_diagram.png" y="-107" x="10" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-97" x="32" text-anchor="start">ArchiveRegisterImpl</text></a></g><!-- node1&#45;&gt;node0 --><g class="edge inheritance" id="graph206_1_0"><a xlink:title="ReportRegisterImpl is a subtype of ArchiveRegisterImpl"><path d="M86.2536,-82.8189C100.433,-72.6906 118.826,-59.5529 132.027,-50.1238" stroke="#d4d4d4" fill="none"></path><polygon points="85.0502,-81.5278 81.9987,-85.8581 87.0845,-84.3759 85.0502,-81.5278" stroke="#d4d4d4" fill="none"></polygon></a></g><!-- node2 --><g class="node trait" id="graph206_2"><a xlink:title="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher" xlink:href="ReportsRegister$$NegotiationSuccessWatcher.html#inheritance-diagram"><polygon points="317.25,-112 148.75,-112 148.75,-86 317.25,-86 317.25,-112" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../lib/trait_diagram.png" y="-107" x="159" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-97" x="181" text-anchor="start">NegotiationSuccessWatcher</text></a></g><!-- node2&#45;&gt;node0 --><g class="edge inheritance" id="graph206_2_0"><a xlink:title="ReportRegisterImpl is a subtype of NegotiationSuccessWatcher"><path d="M211.746,-82.8189C197.567,-72.6906 179.174,-59.5529 165.973,-50.1238" stroke="#d4d4d4" fill="none"></path><polygon points="210.915,-84.3759 216.001,-85.8581 212.95,-81.5278 210.915,-84.3759" stroke="#d4d4d4" fill="none"></polygon></a></g></g></svg></div>
               </div></div>
         
 
@@ -74,7 +71,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit"><span>StaticAgentsInit</span></li><li class="in" name="feh.tec.agents.impl.NegotiationController.GenericBuilding"><span>GenericBuilding</span></li><li class="in" name="akka.actor.ActorLogging"><span>ActorLogging</span></li><li class="in" name="feh.tec.agents.impl.SystemAgent"><span>SystemAgent</span></li><li class="in" name="feh.tec.agents.impl.Agent.EssentialSystemSupport"><span>EssentialSystemSupport</span></li><li class="in" name="feh.tec.agents.NegotiationController"><span>NegotiationController</span></li><li class="in" name="feh.tec.agents.AbstractAgent"><span>AbstractAgent</span></li><li class="in" name="akka.actor.Actor"><span>Actor</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="feh.tec.agents.impl.ReportRegisterImpl"><span>ReportRegisterImpl</span></li><li class="in" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher"><span>NegotiationSuccessWatcher</span></li><li class="in" name="feh.tec.agents.impl.ReportsRegister.ControlNotifier"><span>ControlNotifier</span></li><li class="in" name="feh.tec.agents.impl.ArchiveRegisterImpl"><span>ArchiveRegisterImpl</span></li><li class="in" name="feh.tec.agents.impl.ReportArchive"><span>ReportArchive</span></li><li class="in" name="feh.tec.agents.impl.ReportsPrinter"><span>ReportsPrinter</span></li><li class="in" name="akka.actor.ActorLogging"><span>ActorLogging</span></li><li class="in" name="feh.tec.agents.impl.ReportsRegister"><span>ReportsRegister</span></li><li class="in" name="feh.tec.agents.impl.SystemAgent"><span>SystemAgent</span></li><li class="in" name="feh.tec.agents.impl.Agent.EssentialSystemSupport"><span>EssentialSystemSupport</span></li><li class="in" name="feh.tec.agents.AbstractAgent"><span>AbstractAgent</span></li><li class="in" name="akka.actor.Actor"><span>Actor</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -94,19 +91,19 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(systemAgentBuilders:Map[(feh.tec.agents.impl.agent.AgentBuilder[Ag,Arg],scala.reflect.ClassTag[Ag])forSome{typeAg&lt;:feh.tec.agents.AbstractAgent;typeArg&lt;:Product},Int],agentBuilders:Map[feh.tec.agents.impl.agent.AgentBuilder[_,_],(Map[feh.tec.agents.NegotiationId,Set[feh.tec.agents.Var]],Int)],timeouts:feh.tec.agents.impl.NegotiationController.Timeouts):feh.tec.agents.impl.NegotiationController.StaticAgentsInit"></a>
-      <a id="&lt;init&gt;:StaticAgentsInit"></a>
+              <ol><li name="feh.tec.agents.impl.ReportRegisterImpl#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(controlAcceptanceCheckDelay:scala.concurrent.duration.FiniteDuration,controller:feh.tec.agents.AgentRef):feh.tec.agents.impl.ReportRegisterImpl"></a>
+      <a id="&lt;init&gt;:ReportRegisterImpl"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">StaticAgentsInit</span><span class="params">(<span name="systemAgentBuilders">systemAgentBuilders: <span class="extype" name="scala.Predef.Map">Map</span>[(<a href="agent/AgentBuilder.html" class="extype" name="feh.tec.agents.impl.agent.AgentBuilder">AgentBuilder</a>[<span class="extype" name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit.&lt;init&gt;.systemAgentBuilders.Ag">Ag</span>, <span class="extype" name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit.&lt;init&gt;.systemAgentBuilders.Arg">Arg</span>], <span class="extype" name="scala.reflect.ClassTag">ClassTag</span>[<span class="extype" name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit.&lt;init&gt;.systemAgentBuilders.Ag">Ag</span>]) forSome {type Ag &lt;: <a href="../AbstractAgent.html" class="extype" name="feh.tec.agents.AbstractAgent">AbstractAgent</a>, type Arg &lt;: <span class="extype" name="scala.Product">Product</span>}, <span class="extype" name="scala.Int">Int</span>]</span>, <span name="agentBuilders">agentBuilders: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="agent/AgentBuilder.html" class="extype" name="feh.tec.agents.impl.agent.AgentBuilder">AgentBuilder</a>[_, _], (<span class="extype" name="scala.Predef.Map">Map</span>[<a href="../NegotiationId.html" class="extype" name="feh.tec.agents.NegotiationId">NegotiationId</a>, <span class="extype" name="scala.Predef.Set">Set</span>[<a href="../Var.html" class="extype" name="feh.tec.agents.Var">Var</a>]], <span class="extype" name="scala.Int">Int</span>)]</span>, <span name="timeouts">timeouts: <a href="NegotiationController$$Timeouts.html" class="extype" name="feh.tec.agents.impl.NegotiationController.Timeouts">Timeouts</a></span>)</span>
+        <span class="name">ReportRegisterImpl</span><span class="params">(<span name="controlAcceptanceCheckDelay">controlAcceptanceCheckDelay: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span></span>, <span name="controller">controller: <a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@&lt;init&gt;(systemAgentBuilders:Map[(feh.tec.agents.impl.agent.AgentBuilder[Ag,Arg],scala.reflect.ClassTag[Ag])forSome{typeAg&lt;:feh.tec.agents.AbstractAgent;typeArg&lt;:Product},Int],agentBuilders:Map[feh.tec.agents.impl.agent.AgentBuilder[_,_],(Map[feh.tec.agents.NegotiationId,Set[feh.tec.agents.Var]],Int)],timeouts:feh.tec.agents.impl.NegotiationController.Timeouts):feh.tec.agents.impl.NegotiationController.StaticAgentsInit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@&lt;init&gt;(controlAcceptanceCheckDelay:scala.concurrent.duration.FiniteDuration,controller:feh.tec.agents.AgentRef):feh.tec.agents.impl.ReportRegisterImpl" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -128,7 +125,7 @@
         <span class="name">Id</span><span class="result"> = <a href="Agent$$Id.html" class="extype" name="feh.tec.agents.impl.Agent.Id">Agent.Id</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@Id=feh.tec.agents.impl.Agent.Id" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@Id=feh.tec.agents.impl.Agent.Id" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -145,7 +142,7 @@
         <span class="name">Receive</span><span class="result"> = <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="scala.Any">Any</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@Receive=akka.actor.Actor.Receive" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@Receive=akka.actor.Actor.Receive" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -169,7 +166,7 @@
         <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@!=(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -186,7 +183,7 @@
         <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@##():Int" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@##():Int" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -203,7 +200,7 @@
         <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@==(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@==(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -220,45 +217,45 @@
         <span class="name">_currentMsg</span><span class="result">: <a href="../AbstractMessage.html" class="extype" name="feh.tec.agents.AbstractMessage">AbstractMessage</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@_currentMsg:feh.tec.agents.AbstractMessage" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@_currentMsg:feh.tec.agents.AbstractMessage" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../AbstractAgent.html" class="extype" name="feh.tec.agents.AbstractAgent">AbstractAgent</a></dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.GenericBuilding#acSys" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="acSys:akka.actor.ActorSystem"></a>
-      <a id="acSys:ActorSystem"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">acSys</span><span class="result">: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@acSys:akka.actor.ActorSystem" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a></dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit#agents" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="agents:List[feh.tec.agents.AgentRef]"></a>
-      <a id="agents:List[agents.AgentRef]"></a>
+    </li><li name="feh.tec.agents.impl.ArchiveRegisterImpl#_reports" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="_reports:scala.collection.mutable.LinkedHashMap[feh.tec.agents.AgentRef,scala.collection.mutable.Buffer[feh.tec.agents.impl.AgentReport]]"></a>
+      <a id="_reports:LinkedHashMap[agents.AgentRef,Buffer[AgentReport]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">lazy val</span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">agents</span><span class="result">: <a href="../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a>]</span>
+        <span class="name">_reports</span><span class="result">: <span class="extype" name="scala.collection.mutable.LinkedHashMap">LinkedHashMap</span>[<a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a>, <span class="extype" name="scala.collection.mutable.Buffer">Buffer</span>[<a href="AgentReport.html" class="extype" name="feh.tec.agents.impl.AgentReport">AgentReport</a>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@agents:List[feh.tec.agents.AgentRef]" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@_reports:scala.collection.mutable.LinkedHashMap[feh.tec.agents.AgentRef,scala.collection.mutable.Buffer[feh.tec.agents.impl.AgentReport]]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit">StaticAgentsInit</a> → <a href="../NegotiationController.html" class="extype" name="feh.tec.agents.NegotiationController">NegotiationController</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="ArchiveRegisterImpl.html" class="extype" name="feh.tec.agents.impl.ArchiveRegisterImpl">ArchiveRegisterImpl</a></dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher#acceptanceRegister" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="acceptanceRegister:scala.collection.mutable.HashMap[(feh.tec.agents.AgentRef,feh.tec.agents.NegotiationId),Boolean]"></a>
+      <a id="acceptanceRegister:HashMap[(agents.AgentRef,NegotiationId),Boolean]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">acceptanceRegister</span><span class="result">: <span class="extype" name="scala.collection.mutable.HashMap">HashMap</span>[(<a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a>, <a href="../NegotiationId.html" class="extype" name="feh.tec.agents.NegotiationId">NegotiationId</a>), <span class="extype" name="scala.Boolean">Boolean</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@acceptanceRegister:scala.collection.mutable.HashMap[(feh.tec.agents.AgentRef,feh.tec.agents.NegotiationId),Boolean]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="ReportsRegister$$NegotiationSuccessWatcher.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">NegotiationSuccessWatcher</a></dd></dl></div>
     </li><li name="akka.actor.Actor#aroundPostRestart" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="aroundPostRestart(reason:Throwable):Unit"></a>
       <a id="aroundPostRestart(Throwable):Unit"></a>
@@ -271,7 +268,7 @@
         <span class="name">aroundPostRestart</span><span class="params">(<span name="reason">reason: <a href="../../../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@aroundPostRestart(reason:Throwable):Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@aroundPostRestart(reason:Throwable):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -288,7 +285,7 @@
         <span class="name">aroundPostStop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@aroundPostStop():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@aroundPostStop():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -305,7 +302,7 @@
         <span class="name">aroundPreRestart</span><span class="params">(<span name="reason">reason: <a href="../../../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a></span>, <span name="message">message: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@aroundPreRestart(reason:Throwable,message:Option[Any]):Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@aroundPreRestart(reason:Throwable,message:Option[Any]):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -322,7 +319,7 @@
         <span class="name">aroundPreStart</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@aroundPreStart():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@aroundPreStart():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -339,7 +336,7 @@
         <span class="name">aroundReceive</span><span class="params">(<span name="receive">receive: <span class="extype" name="akka.actor.Actor.Receive">akka.actor.Actor.Receive</span></span>, <span name="msg">msg: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@aroundReceive(receive:akka.actor.Actor.Receive,msg:Any):Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@aroundReceive(receive:akka.actor.Actor.Receive,msg:Any):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -356,11 +353,45 @@
         <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@asInstanceOf[T0]:T0" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher#checkAcceptance" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkAcceptance(neg:feh.tec.agents.NegotiationId):Boolean"></a>
+      <a id="checkAcceptance(NegotiationId):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkAcceptance</span><span class="params">(<span name="neg">neg: <a href="../NegotiationId.html" class="extype" name="feh.tec.agents.NegotiationId">NegotiationId</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@checkAcceptance(neg:feh.tec.agents.NegotiationId):Boolean" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="ReportsRegister$$NegotiationSuccessWatcher.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">NegotiationSuccessWatcher</a></dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher#checkAcceptance" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkAcceptance():Map[feh.tec.agents.NegotiationId,Boolean]"></a>
+      <a id="checkAcceptance():Map[NegotiationId,Boolean]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkAcceptance</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../NegotiationId.html" class="extype" name="feh.tec.agents.NegotiationId">NegotiationId</a>, <span class="extype" name="scala.Boolean">Boolean</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@checkAcceptance():Map[feh.tec.agents.NegotiationId,Boolean]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="ReportsRegister$$NegotiationSuccessWatcher.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">NegotiationSuccessWatcher</a></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>
@@ -373,7 +404,7 @@
         <span class="name">clone</span><span class="params">()</span><span class="result">: <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@clone():Object" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@clone():Object" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -384,23 +415,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.GenericBuilding#conflictResolver" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="conflictResolver:feh.tec.agents.AgentRef"></a>
-      <a id="conflictResolver:agents.AgentRef"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">conflictResolver</span><span class="result">: <a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@conflictResolver:feh.tec.agents.AgentRef" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a></dd></dl></div>
     </li><li name="akka.actor.Actor#context" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="context:akka.actor.ActorContext"></a>
       <a id="context:ActorContext"></a>
@@ -413,11 +427,45 @@
         <span class="name">context</span><span class="result">: <span class="extype" name="akka.actor.ActorContext">ActorContext</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@context:akka.actor.ActorContext" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@context:akka.actor.ActorContext" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ReportRegisterImpl#controlAcceptanceCheckDelay" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="controlAcceptanceCheckDelay:scala.concurrent.duration.FiniteDuration"></a>
+      <a id="controlAcceptanceCheckDelay:FiniteDuration"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">controlAcceptanceCheckDelay</span><span class="result">: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@controlAcceptanceCheckDelay:scala.concurrent.duration.FiniteDuration" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.impl.ReportRegisterImpl">ReportRegisterImpl</a> → <a href="ReportsRegister$$NegotiationSuccessWatcher.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">NegotiationSuccessWatcher</a></dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ReportRegisterImpl#controller" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="controller:feh.tec.agents.AgentRef"></a>
+      <a id="controller:agents.AgentRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">controller</span><span class="result">: <a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@controller:feh.tec.agents.AgentRef" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.impl.ReportRegisterImpl">ReportRegisterImpl</a> → <a href="ReportsRegister$$ControlNotifier.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.ControlNotifier">ControlNotifier</a></dd></dl></div>
     </li><li name="feh.tec.agents.AbstractAgent#currentMsg" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="currentMsg:feh.tec.agents.AbstractMessage"></a>
       <a id="currentMsg:AbstractMessage"></a>
@@ -430,7 +478,7 @@
         <span class="name">currentMsg</span><span class="result">: <a href="../AbstractMessage.html" class="extype" name="feh.tec.agents.AbstractMessage">AbstractMessage</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@currentMsg:feh.tec.agents.AbstractMessage" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@currentMsg:feh.tec.agents.AbstractMessage" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -447,7 +495,7 @@
         <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -464,28 +512,11 @@
         <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@equals(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.GenericBuilding#exContext" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="exContext:scala.concurrent.ExecutionContextExecutor"></a>
-      <a id="exContext:ExecutionContextExecutor"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">exContext</span><span class="result">: <span class="extype" name="scala.concurrent.ExecutionContextExecutor">ExecutionContextExecutor</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@exContext:scala.concurrent.ExecutionContextExecutor" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a></dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -498,7 +529,7 @@
         <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@finalize():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@finalize():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -509,6 +540,23 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ReportsPrinter#forwarding" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="forwarding:scala.collection.mutable.HashSet[akka.actor.ActorRef]"></a>
+      <a id="forwarding:HashSet[ActorRef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">forwarding</span><span class="result">: <span class="extype" name="scala.collection.mutable.HashSet">HashSet</span>[<span class="extype" name="akka.actor.ActorRef">ActorRef</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@forwarding:scala.collection.mutable.HashSet[akka.actor.ActorRef]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ReportsPrinter.html" class="extype" name="feh.tec.agents.impl.ReportsPrinter">ReportsPrinter</a></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -521,45 +569,11 @@
         <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@getClass():Class[_]" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@getClass():Class[_]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.GenericBuilding#getSystemAgent" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="getSystemAgent(role:feh.tec.agents.Role):feh.tec.agents.AgentRef"></a>
-      <a id="getSystemAgent(Role):agents.AgentRef"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getSystemAgent</span><span class="params">(<span name="role">role: <a href="../Role.html" class="extype" name="feh.tec.agents.Role">Role</a></span>)</span><span class="result">: <a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@getSystemAgent(role:feh.tec.agents.Role):feh.tec.agents.AgentRef" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a></dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit#handleStartup" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="handleStartup:PartialFunction[feh.tec.agents.SystemMessage,Unit]"></a>
-      <a id="handleStartup:PartialFunction[SystemMessage,Unit]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">handleStartup</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="../SystemMessage.html" class="extype" name="feh.tec.agents.SystemMessage">SystemMessage</a>, <span class="extype" name="scala.Unit">Unit</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@handleStartup:PartialFunction[feh.tec.agents.SystemMessage,Unit]" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit">StaticAgentsInit</a> → <a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a></dd></dl></div>
     </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <a id="hashCode():Int"></a>
@@ -572,7 +586,7 @@
         <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@hashCode():Int" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@hashCode():Int" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -589,7 +603,7 @@
         <span class="name">id</span><span class="result">: <a href="Agent$$Id.html" class="extype" name="feh.tec.agents.impl.Agent.Id">Agent.Id</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@id:feh.tec.agents.impl.Agent.Id" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@id:feh.tec.agents.impl.Agent.Id" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -606,7 +620,7 @@
         <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -623,7 +637,7 @@
         <span class="name">lifeCycle</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="../AbstractMessage.html" class="extype" name="feh.tec.agents.AbstractMessage">AbstractMessage</a>, <span class="extype" name="scala.Unit">Unit</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@lifeCycle:PartialFunction[feh.tec.agents.AbstractMessage,Unit]" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@lifeCycle:PartialFunction[feh.tec.agents.AbstractMessage,Unit]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -640,7 +654,7 @@
         <span class="name">log</span><span class="result">: <span class="extype" name="akka.event.LoggingAdapter">LoggingAdapter</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@log:akka.event.LoggingAdapter" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@log:akka.event.LoggingAdapter" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -657,45 +671,28 @@
         <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit#negotiationInit" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="negotiationInit(issues:Set[feh.tec.agents.Var]):feh.tec.agents.impl.agent.AgentCreation.NegotiationInit"></a>
-      <a id="negotiationInit(Set[Var]):NegotiationInit"></a>
+    </li><li name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher#newReport" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="newReport(rep:feh.tec.agents.impl.AgentReport):Unit"></a>
+      <a id="newReport(AgentReport):Unit"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">negotiationInit</span><span class="params">(<span name="issues">issues: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="../Var.html" class="extype" name="feh.tec.agents.Var">Var</a>]</span>)</span><span class="result">: <a href="agent/AgentCreation$$NegotiationInit.html" class="extype" name="feh.tec.agents.impl.agent.AgentCreation.NegotiationInit">NegotiationInit</a></span>
+        <span class="name">newReport</span><span class="params">(<span name="rep">rep: <a href="AgentReport.html" class="extype" name="feh.tec.agents.impl.AgentReport">AgentReport</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@negotiationInit(issues:Set[feh.tec.agents.Var]):feh.tec.agents.impl.agent.AgentCreation.NegotiationInit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@newReport(rep:feh.tec.agents.impl.AgentReport):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit#nextPriority" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="nextPriority():feh.tec.agents.Priority"></a>
-      <a id="nextPriority():Priority"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">nextPriority</span><span class="params">()</span><span class="result">: <a href="../Priority.html" class="extype" name="feh.tec.agents.Priority">Priority</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@nextPriority():feh.tec.agents.Priority" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ReportsRegister$$NegotiationSuccessWatcher.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">NegotiationSuccessWatcher</a> → <a href="ReportsRegister.html" class="extype" name="feh.tec.agents.impl.ReportsRegister">ReportsRegister</a></dd></dl></div>
     </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <a id="notify():Unit"></a>
@@ -708,7 +705,7 @@
         <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@notify():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@notify():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -725,11 +722,28 @@
         <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@notifyAll():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@notifyAll():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ReportsRegister.ControlNotifier#notifyController" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyController(msg:feh.tec.agents.SystemMessage):Unit"></a>
+      <a id="notifyController(SystemMessage):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyController</span><span class="params">(<span name="msg">msg: <a href="../SystemMessage.html" class="extype" name="feh.tec.agents.SystemMessage">SystemMessage</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@notifyController(msg:feh.tec.agents.SystemMessage):Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ReportsRegister$$ControlNotifier.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.ControlNotifier">ControlNotifier</a></dd></dl></div>
     </li><li name="akka.actor.Actor#postRestart" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="postRestart(reason:Throwable):Unit"></a>
       <a id="postRestart(Throwable):Unit"></a>
@@ -742,7 +756,7 @@
         <span class="name">postRestart</span><span class="params">(<span name="reason">reason: <a href="../../../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@postRestart(reason:Throwable):Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@postRestart(reason:Throwable):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -765,7 +779,7 @@
         <span class="name">postStop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@postStop():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@postStop():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -788,7 +802,7 @@
         <span class="name">preRestart</span><span class="params">(<span name="reason">reason: <a href="../../../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a></span>, <span name="message">message: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@preRestart(reason:Throwable,message:Option[Any]):Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@preRestart(reason:Throwable,message:Option[Any]):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -811,7 +825,7 @@
         <span class="name">preStart</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@preStart():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@preStart():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -822,7 +836,41 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.GenericBuilding#processSys" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="feh.tec.agents.impl.ReportsPrinter#printAgentReport" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="printAgentReport(rep:feh.tec.agents.impl.AgentReport):Unit"></a>
+      <a id="printAgentReport(AgentReport):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">printAgentReport</span><span class="params">(<span name="rep">rep: <a href="AgentReport.html" class="extype" name="feh.tec.agents.impl.AgentReport">AgentReport</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@printAgentReport(rep:feh.tec.agents.impl.AgentReport):Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ReportsPrinter.html" class="extype" name="feh.tec.agents.impl.ReportsPrinter">ReportsPrinter</a></dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ReportsPrinter#printing" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="printing:Boolean"></a>
+      <a id="printing:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">printing</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@printing:Boolean" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ReportsPrinter.html" class="extype" name="feh.tec.agents.impl.ReportsPrinter">ReportsPrinter</a></dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher#processSys" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="processSys:PartialFunction[feh.tec.agents.SystemMessage,Unit]"></a>
       <a id="processSys:PartialFunction[SystemMessage,Unit]"></a>
       <h4 class="signature">
@@ -834,11 +882,11 @@
         <span class="name">processSys</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="../SystemMessage.html" class="extype" name="feh.tec.agents.SystemMessage">SystemMessage</a>, <span class="extype" name="scala.Unit">Unit</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@processSys:PartialFunction[feh.tec.agents.SystemMessage,Unit]" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@processSys:PartialFunction[feh.tec.agents.SystemMessage,Unit]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a> → <a href="Agent$$EssentialSystemSupport.html" class="extype" name="feh.tec.agents.impl.Agent.EssentialSystemSupport">EssentialSystemSupport</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ReportsRegister$$NegotiationSuccessWatcher.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">NegotiationSuccessWatcher</a> → <a href="Agent$$EssentialSystemSupport.html" class="extype" name="feh.tec.agents.impl.Agent.EssentialSystemSupport">EssentialSystemSupport</a></dd></dl></div>
     </li><li name="feh.tec.agents.AbstractAgent#receive" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="receive:PartialFunction[Any,Unit]"></a>
       <a id="receive:PartialFunction[Any,Unit]"></a>
@@ -851,7 +899,7 @@
         <span class="name">receive</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="scala.Any">Any</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@receive:PartialFunction[Any,Unit]" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@receive:PartialFunction[Any,Unit]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -868,62 +916,79 @@
         <span class="name">ref</span><span class="result">: <a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@ref:feh.tec.agents.AgentRef" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@ref:feh.tec.agents.AgentRef" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SystemAgent.html" class="extype" name="feh.tec.agents.impl.SystemAgent">SystemAgent</a> → <a href="../AbstractAgent.html" class="extype" name="feh.tec.agents.AbstractAgent">AbstractAgent</a></dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.GenericBuilding#reportingTo" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="reportingTo:feh.tec.agents.AgentRef"></a>
-      <a id="reportingTo:agents.AgentRef"></a>
+    </li><li name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher#registerAcceptance" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="registerAcceptance(rep:feh.tec.agents.impl.AgentReport):Unit"></a>
+      <a id="registerAcceptance(AgentReport):Unit"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">reportingTo</span><span class="result">: <a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a></span>
+        <span class="name">registerAcceptance</span><span class="params">(<span name="rep">rep: <a href="AgentReport.html" class="extype" name="feh.tec.agents.impl.AgentReport">AgentReport</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@reportingTo:feh.tec.agents.AgentRef" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@registerAcceptance(rep:feh.tec.agents.impl.AgentReport):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a></dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.GenericBuilding#resume" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="resume():Seq[scala.concurrent.Future[Unit]]"></a>
-      <a id="resume():Seq[Future[Unit]]"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="ReportsRegister$$NegotiationSuccessWatcher.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">NegotiationSuccessWatcher</a></dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ArchiveRegisterImpl#reports" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="reports:Map[feh.tec.agents.AgentRef,List[feh.tec.agents.impl.AgentReport]]"></a>
+      <a id="reports:Map[agents.AgentRef,List[AgentReport]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">resume</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.collection.Seq">Seq</span>[<span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.Unit">Unit</span>]]</span>
+        <span class="name">reports</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a>, <a href="../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="AgentReport.html" class="extype" name="feh.tec.agents.impl.AgentReport">AgentReport</a>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@resume():Seq[scala.concurrent.Future[Unit]]" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@reports:Map[feh.tec.agents.AgentRef,List[feh.tec.agents.impl.AgentReport]]" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a></dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.GenericBuilding#role" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="role:feh.tec.agents.impl.NegotiationController.Role.type"></a>
-      <a id="role:Role.type"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ArchiveRegisterImpl.html" class="extype" name="feh.tec.agents.impl.ArchiveRegisterImpl">ArchiveRegisterImpl</a> → <a href="ReportArchive.html" class="extype" name="feh.tec.agents.impl.ReportArchive">ReportArchive</a></dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ReportArchive#role" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="role:feh.tec.agents.impl.ReportArchive.type"></a>
+      <a id="role:ReportArchive.type"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">role</span><span class="result">: <a href="NegotiationController$$Role$.html" class="extype" name="feh.tec.agents.impl.NegotiationController.Role">Role</a>.type</span>
+        <span class="name">role</span><span class="result">: <a href="ReportArchive$.html" class="extype" name="feh.tec.agents.impl.ReportArchive">ReportArchive</a>.type</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@role:feh.tec.agents.impl.NegotiationController.Role.type" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@role:feh.tec.agents.impl.ReportArchive.type" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a> → <a href="SystemAgent.html" class="extype" name="feh.tec.agents.impl.SystemAgent">SystemAgent</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ReportArchive.html" class="extype" name="feh.tec.agents.impl.ReportArchive">ReportArchive</a> → <a href="SystemAgent.html" class="extype" name="feh.tec.agents.impl.SystemAgent">SystemAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher#scheduleControlAcceptanceCheck" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="scheduleControlAcceptanceCheck(of:feh.tec.agents.NegotiationId):akka.actor.Cancellable"></a>
+      <a id="scheduleControlAcceptanceCheck(NegotiationId):Cancellable"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">scheduleControlAcceptanceCheck</span><span class="params">(<span name="of">of: <a href="../NegotiationId.html" class="extype" name="feh.tec.agents.NegotiationId">NegotiationId</a></span>)</span><span class="result">: <span class="extype" name="akka.actor.Cancellable">Cancellable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@scheduleControlAcceptanceCheck(of:feh.tec.agents.NegotiationId):akka.actor.Cancellable" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="ReportsRegister$$NegotiationSuccessWatcher.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">NegotiationSuccessWatcher</a></dd></dl></div>
     </li><li name="akka.actor.Actor#self" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="self:akka.actor.ActorRef"></a>
       <a id="self:ActorRef"></a>
@@ -936,7 +1001,7 @@
         <span class="name">self</span><span class="result">: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@self:akka.actor.ActorRef" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@self:akka.actor.ActorRef" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -953,12 +1018,12 @@
         <span class="name">sender</span><span class="params">()</span><span class="result">: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@sender():akka.actor.ActorRef" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@sender():akka.actor.ActorRef" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.GenericBuilding#start" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="feh.tec.agents.impl.ReportRegisterImpl#start" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="start():Unit"></a>
       <a id="start():Unit"></a>
       <h4 class="signature">
@@ -970,28 +1035,11 @@
         <span class="name">start</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@start():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@start():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a> → <a href="../NegotiationController.html" class="extype" name="feh.tec.agents.NegotiationController">NegotiationController</a></dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.GenericBuilding#stop" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="stop():Unit"></a>
-      <a id="stop():Unit"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">stop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@stop():Unit" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a> → <a href="../NegotiationController.html" class="extype" name="feh.tec.agents.NegotiationController">NegotiationController</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.impl.ReportRegisterImpl">ReportRegisterImpl</a> → <a href="ArchiveRegisterImpl.html" class="extype" name="feh.tec.agents.impl.ArchiveRegisterImpl">ArchiveRegisterImpl</a> → <a href="ReportArchive.html" class="extype" name="feh.tec.agents.impl.ReportArchive">ReportArchive</a></dd></dl></div>
     </li><li name="akka.actor.Actor#supervisorStrategy" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="supervisorStrategy:akka.actor.SupervisorStrategy"></a>
       <a id="supervisorStrategy:SupervisorStrategy"></a>
@@ -1004,7 +1052,7 @@
         <span class="name">supervisorStrategy</span><span class="result">: <span class="extype" name="akka.actor.SupervisorStrategy">SupervisorStrategy</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@supervisorStrategy:akka.actor.SupervisorStrategy" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@supervisorStrategy:akka.actor.SupervisorStrategy" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -1021,62 +1069,11 @@
         <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit#systemAgentBuilders" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="systemAgentBuilders:Map[(feh.tec.agents.impl.agent.AgentBuilder[Ag,Arg],scala.reflect.ClassTag[Ag])forSome{typeAg&lt;:feh.tec.agents.AbstractAgent;typeArg&lt;:Product},Int]"></a>
-      <a id="systemAgentBuilders:Map[(AgentBuilder[Ag,Arg],ClassTag[Ag])forSome{typeAg&lt;:AbstractAgent,typeArg&lt;:Product},Int]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">systemAgentBuilders</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[(<a href="agent/AgentBuilder.html" class="extype" name="feh.tec.agents.impl.agent.AgentBuilder">AgentBuilder</a>[<span class="extype" name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit.systemAgentBuilders.Ag">Ag</span>, <span class="extype" name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit.systemAgentBuilders.Arg">Arg</span>], <span class="extype" name="scala.reflect.ClassTag">ClassTag</span>[<span class="extype" name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit.systemAgentBuilders.Ag">Ag</span>]) forSome {type Ag &lt;: <a href="../AbstractAgent.html" class="extype" name="feh.tec.agents.AbstractAgent">AbstractAgent</a>, type Arg &lt;: <span class="extype" name="scala.Product">Product</span>}, <span class="extype" name="scala.Int">Int</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@systemAgentBuilders:Map[(feh.tec.agents.impl.agent.AgentBuilder[Ag,Arg],scala.reflect.ClassTag[Ag])forSome{typeAg&lt;:feh.tec.agents.AbstractAgent;typeArg&lt;:Product},Int]" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit">StaticAgentsInit</a> → <a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a></dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.GenericBuilding#systemAgents" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="systemAgents:List[feh.tec.agents.AgentRef]"></a>
-      <a id="systemAgents:List[agents.AgentRef]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">lazy val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">systemAgents</span><span class="result">: <a href="../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="../AgentRef.html" class="extype" name="feh.tec.agents.AgentRef">agents.AgentRef</a>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@systemAgents:List[feh.tec.agents.AgentRef]" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a> → <a href="../NegotiationController.html" class="extype" name="feh.tec.agents.NegotiationController">NegotiationController</a></dd></dl></div>
-    </li><li name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit#timeouts" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="timeouts:feh.tec.agents.impl.NegotiationController.Timeouts"></a>
-      <a id="timeouts:Timeouts"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">timeouts</span><span class="result">: <a href="NegotiationController$$Timeouts.html" class="extype" name="feh.tec.agents.impl.NegotiationController.Timeouts">Timeouts</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@timeouts:feh.tec.agents.impl.NegotiationController.Timeouts" title="Permalink" target="_top">
-        <img src="../../../../lib/permalink.png" />
-      </a>
-    </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.impl.NegotiationController.StaticAgentsInit">StaticAgentsInit</a> → <a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a></dd></dl></div>
     </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <a id="toString():String"></a>
@@ -1089,7 +1086,7 @@
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@toString():String" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@toString():String" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -1106,7 +1103,7 @@
         <span class="name">unhandled</span><span class="params">(<span name="message">message: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@unhandled(message:Any):Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@unhandled(message:Any):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -1123,7 +1120,7 @@
         <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@wait():Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@wait():Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -1146,7 +1143,7 @@
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -1169,7 +1166,7 @@
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.agents.impl.NegotiationController$$StaticAgentsInit@wait(x$1:Long):Unit" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@wait(x$1:Long):Unit" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
@@ -1180,6 +1177,23 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="feh.tec.agents.impl.ArchiveRegisterImpl#zeroTime" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="zeroTime:feh.tec.agents.impl.AgentReports.ZeroTime"></a>
+      <a id="zeroTime:ZeroTime"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">zeroTime</span><span class="result">: <a href="AgentReports$$ZeroTime.html" class="extype" name="feh.tec.agents.impl.AgentReports.ZeroTime">ZeroTime</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.impl.ReportRegisterImpl@zeroTime:feh.tec.agents.impl.AgentReports.ZeroTime" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ArchiveRegisterImpl.html" class="extype" name="feh.tec.agents.impl.ArchiveRegisterImpl">ArchiveRegisterImpl</a> → <a href="ReportArchive.html" class="extype" name="feh.tec.agents.impl.ReportArchive">ReportArchive</a></dd></dl></div>
     </li></ol>
             </div>
 
@@ -1189,16 +1203,24 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">
-              <h3>Inherited from <a href="NegotiationController$$GenericBuilding.html" class="extype" name="feh.tec.agents.impl.NegotiationController.GenericBuilding">GenericBuilding</a></h3>
+        <div class="parent" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">
+              <h3>Inherited from <a href="ReportsRegister$$NegotiationSuccessWatcher.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.NegotiationSuccessWatcher">NegotiationSuccessWatcher</a></h3>
+            </div><div class="parent" name="feh.tec.agents.impl.ReportsRegister.ControlNotifier">
+              <h3>Inherited from <a href="ReportsRegister$$ControlNotifier.html" class="extype" name="feh.tec.agents.impl.ReportsRegister.ControlNotifier">ControlNotifier</a></h3>
+            </div><div class="parent" name="feh.tec.agents.impl.ArchiveRegisterImpl">
+              <h3>Inherited from <a href="ArchiveRegisterImpl.html" class="extype" name="feh.tec.agents.impl.ArchiveRegisterImpl">ArchiveRegisterImpl</a></h3>
+            </div><div class="parent" name="feh.tec.agents.impl.ReportArchive">
+              <h3>Inherited from <a href="ReportArchive.html" class="extype" name="feh.tec.agents.impl.ReportArchive">ReportArchive</a></h3>
+            </div><div class="parent" name="feh.tec.agents.impl.ReportsPrinter">
+              <h3>Inherited from <a href="ReportsPrinter.html" class="extype" name="feh.tec.agents.impl.ReportsPrinter">ReportsPrinter</a></h3>
             </div><div class="parent" name="akka.actor.ActorLogging">
               <h3>Inherited from <span class="extype" name="akka.actor.ActorLogging">ActorLogging</span></h3>
+            </div><div class="parent" name="feh.tec.agents.impl.ReportsRegister">
+              <h3>Inherited from <a href="ReportsRegister.html" class="extype" name="feh.tec.agents.impl.ReportsRegister">ReportsRegister</a></h3>
             </div><div class="parent" name="feh.tec.agents.impl.SystemAgent">
               <h3>Inherited from <a href="SystemAgent.html" class="extype" name="feh.tec.agents.impl.SystemAgent">SystemAgent</a></h3>
             </div><div class="parent" name="feh.tec.agents.impl.Agent.EssentialSystemSupport">
               <h3>Inherited from <a href="Agent$$EssentialSystemSupport.html" class="extype" name="feh.tec.agents.impl.Agent.EssentialSystemSupport">EssentialSystemSupport</a></h3>
-            </div><div class="parent" name="feh.tec.agents.NegotiationController">
-              <h3>Inherited from <a href="../NegotiationController.html" class="extype" name="feh.tec.agents.NegotiationController">agents.NegotiationController</a></h3>
             </div><div class="parent" name="feh.tec.agents.AbstractAgent">
               <h3>Inherited from <a href="../AbstractAgent.html" class="extype" name="feh.tec.agents.AbstractAgent">AbstractAgent</a></h3>
             </div><div class="parent" name="akka.actor.Actor">

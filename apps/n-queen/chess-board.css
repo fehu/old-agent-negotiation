@@ -12,6 +12,7 @@ table.chess-board {
     width:      80px;
     height:     80px;
     text-align: center;
+    vertical-align:     middle;
     font-size:  large;
 }
 
