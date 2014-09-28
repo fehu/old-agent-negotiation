@@ -8,11 +8,12 @@ table.chess-board {
 }
 
 .chess-board td, .chess-board th{
-    border:     1px solid #999;
-    width:      80px;
-    height:     80px;
-    text-align: center;
-    font-size:  large;
+    border:         1px solid #999;
+    width:          80px;
+    height:         80px;
+    text-align:     center;
+    vertical-align: middle;
+    font-size:      large;
 }
 
 .chess-board .description{
