@@ -1,7 +1,6 @@
 package feh.tec.agents.spec.macros
 
 import feh.tec.agents.spec
-
 import scala.reflect.internal.HasFlags
 import scala.reflect.macros.whitebox
 //import scala.language.experimental.macros
@@ -20,20 +19,17 @@ object NegotiationSpecificationBuilder{
       "package.Negotiation"
     )
 
-    val definitions = b.extractDefinitions(dsl.tree, KnownDSLNames)
+    val (definitions, applications) = b.extractRoot(dsl.tree, KnownDSLNames)
 
     val varsAndDomains = b.extractVars(definitions)
     val negotiationsAndIssues = b.extractNegotiations(definitions)
     val agentDefs = b.extractAgents(definitions)
-
-//    def applications =
 
     val vars = for ((name, tpe, domain, domainTpe) <- varsAndDomains) yield {
       q"""val clazz = classOf[$tpe].asInstanceOf[Class[$tpe]]
           VarDef[$tpe](${name.decodedName.toString.trim}, GenericDomainDef[$tpe, $domainTpe]($domain, clazz))
           """
     }
-
 
     val negotiations = for ((name, issues) <- negotiationsAndIssues) yield {
       val iss = issues.map{ case Select(This(TypeName("$anon")), varName) => varName.decodedName.toString }
@@ -65,6 +61,12 @@ object NegotiationSpecificationBuilder{
       q"""AgentDef(${name.decodedName.toString}, $role, Seq(..$n))"""
     }
 
+    val spawns = q"""SimpleSpawnDef(Map(..${b.extractSpawns(applications)}))"""
+
+    val (timeoutDefs, timingDefs) = b.extractTimeoutsAndTimings(applications)
+    val timeouts = q"""TimeoutsDef(Map(..$timeoutDefs))"""
+    val timings = q"""TimingsDef(Map(..$timingDefs))"""
+
     val specTree = q"""
       new feh.tec.agents.spec.NegotiationSpecification {
         import feh.tec.agents.spec.NegotiationSpecification._
@@ -73,9 +75,9 @@ object NegotiationSpecificationBuilder{
         def negotiations: Seq[NegotiationDef] = Seq(..$negotiations)
         def agents: Seq[AgentDef] = Seq(..$agents)
 
-        def spawns: SpawnDef = null
-        def timings: TimingsDef = null
-        def timeouts: TimeoutsDef = null
+        def spawns: SpawnDef = $spawns
+        def timings: TimingsDef = $timings
+        def timeouts: TimeoutsDef = $timeouts
       }
     """
 
@@ -87,9 +89,8 @@ object NegotiationSpecificationBuilder{
 //            "\n\tNEGOTIATIONS\n"  + (negotiations mkString "\n") +
 //            "\n\tAGENTS\n"        + (agents mkString "\n")
 
-
     c.Expr[spec.NegotiationSpecification](
-//      q"""{ println($s);  $spec }"""
+//      q"""{ println($s);  $specTree }"""
       specTree
     )
 
@@ -103,7 +104,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
   val xc = new ExtendedConstraint[c.type](c)
 
   /** List(name -> body) */
-  def extractDefinitions(root: c.Tree, knownDslNames: Set[String]) = {
+  def extractRoot(root: c.Tree, knownDslNames: Set[String]) = {
     def extends_?(parents: List[c.Tree]) = parents.exists{
       p => knownDslNames exists {
         knownName => h.selects(p, knownName)
@@ -113,26 +114,18 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
       case cd@ClassDef(_, _, _, Template(parents, _, body)) if extends_?(parents) => body
       case unknown: ClassDef => c.abort(NoPosition, unknown.toString())
     })
-
-    defBody.collect{
-      case ValDef(_, name, _, body) => name -> body
-      case DefDef(mods: HasFlags, name, Nil, Nil, _, body) if name != termNames.CONSTRUCTOR && !mods.hasAccessorFlag =>
-        name -> body
-    }
+    extractDefinitions(defBody) -> extractApplications(defBody)
   }
 
-//Block(
-//  List(
-//    ClassDef(
-//      Modifiers(FINAL),
-//      TypeName("$anon"),
-//      List(),
-//      Template(
-//        List(
-//          TypeTree(),
-//          TypeTree().setOriginal(Select(Select(Ident(feh.tec.agents.dsl), package), TypeName("Negotiation")))
-//        ),
-//        noSelfType, List(DefDef(Modifiers(), termNames.CONSTRUCTOR, List(), List(List()), TypeTree(), Block(List(Apply(Select(Super(This(TypeName("$anon")), typeNames.EMPTY), termNames.CONSTRUCTOR), List())), Literal(Constant(())))), ValDef(Modifiers(PRIVATE | MUTABLE | LOCAL), TermName("x "), TypeTree(), Apply(TypeApply(Select(Select(This(TypeName("$anon")), TermName("variable")), TermName("with")), List(TypeTree())), List(Apply(Select(This(TypeName("$anon")), TermName("domain")), List(Apply(Select(Apply(Select(Select(This(TypeName("scala")), scala.Predef), TermName("intWrapper")), List(Literal(Constant(1)))), TermName("to")), List(Ident(TermName("boardSize"))))))))), DefDef(Modifiers(PRIVATE | METHOD | ACCESSOR | TRANS_FLAG), TermName("x"), List(), List(), TypeTree(), Select(This(TypeName("$anon")), TermName("x "))), DefDef(Modifiers(PRIVATE | METHOD | ACCESSOR | TRANS_FLAG), TermName("x_$eq"), List(), List(List(ValDef(Modifiers(PARAM | SYNTHETIC), TermName("x$1"), TypeTree(), EmptyTree))), TypeTree(), Assign(Select(This(TypeName("$anon")), TermName("x ")), Ident(TermName("x$1")))), ValDef(Modifiers(PRIVATE | MUTABLE | LOCAL), TermName("y "), TypeTree(), Apply(TypeApply(Select(Select(This(TypeName("$anon")), TermName("variable")), TermName("with")), List(TypeTree())), List(Apply(Select(This(TypeName("$anon")), TermName("domain")), List(Apply(Select(Apply(Select(Select(This(TypeName("scala")), scala.Predef), TermName("intWrapper")), List(Literal(Constant(1)))), TermName("to")), List(Ident(TermName("boardSize"))))))))), DefDef(Modifiers(PRIVATE | METHOD | ACCESSOR | TRANS_FLAG), TermName("y"), List(), List(), TypeTree(), Select(This(TypeName("$anon")), TermName("y "))), DefDef(Modifiers(PRIVATE | METHOD | ACCESSOR | TRANS_FLAG), TermName("y_$eq"), List(), List(List(ValDef(Modifiers(PARAM | SYNTHETIC), TermName("x$1"), TypeTree(), EmptyTree))), TypeTree(), Assign(Select(This(TypeName("$anon")), TermName("y ")), Ident(TermName("x$1")))), DefDef(Modifiers(), TermName("queen$u0027s$u0020position"), List(), List(), TypeTree(), Apply(Select(Select(This(TypeName("$anon")), TermName("negotiation")), TermName("over")), List(Select(This(TypeName("$anon")), TermName("x")), Select(This(TypeName("$anon")), TermName("y"))))), DefDef(Modifiers(), TermName("Queen"), List(), List(), TypeTree(), Apply(Select(Apply(Select(Select(This(TypeName("$anon")), TermName("agent")), TermName("withRole")), List(Literal(Constant("chess queen")))), TermName("that")), List(Apply(Select(Apply(Apply(TypeApply(Select(Apply(Select(Select(This(TypeName("$anon")), TermName("negotiates")), TermName("the")), List(Select(This(TypeName("$anon")), TermName("queen$u0027s$u0020position")))), TermName("with")), List(TypeTree())), List(Select(Select(This(TypeName("$anon")), TermName("the")), TermName("others")))), List(Select(This(TypeName("$anon")), TermName("TheRestOfSelectsInterlocutors")))), TermName("and")), List(Apply(Select(This(TypeName("$anon")), TermName("hasConstraints")), List(Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("VarDefConstraintBuilder")), List(TypeTree())), List(Literal(Constant("direct-line sight")))), TermName("$bar")), List(Apply(Select(Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("proposed")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("x")))), TermName("$bang$eq")), List(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("valueOf")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("x")))))), TermName("$amp$amp")), List(Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("proposed")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("y")))), TermName("$bang$eq")), List(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("valueOf")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("y")))))))))), Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("VarDefConstraintBuilder")), List(TypeTree())), List(Literal(Constant("diagonal-line sight")))), TermName("$bar")), List(Apply(Select(Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("proposed")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("x")))), TermName("$minus")), List(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("valueOf")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("x")))))), TermName("$bang$eq")), List(Apply(Select(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("proposed")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("y")))), TermName("$minus")), List(Apply(TypeApply(Select(This(TypeName("$anon")), TermName("valueOf")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("y"))))))))))))))))), Apply(Select(Select(This(TypeName("$anon")), TermName("spawn")), TermName("agents")), List(Apply(TypeApply(Select(Apply(TypeApply(Select(Select(This(TypeName("scala")), scala.Predef), TermName("ArrowAssoc")), List(TypeTree())), List(Select(This(TypeName("$anon")), TermName("Queen")))), TermName("$minus$greater")), List(TypeTree())), List(Ident(TermName("boardSize")))))), Apply(Select(This(TypeName("$anon")), TermName("configure")), List(Apply(Select(Select(Select(This(TypeName("$anon")), TermName("timeout")), TermName("creation")), TermName("$less$eq")), List(Select(Apply(Select(Select(Select(Select(Ident(scala), scala.concurrent), scala.concurrent.duration), scala.concurrent.duration.package), TermName("DurationInt")), List(Literal(Constant(100)))), TermName("millis")))), Apply(Select(Select(Select(This(TypeName("$anon")), TermName("timeout")), TermName("resolve$u0020conflict")), TermName("$less$eq")), List(Select(Apply(Select(Select(Select(Select(Ident(scala), scala.concurrent), scala.concurrent.duration), scala.concurrent.duration.package), TermName("DurationInt")), List(Literal(Constant(100)))), TermName("millis")))))))))), Apply(Select(New(Ident(TypeName("$anon"))), termNames.CONSTRUCTOR), List()))
+  def extractDefinitions(defBody: Seq[c.Tree]) = defBody.collect{
+    case ValDef(_, name, _, body) => name -> body
+    case DefDef(mods: HasFlags, name, Nil, Nil, _, body) if name != termNames.CONSTRUCTOR && !mods.hasAccessorFlag =>
+      name -> body
+  }
+
+  def extractApplications(defBody: Seq[c.Tree]) = defBody.collect{
+    case Apply(sel, args) if h.selectsSome(sel, "$anon") => sel -> args
+  }
 
 
   /** Seq( (name, type, domain, domain type) ) */
@@ -192,6 +185,52 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
           negotiationsAndInterlocutors -> config
       }
       (name, r, negs)
+  }
+
+  /** Seq(name -> count) */
+  def extractSpawns(applications: Seq[(c.Tree, List[c.Tree])]) = applications.collect{
+    case (Select(Select(This(TypeName("$anon")), TermName("spawn")), TermName("agents")), spawnDefs) =>
+      spawnDefs map {
+        case Apply(
+              TypeApply(
+                Select(
+                  Apply(
+                    TypeApply(
+                      Select(Select(This(TypeName("scala")), TermName("Predef")), TermName("ArrowAssoc")),
+                      List(TypeTree())
+                      ),
+                    List(Select(This(TypeName("$anon")), TermName(ag)))
+                    ),
+                  TermName("$minus$greater")
+                  ),
+                List(TypeTree())
+                ),
+              List(n)
+             ) => ag -> n
+      }
+  }.flatten
+
+  /** (Timeouts, Timings): Seq(config_name -> duration) -> Seq(config_name -> duration) */
+  def extractTimeoutsAndTimings(applications: Seq[(c.Tree, List[c.Tree])]) = {
+    val mp = applications.collect{
+      case (Select(This(TypeName("$anon")), TermName("configure")), confDefs) =>
+        confDefs map {
+          case Apply(
+            Select(Select(Select(This(TypeName("$anon")), TermName(tpe)), confName), TermName("$less$eq")),
+              List(
+       duration@Select(
+                  Apply(
+                    Select(Select(Select(Select(Ident(TermName("scala")), TermName("concurrent")), TermName("duration")), termNames.PACKAGE), TermName("DurationInt")),
+                    List(_)
+                    ),
+                  TermName(_)
+                  )
+                )
+              ) => tpe -> (confName.decodedName.toString, duration)
+        }
+    }.flatten.groupBy(_._1).mapValues(_.map(_._2))
+
+    mp.getOrElse("timeout", Nil) -> mp.getOrElse("timing", Nil)
   }
 
   protected def extractConstraintsDef(t: c.Tree) = t match {

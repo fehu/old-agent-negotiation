@@ -1,6 +1,7 @@
 package feh.tec.agents.spec.macros
 
 import scala.reflect.macros.whitebox
+import feh.util._
 
 class Helper[C <: whitebox.Context](val c: C){
   import c.universe._
@@ -39,31 +40,39 @@ class Helper[C <: whitebox.Context](val c: C){
     case _ => None
   }
 
-  def selects(in: c.Tree, what: String): Boolean = {
+  def selects(in: c.Tree, what: String): Boolean = selectsInner(in, what){
+    rec => (tree, path) =>
+        PartialFunction.cond(path, tree){
+          case (p :: tail, Select(next, name)) if p == name.decodedName.toString => rec(next, tail)
+          case (p :: tail, Select(next, name)) if name == typeNames.PACKAGE && p == "package"  => rec(next, tail)
+          case (p :: tail, Ident(name)) if p == name.decodedName.toString => true
+          case (p :: Nil, This(name)) if p == name.decodedName.toString => true
+        }
+  }
 
+  def selectsSome(in: c.Tree, what: String) = selectsInner(in, what){
+    rec => (tree, path) =>
+      PartialFunction.cond(path, tree){
+        case (p :: tail, Select(next, name)) if p == name.decodedName.toString => rec(next, tail)
+        case (p :: tail, Select(next, name)) if name == typeNames.PACKAGE && p == "package"  => rec(next, tail)
+        case (p, Select(next, name)) => rec(next, p)
+        case (p :: Nil, Ident(name)) if p == name.decodedName.toString => true
+        case (p :: Nil, This(name)) if p == name.decodedName.toString => true
+      }
+  }
+
+  protected def selectsInner(in: c.Tree, what: String)
+                            (isTheOneSearched_? : Y2[c.Tree, Seq[String], Boolean]): Boolean = {
     val w = what.split('.').reverse.toList
 
-//    c.info(NoPosition, showRaw(in), true)
-
-    def rec(t: c.Tree): Boolean = {
+    def rec(t: c.Tree): Boolean =
       PartialFunction.cond(t) {
-        case sel: Select          => isTheOneSearched_?(sel, w)
+        case sel: Select          => isTheOneSearched_?(Y2(isTheOneSearched_?))(sel, w)
         case Function(_, body)    => rec(body)
         case Apply(fun, args)     => rec(fun) || args.exists(rec)
         case TypeApply(fun, args) => rec(fun) || args.exists(rec)
         case tr@TypeTree()        => rec(tr.original)
       }
-    }
-
-    def isTheOneSearched_?(t: c.Tree, path: Seq[String]): Boolean = {
-      PartialFunction.cond(path, t){
-        case (p :: tail, Select(next, name)) if p == name.decodedName.toString => isTheOneSearched_?(next, tail)
-        case (p :: tail, Select(next, name)) if name == typeNames.PACKAGE && p == "package"  => isTheOneSearched_?(next, tail)
-        case (p :: tail, Ident(name)) if p == name.decodedName.toString => true
-        case (p :: Nil, This(name)) if p == name.decodedName.toString => true
-      }
-    }
-
     rec(in)
   }
 }

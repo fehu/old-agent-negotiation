@@ -41,8 +41,6 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
   def timeouts: Timeouts
   def timings: Timings
 
-  def buildAgentsCount(defs: Seq[SpawnDef]) = defs.collect{ case SimpleSpawnDef(mp) => mp }.flatten.toMap
-
   protected def buildVars(defs: Seq[VarDef[_]]): Map[String, Var] = defs.map{
     case VarDef(name, GenericDomainDef(dom, clz)) =>
       val clazz = replaceClass(clz)
@@ -204,13 +202,17 @@ object NegotiationControllerBuilder{
       case (acc, ("retry startup", time)) => acc.copy(retryToStartAgent = time)
     }
 
+    def buildAgentsCount(d: SpawnDef) = d match {
+      case SimpleSpawnDef(map) => map
+    }
+
     def apply(v1: spec.NegotiationSpecification) = {
       vars = buildVars(v1.variables.map{ case vd: VarDef[_] => vd })
       negotiations = buildNegotiations(v1.negotiations)
       agents = buildAgents(v1.agents)
-      agentsCount = Map("Queen" -> 4) //buildAgentsCount(v1.config.agentSpawn) todo
-      timeouts = buildTimeouts(Map()) //v1.config.configs.collect { case TimeoutsDef(t) => t }.flatten.toMap |> buildTimeouts
-      timings  = buildTimings(Map()) //v1.config.configs.collect { case TimingsDef(t)  => t }.flatten.toMap |> buildTimings
+      agentsCount = buildAgentsCount(v1.spawns)
+      timeouts = buildTimeouts(v1.timeouts.mp)
+      timings  = buildTimings(v1.timings.mp)
 
       val arg = GenericStaticInitArgs[DefaultBuildAgentArgs](
         systemAgentBuilders = systemAgents,

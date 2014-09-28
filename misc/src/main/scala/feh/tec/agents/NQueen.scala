@@ -43,7 +43,7 @@ object NQueen{
 object NQueenApp extends App{
   implicit val acSys = ActorSystem.create("NQueenApp")
 
-  val spec = NQueen.spec(4)
+  val spec = NQueen.spec(8)
 
   acSys.actorOf(Props(classOf[NQueenUserAgent], spec), "NQueenUserAgent")
 }
