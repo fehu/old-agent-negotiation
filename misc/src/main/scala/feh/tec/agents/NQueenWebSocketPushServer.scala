@@ -1,6 +1,7 @@
 package feh.tec.agents
 
 import akka.actor.{Props, ActorSystem}
+import feh.tec.agents.impl.ProposalEngine.SharingKnowledge
 import scala.concurrent.duration._
 import feh.tec.agents.impl.Agent.Id
 import feh.tec.agents.impl.AgentReports.StateReportEntry
@@ -32,16 +33,15 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
   def push[Msg <: NQueenMessages.Msg : JsonFormat](msg: Msg) =
     Push(msg, implicitly[JsonFormat[Msg]].asInstanceOf[JsonFormat[WebSocketMessages#Msg]])
 
+  private def getPos(vals: Map[Var, Any], nme: String) = vals.find(_._1.name == nme).get._2.asInstanceOf[Int]
+  private def getPosXY(vals: Map[Var, Any]) = getPos(vals, "x") -> getPos(vals, "y")
+
   protected def reportToBulkable(report: AgentReport): Option[NQueenMessages.CanBulk] = {
-
-    def getPos(vals: Map[Var, Any], nme: String) = vals.find(_._1.name == nme).get._2.asInstanceOf[Int]
-    def getPosXY(vals: Map[Var, Any]) = getPos(vals, "x") -> getPos(vals, "y")
-
     report match {
       case AgentReports.StateReport(ref, entries, time, _) =>
         val q = indexMap.getOrElse(ref, addNewIndex(ref))
-        val StateReportEntry(priority, vals, scope, acceptance, extra) = entries(neg)
-        Some(NQueenMessages.StateReport(q, getPosXY(vals), priority.get, Nil, time.diff, acceptance))
+        val StateReportEntry(priority, vals, scope, acceptance, topPriority, extra) = entries(neg)
+        Some(NQueenMessages.StateReport(q, getPosXY(vals), priority.get, Nil, time.diff, acceptance, topPriority))
       case rep@AgentReports.MessageReport(_to, msg, at, extra) =>
         val by = indexMap.getOrElse(rep.msg.sender, addNewIndex(rep.msg.sender))
         val to = indexMap.getOrElse(_to, addNewIndex(_to))
@@ -91,7 +91,9 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
     case SystemMessage.NegotiationFinishedAutoRestart(_, delay) =>
       reportsBuff.clear()
       super.receive(push(NQueenMessages.NegotiationFinishedAutoRestart(delay.toMillis.toInt)))
-    case NQueenMessages.Restart =>  super.receive(push(NQueenMessages.Restart))
+    case NQueenMessages.Restart => super.receive(push(NQueenMessages.Restart))
+    case SharingKnowledge.ConfigurationProvenFailure(_, pos, _) =>
+      super.receive(push(NQueenMessages.PositionProvenFailure(getPosXY(pos))))
   }
 
   scheduleFlush()

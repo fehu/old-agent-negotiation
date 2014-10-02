@@ -4,7 +4,7 @@ import feh.tec.web.common.NQueenMessages._
 import org.scalajs.dom.WebSocket
 
 import scala.scalajs.js
-import scala.scalajs.js.JSON
+import scala.scalajs.js.{Dynamic, JSON}
 
 trait NQueenSocketListener extends SocketConnections{
 
@@ -15,7 +15,8 @@ trait NQueenSocketListener extends SocketConnections{
   def initNegotiationInfo(queens: Map[Int, String]): Any
   def bulkReport(report: BulkReport): Any
 
-  def restartSupport = new NQueenRestart
+  protected def restartSupport = new NQueenRestart
+  protected def chessBoard: ChessBoard
 
   def onMessage: PartialFunction[js.Any, Unit] = {
     case msg: js.prim.String =>
@@ -35,7 +36,12 @@ trait NQueenSocketListener extends SocketConnections{
         case "BulkReport" =>
         case "NegotiationFinished" => js.eval("alert('Negotiation Finished')")
         case "NegotiationFinishedAutoRestart" => restartSupport.negotiationFinishedAndWillRestart(json.delay.asInstanceOf[Int])
-        case "Restart" => restartSupport.restart()
+        case "Restart" =>
+          restartSupport.restart()
+          chessBoard.resetFailedPositions()
+        case "PositionProvenFailure" =>
+          val arr = json.pos.asInstanceOf[js.Array[Int]]
+          chessBoard.positionProvenFailure(arr(0) -> arr(1))
       }
   }
 
@@ -49,7 +55,8 @@ trait NQueenSocketListener extends SocketConnections{
           (x: js.Array[_]) => Queen(x(0).asInstanceOf[js.Dynamic].n.asInstanceOf[Int]) -> x(1).asInstanceOf[Boolean]
         ),
         at = json.at.asInstanceOf[Int],
-        acceptanceFlag = json.acceptanceFlag.asInstanceOf[Boolean]
+        acceptanceFlag = json.acceptanceFlag.asInstanceOf[Boolean],
+        topPriorityFlag = json.topPriorityFlag.asInstanceOf[Boolean]
       )
     case "MessageReport" =>
       MessageReport(

@@ -101,7 +101,8 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
       case range: Range => new DomainIterator.Range()
       case iterable: Iterable[_] => new DomainIterator.Generic[Any]
     }
-    DomainIterator.Random(straightForward)
+    straightForward
+//    DomainIterator.Random(straightForward)
   }
 
   protected def replaceClass(clazz: Class[_]) = clazz match{ // replace primitive type classes by the boxes

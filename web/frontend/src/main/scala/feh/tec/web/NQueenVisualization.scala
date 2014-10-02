@@ -18,21 +18,24 @@ object NQueenTemplates{
     def communications      = jQuery(".queen-comm")
   }
 
-  object QueenAcceptanceFlagStyles{
-    def id(i: Int) = s"style-acceptance-flag-$i"
+  object QueenFlagStyles{
+    def acceptance(i: Int) = s"style-acceptance-flag-$i"
+    def topPriority(i: Int) = s"style-top-priority-flag-$i"
 
-    def generate(n: Int) = (
+    def generate(n: Int): String = generateAcceptance(n) :: generateTopPriority(n) :: Nil mkString "\n"
+
+    def generateAcceptance(n: Int) =  generate(n, acceptance, i => s".queen-$i .name { color: green; }")
+    def generateTopPriority(n: Int) = generate(n, topPriority, i => s".queen-$i .name { color: orange; }")
+
+    protected def generate(n: Int, id: Int => String, style: Int => String): String = (
       for (i <- 1 to n)
-        yield tags2.style(
-          *.`type`  := "text/css",
-          *.disabled  := true,
-          *.id      := id(i),
-          raw(
-            s"""
-              |.queen-$i .name { color: green; }
-            """.stripMargin)
-        )
-      ).mkString("\n")
+      yield tags2.style(
+        *.`type`  := "text/css",
+        *.disabled  := true,
+        *.id      := id(i),
+        raw(style(i))
+      )
+    ).mkString("\n")
   }
 }
 
@@ -76,6 +79,7 @@ class ChessBoard(size: Int) {
 
   protected val placedQueens = mutable.HashMap.empty[Int, (Int, Int)] // queen's number -> position
 
+  protected def selectSquare(x: Int, y: Int) = jQuery(s".chess-board tr:nth-child(${y+1}) td:nth-child(${x+1})")
 
   def updatePositions(state: StateReport): Any = updatePositions(Map(state.by.n -> state.position))
   def updatePositions(posUpdate: Map[Int, (Int, Int)]): Any = {
@@ -86,9 +90,14 @@ class ChessBoard(size: Int) {
         tags.span(*.`class` := s"queen-$i", tags.span(*.`class` := "name", i))
       ).mkString(",")).withDefaultValue("")
     for(i <- 1 to size; j <- 1 to size) {
-      jQuery(s".chess-board tr:nth-child(${i+1}) td:nth-child(${j+1})") html newLabels.getOrElse(i -> j, "")
+      selectSquare(i, j) html newLabels.getOrElse(i -> j, "")
     }
   }
+
+  def failedPositionClass = "glyphicon-remove"
+
+  def positionProvenFailure(pos: (Int, Int)) = (selectSquare _).tupled(pos) addClass failedPositionClass
+  def resetFailedPositions() = jQuery(".chess-board td." + failedPositionClass) removeClass failedPositionClass
 }
 
 object QueenInfo{
@@ -103,11 +112,12 @@ object QueenInfo{
 class QueenInfo(name: String, val n: Int, selection: QueenInfo.Selection){
 
   def updateState(state: StateReport) = state match {
-    case StateReport(Queen(q), pos, pr, _, _, acceptFlag) =>
+    case StateReport(Queen(q), pos, pr, _, _, acceptFlag, topPriorityFlag) =>
       sel.queenInfo(q) children ".priority" children "dd" text pr.toString
       sel.queenInfo(q) children ".position" children "dd" text pos.toString
 
-      jQuery("#" + QueenAcceptanceFlagStyles.id(q)).prop("disabled", !acceptFlag)
+      jQuery("#" + QueenFlagStyles.acceptance(q)).prop("disabled", !acceptFlag || topPriorityFlag)
+      jQuery("#" + QueenFlagStyles.topPriority(q)).prop("disabled", !topPriorityFlag)
   }
 
   def updateSelection() = for(i <- 1 to n ){

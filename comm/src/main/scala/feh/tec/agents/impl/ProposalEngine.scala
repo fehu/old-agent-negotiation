@@ -5,7 +5,7 @@ import java.util.Date
 import akka.actor.ActorLogging
 import feh.tec.agents.Message.AutoId
 import feh.tec.agents._
-import feh.tec.agents.impl.Agent.SystemSupport
+import feh.tec.agents.impl.Agent.{AgentReporting, SystemSupport}
 import feh.tec.agents.impl.ProposalEngine.SharingKnowledge.ConfigurationProvenFailure
 import feh.util._
 
@@ -152,14 +152,23 @@ object ProposalEngine{
   }
 
   trait SharingKnowledge[Lang <: ProposalLanguage] extends LearningFromMistakes[Lang] with SystemSupport{
-    self: NegotiatingAgent with ProposalBased[Lang] with ActorLogging with SpeakingAgent[_] with AgentHelpers[_] =>
+    self: NegotiatingAgent
+            with ProposalBased[Lang]
+            with ActorLogging
+            with SpeakingAgent[Lang]
+            with AgentHelpers[Lang]
+            with AgentReporting[Lang] =>
 
     def knowledgeShare: AgentRef
 
     override def guardFailedValueConfiguration(neg: Negotiation) = {
       super.guardFailedValueConfiguration(neg)
-      knowledgeShare.ref ! ConfigurationProvenFailure(neg.id, neg.currentValues.toMap, ref.id)
+      val msg = ConfigurationProvenFailure(neg.id, neg.currentValues.toMap, ref.id)
+      knowledgeShare.ref ! msg
+      reportingTo.ref ! msg
     }
+
+    def maxPriority(neg: Negotiation) = neg.state.currentProposalUnconditionallyAccepted
 
     override def processSys = super.processSys orElse{
       case ConfigurationProvenFailure(neg, config, _) => failedValueConfigurations(neg) += config

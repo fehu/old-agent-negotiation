@@ -24,7 +24,8 @@ object NQueenMessages extends WebSocketMessages{
                          priority: Int,
                          proposalAcceptance: Seq[(Queen, Boolean)],
                          at: Int, // system time in millis
-                         acceptanceFlag: Boolean
+                         acceptanceFlag: Boolean,
+                         topPriorityFlag: Boolean
                           ) extends CanBulk
   {
     def reportsState = true
@@ -62,4 +63,6 @@ object NQueenMessages extends WebSocketMessages{
   case object NegotiationFinished extends Msg
   case class NegotiationFinishedAutoRestart(delay: Int) extends Msg
   case object Restart extends Msg
+
+  case class PositionProvenFailure(pos: (Int, Int)) extends Msg
 }

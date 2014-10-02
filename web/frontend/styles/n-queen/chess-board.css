@@ -5,6 +5,9 @@
 table.chess-board {
 //    width: 300px;
 //    height: 300px;
+    font-family: 'Glyphicons Halflings';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .chess-board td, .chess-board th{

@@ -1,6 +1,6 @@
 package feh.tec.web
 
-import feh.tec.web.NQueenTemplates.QueenAcceptanceFlagStyles
+import feh.tec.web.NQueenTemplates.QueenFlagStyles
 import feh.tec.web.common.NQueenMessages._
 import org.scalajs.jquery.jQuery
 
@@ -36,7 +36,7 @@ object NQueen extends JSApp with NQueenSocketListener{
 
     queensInfo.foreach(_._2.setCallbacks())
 
-    jQuery("head") append QueenAcceptanceFlagStyles.generate(queens.size)
+    jQuery("head") append QueenFlagStyles.generate(queens.size)
     jQuery(sel.containerForBoard) append chessBoard.create
     jQuery(sel.containerForInfo) append communications.create.toString()
 

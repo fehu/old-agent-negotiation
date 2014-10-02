@@ -94,7 +94,7 @@ object Agent{
 // ReportState messages
       case req: AgentReports.ReportStates => sender ! req.response( negId => getOpt(negId) map {
         neg =>
-          StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, neg.currentValuesAcceptance, extractStateReportExtra(neg.id))
+          StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, neg.currentValuesAcceptance, maxPriority(neg), extractStateReportExtra(neg.id))
         })
       case req: AgentReports.ReportAllStates => sender ! reportAllStates(req.id)
     }
@@ -102,10 +102,19 @@ object Agent{
     protected def reportStates(of: NegotiationId, id: UUID = UUID.randomUUID()) = reportStatesInner(negotiations.find(_.id == of), id)
     protected def reportAllStates(id: UUID = UUID.randomUUID()) = reportStatesInner(negotiations, id)
 
-    private def reportStatesInner(negs: Iterable[Negotiation], id: UUID) = {
+    def maxPriority(neg: Negotiation): Boolean
+
+    private def reportStatesInner(negs: Iterable[ANegotiation], id: UUID) = {
       val negReps = negs.map{
         neg => neg.id ->
-          StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, neg.currentValuesAcceptance, extractStateReportExtra(neg.id))
+          StateReportEntry(
+            neg.priority,
+            neg.currentValues.toMap,
+            neg.scope,
+            neg.currentValuesAcceptance,
+            maxPriority(neg),
+            extractStateReportExtra(neg.id)
+          )
       }.toMap
       AgentReports.StateReport(ref, negReps, TimeDiffUndefined)
     }

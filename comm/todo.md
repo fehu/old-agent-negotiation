@@ -16,3 +16,5 @@
 - [x] domain iterator must be reset when a new top-priority agent arises
 - [ ] fix: deadlocks possible if 3 or more agents have same priority
 - [ ] throw exception if all domain values have been proven failure  
+- [ ] delayed reset of agent domain iterator
+- [ ] reassess unsuitable configuration estimation engine

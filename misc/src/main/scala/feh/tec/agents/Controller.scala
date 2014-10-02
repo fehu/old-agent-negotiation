@@ -1,6 +1,7 @@
 package feh.tec.agents
 
 import akka.actor.{ActorRef, ActorSystem, Props}
+import feh.tec.agents.impl.ProposalEngine.SharingKnowledge
 import feh.util._
 import feh.tec.agents.impl.Agent.Id
 import feh.tec.agents.impl.NegotiationController.GenericStaticInitArgs
@@ -37,6 +38,10 @@ class Controller(arg: GenericStaticInitArgs[DefaultBuildAgentArgs], web: WebSock
   def initMessage = NQueenMessages.Init(agents.map{
     case AgentRef(Id.named(RefNameRegex(name, i), _, _), _) => NQueenMessages.Queen(i.toInt) -> name
   })
+
+  override def processSys = super.processSys orElse{
+    case fail: SharingKnowledge.ConfigurationProvenFailure => web.ref ! fail
+  }
 
   override def start() = {
     super.start()

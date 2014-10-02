@@ -62,6 +62,7 @@ object AgentReports{
                               vals: Map[Var, Any],
                               scope: Set[AgentRef],
                               currentValuesAcceptance: Boolean,
+                              isTopPriority: Boolean,
                               extra: Option[Any])
 
   case class MessageReport(to: AgentRef, msg: Language#Msg, at: TimeDiff, extra: Option[MessageReportExtra])

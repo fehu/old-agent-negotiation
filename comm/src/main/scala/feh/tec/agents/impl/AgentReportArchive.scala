@@ -3,6 +3,7 @@ package feh.tec.agents.impl
 import akka.actor.{ActorLogging, ActorRef}
 import feh.tec.agents.Message.AutoId
 import feh.tec.agents.impl.AgentReports.ZeroTime
+import feh.tec.agents.impl.ProposalEngine.SharingKnowledge
 import feh.tec.agents.impl.System.Service
 import feh.tec.agents.{AgentRef, SystemMessage, SystemRole}
 
@@ -102,6 +103,10 @@ class ReportRegisterImpl(val controlAcceptanceCheckDelay: FiniteDuration, val co
   override def start() = {
     super.start()
     acceptanceRegister.clear()
+  }
+
+  override def processSys = super.processSys orElse {
+    case fail: SharingKnowledge.ConfigurationProvenFailure => notifyController(fail)
   }
 }
 

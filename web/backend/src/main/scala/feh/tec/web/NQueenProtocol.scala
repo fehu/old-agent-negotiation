@@ -22,7 +22,7 @@ object NQueenProtocol extends DefaultJsonProtocol{
   
   implicit object QueenFormat extends NamedFormat(jsonFormat1(Queen))
   implicit lazy val InitFormat: JsonFormat[Init] = new NamedFormat(jsonFormat1(Init)){}
-  implicit lazy val StateReportFormat: JsonFormat[StateReport] = new NamedFormat(jsonFormat6(StateReport)){}
+  implicit lazy val StateReportFormat: JsonFormat[StateReport] = new NamedFormat(jsonFormat7(StateReport)){}
 
   implicit object CanBulkFormat extends WriteOnlyFormat[CanBulk] ({
     case state: StateReport => StateReportFormat.write(state)
@@ -69,4 +69,7 @@ object NQueenProtocol extends DefaultJsonProtocol{
 
   implicit lazy val NegotiationFinishedAutoRestartFormat =
     new NamedFormat[NegotiationFinishedAutoRestart](jsonFormat1(NegotiationFinishedAutoRestart)) {}
+
+  implicit lazy val PositionProvenFailureProtocol =
+    new NamedFormat[PositionProvenFailure](jsonFormat1(PositionProvenFailure)) {}
 }
