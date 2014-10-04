@@ -102,7 +102,6 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
       case iterable: Iterable[_] => new DomainIterator.Generic[Any]
     }
     straightForward
-//    DomainIterator.Random(straightForward)
   }
 
   protected def replaceClass(clazz: Class[_]) = clazz match{ // replace primitive type classes by the boxes
@@ -117,6 +116,23 @@ trait NegotiationControllerBuilder[Control <: NegotiationController with ScopesI
   }
 
 }
+
+//trait NegotiationControllerBuilderRandomDomain[Control <: NegotiationController with ScopesInitialization]
+//  extends NegotiationControllerBuilder[Control]
+//{
+//  def randomize[D, T]: DomainIterator[D, T] => DomainIterator[D, T]
+//
+//  //todo: should be defined in the agent
+//  override protected def defaultDomainIterator(v: Var): DomainIterator[_, _] = randomize(super.defaultDomainIterator(v))
+//}
+
+//object NegotiationControllerBuilderRandomDomain{
+//  trait Rand[Control <: NegotiationController with ScopesInitialization]
+//    extends NegotiationControllerBuilderRandomDomain[Control]
+//  {
+//    def randomize[D, T] = DomainIterator.Random.apply
+//  }
+//}
 
 object NegotiationControllerBuilder{
 

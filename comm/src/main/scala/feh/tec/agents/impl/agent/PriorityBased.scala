@@ -7,12 +7,14 @@ import akka.util.Timeout
 import feh.tec.agents.ConstraintsView.Constraint
 import feh.tec.agents._
 import AgentCreation.NegotiationInit
-import feh.tec.agents.impl.Agent.Status
+import feh.tec.agents.impl.Agent.{AgentReporting, Status}
+import feh.tec.agents.impl.ProposalEngine.{SharingKnowledge, MySolutionValues}
 import feh.tec.agents.impl._
 import feh.tec.agents
 import feh.tec.agents.impl.view.{Priority, ExternalConstraints, Constraints, ConstraintsSatisfactionWithPriority}
 import feh.util._
 
+import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
 
 
@@ -214,7 +216,20 @@ trait PriorityBasedLearningFromMistakes[Lang <: ProposalLanguage] extends Priori
 
   override def startLife() = {
     super.startLife()
-    failedConfigurations.foreach(_._2.clear())
+    failedSolutions.foreach(_._2.clear())
+  }
+}
+
+trait PriorityBasedSharingAndLearningFromFatalMistakes[Lang <: ProposalLanguage]
+  extends PriorityBasedLearningFromMistakes[Lang]
+  with ProposalEngine.SharingKnowledge[Lang]
+  with LearningFromMistakesExtraction[Lang]
+{
+  self: NegotiatingAgent with PriorityBasedAgent[Lang] with ActorLogging with AgentHelpers[Lang] with AgentReporting[Lang] =>
+
+  override def externalConstraintsNotSatisfied(neg: ANegotiation) = {
+    configurationFailed(neg.id)
+    super.externalConstraintsNotSatisfied(neg)
   }
 }
 

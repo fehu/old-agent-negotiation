@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import feh.tec.agents.impl.ProposalEngine.SharingKnowledge
 import feh.util._
 import feh.tec.agents.impl.Agent.Id
-import feh.tec.agents.impl.NegotiationController.GenericStaticInitArgs
+import feh.tec.agents.impl.NegotiationController.{GenericStaticAgentsInit, GenericStaticInitArgs}
 import feh.tec.agents.impl._
 import feh.tec.agents.impl.agent.NegotiationControllerBuilder.DefaultBuildAgentArgs
 import feh.tec.agents.impl.agent.{GenericIteratingAgentCreation, NegotiationControllerBuilder}
@@ -21,6 +21,8 @@ class ControllerBuilder[AgImpl <: GenericIteratingAgentCreation[_]](web: => WebS
   extends NegotiationControllerBuilder.Default[AgImpl]
 {
   cb =>
+
+  def randomize[D, T] = ???
 
   override protected def props(arg: GenericStaticInitArgs[DefaultBuildAgentArgs]) = Props(new Controller(arg, web) with AutoRestart{
     def restartDelay = cb.restartDelay
@@ -39,9 +41,9 @@ class Controller(arg: GenericStaticInitArgs[DefaultBuildAgentArgs], web: WebSock
     case AgentRef(Id.named(RefNameRegex(name, i), _, _), _) => NQueenMessages.Queen(i.toInt) -> name
   })
 
-//  override def processSys = super.processSys orElse{
-//    case fail: SharingKnowledge.ConfigurationProvenFailure => web.ref ! fail
-//  }
+  override def processSys = super.processSys orElse{
+    case fail: SharingKnowledge.ConfigurationProvenFailure => web.ref ! fail
+  }
 
   override def start() = {
     super.start()

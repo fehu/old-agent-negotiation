@@ -105,9 +105,9 @@ class ReportRegisterImpl(val controlAcceptanceCheckDelay: FiniteDuration, val co
     acceptanceRegister.clear()
   }
 
-//  override def processSys = super.processSys orElse {
-//    case fail: SharingKnowledge.ConfigurationProvenFailure => notifyController(fail)
-//  }
+  override def processSys = super.processSys orElse {
+    case fail: SharingKnowledge.ConfigurationProvenFailure => notifyController(fail)
+  }
 }
 
 object ReportRegisterImpl{

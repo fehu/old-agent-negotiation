@@ -3,8 +3,9 @@ package feh.tec.agents
 import akka.actor.ActorLogging
 import feh.tec.agents.impl.Agent.AgentReportingMessagesAndState
 import feh.tec.agents.impl.AgentReports.WeightReport
+import feh.tec.agents.impl.ProposalEngine.IteratingAllDomainsRandom
 import feh.tec.agents.impl._
-import feh.tec.agents.impl.agent.GenericIteratingAgentCreation
+import feh.tec.agents.impl.agent.{PriorityBasedSharingAndLearningFromFatalMistakes, GenericIteratingAgentCreation}
 import feh.util.InUnitInterval
 
 class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
@@ -14,10 +15,12 @@ class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
   with ProposalEngine.IteratingAllDomainsLearningFromMistakes[DefaultNegotiatingLanguage]
   with AgentReportingMessagesAndState[DefaultNegotiatingLanguage]
   with ActorLogging
-  with LearningFromMistakesExtraction[DefaultNegotiatingLanguage]
-  with ProposalEngine.SharingKnowledge[DefaultNegotiatingLanguage]
+  with PriorityBasedSharingAndLearningFromFatalMistakes[DefaultNegotiatingLanguage]
+  with IteratingAllDomainsRandom[DefaultNegotiatingLanguage]
 {
   type StateOfNegotiation = ProposalIteratorNegotiationState[DefaultNegotiatingLanguage] with ProposalViewState
+
+  def randomizeDomainIterator = DomainIterator.Random(0) // randomize first issue
 
   def newNegotiationState(of: Negotiation): StateOfNegotiation =
     new ProposalIteratorNegotiationState[DefaultNegotiatingLanguage] with ProposalViewState{ def negotiation = of }
@@ -39,10 +42,5 @@ class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
 
   def knowledgeShare = arg.knowledgeShare
 
-  def resetIterator(negId: NegotiationId) = {
-    val neg = get(negId)
-    val vals = neg.currentValues.toMap
-    val it = newIterator(negId)
-    neg.state.currentIterator = Some(it)
-  }
+  def resetIterator(negId: NegotiationId) = resetIterator(get(negId))
 }

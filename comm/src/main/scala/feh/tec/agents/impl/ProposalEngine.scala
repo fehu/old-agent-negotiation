@@ -62,11 +62,14 @@ object ProposalEngine{
 
     protected val domainSeqIterators = negotiations.map{ neg => neg.id -> iteratorForNegotiation(neg) }.toMap
 
+    protected def createDomainIterator(itByVar: Seq[(Var, DomainIterator[Var#Domain, Var#Tpe])]): DomainSeqIterator[Var#Domain, Var#Tpe] =
+      DomainIterator overSeq itByVar.map(_._2)
+    
     protected def iteratorForNegotiation(ng: Negotiation) = {
       val dItByVar = ng.currentValues.keys.toSeq.zipMap(domainIterators)
       val domains = dItByVar.map(_._1.domain)
       log.info(s"iteratorForNegotiation domains: $domains")
-      val it = () => DomainIterator overSeq dItByVar.map(_._2) apply domains
+      val it = () => createDomainIterator(dItByVar)(domains)
       val vars = dItByVar.map(_._1)
       val i2i: Seq[Any] => Map[Var, Any] = seq => {
         assert(vars.length == seq.length)
@@ -85,10 +88,14 @@ object ProposalEngine{
       _.inCase(_.hasNext).map(_.next())
     }
 
+    def resetIterator(neg: ANegotiation) = {
+      val it = newIterator(neg.id)
+      neg.state.currentIterator = Some(it)
+    }
+
     /** resets values and sets a new proposal */
     def resetProposal(neg: ANegotiation) = {
-      neg.state.currentIterator = Some(newIterator(neg.id))
-      val it = neg.state.currentIterator.get
+      resetIterator(neg)
       setNextProposal(neg)
     }
 
@@ -114,6 +121,15 @@ object ProposalEngine{
       neg.state.currentProposalDate = Some(new Date())
       prop
     }
+  }
+  
+  trait IteratingAllDomainsRandom[Lang <: ProposalLanguage] extends IteratingAllDomains[Lang]{
+    self: NegotiatingAgent with ProposalBased[Lang] with ProposalRegister[Lang] =>
+
+    def randomizeDomainIterator: DomainSeqIterator[Var#Domain, Var#Tpe] => DomainSeqIterator[Var#Domain, Var#Tpe]
+
+    override protected def createDomainIterator(itByVar: Seq[(Var, DomainIterator[Var#Domain, Var#Tpe])]) = 
+      randomizeDomainIterator(super.createDomainIterator(itByVar))
   }
   
   trait IteratingCurrentIssues[Lang <: ProposalLanguage] extends Iterating[Lang]{ // todo
@@ -154,17 +170,17 @@ object ProposalEngine{
 
     protected type MyConf = Map[Var, Any]
 
-    protected val failedConfigurations = negotiations.map(neg =>
+    protected val failedSolutions = negotiations.map(neg =>
       neg.id -> mutable.HashSet.empty[MySolutionValues]
     ).toMap
 
     def configurationFailed(neg: NegotiationId): MySolutionValues =
-      currentConfiguration(neg) $$ { failedConfigurations(neg) += _ }
+      currentConfiguration(neg) $$ { failedSolutions(neg) += _ }
 
     def provenFailure(neg: NegotiationId, takeAgentInAccount: Boolean = false)(myConf: MyConf): Boolean = {
       val conf = currentConfiguration(neg).copy(myValues = myConf)
-      if(takeAgentInAccount) failedConfigurations(neg).exists(conf ==)
-      else failedConfigurations(neg).map(_.pureValues).exists(conf.pureValues ==)
+      if(takeAgentInAccount) failedSolutions(neg).exists(conf ==)
+      else failedSolutions(neg).map(_.pureValues).exists(conf.pureValues ==)
     } 
       
 
@@ -175,33 +191,51 @@ object ProposalEngine{
 
   /** Avoids value configurations proven failure */
   trait IteratingAllDomainsLearningFromMistakes[Lang <: ProposalLanguage] 
-    extends IteratingAllDomains[Lang] with LearningFromMistakes[Lang]
+    extends Agent[Lang] with IteratingAllDomains[Lang] with LearningFromMistakes[Lang]
   {
-    self: NegotiatingAgent with ProposalBased[Lang] with ProposalRegister[Lang] with SpeakingAgent[_] with AgentHelpers[_] =>
+    self: NegotiatingAgent with ProposalBased[Lang] with ProposalRegister[Lang] =>
 
     def takeAgentInAccountDuringFailedProposalFiltering = false
 
     override protected def nextIssues(neg: Negotiation) = neg.state.currentIterator flatMap {
       _.filter(notProvenFailure(neg.id, takeAgentInAccountDuringFailedProposalFiltering)).inCase(_.hasNext).map(_.next())
     }
+
+    override def startLife() = {
+      prependCurrentToTheIterator = false
+      super.startLife()
+      prependCurrentToTheIterator = true
+    }
+
+    protected var prependCurrentToTheIterator = false
+
+    override protected def newIterator(negId: NegotiationId) ={
+      val it = super.newIterator(negId)
+      val cv = get(negId).currentValues.toMap
+      if(prependCurrentToTheIterator) Iterator[Map[Var, Any]](cv +: it.filter(cv !=).toSeq: _*)
+      else it
+    }
   }
 
 
   object SharingKnowledge{
-    case class SolutionProvenFailure(neg: NegotiationId, solution: SolutionValues)
-                                    (implicit sender: AgentRef) extends SystemMessage with AutoId
-    {
-      def senderId = sender.id
+    trait ProvenFailure extends SystemMessage{
+      def neg: NegotiationId
+      def senderId: Agent.Id
     }
+
+    case class SolutionProvenFailure(neg: NegotiationId, solution: SolutionValues)
+                                    (implicit sender: AgentRef) extends ProvenFailure with AutoId{ def senderId = sender.id }
+
+    case class ConfigurationProvenFailure(neg: NegotiationId, config: Map[Var, Any])
+                                         (implicit sender: AgentRef) extends ProvenFailure with AutoId{ def senderId = sender.id }
   }
 
   trait SharingKnowledge[Lang <: ProposalLanguage] extends LearningFromMistakes[Lang] with SystemSupport{
     self: NegotiatingAgent
             with ProposalBased[Lang]
             with ActorLogging
-//            with SpeakingAgent[Lang]
-            with AgentHelpers[Lang] =>1
-//            with AgentReporting[Lang] =>
+            with AgentHelpers[Lang] =>
 
     def knowledgeShare: AgentRef
 
@@ -209,12 +243,11 @@ object ProposalEngine{
       val cf = super.configurationFailed(neg)
       val msg = SolutionProvenFailure(neg, cf)
       knowledgeShare.ref ! msg
-//      reportingTo.ref ! msg
       cf
     }
 
     override def processSys = super.processSys orElse{
-      case SolutionProvenFailure(neg, config) => failedConfigurations(neg) += config.my
+      case SolutionProvenFailure(neg, config) => failedSolutions(neg) += config.my
     }
   }
 }

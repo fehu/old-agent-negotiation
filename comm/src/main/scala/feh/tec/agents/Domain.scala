@@ -35,6 +35,14 @@ trait DomainIterator[-Domain, +T] extends (Domain => Iterator[T])
 trait StraightForwardDomainIterator[-Domain, +T] extends DomainIterator[Domain, T]
 trait RandomOrderDomainIterator[-Domain, +T] extends DomainIterator[Domain, T]
 
+trait DomainSeqIterator[Domain, T] extends DomainIterator[Seq[Domain], Seq[T]]{
+  type WithUnderlying = Iterator[Seq[T]] {
+    def iterators: mutable.HashMap[Int, scala.Iterator[T]]
+  }
+
+  override def apply(v1: Seq[Domain]): WithUnderlying
+}
+
 object DomainIterator{
   class Range(min: Int = Int.MinValue, max: Int = Int.MaxValue, step: Int = 1)
     extends StraightForwardDomainIterator[scala.collection.immutable.Range, Int]
@@ -71,8 +79,8 @@ object DomainIterator{
       }
     }
 
-  def overSeq[D, T](di: Seq[DomainIterator[D, T]]) = new StraightForwardDomainIterator[Seq[D], Seq[T]] {
-    def apply(v1: Seq[D]) = new Iterator[Seq[T]]{
+  def overSeq[D, T](di: Seq[DomainIterator[D, T]]) = new StraightForwardDomainIterator[Seq[D], Seq[T]] with DomainSeqIterator[D, T]{
+    def apply(v1: Seq[D]): WithUnderlying = new Iterator[Seq[T]]{
       val iteratorCreation = di.zip(v1)
         .map { case (domIt, domain) => () => domIt(domain)}
         .zipWithIndex.map(_.swap).toMap
@@ -109,8 +117,8 @@ object DomainIterator{
   }
 
   object Random{
-    def apply[D, T](dit: DomainIterator[D, T]) = dit match{
-      case rand: RandomOrderDomainIterator[D, T] => rand
+    def apply[D, T](dit: DomainIterator[D, T]): RandomOrderDomainIterator[D, T] = dit match{
+      case rand: RandomOrderDomainIterator[_, _] => ???
       case _ => new RandomOrderDomainIterator[D, T] {
         def apply(v1: D) = {
           val underlying = dit(v1)
@@ -118,5 +126,19 @@ object DomainIterator{
         }
       }
     }
+
+    def apply[D, T](applyRandom: Int*)(dit: DomainSeqIterator[D, T]): DomainSeqIterator[D, T] with RandomOrderDomainIterator[Seq[D], Seq[T]] =
+      dit match {
+        case rand: RandomOrderDomainIterator[_, _] => ???
+        case _ => new DomainSeqIterator[D, T] with RandomOrderDomainIterator[Seq[D], Seq[T]] {
+          def apply(v1: Seq[D]) = {
+            val underlying = dit(v1)
+            underlying.iterators.withFilter(applyRandom contains _._1) foreach{
+              case (i, it) => underlying.iterators(i) = it.toSeq.randomOrder().iterator
+            }
+            underlying
+          }
+        }
+      }
   }
 }
