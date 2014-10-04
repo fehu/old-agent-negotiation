@@ -14,6 +14,7 @@ class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
   with ProposalEngine.IteratingAllDomainsLearningFromMistakes[DefaultNegotiatingLanguage]
   with AgentReportingMessagesAndState[DefaultNegotiatingLanguage]
   with ActorLogging
+  with LearningFromMistakesExtraction[DefaultNegotiatingLanguage]
   with ProposalEngine.SharingKnowledge[DefaultNegotiatingLanguage]
 {
   type StateOfNegotiation = ProposalIteratorNegotiationState[DefaultNegotiatingLanguage] with ProposalViewState

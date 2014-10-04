@@ -42,7 +42,7 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
     context.system.scheduler.schedule(init, delay, self, PriorityBased.CheckConstraints)(context.system.dispatcher, self)
 
   def constraints: Set[Constraint]
-  protected def issuesExtractor: IssuesExtractor[Lang]
+  protected implicit def issuesExtractor: IssuesExtractor[Lang]
 
   protected def isFailure(neg: Negotiation, weighted: Map[Option[Boolean], InUnitInterval]): Boolean
 
@@ -63,9 +63,9 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
     if(lastOnProposalMaxPriority.exists(msg.priority > _)) resetIterator(msg.negotiation)
     lastOnProposalMaxPriority = Some(maxPriority)
   }
-  
+
   protected var lastOnProposalMaxPriority: Option[agents.Priority] = None
-  
+
   override lazy val behaviourOnProposal = new OnProposalBehaviour{
     override def act(prop: Lang#Proposal) = {
       resetIteratorIfNewTopPriority(prop)
@@ -128,15 +128,14 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
 //          log.info("constraintsSatisfactions.data = " + constraintsSatisfactions.data)
 //          log.info("externalConstraints.data = " + constraintsSatisfactions.merge._1.data)
 
-      if(isFailure(neg, weighted)){
-        if(markedUncondAccepted(neg)) guardFailedValueConfiguration(neg)
-        setNextProposal(neg)
-          .map( _ => spamProposal _ )
-          .getOrElse( noMoreProposals _ )
-          .apply(neg)
-      }
+      if(isFailure(neg, weighted)) externalConstraintsNotSatisfied(neg)
       else markAccepted(neg)
   }
+
+  def externalConstraintsNotSatisfied(neg: ANegotiation) = setNextProposal(neg)
+    .map( _ => spamProposal _ )
+    .getOrElse( noMoreProposals _ )
+    .apply(neg)
 
   def markAccepted(neg: ANegotiation) = {
     val old = neg.currentValuesAcceptance
@@ -167,7 +166,6 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
 //      log.info(s"$before neg.state.currentProposal: ${neg.state.currentProposal}")
 
       externalViews.foreach(_.reset())
-      failedValueConfigurations.foreach(_._2.clear())
       proposalsWithoutResponse.clear()
 
       neg.state.lastWeightedProposal = None
@@ -205,6 +203,19 @@ trait PriorityBased[Lang <: ProposalLanguage] extends PriorityBasedAgent[Lang]
     resetProposal(neg)
     spamProposal(neg)
   }
+
+  def topPriority_?(neg: Negotiation) = neg.state.currentProposalUnconditionallyAccepted
+}
+
+trait PriorityBasedLearningFromMistakes[Lang <: ProposalLanguage] extends PriorityBased[Lang]
+  with ProposalEngine.LearningFromMistakes[Lang]
+{
+  self: NegotiatingAgent with ProposalBased[Lang] with ActorLogging =>
+
+  override def startLife() = {
+    super.startLife()
+    failedConfigurations.foreach(_._2.clear())
+  }
 }
 
 abstract class PriorityBasedCreation[Lang <: ProposalLanguage](
@@ -212,7 +223,7 @@ abstract class PriorityBasedCreation[Lang <: ProposalLanguage](
              negotiationInit: Map[NegotiationId, NegotiationInit],
              val conflictResolver: AgentRef,
              val conflictResolveTimeout: Timeout)
-  extends AgentCreation[Lang](uuid, negotiationInit) with PriorityBased[Lang]
+  extends AgentCreation[Lang](uuid, negotiationInit) with PriorityBased[Lang] with PriorityBasedLearningFromMistakes[Lang]
 
 object PriorityBasedCreation{
   type Interface = (UUID, Map[NegotiationId, NegotiationInit], AgentRef, Timeout)

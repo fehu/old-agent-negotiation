@@ -94,7 +94,7 @@ object Agent{
 // ReportState messages
       case req: AgentReports.ReportStates => sender ! req.response( negId => getOpt(negId) map {
         neg =>
-          StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, neg.currentValuesAcceptance, maxPriority(neg), extractStateReportExtra(neg.id))
+          StateReportEntry(neg.priority, neg.currentValues.toMap, neg.scope, neg.currentValuesAcceptance, topPriority_?(neg), extractStateReportExtra(neg.id))
         })
       case req: AgentReports.ReportAllStates => sender ! reportAllStates(req.id)
     }
@@ -102,7 +102,8 @@ object Agent{
     protected def reportStates(of: NegotiationId, id: UUID = UUID.randomUUID()) = reportStatesInner(negotiations.find(_.id == of), id)
     protected def reportAllStates(id: UUID = UUID.randomUUID()) = reportStatesInner(negotiations, id)
 
-    def maxPriority(neg: Negotiation): Boolean
+    // todo: shouldn't be defined here
+    def topPriority_?(neg: Negotiation): Boolean
 
     private def reportStatesInner(negs: Iterable[ANegotiation], id: UUID) = {
       val negReps = negs.map{
@@ -112,7 +113,7 @@ object Agent{
             neg.currentValues.toMap,
             neg.scope,
             neg.currentValuesAcceptance,
-            maxPriority(neg),
+            topPriority_?(neg),
             extractStateReportExtra(neg.id)
           )
       }.toMap

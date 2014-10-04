@@ -56,11 +56,11 @@ trait ReportsPrinter extends ActorLogging{
         val sb = new StringBuilder
         sb ++= s"Report by $of:\n"
         report foreach {
-          case (negId, AgentReports.StateReportEntry(p, v, s, a, extra)) =>
-            sb ++= (" "*12 + s"  priority: $p\n")
-            sb ++= (" "*12 + s"    values: $v\n")
-            sb ++= (" "*12 + s"     scope: $s\n")
-            sb ++= (" "*12 + s"acceptance: $s")
+          case (negId, AgentReports.StateReportEntry(p, v, s, a, top, extra)) =>
+            sb ++= " "*12 ++= s"  priority: $p\n" ++= (if(top) " (top)" else "")
+            sb ++= " "*12 ++= s"    values: $v\n"
+            sb ++= " "*12 ++= s"     scope: $s\n"
+            sb ++= " "*12 ++= s"acceptance: $s"
             if(extra.isDefined) sb ++= ("\n" + " "*12 + s"   extra: ${extra.get}")
         }
         log.info(sb.mkString)
@@ -105,9 +105,9 @@ class ReportRegisterImpl(val controlAcceptanceCheckDelay: FiniteDuration, val co
     acceptanceRegister.clear()
   }
 
-  override def processSys = super.processSys orElse {
-    case fail: SharingKnowledge.ConfigurationProvenFailure => notifyController(fail)
-  }
+//  override def processSys = super.processSys orElse {
+//    case fail: SharingKnowledge.ConfigurationProvenFailure => notifyController(fail)
+//  }
 }
 
 object ReportRegisterImpl{

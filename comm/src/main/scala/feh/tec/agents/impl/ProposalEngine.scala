@@ -6,7 +6,7 @@ import akka.actor.ActorLogging
 import feh.tec.agents.Message.AutoId
 import feh.tec.agents._
 import feh.tec.agents.impl.Agent.{AgentReporting, SystemSupport}
-import feh.tec.agents.impl.ProposalEngine.SharingKnowledge.ConfigurationProvenFailure
+import feh.tec.agents.impl.ProposalEngine.SharingKnowledge.SolutionProvenFailure
 import feh.util._
 
 import scala.collection.mutable
@@ -104,7 +104,7 @@ object ProposalEngine{
       }
     }
 
-    protected def issuesExtractor: IssuesExtractor[Lang]
+    protected implicit def issuesExtractor: IssuesExtractor[Lang]
 
     protected def updateProposal(neg: ANegotiation) = {
       val old = neg.state.currentProposal
@@ -120,19 +120,57 @@ object ProposalEngine{
     self: NegotiatingAgent with ProposalBased[Lang] =>
   }
 
+  trait SolutionValues{
+    def values: Map[AgentRef, Map[Var, Any]]
+    def pureValues = values.values.toSet
+
+    override def equals(obj: scala.Any) = PartialFunction.cond(obj) {
+      case that: SolutionValues => this.values == that.values
+    }
+    override def hashCode() = values.hashCode()
+  }
+  
+  object SolutionValues{
+    def apply(vals: Map[AgentRef, Map[Var, Any]]) = 
+      new SolutionValues { 
+        def values = vals
+      }
+    
+    implicit class MineExt(c: SolutionValues){
+      def my(implicit ref: AgentRef) = MySolutionValues(c.values(ref), c.values - ref)
+    }
+  }
+  
+  case class MySolutionValues(myValues: Map[Var, Any], othersValues: Map[AgentRef, Map[Var, Any]])
+                                  (implicit ref: AgentRef) extends SolutionValues
+  {
+    def values = othersValues + (ref -> myValues)
+  }
+
+  // todo: shall be refactored
   /** Guards values configuration that were proved failure and avoids them in the future */
   trait LearningFromMistakes[Lang <: ProposalLanguage] extends ProposalEngine[Lang]{
-    self: NegotiatingAgent with ProposalBased[Lang] with ActorLogging=>
-    
-    protected lazy val failedValueConfigurations = negotiations.map{ neg => neg.id -> mutable.HashSet.empty[Map[Var, Any]] }.toMap
-    
-    def guardFailedValueConfiguration(neg: Negotiation): Unit =
-      failedValueConfigurations(neg.id) += neg.currentValues.toMap
+    self: NegotiatingAgent with ProposalBased[Lang] with ActorLogging =>
 
-    def provenFailure(neg: Negotiation)(configuration: Map[Var, Any]) = 
-      failedValueConfigurations(neg.id) contains configuration
+    protected type MyConf = Map[Var, Any]
 
-    def notProvenFailure(neg: Negotiation)(configuration: Map[Var, Any]) = !provenFailure(neg)(configuration)
+    protected val failedConfigurations = negotiations.map(neg =>
+      neg.id -> mutable.HashSet.empty[MySolutionValues]
+    ).toMap
+
+    def configurationFailed(neg: NegotiationId): MySolutionValues =
+      currentConfiguration(neg) $$ { failedConfigurations(neg) += _ }
+
+    def provenFailure(neg: NegotiationId, takeAgentInAccount: Boolean = false)(myConf: MyConf): Boolean = {
+      val conf = currentConfiguration(neg).copy(myValues = myConf)
+      if(takeAgentInAccount) failedConfigurations(neg).exists(conf ==)
+      else failedConfigurations(neg).map(_.pureValues).exists(conf.pureValues ==)
+    } 
+      
+
+    def notProvenFailure(neg: NegotiationId, takeAgentInAccount: Boolean = false)(myConf: MyConf) = !provenFailure(neg, takeAgentInAccount)(myConf)
+
+    protected def currentConfiguration(negId: NegotiationId): MySolutionValues
   }
 
   /** Avoids value configurations proven failure */
@@ -140,38 +178,43 @@ object ProposalEngine{
     extends IteratingAllDomains[Lang] with LearningFromMistakes[Lang]
   {
     self: NegotiatingAgent with ProposalBased[Lang] with ProposalRegister[Lang] with SpeakingAgent[_] with AgentHelpers[_] =>
-    
+
+    def takeAgentInAccountDuringFailedProposalFiltering = false
+
     override protected def nextIssues(neg: Negotiation) = neg.state.currentIterator flatMap {
-      _.filter(notProvenFailure(neg)).inCase(_.hasNext).map(_.next())
+      _.filter(notProvenFailure(neg.id, takeAgentInAccountDuringFailedProposalFiltering)).inCase(_.hasNext).map(_.next())
     }
   }
 
 
   object SharingKnowledge{
-    case class ConfigurationProvenFailure(neg: NegotiationId, config: Map[Var, Any], sender: Agent.Id) extends SystemMessage with AutoId
+    case class SolutionProvenFailure(neg: NegotiationId, solution: SolutionValues)
+                                    (implicit sender: AgentRef) extends SystemMessage with AutoId
+    {
+      def senderId = sender.id
+    }
   }
 
   trait SharingKnowledge[Lang <: ProposalLanguage] extends LearningFromMistakes[Lang] with SystemSupport{
     self: NegotiatingAgent
             with ProposalBased[Lang]
             with ActorLogging
-            with SpeakingAgent[Lang]
-            with AgentHelpers[Lang]
-            with AgentReporting[Lang] =>
+//            with SpeakingAgent[Lang]
+            with AgentHelpers[Lang] =>1
+//            with AgentReporting[Lang] =>
 
     def knowledgeShare: AgentRef
 
-    override def guardFailedValueConfiguration(neg: Negotiation) = {
-      super.guardFailedValueConfiguration(neg)
-      val msg = ConfigurationProvenFailure(neg.id, neg.currentValues.toMap, ref.id)
+    override def configurationFailed(neg: NegotiationId): MySolutionValues = {
+      val cf = super.configurationFailed(neg)
+      val msg = SolutionProvenFailure(neg, cf)
       knowledgeShare.ref ! msg
-      reportingTo.ref ! msg
+//      reportingTo.ref ! msg
+      cf
     }
 
-    def maxPriority(neg: Negotiation) = neg.state.currentProposalUnconditionallyAccepted
-
     override def processSys = super.processSys orElse{
-      case ConfigurationProvenFailure(neg, config, _) => failedValueConfigurations(neg) += config
+      case SolutionProvenFailure(neg, config) => failedConfigurations(neg) += config.my
     }
   }
 }

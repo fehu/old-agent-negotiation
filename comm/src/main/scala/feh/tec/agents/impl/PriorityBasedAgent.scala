@@ -1,7 +1,9 @@
 package feh.tec.agents.impl
 
+import akka.actor.ActorLogging
 import akka.pattern.ask
 import akka.util.Timeout
+import feh.tec.agents.impl.ProposalEngine.{MySolutionValues, LearningFromMistakes}
 import feh.tec.agents.service.ConflictResolver.{ConflictResolved, ResolveConflict}
 import feh.tec.agents._
 
@@ -100,4 +102,20 @@ trait PriorityBasedAgentViews extends ExternalViewSupport{
 
   def externalViews = (constraintsSatisfactions: ExternalView) :: Nil
   def filterIncoming = _ => true
+}
+
+trait LearningFromMistakesExtraction[Lang <: ProposalLanguage] extends LearningFromMistakes[Lang] with PriorityBasedAgentViews{
+  self: NegotiatingAgent with PriorityBasedAgent[Lang] with ActorLogging with AgentHelpers[Lang] =>
+
+  protected implicit def issuesExtractor: IssuesExtractor[Lang]
+
+  lazy val interlocutorsVars: InterlocutorsVarsView = new view.InterlocutorsVars(lang)
+  override def externalViews = interlocutorsVars :: super.externalViews
+
+  protected def currentConfiguration(negId: NegotiationId) = {
+    val myConf = get(negId).currentValues.toMap
+    val othersConf = interlocutorsVars.data
+    MySolutionValues(myConf, othersConf)
+  }
+
 }

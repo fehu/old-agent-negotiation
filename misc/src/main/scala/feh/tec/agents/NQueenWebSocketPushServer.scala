@@ -92,8 +92,8 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
       reportsBuff.clear()
       super.receive(push(NQueenMessages.NegotiationFinishedAutoRestart(delay.toMillis.toInt)))
     case NQueenMessages.Restart => super.receive(push(NQueenMessages.Restart))
-    case SharingKnowledge.ConfigurationProvenFailure(_, pos, _) =>
-      super.receive(push(NQueenMessages.PositionProvenFailure(getPosXY(pos))))
+//    case SharingKnowledge.ConfigurationProvenFailure(_, pos) =>
+//      super.receive(push(NQueenMessages.PositionProvenFailure(getPosXY(pos.))))
   }
 
   scheduleFlush()

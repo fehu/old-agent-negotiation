@@ -2,7 +2,7 @@ package feh.tec.agents.impl
 
 import akka.actor.ActorLogging
 import feh.tec.agents.SystemMessage.{Start, ScopeUpdate}
-import feh.tec.agents.impl.ProposalEngine.SharingKnowledge.ConfigurationProvenFailure
+import feh.tec.agents.impl.ProposalEngine.SharingKnowledge.SolutionProvenFailure
 import feh.tec.agents.{SystemRole, AgentRef, Role}
 
 import scala.collection.mutable
@@ -23,7 +23,7 @@ class KnowledgeSharing extends SystemAgent with ActorLogging{
     case ScopeUpdate.NewScope(scp, _) => scp.groupBy(_.id.role) foreach{
       case (role, refs) => scopes(role) = scopes(role) ++ refs
     }
-    case msg@ConfigurationProvenFailure(neg, conf, senderId) =>
-      scopes get senderId.role foreach (_ withFilter (_.id != senderId) foreach (_.ref ! msg))
+    case msg@SolutionProvenFailure(neg, conf) =>
+      scopes get msg.senderId.role foreach (_ withFilter (_.id != msg.senderId) foreach (_.ref ! msg))
   }
 }

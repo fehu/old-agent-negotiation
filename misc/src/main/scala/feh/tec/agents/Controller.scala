@@ -39,9 +39,9 @@ class Controller(arg: GenericStaticInitArgs[DefaultBuildAgentArgs], web: WebSock
     case AgentRef(Id.named(RefNameRegex(name, i), _, _), _) => NQueenMessages.Queen(i.toInt) -> name
   })
 
-  override def processSys = super.processSys orElse{
-    case fail: SharingKnowledge.ConfigurationProvenFailure => web.ref ! fail
-  }
+//  override def processSys = super.processSys orElse{
+//    case fail: SharingKnowledge.ConfigurationProvenFailure => web.ref ! fail
+//  }
 
   override def start() = {
     super.start()
