@@ -122,7 +122,7 @@ object  Build extends sbt.Build {
       }
     )
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(comm, oldcomm, coloring, misc, webFrontend, webBackend)
+   .aggregate(comm, oldcomm, coloring, misc, webFrontend, webBackend, commLight)
 
   lazy val comm = Project(
     id = "comm",
@@ -188,4 +188,9 @@ object  Build extends sbt.Build {
     )
   ) dependsOn webCommon
 
+  lazy val commLight = Project("comm-light", file("comm-light"),
+    settings = buildSettings ++ Seq(
+      libraryDependencies ++= Seq(akka, feh.util)
+    )
+  )
 }
