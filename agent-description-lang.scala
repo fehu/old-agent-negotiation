@@ -1,4 +1,4 @@
-define(new Agent with PriorityAndProposalBased.HavingViews with SolutionFiltering.andSharing { agent => 
+define(new Agent with PriorityAndProposalBased.HavingViews with DomainIterating.AllAsOne with SolutionFiltering.andSharing { agent => 
 
   import views.{ fullMerge => view }
 
@@ -9,7 +9,7 @@ define(new Agent with PriorityAndProposalBased.HavingViews with SolutionFilterin
   }
   
   // definition for all negotiations
-  afterStart {
+  afterStart := {
     spamProposal
     await(view.hasMinimumData)
     state = Negotiating
@@ -17,15 +17,15 @@ define(new Agent with PriorityAndProposalBased.HavingViews with SolutionFilterin
   
   for(neg <- `queen's position`){
   
-    onProposalMessage {
+    onProposalMessage := {
       proposal => respond(if(proposal breaks constraints) Rejected else Accepted)
     }
     
-    onAcceptanceMessage {
+    onAcceptanceMessage := {
       msg => /* do nothing */
     }
     
-    onRejectionMessage {
+    onRejectionMessage := {
       case agent.priority > sender.priority => ignore
       case agent.priority < sender.priority => rejection
     }
@@ -36,7 +36,7 @@ define(new Agent with PriorityAndProposalBased.HavingViews with SolutionFilterin
       else neg.currentProposal is Rejected
     }
     
-    onAcceptance{ 
+    onAcceptance := { 
       _ => state = Sleeping
     }
     

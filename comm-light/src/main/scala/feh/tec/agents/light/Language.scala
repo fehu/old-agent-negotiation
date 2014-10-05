@@ -20,11 +20,11 @@ object Language{
   trait HasPriority extends NegotiationLanguage{
     type Msg <: Message.HasPriority
     
-    trait Priority{
-      type RaiseRequest <: Message.PriorityRaiseRequest[_]
-      type Keeping      = Message.Keep
-      type Raising      = Message.Raise
-    }
+    type Priority             = Message.HasPriority
+    type PriorityRaiseRequest <: Message.PriorityRaiseRequest[_]
+    type PriorityKeeping      = Message.Keep
+    type PriorityRaising      = Message.Raise
+
   }
 }
 
@@ -44,6 +44,9 @@ object Message{
   }
 
   case class ProposalId(get: UUID)
+  object ProposalId{
+    def rand = ProposalId(UUID.randomUUID())
+  }
   
   case class Proposal(id: ProposalId, negotiation: NegotiationId, get: Map[Var, Any])
                      (implicit val sender: AgentRef, val priority: Priority) extends Message.HasPriority{

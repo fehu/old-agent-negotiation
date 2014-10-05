@@ -4,7 +4,7 @@ import feh.tec.agents.light.SystemMessage.ScopeUpdate
 import feh.util.AbstractScopedState
 
 trait AgentHelpers[Lang <: NegotiationLanguage]{
-  self: NegotiatingAgent with SpeakingAgent[Lang] =>
+  self: NegotiatingAgent[Lang] with SpeakingAgent[Lang] =>
 
   protected object hooks{
 
@@ -68,7 +68,7 @@ trait SpeakingSystemSupport[Lang <: Language] extends SystemSupport{
   protected def beforeEachMessage(msg: Lang#Msg)
 }
 
-trait DynamicScopeSupport[Lang <: Language]
+trait DynamicScopeSupport[Lang <: NegotiationLanguage]
   extends SystemSupport
   with NegotiatingAgent[Lang]
   with AgentHelpers[Lang]

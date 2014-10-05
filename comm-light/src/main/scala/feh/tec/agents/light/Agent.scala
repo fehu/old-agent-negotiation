@@ -41,7 +41,7 @@ trait PriorityNegotiationHandler[Lang <: Language.HasPriority]{
 trait PriorityBasedAgent[Lang <: Language.HasPriority] extends NegotiatingAgent[Lang]{
   type Negotiation <: Negotiation.HasPriority
 
-  def requestPriorityRaise(neg: NegotiationId): Lang#Priority#RaiseRequest
+  def requestPriorityRaise(neg: NegotiationId): Lang#PriorityRaiseRequest
   def priorityNegotiationHandler: PriorityNegotiationHandler[Lang]
 
   def comparePriority(msg: Lang#Msg, f: (Priority, Priority) => Boolean): Boolean

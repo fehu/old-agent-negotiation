@@ -15,7 +15,7 @@ trait AbstractNegotiation {
 
     protected def upd: (Upd, Repr) => Repr
 
-    def apply: Get = get(repr)
+    def apply(): Get = get(repr)
     def update(u: Upd) = repr = {
       reset()
       upd(u, repr)
@@ -55,11 +55,12 @@ trait AbstractNegotiation {
 trait NegotiationState
 
 object NegotiationState{
-  case object Starting              extends NegotiationState
   case object Initializing          extends NegotiationState
   case object Initialized           extends NegotiationState
+  case object Starting              extends NegotiationState
   case object Negotiating           extends NegotiationState
   case object NegotiatingPriority   extends NegotiationState
+  case object Waiting               extends NegotiationState
   case object Stopped               extends NegotiationState
 }
 
