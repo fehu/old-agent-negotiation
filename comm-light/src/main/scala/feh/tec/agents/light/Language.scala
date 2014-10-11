@@ -20,10 +20,11 @@ object Language{
   trait HasPriority extends NegotiationLanguage{
     type Msg <: Message.HasPriority
     
-    type Priority             = Message.HasPriority
-    type PriorityRaiseRequest <: Message.PriorityRaiseRequest[_]
-    type PriorityKeeping      = Message.Keep
-    type PriorityRaising      = Message.Raise
+    type Priority               = Message.HasPriority
+    type PriorityRaiseRequest   <: Msg with Message.PriorityRaiseRequest[_]
+    type PriorityRaiseResponse  <: Msg with Message.PriorityRaiseResponse
+    type PriorityKeeping        = Message.Keep
+    type PriorityRaising        = Message.Raise
 
   }
 }
@@ -48,8 +49,8 @@ object Message{
     def rand = ProposalId(UUID.randomUUID())
   }
   
-  case class Proposal(id: ProposalId, negotiation: NegotiationId, get: Map[Var, Any])
-                     (implicit val sender: AgentRef, val priority: Priority) extends Message.HasPriority{
+  case class Proposal(id: ProposalId, negotiation: NegotiationId, priority: Priority, get: Map[Var, Any])
+                     (implicit val sender: AgentRef) extends Message.HasPriority{
     def asString = s"I would like to set values: $get, are you ok with it?"
   }
 
@@ -58,19 +59,22 @@ object Message{
     def myValues: Map[Var, Any]
   }
 
-  case class Accepted(negotiation: NegotiationId, respondingTo: ProposalId, myValues: Map[Var, Any])
-                     (implicit val sender: AgentRef, val priority: Priority) extends ProposalResponse {
+  case class Accepted(negotiation: NegotiationId, respondingTo: ProposalId, priority: Priority, myValues: Map[Var, Any])
+                     (implicit val sender: AgentRef) extends ProposalResponse {
     def asString = "I accept your offer"
   }
-  case class Rejected(negotiation: NegotiationId, respondingTo: ProposalId, myValues: Map[Var, Any])
-                     (implicit val sender: AgentRef, val priority: Priority) extends ProposalResponse {
+  case class Rejected(negotiation: NegotiationId, respondingTo: ProposalId, priority: Priority, myValues: Map[Var, Any])
+                     (implicit val sender: AgentRef) extends ProposalResponse {
     def asString = "I reject your offer"
   }
 
   case class PriorityRaiseRequestId(get: UUID)
+  object PriorityRaiseRequestId{
+    def rand = PriorityRaiseRequestId(UUID.randomUUID())
+  }
 
-  case class PriorityRaiseRequest[Ev](id: PriorityRaiseRequestId, negotiation: NegotiationId, evidence: Ev)
-                                     (implicit val sender: AgentRef, val priority: Priority) extends Message.HasPriority{
+  case class PriorityRaiseRequest[Ev](id: PriorityRaiseRequestId, negotiation: NegotiationId, priority: Priority, evidence: Ev)
+                                     (implicit val sender: AgentRef) extends Message.HasPriority{
     def asString = s"I request my $priority to be raised"
   }
 
@@ -78,13 +82,13 @@ object Message{
     def respondingTo: PriorityRaiseRequestId
   }
 
-  case class Keep(negotiation: NegotiationId, respondingTo: PriorityRaiseRequestId)
-                 (implicit val sender: AgentRef, val priority: Priority) extends PriorityRaiseResponse{
+  case class Keep(negotiation: NegotiationId, respondingTo: PriorityRaiseRequestId, priority: Priority)
+                 (implicit val sender: AgentRef) extends PriorityRaiseResponse{
     def asString = s"I will keep my $priority"
   }
 
-  case class Raise(negotiation: NegotiationId, respondingTo: PriorityRaiseRequestId)
-                  (implicit val sender: AgentRef, val priority: Priority) extends PriorityRaiseResponse{
+  case class Raise(negotiation: NegotiationId, respondingTo: PriorityRaiseRequestId, priority: Priority)
+                  (implicit val sender: AgentRef) extends PriorityRaiseResponse{
     def asString = s"I will raise my $priority"
   }
 }

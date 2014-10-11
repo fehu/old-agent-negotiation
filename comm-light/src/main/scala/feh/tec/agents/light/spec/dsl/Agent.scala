@@ -2,11 +2,16 @@ package feh.tec.agents.light.spec.dsl
 
 import akka.actor.{Actor, ActorLogging}
 import akka.event.LoggingAdapter
+import akka.util.Timeout
 import feh.tec.agents.light
+import feh.tec.agents.light.impl.PriorityAndProposalBasedAgent
 import feh.tec.agents.light.{Message, Language, Priority, NegotiationState}
 import feh.tec.agents.light.spec.NegotiationSpecification.NegotiationDef
 import feh.tec.agents.light.spec.{MonoDefinition, ExtendableDefinition, AgentSpecification}
 import feh.tec.agents.light.spec.dsl.Agent._
+import feh.tec.agents.light.spec.dsl
+
+import scala.concurrent.duration.FiniteDuration
 
 /** Contains definitions for macros to work with */
 abstract class Agent {
@@ -25,7 +30,7 @@ abstract class Agent {
 
   def when[T](cond: WhenCondition, act: WhenAction[T]): When[T] = ???
   def when[T](cond: WhenCondition)(act: => Unit): Unit = ???
-  def await[T](t: Awaitable[T]): T = ???
+  def await[T](t: Awaitable[T], timeout: FiniteDuration): T = ???
 
   var state: NegotiationState = ???
 
@@ -43,7 +48,7 @@ abstract class Agent {
   }
 }
 
-protected[dsl] object Agent{
+/*protected[dsl]*/ object Agent{
   trait When[T]{
     def apply(t: T)
   }
@@ -59,22 +64,25 @@ protected[dsl] object Agent{
 }
 
 trait PriorityComparing{
+  self: Agent =>
 
-  type HasPriority = {
-    def priority: Priority
+  protected trait HasPriority{
+    val priority: Priority
   }
 
-  def agent: HasPriority
-  def sender: HasPriority
+  val my: HasPriority = ???
+  val sender: HasPriority  = ???
 
-  case class <(l: Priority, r: Priority)
-  case class >(l: Priority, r: Priority)
+  object <{ def unapply(msg: Message): Option[(Priority, Priority)] = ??? }
+  object >{ def unapply(msg: Message): Option[(Priority, Priority)] = ??? }
 }
 
-trait PriorityAndProposalBased
-  extends AgentSpecification.PriorityAndProposalBased
+trait PriorityAndProposalBased[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
+  extends AgentSpecification.PriorityAndProposalBased[Ag, Lang]
   with PriorityComparing
 {
+  self: dsl.Agent =>
+
   trait NState
 
   case object Proposal extends Msg
@@ -104,5 +112,34 @@ trait PriorityAndProposalBased
 
   implicit class PriorityAndProposalNegotiationDefWrapper(neg: NegotiationDef){
     def currentProposal: Message.Proposal = ???
+  }
+
+  def onProposalAcceptance //todo
+  def onProposalRejection //todo
+}
+
+object PriorityAndProposalBased{
+  type Lang = Language.ProposalBased with Language.HasPriority
+  type Ag = PriorityAndProposalBasedAgent[Lang]
+
+  trait HavingViews
+    extends PriorityAndProposalBased[Ag, Lang]
+  {
+    self: dsl.Agent =>
+
+    object view{
+      def hasMinimumData: Awaitable[Unit] = ???
+      def externalConstraints: Constraints = ???
+    }
+  }
+}
+
+trait SolutionFiltering{
+  self: dsl.Agent =>
+
+  case object messages extends MsgSeq
+
+  object SolutionFilter{
+    def accepts(msg: MsgSeq): Boolean = ???
   }
 }

@@ -39,8 +39,8 @@ trait AgentHelpers[Lang <: NegotiationLanguage]{
 
   def sendToAll(msg: Lang#Msg) = get(msg.negotiation).scope.foreach(_ ! msg)
 
-  protected val negotiationsCache = negotiations.map(n => n.id -> n).toMap
-  def get(neg: NegotiationId) = negotiationsCache(neg)
+  private val negotiationsCache = negotiations.map(n => n.id -> n).toMap
+  def get(neg: NegotiationId): Negotiation = negotiationsCache(neg)
   def getOpt(neg: NegotiationId) = negotiationsCache.get(neg)
 }
 

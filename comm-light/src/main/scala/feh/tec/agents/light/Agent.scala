@@ -13,7 +13,7 @@ trait NegotiationRole extends Role
 case class AgentRef(id: Agent.Id, ref: ActorRef)
 
 trait SpeakingAgent[Lang <: Language] extends AbstractAgent{
-  val ref: AgentRef
+  implicit val ref: AgentRef
   def process: PartialFunction[Lang#Msg, Any]
 }
 
@@ -35,7 +35,11 @@ trait ProposalBasedAgent[Lang <: Language.ProposalBased] extends NegotiatingAgen
 }
 
 trait PriorityNegotiationHandler[Lang <: Language.HasPriority]{
-  def process(msg: Lang#Priority): Any
+  def process: PartialFunction[Lang#Priority, Any]
+
+  def start(neg: NegotiationId): Lang#PriorityRaiseRequest
+  def decide(requests: Map[AgentRef, Message.PriorityRaiseRequest[_]]): Message.PriorityRaiseResponse
+  def onPriorityUpdate(f: Option[Priority] => Any)
 }
 
 trait PriorityBasedAgent[Lang <: Language.HasPriority] extends NegotiatingAgent[Lang]{
