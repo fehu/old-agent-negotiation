@@ -190,7 +190,7 @@ object  Build extends sbt.Build {
 
   lazy val commLight = Project("comm-light", file("comm-light"),
     settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(akka, feh.util)
+      libraryDependencies ++= Seq(akka, feh.util, scala.reflectApi)
     )
   )
 }
