@@ -138,7 +138,7 @@ object  Build extends sbt.Build {
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq()
     )
-  ) dependsOn (comm, webBackend)
+  ) dependsOn (comm, webBackend, commLight)
 
 
   lazy val oldcomm = Project(

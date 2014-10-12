@@ -1,5 +1,7 @@
 package feh.tec.agents.light.spec
 
+//import scala.reflect.runtime.{universe => ru}
+
 trait ExtendableDefinition[Owner, Def] {
   def get(implicit owner: Owner): Def
 

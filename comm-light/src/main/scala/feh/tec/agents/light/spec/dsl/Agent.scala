@@ -40,9 +40,9 @@ abstract class Agent {
 
   def log: LoggingAdapter = ???
 
-  implicit def negotiationDefHasFold(neg: NegotiationDef): Iterable[NegotiationDef]
+  implicit def negotiationDefHasForeach(neg: NegotiationDef): Iterable[NegDef]
 
-  implicit class NegotiationDefWrapper(neg: NegotiationDef){
+  implicit class NegDefWrapper(neg: NegDef){
     def receives(msg: Msg): WhenCondition = ???
     def receivesAll(msg: MsgSeq): WhenCondition = ???
   }
@@ -61,6 +61,8 @@ abstract class Agent {
   trait MsgSeq
 
   trait Guardable
+
+  trait NegDef
 }
 
 trait PriorityComparing{
@@ -77,8 +79,7 @@ trait PriorityComparing{
   object >{ def unapply(msg: Message): Option[(Priority, Priority)] = ??? }
 }
 
-trait PriorityAndProposalBased[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
-  extends AgentSpecification.PriorityAndProposalBased[Ag, Lang]
+trait PriorityAndProposalBased extends AgentSpecification.PriorityAndProposalBased[PriorityAndProposalBased.Ag, PriorityAndProposalBased.Lang]
   with PriorityComparing
 {
   self: dsl.Agent =>
@@ -104,13 +105,13 @@ trait PriorityAndProposalBased[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <
   trait Constraints
   object constraints extends Constraints
 
-  implicit class ProposalOpt(prop: Lang#Proposal){
+  implicit class ProposalOpt(prop: PriorityAndProposalBased.Lang#Proposal){
     def breaks(c: Constraints): Boolean = ???
     def satisfies(c: Constraints): Boolean = ???
     def is(nState: NState): Unit = ???
   }
 
-  implicit class PriorityAndProposalNegotiationDefWrapper(neg: NegotiationDef){
+  implicit class PriorityAndProposalNegDefWrapper(neg: NegDef){
     def currentProposal: Message.Proposal = ???
   }
 
@@ -122,8 +123,7 @@ object PriorityAndProposalBased{
   type Lang = Language.ProposalBased with Language.HasPriority
   type Ag = PriorityAndProposalBasedAgent[Lang]
 
-  trait HavingViews
-    extends PriorityAndProposalBased[Ag, Lang]
+  trait HavingViews extends PriorityAndProposalBased
   {
     self: dsl.Agent =>
 

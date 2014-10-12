@@ -1,6 +1,6 @@
 package feh.tec.agents.light.impl
 
-import akka.actor.Props
+import akka.actor.{ActorLogging, Props}
 import feh.tec.agents.light.Message.{PriorityRaiseRequestId, PriorityRaiseResponse, PriorityRaiseRequest, ProposalId}
 import feh.tec.agents.light.NegotiationState.{Starting, Negotiating, Stopped}
 import feh.tec.agents.light._
@@ -11,7 +11,7 @@ import feh.util._
 import scala.collection.mutable
 
 class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language.HasPriority]
-  extends PriorityProposalBasedAgent[Lang] with DynamicScopeSupport[Lang] with SpeakingSystemSupport[Lang]
+  extends PriorityProposalBasedAgent[Lang] with DynamicScopeSupport[Lang] with SpeakingSystemSupport[Lang] with ActorLogging
 {
   type Negotiation <: Negotiation.DynamicScope with Negotiation.HasPriority with Negotiation.HasProposal[Lang]
 

@@ -8,7 +8,7 @@ class ExtendedConstraint[C <: whitebox.Context](val c: C) {
 
     val h = new Helper[c.type](c)
 
-
+    import c.universe._
     
     def proposalArgName(s: String) = "$_proposal_" + s
     def proposalArg(s: String) = TermName(proposalArgName(s))

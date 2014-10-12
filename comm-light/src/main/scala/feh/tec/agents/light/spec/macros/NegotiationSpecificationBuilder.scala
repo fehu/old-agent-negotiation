@@ -7,7 +7,7 @@ import feh.tec.agents.light.spec
 
 object NegotiationSpecificationBuilder{
 
-  def build(c: whitebox.Context)(dsl: c.Expr[spec.dsl.NegotiationSpecification]): c.Expr[spec.NegotiationSpecification] = {
+  def build(c: whitebox.Context)(dsl: c.Expr[spec.dsl.Negotiation]): c.Expr[spec.NegotiationSpecification] = {
     import c.universe._
 
     val h = new Helper[c.type](c)

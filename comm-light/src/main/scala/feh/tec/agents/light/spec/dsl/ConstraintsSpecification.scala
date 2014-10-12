@@ -1,7 +1,7 @@
 package feh.tec.agents.light.spec.dsl
 
 trait ConstraintsSpecification{
-  self:  NegotiationSpecification =>
+  self:  Negotiation =>
 
   import feh.tec.agents.light.spec.NegotiationSpecification._
 

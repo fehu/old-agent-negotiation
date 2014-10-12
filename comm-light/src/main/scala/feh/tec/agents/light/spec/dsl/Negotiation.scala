@@ -1,6 +1,6 @@
 package feh.tec.agents.light.spec.dsl
 
-trait NegotiationSpecification extends ConstraintsSpecification with CreationSpecification{
+trait Negotiation extends ConstraintsSpecification with CreationSpecification{
   import feh.tec.agents.light.spec.NegotiationSpecification._
 
   type ChooseVarDomain = {

@@ -3,7 +3,7 @@ package feh.tec.agents.light.spec.dsl
 import scala.concurrent.duration.FiniteDuration
 
 trait CreationSpecification{
-  self: NegotiationSpecification =>
+  self: Negotiation =>
 
   import feh.tec.agents.light.spec.NegotiationSpecification._
 

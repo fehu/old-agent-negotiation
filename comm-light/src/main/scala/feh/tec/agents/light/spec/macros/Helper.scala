@@ -4,6 +4,8 @@ import scala.reflect.macros.whitebox
 import feh.util._
 
 class Helper[C <: whitebox.Context](val c: C){
+  helper =>
+
   import c.universe._
 
   def transform(t: c.Tree, f: PartialFunction[c.Tree, c.Tree]): c.Tree = {
@@ -45,7 +47,8 @@ class Helper[C <: whitebox.Context](val c: C){
       PartialFunction.cond(path, tree){
         case (p :: tail, Select(next, name)) if p == name.decodedName.toString => rec(next, tail)
         case (p :: tail, Select(next, name)) if name == typeNames.PACKAGE && p == "package"  => rec(next, tail)
-        case (p :: tail, Ident(name)) if p == name.decodedName.toString => true
+//        case (p :: "this" :: Nil, This(name)) if p == name.decodedName.toString => true
+        case (p :: Nil, Ident(name)) if p == name.decodedName.toString => true
         case (p :: Nil, This(name)) if p == name.decodedName.toString => true
       }
   }
@@ -55,8 +58,11 @@ class Helper[C <: whitebox.Context](val c: C){
       PartialFunction.cond(path, tree){
         case (p :: tail, Select(next, name)) if p == name.decodedName.toString => rec(next, tail)
         case (p :: tail, Select(next, name)) if name == typeNames.PACKAGE && p == "package"  => rec(next, tail)
-        case (p, Select(next, name)) => rec(next, p)
+        case (p, Select(next, _)) => rec(next, p)
+        case (p, Apply(fun, args))     => rec(fun, p) || args.exists(rec(_, p))
+        case (p, TypeApply(fun, args)) => rec(fun, p) || args.exists(rec(_, p))
         case (p :: Nil, Ident(name)) if p == name.decodedName.toString => true
+//        case (p :: "this" :: Nil, This(name)) if p == name.decodedName.toString => true
         case (p :: Nil, This(name)) if p == name.decodedName.toString => true
       }
   }
@@ -65,14 +71,25 @@ class Helper[C <: whitebox.Context](val c: C){
                             (isTheOneSearched_? : Y2[c.Tree, Seq[String], Boolean]): Boolean = {
     val w = what.split('.').reverse.toList
 
+    def search(sel: c.Tree) = isTheOneSearched_?(Y2(isTheOneSearched_?))(sel, w)
+
     def rec(t: c.Tree): Boolean =
       PartialFunction.cond(t) {
-        case sel: Select          => isTheOneSearched_?(Y2(isTheOneSearched_?))(sel, w)
         case Function(_, body)    => rec(body)
         case Apply(fun, args)     => rec(fun) || args.exists(rec)
         case TypeApply(fun, args) => rec(fun) || args.exists(rec)
         case tr@TypeTree()        => rec(tr.original)
+        case sel                  => search(sel)
       }
     rec(in)
+  }
+
+  implicit class Wrapper(t: c.Tree){
+    def transform(f: PartialFunction[c.Tree, c.Tree]) = helper.transform(t, f)
+    def extract[R](f: PartialFunction[c.Tree, R]) = helper.extract(t, f)
+    def extractOne[R](f: PartialFunction[c.Tree, R]) = helper.extractOne(t, f)
+    def selects(fullName: String) = helper.selects(t, fullName)
+    def selectsSome(fullName: String) = helper.selectsSome(t, fullName)
+//    def selectsInBetween(fullName: String) = helper.selectsInBetween(t, fullName)
   }
 }
