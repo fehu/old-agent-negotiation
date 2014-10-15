@@ -10,36 +10,43 @@ import feh.util._
 
 import scala.collection.mutable
 
-class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language.HasPriority]
+abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language.HasPriority](
+        val name: String,
+        override val role: NegotiationRole,
+        val spec: AgentSpecification.PriorityAndProposalBased[_ <: PriorityAndProposalBasedAgent[Lang], Lang],
+        val negotiationIds: Set[NegotiationId]
+      )
   extends PriorityProposalBasedAgent[Lang] with DynamicScopeSupport[Lang] with SpeakingSystemSupport[Lang] with ActorLogging
 {
   type Negotiation <: Negotiation.DynamicScope with Negotiation.HasPriority with Negotiation.HasProposal[Lang]
 
+  protected def createNegotiation(id: NegotiationId): Negotiation
+
+  lazy val negotiations = negotiationIds.map(createNegotiation)
+
+  implicit val ref = AgentRef(Agent.Id(name, role), self)
+
+  implicit def owner = this
+
   /* should be defined by ExtendableDefinition */
 
-  def nothingToPropose(neg: NegotiationId): Unit = ???
+  def nothingToPropose(neg: NegotiationId): Unit            = spec.nothingToPropose.get apply neg
+  protected def beforeEachMessage(msg: Lang#Msg): Unit      = spec.beforeEachMessage.get apply msg
+  def setNextProposal(neg: NegotiationId): Unit             = spec.setNextProposal.get apply neg
+  def nextValues(neg: NegotiationId): Option[Map[Var, Any]] = spec.nextValues.get apply neg
+  def onProposal: PartialFunction[Lang#Proposal, Any]       = spec.onProposal.get
+  def onRejection: PartialFunction[Lang#Rejection, Any]     = spec.onRejection.get
+  def onAcceptance: PartialFunction[Lang#Acceptance, Any]   = spec.onAcceptance.get
+  def updateCurrentProposal(neg: NegotiationId): Unit       = spec.updateCurrentProposal.get apply neg
+  def stop(): Unit                                          = spec.stop.get
+  def reset(): Unit                                         = spec.reset.get
+  def start(): Unit                                         = spec.start.get
 
-  protected def beforeEachMessage(msg: Lang#Msg): Unit = ???
-
-  def setNextProposal(neg: NegotiationId): Unit = ???
-
-  def nextValues(neg: NegotiationId): Option[Map[Var, Any]] = ???
-
-  def onProposal: PartialFunction[Lang#Proposal, Any] = ???
-
-  def onRejection: PartialFunction[Lang#Rejection, Any] = ???
-
-  def onAcceptance: PartialFunction[Lang#Acceptance, Any] = ???
-
-  def updateCurrentProposal(neg: NegotiationId): Unit = ???
-
-  def priorityNegotiationHandler: PriorityNegotiationHandler[Lang] = ???
-
-  def stop(): Unit = ???
-
-  def reset(): Unit = ???
-
-  def start(): Unit = ???
+  lazy val priorityNegotiationHandler: PriorityNegotiationHandler[Lang] = new PriorityNegotiationHandlerImpl(
+    spec = spec.priorityNegotiationHandler.get,
+    get = this.get,
+    sendAll = this.sendToAll
+  )
 
   /* == == == == Utils == == == == */
 
@@ -60,29 +67,24 @@ class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
     case prop: Lang#Proposal   => onProposal lift prop
     case resp: Lang#Acceptance => onAcceptance lift resp
     case resp: Lang#Rejection  => onRejection lift resp
-    case priority: Lang#Priority =>
+    case priority: Lang#Priority => priorityNegotiationHandler.process(priority)
   }
-
-  val name: String = ???
-  override val role: NegotiationRole = ???
-  implicit val ref: AgentRef = ???
-  def negotiations: Set[Negotiation] = ???
-
 }
 
-abstract class PriorityNegotiationHandlerImpl[Lang <: Language.ProposalBased with Language.HasPriority](
+class PriorityNegotiationHandlerImpl[Lang <: Language.ProposalBased with Language.HasPriority](
+                                          val spec: AgentSpecification.PriorityNegotiationHandler[_ <: PriorityAndProposalBasedAgent[Lang], Lang],
                                           get: NegotiationId => AbstractNegotiation,
                                           sendAll: Lang#Msg => Unit
                                           )
   extends PriorityNegotiationHandler[Lang]
 {
-  protected lazy val requests = mutable.HashMap.empty[PriorityRaiseRequestId, mutable.HashMap[AgentRef, Option[PriorityRaiseRequest[_]]]]
-  protected lazy val confirmations = mutable.HashMap.empty[PriorityRaiseRequestId, mutable.HashMap[AgentRef, Option[PriorityRaiseResponse]]]
+  protected lazy val requests = mutable.HashMap.empty[PriorityRaiseRequestId, mutable.HashMap[AgentRef, Option[Lang#PriorityRaiseRequest]]]
+  protected lazy val confirmations = mutable.HashMap.empty[PriorityRaiseRequestId, mutable.HashMap[AgentRef, Option[Lang#PriorityRaiseResponse]]]
   protected def clear(id: PriorityRaiseRequestId) = {
     requests -= id
     confirmations -= id
   }
-  protected def requestsMap(neg: NegotiationId) = mutable.HashMap(get(neg).scope.toSeq.zipMap(_ => Option.empty[PriorityRaiseRequest[_]]): _*)
+  protected def requestsMap(neg: NegotiationId) = mutable.HashMap(get(neg).scope.toSeq.zipMap(_ => Option.empty[Lang#PriorityRaiseRequest]): _*)
   def allRequests(id: PriorityRaiseRequestId): Boolean = requests.get(id).exists(_.forall(_._2.isDefined))
 
   def process = {
@@ -91,11 +93,9 @@ abstract class PriorityNegotiationHandlerImpl[Lang <: Language.ProposalBased wit
       if(allRequests(req.id)) sendAll(decide(requests(req.id).toMap.mapValues(_.get)).asInstanceOf[Lang#Msg])
   }
 
-  def onPriorityUpdate(f: (Option[Priority]) => Any): Unit = ???
-
-  def decide(requests: Map[AgentRef, PriorityRaiseRequest[_]]): PriorityRaiseResponse = ???
-
-  def start(neg: NegotiationId): Lang#PriorityRaiseRequest = ???
+  def onPriorityUpdate(f: (NegotiationId, Option[Priority])): Any                            = spec.onPriorityUpdate.get.tupled(f)
+  def decide(requests: Map[AgentRef, Lang#PriorityRaiseRequest]): Lang#PriorityRaiseResponse = spec.decide.get apply requests
+  def start(neg: NegotiationId): Lang#PriorityRaiseRequest                                   = spec.start.get apply neg
 }
 
 
@@ -149,8 +149,6 @@ object PriorityAndProposalBasedAgent{
     lazy val stop =  new DefBADS[Unit](_.negotiations.foreach(_.currentState update Stopped))
     lazy val reset = new DefBADS[Unit](_ => {})
 
-    def build(args: BuildArgs): Props = ???
-
   }
 
   object Default{
@@ -170,7 +168,7 @@ object PriorityAndProposalBasedAgent{
         confirmations -= id
       }
       protected def requestsMap(neg: NegotiationId)(implicit owner: Ag) =
-        mutable.HashMap(owner.get(neg).scope.toSeq.zipMap(_ => Option.empty[Lang#PriorityRaiseRequest]): _*)
+        mutable.HashMap(owner.get(neg).scope().toSeq.zipMap(_ => Option.empty[Lang#PriorityRaiseRequest]): _*)
 
       def allRequests(id: PriorityRaiseRequestId): Boolean = requests.get(id).exists(_.forall(_._2.isDefined))
 

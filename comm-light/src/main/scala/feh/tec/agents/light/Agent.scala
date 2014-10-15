@@ -38,8 +38,8 @@ trait PriorityNegotiationHandler[Lang <: Language.HasPriority]{
   def process: PartialFunction[Lang#Priority, Any]
 
   def start(neg: NegotiationId): Lang#PriorityRaiseRequest
-  def decide(requests: Map[AgentRef, Message.PriorityRaiseRequest[_]]): Message.PriorityRaiseResponse
-  def onPriorityUpdate(f: Option[Priority] => Any)
+  def decide(requests: Map[AgentRef, Lang#PriorityRaiseRequest]): Lang#PriorityRaiseResponse
+  def onPriorityUpdate(f: (NegotiationId, Option[Priority])): Any
 }
 
 trait PriorityBasedAgent[Lang <: Language.HasPriority] extends NegotiatingAgent[Lang]{

@@ -84,8 +84,12 @@ object Negotiation{
   }
 
   trait DynamicScope extends AbstractNegotiation{
-    var scope: Set[AgentRef] = Set()
+    var scope = new IdentStateVar[Set[AgentRef]](Set())
 
     def scopeUpdated()
+  }
+
+  trait HasIterator[I <: DomainIteratorBuilder[_, _]] extends AbstractNegotiation{
+    lazy val currentIterator = new OptionStateVar[I]()
   }
 }

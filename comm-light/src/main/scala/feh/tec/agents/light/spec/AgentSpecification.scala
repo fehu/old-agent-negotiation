@@ -6,10 +6,10 @@ import feh.tec.agents.light._
 import feh.tec.agents.light.impl.PriorityAndProposalBasedAgent
 
 trait AgentSpecification {
-  type Agent <: AbstractAgent
-  type BuildArgs
+//  type Agent <: AbstractAgent
+//  type BuildArgs
 
-  def build(args: BuildArgs): Props
+//  def build(args: BuildArgs): Props
 
 //  /** for referring self */
 //  protected val agent: Agent
@@ -37,13 +37,13 @@ object AgentSpecification{
   trait PriorityAndProposalBased[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
     extends AgentSpecification with AgentSpecificationExt[Ag]
   {
-    type Agent = Ag
+//    type Agent = Ag
 
     def start: DefBADS[Unit]
     def stop: DefBADS[Unit]
     def reset: DefBADS[Unit]
 
-    protected def beforeEachMessage: DefDS[Lang#Msg => Unit]
+    def beforeEachMessage: DefDS[Lang#Msg => Unit]
 
     def onProposal: DefDS[PartialFunction[Lang#Proposal, Any]]
     def onAcceptance: DefDS[PartialFunction[Lang#Acceptance, Any]]
