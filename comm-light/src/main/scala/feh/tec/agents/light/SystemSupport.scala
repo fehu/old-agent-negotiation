@@ -37,7 +37,7 @@ trait AgentHelpers[Lang <: NegotiationLanguage]{
     }
   }
 
-  def sendToAll(msg: Lang#Msg) = get(msg.negotiation).scope.foreach(_ ! msg)
+  def sendToAll(msg: Lang#Msg) = get(msg.negotiation).scope().foreach(_ ! msg)
 
   private val negotiationsCache = negotiations.map(n => n.id -> n).toMap
   def get(neg: NegotiationId): Negotiation = negotiationsCache(neg)
@@ -76,8 +76,8 @@ trait DynamicScopeSupport[Lang <: NegotiationLanguage]
   type Negotiation <: Negotiation.DynamicScope
 
   override def processSys = super.processSys orElse {
-    case ScopeUpdate.NewScope(scope, neg) => get(neg).scope = scope; get(neg).scopeUpdated()
-    case ScopeUpdate.NewAgents(ag, neg)   => get(neg).scope ++= ag;  get(neg).scopeUpdated()
-    case ScopeUpdate.RmAgents(ag, neg)    => get(neg).scope --= ag;  get(neg).scopeUpdated()
+    case ScopeUpdate.NewScope(scope, neg) => get(neg).scope update scope;       get(neg).scopeUpdated()
+    case ScopeUpdate.NewAgents(ag, neg)   => get(neg).scope update (_ ++ ag);   get(neg).scopeUpdated()
+    case ScopeUpdate.RmAgents(ag, neg)    => get(neg).scope update (_ -- ag);   get(neg).scopeUpdated()
   }
 }

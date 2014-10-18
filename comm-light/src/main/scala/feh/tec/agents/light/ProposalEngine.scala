@@ -6,10 +6,10 @@ trait ProposalEngine[Lang <: Language.ProposalBased] extends ProposalBasedAgent[
 }
 
 object ProposalEngine{
+  type DomainIterator = Iterator[Map[Var, Any]]
 
   trait Iterating[Lang <: Language.ProposalBased] extends ProposalEngine[Lang]{
-    type DomainIterator = Iterator[Map[Var, Any]]
-    type Negotiation <: Negotiation.HasIterator[DomainIterator]
+    type Negotiation <: Negotiation.HasProposal[Lang] with Negotiation.HasIterator
 
     def newIterator(neg: NegotiationId): DomainIterator
   }

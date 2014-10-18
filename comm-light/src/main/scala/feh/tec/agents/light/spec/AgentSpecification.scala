@@ -77,4 +77,9 @@ object AgentSpecification{
 
   }
 
+  trait Iterating[Ag <: PriorityAndProposalBasedAgent[Lang] with ProposalEngine.Iterating[Lang], Lang <: Language.HasPriority with Language.ProposalBased]
+    extends AgentSpecificationExt[Ag]
+  {
+    def newIterator: DefBADS[NegotiationId => ProposalEngine.DomainIterator]
+  }
 }

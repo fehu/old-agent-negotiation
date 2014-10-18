@@ -8,11 +8,12 @@ trait AbstractNegotiation {
   val id: NegotiationId
   val issues: Set[Var]
 
-  def scope: Set[AgentRef]
+  def scope: IdentStateVar[Set[AgentRef]]
 
   protected abstract class StateVar[Repr, Get, Upd](newRepr: Repr, get: Repr => Get){
     private var repr = newRepr
 
+    def raw = repr
     protected def upd: (Upd, Repr) => Repr
 
     def apply(): Get = get(repr)
@@ -20,6 +21,11 @@ trait AbstractNegotiation {
       reset()
       upd(u, repr)
     }
+    def update(f: Get => Upd) = repr = {
+      reset()
+      upd(f(apply()), repr)
+    }
+
     def reset() = repr = newRepr
   }
 
@@ -84,12 +90,12 @@ object Negotiation{
   }
 
   trait DynamicScope extends AbstractNegotiation{
-    var scope = new IdentStateVar[Set[AgentRef]](Set())
+    val scope = new IdentStateVar[Set[AgentRef]](Set())
 
     def scopeUpdated()
   }
 
-  trait HasIterator[I <: DomainIteratorBuilder[_, _]] extends AbstractNegotiation{
-    lazy val currentIterator = new OptionStateVar[I]()
+  trait HasIterator extends AbstractNegotiation{
+    lazy val currentIterator = new OptionStateVar[ProposalEngine.DomainIterator]()
   }
 }
