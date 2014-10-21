@@ -1,5 +1,7 @@
 package feh.tec.agents.light.spec.dsl
 
+import feh.tec.agents.light.spec.AgentSpecification
+
 trait Negotiation extends ConstraintsSpecification with CreationSpecification{
   import feh.tec.agents.light.spec.NegotiationSpecification._
 
@@ -12,12 +14,16 @@ trait Negotiation extends ConstraintsSpecification with CreationSpecification{
     def over(vars: AbstractVarDef[_]*): NegotiationDef
   }
 
-  type ChooseAgentRole = {
-    def withRole(role: String): {
-      def that(negDefs: AgentNegPartialDef*): AgentDef
-    }
+  type That = {
+    def that(negDefs: AgentNegPartialDef*): AgentDef
   }
 
+  type ChooseAgentRole = {
+    def withRole(role: String): {
+      def definedIn(spec: AgentSpecification): That
+      def definedBy(spec: AgentSpecification): That
+    }
+  }
   type ChooseAgentNegotiation = {
     type ChooseWith = {
       def `with`[S: SelectsInterlocutors](interlocutors: S*): AgentNegPartialDef

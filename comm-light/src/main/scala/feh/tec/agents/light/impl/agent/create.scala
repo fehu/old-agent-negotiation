@@ -1,11 +1,10 @@
 package feh.tec.agents.light.impl.agent
 
 import akka.actor.{ActorSystem, Props}
-import feh.tec.agents.light.impl.agent.create.AgentProps.{NegotiationInitExtended, NegotiationInit}
 import feh.tec.agents.light.impl.spec.{PriorityAndProposalBasedAgentSpec, IteratingSpec}
 import feh.tec.agents.light._
+import feh.tec.agents.light.spec.AgentProps.NegotiationInit
 import feh.tec.agents.light.spec.MonoDefinition
-import feh.tec.agents.light.spec.NegotiationSpecification.Interlocutors
 
 object create {
   trait SpecExt[Ow]{
@@ -24,47 +23,27 @@ object create {
     trait AllVarsSpec extends PriorityAndProposalBasedAgentSpec[Ag, Lang] with IteratingSpec.AllVars[Ag, Lang] with SpecExt[Ag]
   }
 
+  trait PriorityAndProposalBasedIteratingAllVars
+    extends impl.agent.PriorityAndProposalBasedAgent[PPI.Lang] with impl.agent.DomainIteratingAllVars[PPI.Lang]
+  {
+    def domainIterators: Map[Var, DomainIteratorBuilder[Var#Domain, Var#Tpe]] = ???
+
+    protected def createNegotiation(id: NegotiationId): Negotiation = ???
+  }
+
   def PriorityAndProposalBasedIteratingAllVars(
                                     specification: PriorityAndProposalBasedAgentSpec[PPI.Ag, PPI.Lang] with IteratingSpec.AllVars[PPI.Ag, PPI.Lang]
                                                 )(
-                                    name: String, role: NegotiationRole, negotiationIds: Set[NegotiationId]
+                                    name: String, role: NegotiationRole, negInit: Set[NegotiationInit], arg: None.type
                                      ) =
-    Props(new impl.agent.PriorityAndProposalBasedAgent[PPI.Lang](
-      name, role, negotiationIds
-    ) with impl.agent.DomainIteratingAllVars[PPI.Lang]
-    {
-      self: IteratingSpec.Agent[PPI.Lang] =>
+    Props(
+      new impl.agent.PriorityAndProposalBasedAgent[PPI.Lang](name, role, negInit) with PriorityAndProposalBasedIteratingAllVars
+      {
+        self: IteratingSpec.Agent[PPI.Lang] =>
 
-      type Negotiation = Negotiation.HasProposal[PPI.Lang] with Negotiation.HasPriority with Negotiation.HasIterator with Negotiation.DynamicScope
+        type Negotiation = Negotiation.HasProposal[PPI.Lang] with Negotiation.HasPriority with Negotiation.HasIterator with Negotiation.DynamicScope
 
-      val spec = specification.asInstanceOf[PriorityAndProposalBasedAgentSpec[this.type, PPI.Lang] with IteratingSpec.AllVars[this.type, PPI.Lang]]
-
-      def domainIterators: Map[Var, DomainIteratorBuilder[Var#Domain, Var#Tpe]] = ???
-
-      protected def createNegotiation(id: NegotiationId): Negotiation = ???
-    }
+        val spec = specification.asInstanceOf[PriorityAndProposalBasedAgentSpec[this.type, PPI.Lang] with IteratingSpec.AllVars[this.type, PPI.Lang]]
+      }
     )
-
-  case class AgentProps[Arg](name: String, role: NegotiationRole, negotiationInits: Set[NegotiationInitExtended],
-                             buildProps: (Agent.Id, Set[NegotiationInit], Arg) => Props)
-  {
-    lazy val id = Agent.Id(name, role)
-    def props(arg: Arg) = buildProps(id, negotiationInits.map(_.init), arg)
-    def create(arg: Arg)(implicit sys: ActorSystem) = AgentRef(id, sys.actorOf(props(arg), name))
-  }
-
-  object AgentProps{
-    case class NegotiationInit(id: NegotiationId, issues: Set[Var])
-    case class NegotiationInitExtended(init: NegotiationInit, scope: Interlocutors) {
-      def id = init.id
-      def issues = init.issues
-    }
-    trait CanProvide[Arg]{
-      def get: Arg
-    }
-    case class AgentPropsBundle[Arg](props: AgentProps[Arg], provider: CanProvide[Arg]){
-      def props()(implicit sys: ActorSystem): Props = props.props(provider.get)
-      def create(implicit sys: ActorSystem) = props.create(provider.get)
-    }
-  }
 }

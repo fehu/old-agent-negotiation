@@ -1,5 +1,10 @@
 package feh.tec.agents.light.spec.macros
 
+import feh.tec.agents.light.impl.spec.{IteratingSpec, PriorityAndProposalBasedAgentSpec}
+import feh.tec.agents.light.spec.AgentProps.AgentPropsBundle
+import feh.tec.agents.light.spec.NegotiationSpecification
+import feh.tec.agents.light.spec.{ NegotiationSpecification => NS }
+
 import scala.reflect.internal.HasFlags
 import scala.reflect.macros.whitebox
 import feh.tec.agents.light.spec
@@ -10,66 +15,12 @@ object NegotiationSpecificationBuilder{
   def build(c: whitebox.Context)(dsl: c.Expr[spec.dsl.Negotiation]): c.Expr[spec.NegotiationSpecification] = {
     import c.universe._
 
-    val h = new Helper[c.type](c)
-    val b = new NegotiationSpecificationBuilder[c.type](c)
-
-    def KnownDSLNames = Set(
-      "feh.tec.agents.spec.dsl.NegotiationSpecification",
-      "feh.tec.agents.spec.dsl.package.Negotiation",
-      "package.Negotiation"
-    )
-
-    val (definitions, applications) = b.extractRoot(dsl.tree, KnownDSLNames)
-
-    val varsAndDomains = b.extractVars(definitions)
-    val negotiationsAndIssues = b.extractNegotiations(definitions)
-    val agentDefs = b.extractAgents(definitions)
-
-    val vars = for ((name, tpe, domain, domainTpe) <- varsAndDomains) yield {
-      q"""val clazz = classOf[$tpe].asInstanceOf[Class[$tpe]]
-          VarDef[$tpe](${name.decodedName.toString.trim}, GenericDomainDef[$tpe, $domainTpe]($domain, clazz))
-          """
-    }
-
-    val negotiations = for ((name, issues) <- negotiationsAndIssues) yield {
-      val iss = issues.map{ case Select(This(TypeName("$anon")), varName) => varName.decodedName.toString }
-      q"""NegotiationDef(${name.decodedName.toString}, $iss)"""
-    }
-
-    val agents = for ((name, role, negs) <- agentDefs) yield {
-      val n = negs map {
-          case ((negRaw, interlocutorsRaw), constraintsRaw) =>
-            val neg = negRaw match { case Select(This(TypeName("$anon")), negName) => negName.decodedName.toString }
-            val interlocutors = interlocutorsRaw match {
-              case Select(Select(This(TypeName("$anon")), TermName("the")), TermName("others")) => Set(role)
-              // todo: more cases
-            }
-            val constraints = constraintsRaw map{
-              case (cName, b.xc.Replacement(descr, f)) =>
-                val func = f(varsAndDomains.map(tr => tr._1.decodedName.toString.trim -> tr._2).toMap)
-                val descriptions = descr map {
-                  case b.xc.Description(tpe, varName, arg) =>
-                    q"""ConstraintParamDescription($tpe, $varName, ${arg.decodedName.toString})"""
-                }
-                q"""AgentConstraintDef($cName, Seq(..$descriptions), $func.tupled.asInstanceOf[Product => Boolean])"""
-            }
-
-            q"""AgentNegDef($neg, InterlocutorsByRoles($interlocutors), List(
-                  AgentConstraintsDef(Seq(..$constraints))
-                ))"""
-        }
-      q"""AgentDef(${name.decodedName.toString}, $role, Seq(..$n))"""
-    }
-
-    val spawns = q"""SimpleSpawnDef(Map(..${b.extractSpawns(applications)}))"""
-
-    val (timeoutDefs, timingDefs) = b.extractTimeoutsAndTimings(applications)
-    val timeouts = q"""TimeoutsDef(Map(..$timeoutDefs))"""
-    val timings = q"""TimingsDef(Map(..$timingDefs))"""
+    val ExtractRaw = Raw.Extract[c.type](c)
+    val ExtractRaw(vars, negotiations, agents, spawns, timings, timeouts) = raw[c.type](c)(dsl)
 
     val specTree = q"""
-      new feh.tec.agents.spec.NegotiationSpecification {
-        import feh.tec.agents.spec.NegotiationSpecification._
+      new feh.tec.agents.light.spec.NegotiationSpecification {
+        import feh.tec.agents.light.spec.NegotiationSpecification._
 
         def variables: Seq[VarDef] = Seq(..$vars)
         def negotiations: Seq[NegotiationDef] = Seq(..$negotiations)
@@ -95,6 +46,110 @@ object NegotiationSpecificationBuilder{
     )
 
   }
+
+  case class Raw[C <: whitebox.Context](variables: Seq[C#Expr[NS.VarDef[_]]],
+                                        negotiations: Seq[C#Expr[NS.NegotiationDef]],
+                                        agents: Seq[C#Expr[NS.AgentDef]],
+                                        spawns: C#Expr[NS.SpawnDef],
+                                        timings: C#Expr[NS.TimingsDef],
+                                        timeouts: C#Expr[NS.TimeoutsDef]
+                                   )
+
+  object Raw{
+    def Extract[Context <: whitebox.Context](c: Context) = new {
+      def unapply[C <: whitebox.Context](raw: Raw[C]) =
+        Some(
+          raw.variables.map(_.asInstanceOf[c.Expr[NS.VarDef[_]]]),
+          raw.negotiations.map(_.asInstanceOf[c.Expr[NS.NegotiationDef]]),
+          raw.agents.map(_.asInstanceOf[c.Expr[NS.AgentDef]]),
+          raw.spawns.asInstanceOf[c.Expr[NS.SpawnDef]],
+          raw.timings.asInstanceOf[c.Expr[NS.TimingsDef]],
+          raw.timeouts.asInstanceOf[c.Expr[NS.TimeoutsDef]]
+          )
+    }
+  }
+
+  def raw[C <: whitebox.Context](c: C)(dsl: c.Expr[spec.dsl.Negotiation]): Raw[C] = {
+    import c.universe._
+
+    val h = new Helper[c.type](c)
+    val b = new NegotiationSpecificationBuilder[c.type](c)
+
+    def KnownDSLNames = Set(
+      "feh.tec.agents.light.spec.dsl.Negotiation"
+    )
+
+    val (definitions, applications) = b.extractRoot(dsl.tree, KnownDSLNames)
+
+    val varsAndDomains = b.extractVars(definitions)
+    val negotiationsAndIssues = b.extractNegotiations(definitions)
+    val agentDefs = b.extractAgents(definitions)
+
+    val vars = for ((name, tpe, domain, domainTpe) <- varsAndDomains) yield {
+      q"""val clazz = classOf[$tpe].asInstanceOf[Class[$tpe]]
+          VarDef[$tpe](${name.decodedName.toString.trim}, GenericDomainDef[$tpe, $domainTpe]($domain, clazz))
+          """
+    }
+
+    val negotiations = for ((name, issues) <- negotiationsAndIssues) yield {
+      val iss = issues.map{ case Select(This(TypeName("$anon")), varName) => varName.decodedName.toString }
+      q"""NegotiationDef(${name.decodedName.toString}, $iss)"""
+    }
+
+    val agents = for ((name, role, negs, spec) <- agentDefs) yield {
+      val n = negs map {
+        case ((negRaw, interlocutorsRaw), constraintsRaw) =>
+          val neg = negRaw match { case Select(This(TypeName("$anon")), negName) => negName.decodedName.toString }
+          val interlocutors = interlocutorsRaw match {
+            case Select(Select(This(TypeName("$anon")), TermName("the")), TermName("others")) => Set(role)
+            // todo: more cases
+          }
+          val constraints = constraintsRaw map{
+            case (cName, b.xc.Replacement(descr, f)) =>
+              val func = f(varsAndDomains.map(tr => tr._1.decodedName.toString.trim -> tr._2).toMap)
+              val descriptions = descr map {
+                case b.xc.Description(tpe, varName, arg) =>
+                  q"""ConstraintParamDescription($tpe, $varName, ${arg.decodedName.toString})"""
+              }
+              q"""AgentConstraintDef($cName, Seq(..$descriptions), $func.tupled.asInstanceOf[Product => Boolean])"""
+          }
+
+          q"""AgentNegDef($neg, InterlocutorsByRoles($interlocutors), List(
+                  AgentConstraintsDef(Seq(..$constraints))
+                ))"""
+      }
+      q"""AgentDef(${name.decodedName.toString}, $role, Seq(..$n), $spec)"""
+    }
+
+    val spawns = q"""SimpleSpawnDef(Map(..${b.extractSpawns(applications)}))"""
+
+    val (timeoutDefs, timingDefs) = b.extractTimeoutsAndTimings(applications)
+    val timeouts = q"""TimeoutsDef(Map(..$timeoutDefs))"""
+    val timings = q"""TimingsDef(Map(..$timingDefs))"""
+
+    Raw[C](vars.map(c.Expr(_)), negotiations.map(c.Expr(_)), agents.map(c.Expr(_)), c.Expr(spawns), c.Expr(timings), c.Expr(timeouts))
+  }
+
+
+  def agentPropsBundle[C <: whitebox.Context](c: C)(specTree: c.Tree): c.Expr[AgentPropsBundle[_]] = {
+    import c.universe._
+
+    object spec{
+      var PriorityAndProposalBased = false
+      var iterating: Iterating.Value = Iterating.None
+
+      object Iterating extends Enumeration{ val All, CurrentIssues, None = Value }
+    }
+    def typeCheck[T : c.TypeTag] = c.typecheck(specTree, c.TERMmode, c.typeOf[T], silent = true).nonEmpty
+    def typeCheckAndSet[T : c.TypeTag](set: => Unit) = if(typeCheck[T]) set
+
+    typeCheckAndSet[PriorityAndProposalBasedAgentSpec[_, _]]{ spec.PriorityAndProposalBased = true }
+    typeCheckAndSet[IteratingSpec.AllVars[_, _]]{ spec.iterating = spec.Iterating.All }
+
+
+    c.abort(NoPosition, s"PriorityAndProposalBased=${spec.PriorityAndProposalBased}, iterating=${spec.iterating}")
+  }
+
 }
 
 class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
@@ -147,13 +202,22 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
     case (name, Apply(sel: Select, vars)) if h.selects(sel, "$anon.negotiation.over") => name -> vars
   }
 
-  /**  Seq( (name, role, List[constraint name -> ExtendedConstraint#Replaced]) ) */
+  /**  Seq( (name, role, List[constraint name -> ExtendedConstraint#Replaced], AgentSpec) ) */
   def extractAgents(definitions: Seq[(c.TermName, c.Tree)]) = definitions collect{
     case (name, Apply(
-                  Select(Apply(sel: Select, Literal(Constant(r: String)) :: Nil), TermName("that")),
+                  Select(
+                    Apply(
+                      Select(
+                        Apply(selWithRole: Select, Literal(Constant(role: String)) :: Nil),
+                        TermName("definedBy" | "definedIn")
+                      ),
+                      agentSpec :: Nil
+                    ),
+                    TermName("that")
+                  ),
                   negDefs
                 )
-          ) if h.selects(sel, "$anon.agent.withRole") =>
+          ) if h.selects(selWithRole, "$anon.agent.withRole") =>
 
       val negs = negDefs map {
         case Apply(negDef, confDefs) =>
@@ -184,7 +248,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
           }
           negotiationsAndInterlocutors -> config
       }
-      (name, r, negs)
+      (name, role, negs, agentSpec)
   }
 
   /** Seq(name -> count) */

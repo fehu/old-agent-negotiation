@@ -1,11 +1,9 @@
 package feh.tec.agents.light.impl
 
-import akka.actor.ActorSystem
 import akka.util.Timeout
 import feh.tec.agents.light.impl.NegotiationEnvironmentController._
 import feh.tec.agents.light._
-import feh.tec.agents.light.impl.agent.create.AgentProps
-import feh.tec.agents.light.impl.agent.create.AgentProps.{AgentPropsBundle, CanProvide, NegotiationInit}
+import feh.tec.agents.light.spec.AgentProps.AgentPropsBundle
 import feh.tec.agents.light.spec.NegotiationSpecification.{InterlocutorsByRoles, Interlocutors}
 import scala.concurrent.{Await, Future}
 import akka.pattern.ask
@@ -84,6 +82,9 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
     case SystemMessage.Stop       => stop()
     case SystemMessage.Reset      => reset()
   }
+
+  val name = NegotiationEnvironmentController.Name
+  val role = NegotiationEnvironmentController.Role
 }
 
 object NegotiationEnvironmentController{
@@ -93,4 +94,7 @@ object NegotiationEnvironmentController{
     def stop: Timeout
     def reset: Timeout
   }
+
+  lazy val Name = "NegotiationEnvironmentController"
+  lazy val Role = SystemRole(Name)
 }
