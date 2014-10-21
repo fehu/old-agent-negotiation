@@ -1,5 +1,6 @@
 package feh.tec.agents.light
 
+import akka.actor.Actor.Receive
 import akka.actor._
 
 trait AbstractAgent extends Actor{
@@ -7,8 +8,15 @@ trait AbstractAgent extends Actor{
   val role: Role
 }
 
+trait SystemAgent extends AbstractAgent{
+  override val role: SystemRole
+}
+
 case class Role(name: String)
 trait NegotiationRole extends Role
+object NegotiationRole{ def apply(name: String): NegotiationRole = new Role(name) with NegotiationRole }
+trait SystemRole extends Role
+object SystemRole{ def apply(name: String): SystemRole = new Role(name) with SystemRole }
 
 case class AgentRef(id: Agent.Id, ref: ActorRef)
 

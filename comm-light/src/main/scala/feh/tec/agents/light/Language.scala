@@ -18,8 +18,8 @@ object Language{
   }
 
   trait HasPriority extends NegotiationLanguage{
-    type Msg <: Message.HasPriority
-    
+    type Msg = Message.HasPriority
+
     type Priority               = Message.HasPriority
     type PriorityRaiseRequest   <: Msg with Message.PriorityRaiseRequest[_]
     type PriorityRaiseResponse  <: Msg with Message.PriorityRaiseResponse

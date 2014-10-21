@@ -39,6 +39,7 @@ object AgentSpecification{
   {
 //    type Agent = Ag
 
+    def initialize: DefBADS[Unit]
     def start: DefBADS[Unit]
     def stop: DefBADS[Unit]
     def reset: DefBADS[Unit]

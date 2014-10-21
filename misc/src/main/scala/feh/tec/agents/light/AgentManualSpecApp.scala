@@ -1,29 +1,23 @@
 package feh.tec.agents.light
 
-import akka.actor.Props
-import feh.tec.agents.light.impl.spec.{IteratingSpec, PriorityAndProposalBasedAgentSpec}
+import impl.agent._
 
 object AgentManualSpecApp {
-  type Lang = NegotiationLanguage with Language.HasPriority with Language.ProposalBased
+  val agentSpec = new create.PPI.AllVarsSpec{
 
-  def agentSpec[Ag <: impl.spec.IteratingSpec.Agent[Lang]](ag: Ag) =
-    new PriorityAndProposalBasedAgentSpec[Ag, Lang] with IteratingSpec.AllVars[Ag, Lang]{
-
+      start <:= {
+        ag =>
+          import ag._
+          negotiations.foreach{
+            neg =>
+              val proposal = neg.currentProposal.getOrElse{
+                Message.Proposal(Message.ProposalId.rand, neg.id, neg.currentPriority(), neg.currentValues())
+              }
+              sendToAll(proposal)
+          }
+      }
     }
 
-  val ag = Props(new impl.agent.PriorityAndProposalBasedAgent[Lang](
-    "test", new Role("test") with NegotiationRole, Set()
-    ) with impl.agent.DomainIteratingAllVars[Lang]
-  {
-    self: IteratingSpec.Agent[Lang] =>
-
-    type Negotiation = Negotiation.HasProposal[Lang] with Negotiation.HasPriority with Negotiation.HasIterator with Negotiation.DynamicScope
-
-    val spec = AgentManualSpecApp.agentSpec[this.type](this)
-
-    def domainIterators: Map[Var, DomainIteratorBuilder[Var#Domain, Var#Tpe]] = ???
-
-    protected def createNegotiation(id: NegotiationId): Negotiation = ???
-  }
-  )
+  val aProps =
+    create.AgentProps("test", NegotiationRole("test"), Set(), create.PriorityAndProposalBasedIteratingAllVars(agentSpec))
 }

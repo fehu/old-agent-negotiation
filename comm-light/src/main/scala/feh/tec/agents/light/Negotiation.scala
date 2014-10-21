@@ -40,6 +40,9 @@ trait AbstractNegotiation {
                                     _upd: (T,  Option[T]) => Option[T] = (t: T, _: Option[T]) => Option(t)) extends StateVar[Option[T], T, T](newRepr, get)
   {
     protected def upd = _upd
+    def opt = raw
+    def getOrElse(t: => T) = raw getOrElse t
+    def map[R](f: T => R) = raw map f
   }
 
   lazy val currentValues = new StateVar[mutable.HashMap[Var, Any], Map[Var, Any], Map[Var, Any]](
@@ -60,7 +63,8 @@ trait AbstractNegotiation {
 
 trait NegotiationState
 
-object NegotiationState{
+object NegotiationState {
+  case object Created               extends NegotiationState
   case object Initializing          extends NegotiationState
   case object Initialized           extends NegotiationState
   case object Starting              extends NegotiationState

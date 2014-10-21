@@ -47,11 +47,13 @@ trait AgentHelpers[Lang <: NegotiationLanguage]{
 trait SystemSupport extends AbstractAgent{
 
   def processSys: PartialFunction[SystemMessage, Any] = {
-    case SystemMessage.Start => start(); sender() ! SystemMessage.Started
-    case SystemMessage.Stop  => stop();  sender() ! SystemMessage.Stopped
-    case SystemMessage.Reset => reset(); sender() ! SystemMessage.Reset
+    case SystemMessage.Initialize => initialize();  sender() ! SystemMessage.Initialized
+    case SystemMessage.Start      => start();       sender() ! SystemMessage.Started
+    case SystemMessage.Stop       => stop();        sender() ! SystemMessage.Stopped
+    case SystemMessage.Reset      => reset();       sender() ! SystemMessage.Reset
   }
 
+  def initialize()
   def start()
   def stop()
   def reset()

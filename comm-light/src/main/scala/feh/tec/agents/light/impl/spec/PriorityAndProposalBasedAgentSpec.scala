@@ -1,7 +1,7 @@
 package feh.tec.agents.light.impl.spec
 
 import feh.tec.agents.light.Message.{PriorityRaiseRequestId, ProposalId}
-import feh.tec.agents.light.NegotiationState.{Starting, Stopped}
+import feh.tec.agents.light.NegotiationState.{Initialized, Starting, Stopped}
 import feh.tec.agents.light._
 import feh.tec.agents.light.impl.PriorityAndProposalBasedAgent
 import feh.tec.agents.light.spec.AgentSpecification
@@ -51,6 +51,7 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
     new PriorityNegotiationHandlerSpec[Ag, Lang](???) // todo
   )
 
+  lazy val initialize = new DefBADS[Unit](_.negotiations.foreach(_.ensuring(_.scope().nonEmpty).currentState update Initialized ))
   lazy val start = new DefBADS[Unit](_.negotiations.foreach(_.currentState update Starting))
   lazy val stop =  new DefBADS[Unit](_.negotiations.foreach(_.currentState update Stopped))
   lazy val reset = new DefBADS[Unit](_ => {})

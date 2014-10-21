@@ -8,7 +8,8 @@ trait UserMessage extends AbstractMessage
 
 
 object SystemMessage{
-  case object RefDemand extends SystemMessage
+  case object Initialize extends SystemMessage
+  case object Initialized extends SystemMessage
 
   case object Start extends SystemMessage
   case object Started extends SystemMessage
@@ -30,4 +31,6 @@ object SystemMessage{
 
 
   case class NegotiationFinished(neg: NegotiationId) extends SystemMessage
+
+  case class UnexpectedCommand(cmd: SystemMessage, controllerState: NegotiationState)
 }

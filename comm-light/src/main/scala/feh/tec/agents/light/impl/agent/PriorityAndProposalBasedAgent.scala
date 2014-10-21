@@ -31,6 +31,7 @@ abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with
   def stop(): Unit                                          = spec.stop.get
   def reset(): Unit                                         = spec.reset.get
   def start(): Unit                                         = spec.start.get
+  def initialize(): Unit                                    = spec.initialize.get
 
   lazy val priorityNegotiationHandler: PriorityNegotiationHandler[Lang] = new PriorityNegotiationHandlerImpl(
     spec.priorityNegotiationHandler.get, owner, this.get, this.sendToAll
