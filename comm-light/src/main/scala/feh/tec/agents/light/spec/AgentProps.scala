@@ -37,6 +37,12 @@ object AgentProps{
     def product: Option[Product]
     def sequence: Option[Seq[ArgDescription]]
   }
+
+  case object NoArgs extends ArgsDescription{
+    def isDefined = false
+    def product = None
+    def sequence = None
+  }
   
   case class AgentPropsBundle[Arg](props: AgentProps[Arg], provider: CanProvide[Arg]){
     def props()(implicit sys: ActorSystem): Props = props.props(provider.get)

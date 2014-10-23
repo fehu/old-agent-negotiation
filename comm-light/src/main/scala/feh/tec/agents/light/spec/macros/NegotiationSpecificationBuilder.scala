@@ -1,10 +1,10 @@
 package feh.tec.agents.light.spec.macros
 
-import feh.tec.agents.light.impl.spec.{IteratingSpec, PriorityAndProposalBasedAgentSpec}
-import feh.tec.agents.light.spec.AgentProps.AgentPropsBundle
-import feh.tec.agents.light.spec.NegotiationSpecification
-import feh.tec.agents.light.spec.{ NegotiationSpecification => NS }
+import feh.tec.agents.light.spec.AgentSpecification
+import feh.tec.agents.light.spec.NegotiationSpecification._
+import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.Raw.TreesBuilder.ConstraintsBuilder
 
+import scala.concurrent.duration.FiniteDuration
 import scala.reflect.internal.HasFlags
 import scala.reflect.macros.whitebox
 import feh.tec.agents.light.spec
@@ -15,8 +15,10 @@ object NegotiationSpecificationBuilder{
   def build(c: whitebox.Context)(dsl: c.Expr[spec.dsl.Negotiation]): c.Expr[spec.NegotiationSpecification] = {
     import c.universe._
 
-    val ExtractRaw = Raw.Extract[c.type](c)
-    val ExtractRaw(vars, negotiations, agents, spawns, timings, timeouts) = raw[c.type](c)(dsl)
+    implicit val cb: ConstraintsBuilder = ???
+
+    val ExtractRaw = Raw.BuildTrees[c.type](c)
+    val ExtractRaw(vars, negotiations, agents, spawns, timeouts) = raw[c.type](c)(dsl)
 
     val specTree = q"""
       new feh.tec.agents.light.spec.NegotiationSpecification {
@@ -27,7 +29,6 @@ object NegotiationSpecificationBuilder{
         def agents: Seq[AgentDef] = Seq(..$agents)
 
         def spawns: SpawnDef = $spawns
-        def timings: TimingsDef = $timings
         def timeouts: TimeoutsDef = $timeouts
       }
     """
@@ -47,26 +48,131 @@ object NegotiationSpecificationBuilder{
 
   }
 
-  case class Raw[C <: whitebox.Context](variables: Seq[C#Expr[NS.VarDef[_]]],
-                                        negotiations: Seq[C#Expr[NS.NegotiationDef]],
-                                        agents: Seq[C#Expr[NS.AgentDef]],
-                                        spawns: C#Expr[NS.SpawnDef],
-                                        timings: C#Expr[NS.TimingsDef],
-                                        timeouts: C#Expr[NS.TimeoutsDef]
-                                   )
+/*
+  case class Raw[C <: whitebox.Context](variablesWithRaw: Seq[(Raw.VarDef[C], C#Expr[Raw.NS.VarDef[_]])],
+                                        negotiations: Seq[C#Expr[Raw.NS.NegotiationDef]],
+                                        agentsWithRaw: Seq[(Raw.AgentDef[C], C#Expr[Raw.NS.AgentDef])],
+                                        spawnsWithRaw: (Raw.SpawnDefs[C], C#Expr[Raw.NS.SpawnDef]),
+                                        timings: C#Expr[Raw.NS.TimingsDef],
+                                        timeouts: C#Expr[Raw.NS.TimeoutsDef]
+                                   ){
+    def rawVariables = variablesWithRaw.map(_._1)
+//    def rawNegotiations = negotiationsWithRaw.map(_._1)
+    def rawAgents = agentsWithRaw.map(_._1)
+    def rawSpawns = spawnsWithRaw._1
+//    def rawTimings = timingsWithRaw._1
+//    def rawTimeouts = timeoutsWithRaw._1
 
+    def variables: Seq[C#Expr[VarDef[_]]] = variablesWithRaw.map(_._2)
+//    def negotiations: Seq[C#Expr[NegotiationDef]] = negotiationsWithRaw.map(_._2)
+    def agents: Seq[C#Expr[AgentDef]] = agentsWithRaw.map(_._2)
+    def spawns: C#Expr[SpawnDef] = spawnsWithRaw._2
+//    def timings: C#Expr[TimingsDef] = timingsWithRaw._2
+//    def timeouts: C#Expr[TimeoutsDef] = timeoutsWithRaw._2
+  }
+*/
+
+  case class Raw[C <: whitebox.Context](variables: Seq[Raw.VarDef[C]],
+                                        negotiations: Seq[NegotiationDef],
+                                        agents: Seq[Raw.AgentDef[C]],
+                                        spawns: Raw.SpawnDefs[C],
+//                                        timings: Raw.TimeDefs[C],
+                                        timeouts: Raw.TimeDefs[C]
+                                         )
+
+  
   object Raw{
-    def Extract[Context <: whitebox.Context](c: Context) = new {
-      def unapply[C <: whitebox.Context](raw: Raw[C]) =
-        Some(
-          raw.variables.map(_.asInstanceOf[c.Expr[NS.VarDef[_]]]),
-          raw.negotiations.map(_.asInstanceOf[c.Expr[NS.NegotiationDef]]),
-          raw.agents.map(_.asInstanceOf[c.Expr[NS.AgentDef]]),
-          raw.spawns.asInstanceOf[c.Expr[NS.SpawnDef]],
-          raw.timings.asInstanceOf[c.Expr[NS.TimingsDef]],
-          raw.timeouts.asInstanceOf[c.Expr[NS.TimeoutsDef]]
-          )
+    final val NS = feh.tec.agents.light.spec.NegotiationSpecification
+
+    object TreesBuilder{
+      def vars[C <: whitebox.Context](c: C)(raw: Raw.VarDef[c.type]): c.Expr[NS.VarDef[_]] = {
+        import c.universe._
+        c.Expr(q"""
+          NS.VarDef[Any](raw.name, NS.GenericDomainDef(${raw.domain.domain.asInstanceOf[c.Tree]}, classOf[${raw.domain.tpe.asInstanceOf[c.Type]}]))
+        """)
+      }
+
+      trait ConstraintsBuilder{
+        def build[C <: whitebox.Context](c: C)(raw: Raw.AgentConstraintsDef[c.type]): c.Expr[NS.AgentConstraintDef]
+      }
+      
+      def agents[C <: whitebox.Context](c: C)(raw: Raw.AgentDef[C])(implicit cb: ConstraintsBuilder): c.Expr[NS.AgentDef] = {
+        import c.universe._
+
+        raw match{
+          case AgentDef(name, role, negDefs, specExpr) =>
+            val negs = negDefs map {
+              case AgentNegDef(neg, _, interlExpr, constraints) =>
+                q"""NS.AgentNegDef(
+                      $neg,
+                      ${interlExpr.tree.asInstanceOf[c.Tree]},
+                      Seq(..${constraints.asInstanceOf[Seq[Raw.AgentConstraintsDef[c.type]]].map(cb.build[c.type](c)(_))}))
+                    """
+            }
+            c.Expr(q"NS.AgentDef($name, $role, Seq(..$negs), ${specExpr.tree.asInstanceOf[c.Tree]})")
+
+        }
+      }
+
+      def spawns[C <: whitebox.Context](c: C)(raw: Raw.SpawnDefs[C]): c.Expr[NS.SpawnDef] = {
+        import c.universe._
+
+        raw match {
+          case SpawnDefs(sd) =>
+            val mapEntries = sd map{ case SingleSpawnDef(name, countExpr) => q"$name -> ${countExpr.tree.asInstanceOf[c.Tree]}" }
+            c.Expr(q"NS.SpawnDef(Map(Seq(..$mapEntries): _*))")
+        }
+      }
+
+      def timeouts[C <: whitebox.Context](c: C)(raw: Raw.TimeDefs[C]): c.Expr[NS.TimeoutsDef] = {
+        import c.universe._
+        val mapEntries = raw.mp.map{ case (name, expr) => q"$name -> ${expr.tree.asInstanceOf[c.Tree]}"}
+        c.Expr(q"NS.TimeoutsDef(Map(Seq(..$mapEntries): _*))")
+      }
+
     }
+
+    case class TreesBuilder[C <: whitebox.Context](raw: Raw[_ <: whitebox.Context], c: C)(implicit cb: ConstraintsBuilder){
+      import c.universe._
+
+      lazy val variables: Seq[c.Expr[NS.VarDef[_]]] = raw.variables.map{
+        rvd => TreesBuilder.vars[c.type](c)(rvd.asInstanceOf[Raw.VarDef[c.type]])
+      }
+
+      lazy val negotiations = raw.negotiations.map{ case NegotiationDef(name, issues) => reify(NegotiationDef(name, issues))}
+      
+      lazy val agents: Seq[c.Expr[NS.AgentDef]] = raw.agents.map{
+        rad => TreesBuilder.agents[c.type](c)(rad.asInstanceOf[Raw.AgentDef[c.type]])
+      }
+
+      lazy val spawns: c.Expr[NS.SpawnDef] = TreesBuilder.spawns[c.type](c)(raw.spawns.asInstanceOf[Raw.SpawnDefs[c.type]])
+      lazy val timeouts: C#Expr[NS.TimeoutsDef] = TreesBuilder.timeouts[c.type](c)(raw.timeouts.asInstanceOf[Raw.TimeDefs[c.type]])
+    }
+    
+    def BuildTrees[Context <: whitebox.Context](c: Context)(implicit cb: ConstraintsBuilder) = new {
+      def unapply[C <: whitebox.Context](raw: Raw[C]) ={
+        val extr = TreesBuilder[c.type](raw, c)
+        Some((
+          extr.variables, extr.negotiations, extr.agents, extr.spawns, extr.timeouts
+          ))
+      }
+    }
+
+    case class VarDef[C <: whitebox.Context](name: String, domain: DomainDef[C])
+    case class DomainDef[C <: whitebox.Context](domain: C#Tree, tpe: C#Type, domTpe: C#Type)
+    
+    case class SingleSpawnDef[C <: whitebox.Context](name: String, count: C#Expr[Int])
+    case class SpawnDefs[C <: whitebox.Context](defs: Seq[SingleSpawnDef[C]])
+    
+    case class AgentNegDef[C <: whitebox.Context](negotiation: String,
+                                                  interlocutors: Interlocutors,
+                                                  interlocutorsExpr: C#Expr[Interlocutors],
+                                                  constraints: Seq[AgentConstraintsDef[C]])
+    case class AgentDef[C <: whitebox.Context](name: String, role: String, negotiations: Seq[AgentNegDef[C]], spec: C#Expr[AgentSpecification])
+    case class AgentConstraintsDef[C <: whitebox.Context](constraints: Seq[C#Tree])
+    
+    case class TimeDefs[C <: whitebox.Context](mp: Map[String, C#Expr[FiniteDuration]])
+
   }
 
   def raw[C <: whitebox.Context](c: C)(dsl: c.Expr[spec.dsl.Negotiation]): Raw[C] = {
@@ -86,18 +192,17 @@ object NegotiationSpecificationBuilder{
     val agentDefs = b.extractAgents(definitions)
 
     val vars = for ((name, tpe, domain, domainTpe) <- varsAndDomains) yield {
-      q"""val clazz = classOf[$tpe].asInstanceOf[Class[$tpe]]
-          VarDef[$tpe](${name.decodedName.toString.trim}, GenericDomainDef[$tpe, $domainTpe]($domain, clazz))
-          """
+      val nme = name.decodedName.toString.trim
+      Raw.VarDef[C](nme, Raw.DomainDef[C](domain, tpe, domainTpe))
     }
 
     val negotiations = for ((name, issues) <- negotiationsAndIssues) yield {
       val iss = issues.map{ case Select(This(TypeName("$anon")), varName) => varName.decodedName.toString }
-      q"""NegotiationDef(${name.decodedName.toString}, $iss)"""
+      NegotiationDef(name.decodedName.toString, iss)
     }
 
     val agents = for ((name, role, negs, spec) <- agentDefs) yield {
-      val n = negs map {
+      val nr = negs.map{
         case ((negRaw, interlocutorsRaw), constraintsRaw) =>
           val neg = negRaw match { case Select(This(TypeName("$anon")), negName) => negName.decodedName.toString }
           val interlocutors = interlocutorsRaw match {
@@ -114,40 +219,18 @@ object NegotiationSpecificationBuilder{
               q"""AgentConstraintDef($cName, Seq(..$descriptions), $func.tupled.asInstanceOf[Product => Boolean])"""
           }
 
-          q"""AgentNegDef($neg, InterlocutorsByRoles($interlocutors), List(
-                  AgentConstraintsDef(Seq(..$constraints))
-                ))"""
+          Raw.AgentNegDef[C](neg, InterlocutorsByRoles(interlocutors), c.Expr(q"InterlocutorsByRoles($interlocutors)"), List(Raw.AgentConstraintsDef[C](constraints)))
       }
-      q"""AgentDef(${name.decodedName.toString}, $role, Seq(..$n), $spec)"""
+      Raw.AgentDef[C](name.decodedName.toString, role, nr, c.Expr(spec))
     }
 
+    val spawnsRaw = Raw.SpawnDefs[C](b.extractSpawns(applications) map (Raw.SingleSpawnDef.apply[C] _).tupled)
     val spawns = q"""SimpleSpawnDef(Map(..${b.extractSpawns(applications)}))"""
 
-    val (timeoutDefs, timingDefs) = b.extractTimeoutsAndTimings(applications)
-    val timeouts = q"""TimeoutsDef(Map(..$timeoutDefs))"""
-    val timings = q"""TimingsDef(Map(..$timingDefs))"""
+    val timeoutDefs = b.extractTimeouts(applications)
+    val timeouts = Raw.TimeDefs[C](timeoutDefs.toMap.mapValues(c.Expr(_))) //q"""TimeoutsDef(Map(..$timeoutDefs))"""
 
-    Raw[C](vars.map(c.Expr(_)), negotiations.map(c.Expr(_)), agents.map(c.Expr(_)), c.Expr(spawns), c.Expr(timings), c.Expr(timeouts))
-  }
-
-
-  def agentPropsBundle[C <: whitebox.Context](c: C)(specTree: c.Tree): c.Expr[AgentPropsBundle[_]] = {
-    import c.universe._
-
-    object spec{
-      var PriorityAndProposalBased = false
-      var iterating: Iterating.Value = Iterating.None
-
-      object Iterating extends Enumeration{ val All, CurrentIssues, None = Value }
-    }
-    def typeCheck[T : c.TypeTag] = c.typecheck(specTree, c.TERMmode, c.typeOf[T], silent = true).nonEmpty
-    def typeCheckAndSet[T : c.TypeTag](set: => Unit) = if(typeCheck[T]) set
-
-    typeCheckAndSet[PriorityAndProposalBasedAgentSpec[_, _]]{ spec.PriorityAndProposalBased = true }
-    typeCheckAndSet[IteratingSpec.AllVars[_, _]]{ spec.iterating = spec.Iterating.All }
-
-
-    c.abort(NoPosition, s"PriorityAndProposalBased=${spec.PriorityAndProposalBased}, iterating=${spec.iterating}")
+    Raw[C](vars, negotiations, agents, spawnsRaw, timeouts)
   }
 
 }
@@ -270,17 +353,17 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
                 List(TypeTree())
                 ),
               List(n)
-             ) => ag -> n
+             ) => ag -> c.Expr[Int](n)
       }
   }.flatten
 
-  /** (Timeouts, Timings): Seq(config_name -> duration) -> Seq(config_name -> duration) */
-  def extractTimeoutsAndTimings(applications: Seq[(c.Tree, List[c.Tree])]) = {
-    val mp = applications.collect{
+  /** Timeouts: Seq(config_name -> duration) */
+  def extractTimeouts(applications: Seq[(c.Tree, List[c.Tree])]) =
+    applications.collect{
       case (Select(This(TypeName("$anon")), TermName("configure")), confDefs) =>
         confDefs map {
           case Apply(
-            Select(Select(Select(This(TypeName("$anon")), TermName(tpe)), confName), TermName("$less$eq")),
+            Select(Select(Select(This(TypeName("$anon")), TermName("timeout")), confName), TermName("$less$eq")),
               List(
        duration@Select(
                   Apply(
@@ -290,12 +373,9 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
                   TermName(_)
                   )
                 )
-              ) => tpe -> (confName.decodedName.toString, duration)
+              ) => (confName.decodedName.toString, duration)
         }
-    }.flatten.groupBy(_._1).mapValues(_.map(_._2))
-
-    mp.getOrElse("timeout", Nil) -> mp.getOrElse("timing", Nil)
-  }
+    }.flatten
 
   protected def extractConstraintsDef(t: c.Tree) = t match {
     case Apply(

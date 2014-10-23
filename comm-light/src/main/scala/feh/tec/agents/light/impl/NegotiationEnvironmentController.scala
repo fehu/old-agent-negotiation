@@ -19,6 +19,8 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
 
   implicit def asys = context.system
 
+  def sysAgentByRole: Map[SystemRole, AgentRef]
+
   def initialize(): Unit =
     if (state == NegotiationState.Created){
       state = NegotiationState.Initializing
