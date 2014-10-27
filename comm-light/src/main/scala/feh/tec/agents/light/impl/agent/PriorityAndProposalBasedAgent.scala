@@ -1,17 +1,18 @@
 package feh.tec.agents.light.impl.agent
 
-import feh.tec.agents.light.spec.AgentProps.NegotiationInit
+import feh.tec.agents.light.AgentCreationInterface.NegotiationInit
 import feh.tec.agents.light.spec.AgentSpecification
 import feh.tec.agents.light._
 import feh.util._
 import feh.tec.agents.light.impl
 
 abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language.HasPriority](
-            val name: String,
+            val uniqueName: String,
             override val role: NegotiationRole,
-            negotiationInit: Set[NegotiationInit]
+            val negotiationsInit: Set[NegotiationInit],
+            val args: AgentCreationInterface#Args
           )
-  extends impl.PriorityAndProposalBasedAgent[Lang]
+  extends impl.PriorityAndProposalBasedAgent[Lang] with AgentCreationInterface
 {
   type Negotiation <: Negotiation.DynamicScope with Negotiation.HasPriority with Negotiation.HasProposal[Lang]
 
@@ -34,7 +35,7 @@ abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with
   def start(): Unit                                         = spec.start.get
   def initialize(): Unit                                    = spec.initialize.get
 
-  val negotiationIds: Set[NegotiationId] = negotiationInit.map(_.id)
+  val negotiationIds: Set[NegotiationId] = negotiationsInit.map(_.id)
 
   lazy val priorityNegotiationHandler: PriorityNegotiationHandler[Lang] = new PriorityNegotiationHandlerImpl(
     spec.priorityNegotiationHandler.get, owner, this.get, this.sendToAll

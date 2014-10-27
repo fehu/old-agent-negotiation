@@ -1,5 +1,8 @@
 package feh.tec.agents.light
 
+import akka.actor.ActorSystem
+import akka.util.Timeout
+import feh.tec.agents.light.impl.NegotiationEnvironmentController
 import feh.tec.agents.light.spec.dsl._
 import impl.agent._
 import scala.concurrent.duration._
@@ -54,5 +57,9 @@ object AgentManualSpecApp extends App{
     }
   }
 
-  negController(4)
+  val props = negController(4)
+
+  implicit val asys = ActorSystem()
+
+  val ag = asys.actorOf(props)
 }

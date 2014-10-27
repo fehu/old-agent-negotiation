@@ -1,10 +1,11 @@
 package feh.tec.agents.light.spec
 
-import akka.actor.{Props, ActorSystem}
-import feh.tec.agents.light.spec.AgentProps.{NegotiationInitExtended, NegotiationInit}
-import feh.tec.agents.light.spec.NegotiationSpecification.Interlocutors
-import feh.tec.agents.light._
+//import akka.actor.{Props, ActorSystem}
+//import feh.tec.agents.light.spec.AgentProps.{NegotiationInitExtended, NegotiationInit}
+//import feh.tec.agents.light.spec.NegotiationSpecification.Interlocutors
+//import feh.tec.agents.light._
 
+/*
 case class AgentProps[Arg](name: String, role: NegotiationRole, negotiationInits: Set[NegotiationInitExtended],
                            build: AgentProps.Building[Arg])
 {
@@ -12,7 +13,9 @@ case class AgentProps[Arg](name: String, role: NegotiationRole, negotiationInits
   def props(arg: Arg) = build(name, role, negotiationInits.map(_.init), arg)
   def create(arg: Arg)(implicit sys: ActorSystem) = AgentRef(id, sys.actorOf(props(arg), name))
 }
+*/
 
+/*
 object AgentProps{
   case class Building[Args](argsDescription: ArgsDescription, buildProps: (/*name: */String, NegotiationRole, Set[NegotiationInit], Args) => Props){
     def apply(name: String, role: NegotiationRole, negInit: Set[NegotiationInit], args: Args) = buildProps(name, role, negInit, args)
@@ -26,17 +29,6 @@ object AgentProps{
     def get: Arg
   }
 
-  trait ArgDescription{
-    def clazz: Class[_]
-  }
-
-  case class SystemAgentRef(role: SystemRole) extends ArgDescription{ def clazz = classOf[AgentRef] }
-
-  trait ArgsDescription{
-    def isDefined: Boolean
-    def product: Option[Product]
-    def sequence: Option[Seq[ArgDescription]]
-  }
 
   case object NoArgs extends ArgsDescription{
     def isDefined = false
@@ -48,4 +40,4 @@ object AgentProps{
     def props()(implicit sys: ActorSystem): Props = props.props(provider.get)
     def create()(implicit sys: ActorSystem) = props.create(provider.get)
   }
-}
+}*/

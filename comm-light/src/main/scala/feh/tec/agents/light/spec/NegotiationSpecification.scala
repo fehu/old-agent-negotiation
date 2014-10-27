@@ -1,7 +1,6 @@
 package feh.tec.agents.light.spec
 
 import feh.tec.agents
-import feh.tec.agents.light.spec.AgentProps.AgentPropsBundle
 import scala.concurrent.duration.FiniteDuration
 
 object NegotiationSpecification{

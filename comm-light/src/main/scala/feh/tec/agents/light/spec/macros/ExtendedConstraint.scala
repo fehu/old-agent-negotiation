@@ -3,13 +3,29 @@ package feh.tec.agents.light.spec.macros
 import scala.reflect.macros.whitebox
 
 class ExtendedConstraint[C <: whitebox.Context](val c: C) {
+  import c.universe._
+
+  val h = new Helper[c.type](c)
+
+  def extractConstraintsDef(t: c.Tree) = t match {
+    case Apply(
+          Select(
+            Apply(
+              TypeApply(
+                Select(This(TypeName("$anon")), TermName("VarDefConstraintBuilder")),
+                List(TypeTree())
+                ),
+              List(Literal(Constant(name: String)))
+              ),
+            TermName("$bar")
+            ),
+          List( constraint )
+        ) => name -> replace(constraint)
+  }
+
 
   def replace(in: c.Tree): Replacement = {
 
-    val h = new Helper[c.type](c)
-
-    import c.universe._
-    
     def proposalArgName(s: String) = "$_proposal_" + s
     def proposalArg(s: String) = TermName(proposalArgName(s))
     

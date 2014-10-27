@@ -3,8 +3,7 @@ package feh.tec.agents.light.impl.agent
 import akka.actor.{ActorSystem, Props}
 import feh.tec.agents.light.impl.spec.{PriorityAndProposalBasedAgentSpec, IteratingSpec}
 import feh.tec.agents.light._
-import feh.tec.agents.light.spec.AgentProps.NegotiationInit
-import feh.tec.agents.light.spec.{AgentProps, MonoDefinition}
+import feh.tec.agents.light.spec.MonoDefinition
 
 object create {
   trait SpecExt[Ow]{
@@ -31,19 +30,19 @@ object create {
     protected def createNegotiation(id: NegotiationId): Negotiation = ???
   }
 
-  def PriorityAndProposalBasedIteratingAllVars(
-                                    specification: PriorityAndProposalBasedAgentSpec[PPI.Ag, PPI.Lang] with IteratingSpec.AllVars[PPI.Ag, PPI.Lang]
-                                                ): AgentProps.Building[None.type] =
-    AgentProps.Building(AgentProps.NoArgs, (name: String, role: NegotiationRole, negInit: Set[NegotiationInit], arg: None.type) =>
-      Props(
-        new impl.agent.PriorityAndProposalBasedAgent[PPI.Lang](name, role, negInit) with PriorityAndProposalBasedIteratingAllVars
-        {
-          self: IteratingSpec.Agent[PPI.Lang] =>
-
-          type Negotiation = Negotiation.HasProposal[PPI.Lang] with Negotiation.HasPriority with Negotiation.HasIterator with Negotiation.DynamicScope
-
-          val spec = specification.asInstanceOf[PriorityAndProposalBasedAgentSpec[this.type, PPI.Lang] with IteratingSpec.AllVars[this.type, PPI.Lang]]
-        }
-      )
-    )
+//  def PriorityAndProposalBasedIteratingAllVars(
+//                                    specification: PriorityAndProposalBasedAgentSpec[PPI.Ag, PPI.Lang] with IteratingSpec.AllVars[PPI.Ag, PPI.Lang]
+//                                                ): AgentProps.Building[None.type] =
+//    AgentProps.Building(AgentProps.NoArgs, (name: String, role: NegotiationRole, negInit: Set[NegotiationInit], arg: None.type) =>
+//      Props(
+//        new impl.agent.PriorityAndProposalBasedAgent[PPI.Lang](name, role, negInit) with PriorityAndProposalBasedIteratingAllVars
+//        {
+//          self: IteratingSpec.Agent[PPI.Lang] =>
+//
+//          type Negotiation = Negotiation.HasProposal[PPI.Lang] with Negotiation.HasPriority with Negotiation.HasIterator with Negotiation.DynamicScope
+//
+//          val spec = specification.asInstanceOf[PriorityAndProposalBasedAgentSpec[this.type, PPI.Lang] with IteratingSpec.AllVars[this.type, PPI.Lang]]
+//        }
+//      )
+//    )
 }

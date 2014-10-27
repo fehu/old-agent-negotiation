@@ -1,33 +1,83 @@
 package feh.tec.agents.light.impl
 
+import akka.actor.{ActorSystem, Actor, Props}
 import akka.util.Timeout
+import feh.tec.agents.light.AgentCreationInterface.NegotiationInit
 import feh.tec.agents.light.impl.NegotiationEnvironmentController._
 import feh.tec.agents.light._
-import feh.tec.agents.light.spec.AgentProps.AgentPropsBundle
-import feh.tec.agents.light.spec.NegotiationSpecification.{InterlocutorsByRoles, Interlocutors}
+import feh.tec.agents.light.spec.NegotiationSpecification.{AgentNegDef, AgentDef, InterlocutorsByRoles, Interlocutors}
 import scala.concurrent.{Await, Future}
 import akka.pattern.ask
 
 trait NegotiationEnvironmentController extends EnvironmentController with DynamicEnvironmentController{
-  protected val initialAgents: Set[AgentPropsBundle[_]]
+  type CreateInterface = (String, NegotiationRole, Set[NegotiationInit])
+  implicit def asys: ActorSystem = context.system
+
+//  protected val initialAgents: List[(AgentDef, () => AgentRef)]
+  protected val spawns: Map[String, Int]
+  protected val issues: Map[String, Var]
+  protected val issuesByNegotiation: Map[String, Seq[String]]
+  protected val initialAgents: List[(AgentDef, CreateInterface => AgentRef)]
   protected val timeouts: Timeouts
-  protected val systemAgentsProps: Set[AgentPropsBundle[_]]
+  protected val systemAgentsInit: Set[() => AgentRef]
 
   protected var state: NegotiationState = NegotiationState.Created
   protected var currentAgents: Set[AgentRef] = null
   protected var systemAgents: Set[AgentRef] = null
 
-  implicit def asys = context.system
+  protected lazy val initialAgentsByName = initialAgents.map(x => x._1.name -> x).toMap
 
-  def sysAgentByRole: Map[SystemRole, AgentRef]
+  implicitly[ActorSystem].actorOf(Props.apply(new Actor{
+    def receive: Actor.Receive = Map()
+  }))
+
+  def info =
+    s""" NegotiationEnvironmentController:
+       |   spawns = $spawns
+       |   issues = $issues
+       |   initialAgents = $initialAgents
+       |   systemAgentsInit = $systemAgentsInit
+       |   timeouts = $timeouts
+       |   state = $state
+       |   currentAgents = $currentAgents
+       |   systemAgents = $systemAgents
+     """.stripMargin
+
+  println(info)
+
+  var sysAgentByRole: Map[SystemRole, AgentRef] = null
+
+
+  def createAgent(c: Int, d: AgentDef, f: CreateInterface => AgentRef) = d match {
+    case AgentDef(nme, rle, negDefs, _) =>
+      val uniqueName = s"$nme-$c"
+      val negInits = negDefs.toSet.map{
+        {
+          case AgentNegDef(negName, scope, extra) =>
+            NegotiationInit(NegotiationId(negName), issuesByNegotiation(negName).map(issues).toSet)
+        }: (AgentNegDef => NegotiationInit)}
+        f((uniqueName, NegotiationRole(rle), negInits)) -> d
+    }
 
   def initialize(): Unit =
     if (state == NegotiationState.Created){
       state = NegotiationState.Initializing
-      val (refs, negotiationInits) = initialAgents.map(b => b.create -> b.props.negotiationInits).unzip
-      systemAgents = systemAgentsProps.map(_.create)
-      currentAgents = refs
-      initialAgentsCreated(refs.zip(negotiationInits.map(_.map(ext => ext.id -> ext.scope).toMap)).toMap)
+      systemAgents = systemAgentsInit.map(_())
+      sysAgentByRole = systemAgents.map(ag => ag.id.role.asInstanceOf[SystemRole] -> ag).toMap
+
+      val refsAndDefs = spawns flatMap {
+        case (agName, count) =>
+          val (agDef, f) = initialAgentsByName(agName)
+          for (c <- 1 to count)
+            yield createAgent(c, agDef, f)
+      }
+      currentAgents = refsAndDefs.keySet
+
+      initialAgentsCreated(refsAndDefs.mapValues{
+        adef => adef.negotiations.map{
+          case AgentNegDef(neg, scope, _) => NegotiationId(neg) -> scope
+        }.toMap
+      })
       currentAgents foreach sendAndProcessAnswer(SystemMessage.Initialize, timeouts.initialize, _.mapTo[SystemMessage.Initialized.type])
       state = NegotiationState.Initialized
     }

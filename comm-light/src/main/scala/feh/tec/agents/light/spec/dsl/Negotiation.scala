@@ -20,8 +20,8 @@ trait Negotiation extends ConstraintsSpecification with CreationSpecification{
 
   type ChooseAgentRole = {
     def withRole(role: String): {
-      def definedIn(spec: AgentSpecification): That
-      def definedBy(spec: AgentSpecification): That
+      def definedIn[Spec <: AgentSpecification](spec: Spec): That
+      def definedBy[Spec <: AgentSpecification](spec: Spec): That
     }
   }
   type ChooseAgentNegotiation = {
