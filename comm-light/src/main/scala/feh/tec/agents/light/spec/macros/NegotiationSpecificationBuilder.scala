@@ -25,12 +25,12 @@ object NegotiationSpecificationBuilder{
       new feh.tec.agents.light.spec.NegotiationSpecification {
         import feh.tec.agents.light.spec.NegotiationSpecification._
 
-        def variables: Seq[VarDef] = Seq(..$vars)
-        def negotiations: Seq[NegotiationDef] = Seq(..$negotiations)
-        def agents: Seq[AgentDef] = Seq(..$agents)
+        val variables: Seq[VarDef] = Seq(..$vars)
+        val negotiations: Seq[NegotiationDef] = Seq(..$negotiations)
+        val agents: Seq[AgentDef] = Seq(..$agents)
 
-        def spawns: SpawnDef = $spawns
-        def timeouts: TimeoutsDef = $timeouts
+        val spawns: SpawnDef = $spawns
+        val timeouts: TimeoutsDef = $timeouts
       }
     """
 
@@ -81,7 +81,7 @@ object NegotiationSpecificationBuilder{
         import c.universe._
 
         agDef match{
-          case AgentDef(name, role, negDefs, specExpr) =>
+          case AgentDef(name, role, negDefs, specExpr, specTpe) =>
             val negs = negDefs map {
               case AgentNegDef(neg, _, interlExpr, constraints) =>
                 q"""
@@ -163,7 +163,11 @@ object NegotiationSpecificationBuilder{
                                                   interlocutors: Interlocutors,
                                                   interlocutorsExpr: C#Expr[Interlocutors],
                                                   constraints: Seq[AgentConstraintsDef[C]])
-    case class AgentDef[C <: whitebox.Context](name: String, role: String, negotiations: Seq[AgentNegDef[C]], spec: C#Expr[AgentSpecification])
+    case class AgentDef[C <: whitebox.Context](name: String,
+                                               role: String,
+                                               negotiations: Seq[AgentNegDef[C]],
+                                               spec: C#Expr[AgentSpecification],
+                                               specTpe: C#Type)
     case class AgentConstraintsDef[C <: whitebox.Context](constraints: Seq[C#Tree])
 
     case class TimeDefs[C <: whitebox.Context](mp: Map[String, C#Expr[FiniteDuration]])
@@ -196,7 +200,7 @@ object NegotiationSpecificationBuilder{
       NegotiationDef(name.decodedName.toString, iss)
     }
 
-    val agents = for ((name, role, negs, spec) <- agentDefs) yield {
+    val agents = for ((name, role, negs, spec, specTpe) <- agentDefs) yield {
       val nr = negs.map{
         case ((negRaw, interlocutorsRaw), constraintsRaw) =>
           val neg = negRaw match { case Select(This(TypeName("$anon")), negName) => negName.decodedName.toString }
@@ -208,7 +212,7 @@ object NegotiationSpecificationBuilder{
 
           Raw.AgentNegDef[C](neg, InterlocutorsByRoles(interlocutors), c.Expr(q"InterlocutorsByRoles($interlocutors)"), List(constraints))
       }
-      Raw.AgentDef[C](name.decodedName.toString, role, nr, c.Expr(spec))
+      Raw.AgentDef[C](name.decodedName.toString, role, nr, c.Expr(spec), specTpe)
     }
 
     val spawnsRaw = Raw.SpawnDefs[C](b.extractSpawns(applications) map (Raw.SingleSpawnDef.apply[C] _).tupled)
@@ -291,7 +295,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
     case (name, Apply(sel: Select, vars)) if h.selects(sel, "$anon.negotiation.over") => name -> vars
   }
 
-  /**  Seq( (name, role, List[constraint name -> constraintsTree], AgentSpec) ) */
+  /**  Seq( (name, role, List[constraint name -> constraintsTree], AgentSpec, Type[AgentSpec]) ) */
   def extractAgents(definitions: Seq[(c.TermName, c.Tree)]) = definitions collect{
     case (name, Apply(
                   Select(
@@ -301,7 +305,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
                           Apply(selWithRole: Select, Literal(Constant(role: String)) :: Nil),
                           TermName("definedBy" | "definedIn")
                           ),
-                        List(TypeTree())
+                        List(specTTree@TypeTree())
                       ),
                       agentSpec :: Nil
                     ),
@@ -339,7 +343,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
           }
           negotiationsAndInterlocutors -> constraints
       }
-      (name, role, negs, agentSpec)
+      (name, role, negs, agentSpec, specTTree.tpe)
   }
 
   /** Seq(name -> count) */
