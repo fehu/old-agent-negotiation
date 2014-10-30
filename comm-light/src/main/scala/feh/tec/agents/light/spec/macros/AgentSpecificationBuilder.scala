@@ -159,13 +159,14 @@ object OwnerDependent {
 
 abstract class AgentSpecificationBuilder[C <: whitebox.Context](val c: C){
   lazy val h = new Helper[c.type](c)
-  implicit def hWrapper(t: c.Tree) = new h.Wrapper(t)
+//  implicit def hWrapper(t: c.Tree) = new h.Wrapper(t)
 
   def build(tr: List[c.Tree], negotiationDef: Option[c.Expr[NegotiationDef]]): List[ConstructionPart]
 }
 
 class AgentSpecificationSyntaxBuilder[C <: whitebox.Context](_c: C) extends AgentSpecificationBuilder[C](_c) {
   import c.universe._
+  import h._
 
   def build(tr: List[c.Tree], negotiationDef: Option[c.Expr[NegotiationDef]]): List[ConstructionPart] = tr.collect{
     case Apply(sel, List(arg)) if sel selectsSome "$anon.ExtendableMonoDefinitionWrapper" => extendableMonoDefinitionWrapper(sel, arg, negotiationDef)
@@ -183,18 +184,6 @@ class AgentSpecificationSyntaxBuilder[C <: whitebox.Context](_c: C) extends Agen
     )
   }
 */
-
-  object AnonSelect{
-    def unapply(tree: c.Tree) = PartialFunction.condOpt(tree){
-      case Select(This(TypeName("$anon")), TermName(name)) => name
-    }
-  }
-
-  object AnonTypeApply{
-    def unapply(tree: c.Tree) = PartialFunction.condOpt(tree){
-      case TypeApply(AnonSelect(name), _) => name
-    }
-  }
 
   protected def extendableMonoDefinitionWrapper(tree: c.Tree, body: c.Tree, negotiationDef: Option[c.Expr[NegotiationDef]]) = tree match{
     case Select(
@@ -253,8 +242,7 @@ abstract class AgentSpecificationSyntaxTransformations[C <: whitebox.Context](va
   val sb: AgentSpecificationSyntaxBuilder[c.type]
 
   implicit val h: Helper[c.type]
-  import h.Wrapper
-  import sb.AnonSelect
+  import h._
 
   lazy val negIdByDef: c.Expr[NegotiationDef] => c.Expr[NegotiationId] =
     neg => c.Expr(q"""NegotiationId($neg.name)""")

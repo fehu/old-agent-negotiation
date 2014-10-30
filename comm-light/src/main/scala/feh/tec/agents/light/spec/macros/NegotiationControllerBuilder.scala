@@ -8,7 +8,7 @@ import feh.tec.agents.light.impl.NegotiationEnvironmentController.Timeouts
 import feh.tec.agents.light.impl.spec.{IteratingSpec, PriorityAndProposalBasedAgentSpec}
 import feh.tec.agents.light.spec.AgentSpecification
 import feh.tec.agents.light.spec.NegotiationSpecification.{AgentDef, NegotiationDef}
-import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.{SimpleConstrainsBuilder, Raw}
+import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.{VarsSeparatingConstrainsBuilder, SimpleConstrainsBuilder, Raw}
 import feh.tec.agents.light._
 import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.Raw.{DomainDef, VarDef, AgentNegDef}
 import feh.util._
@@ -22,7 +22,7 @@ object NegotiationControllerBuilder {
 
     val builder = new NegotiationControllerBuilder[c.type](c)
     val raw = NegotiationSpecificationBuilder.raw[c.type](c)(dsl)
-    implicit val cb = new SimpleConstrainsBuilder
+    implicit val cb = new VarsSeparatingConstrainsBuilder
     
     val specCompositionAndDependencies = raw.agents.zipMap{
       rawAgDef =>

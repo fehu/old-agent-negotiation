@@ -40,6 +40,7 @@ object AgentManualSpecApp extends App{
         negotiates the `queen's position` `with` the.others and
           hasConstraints(
             "direct-line sight" | {
+              /* Constraints that can be run independently for vars should be separated by && or ||, or defined separately */
               proposed(x) != valueOf(x) && proposed(y) != valueOf(y)
             },
             "diagonal-line sight" | {

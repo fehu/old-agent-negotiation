@@ -2,7 +2,6 @@ package feh.tec.agents.light.spec.macros
 
 import feh.tec.agents.light.spec.AgentSpecification
 import feh.tec.agents.light.spec.NegotiationSpecification._
-import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.Raw
 import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.Raw.TreesBuilder.ConstraintsBuilder
 
 import scala.concurrent.duration.FiniteDuration
@@ -229,20 +228,110 @@ object NegotiationSpecificationBuilder{
 
     def build[C <: whitebox.Context](c: C)(agDef: Raw.AgentConstraintsDef[c.type], raw: Raw[c.type]): c.Expr[AgentConstraintDef] = {
 
-    val xc = new ExtendedConstraint[c.type](c)
+      val xc = new ExtendedConstraint[c.type](c)
+        import c.universe._
+
+        val constraints = agDef.constraints.asInstanceOf[Seq[c.Tree]] map xc.extractConstraintsDef map {
+          case (cName, xc.Replacement(descr, f)) =>
+            val func = f(raw.varsAndDomains.map(tr => tr._1.decodedName.toString.trim -> tr._2).toMap)
+            val descriptions = descr map {
+              case xc.Description(tpe, varName, arg) =>
+              q"""ConstraintParamDescription($tpe, $varName, ${arg.decodedName.toString})"""
+            }
+            q"""AgentConstraintDef($cName, Seq(..$descriptions), $func.tupled.asInstanceOf[Product => Boolean])"""
+        }
+        c.Expr(q"AgentConstraintsDef(Seq(..$constraints))")
+      }
+  }
+
+  class VarsSeparatingConstrainsBuilder extends ConstraintsBuilder{
+    import VarsSeparatingConstrainsBuilder._
+
+    def build[C <: whitebox.Context](c: C)(agConstrDef: Raw.AgentConstraintsDef[c.type], raw: Raw[c.type]): c.Expr[AgentConstraintDef] = {
       import c.universe._
 
-      val constraints = agDef.constraints.asInstanceOf[Seq[c.Tree]] map xc.extractConstraintsDef map {
-        case (cName, xc.Replacement(descr, f)) =>
-          val func = f(raw.varsAndDomains.map(tr => tr._1.decodedName.toString.trim -> tr._2).toMap)
-          val descriptions = descr map {
-            case xc.Description(tpe, varName, arg) =>
-            q"""ConstraintParamDescription($tpe, $varName, ${arg.decodedName.toString})"""
-          }
-          q"""AgentConstraintDef($cName, Seq(..$descriptions), $func.tupled.asInstanceOf[Product => Boolean])"""
+      val h = new Helper[c.type](c)
+      import h._
+
+      val xc = new ExtendedConstraint[c.type](c)
+
+//      val constraints = agConstrDef.constraints.asInstanceOf[Seq[c.Tree]] map xc.extractConstraintsDef map {
+//        case (cName, xc.Replacement(descr, f)) =>
+//      }
+
+      def separateAndOr(in: c.Tree): ConstraintPart[c.Tree] = in match {
+        case Apply(Select(left, op@(TermName("$bar$bar") | TermName("$amp$amp"))), List(right)) =>
+          ConstraintPartComb[c.Tree, c.TermName](op.asInstanceOf[c.TermName], separateAndOr(left), separateAndOr(right))
+        case other if other.tpe == typeOf[Boolean] => ConstraintPartLeaf[c.Tree](other)
       }
-      c.Expr(q"AgentConstraintsDef(Seq(..$constraints))")
+      
+      val separatedByName = agConstrDef.constraints.asInstanceOf[Seq[c.Tree]].map{
+        case Apply(
+              Select(
+                Apply(
+                  TypeApply(AnonSelect("VarDefConstraintBuilder"), List(TypeTree())),
+                  List(Literal(Constant(constraintName: String)))
+                  ),
+                TermName("$bar")
+                ),
+              List(constraintTree)
+            ) =>
+          constraintName -> separateAndOr(constraintTree)
+      }.groupBy(_._1).mapValues(_.map(_._2))
+
+      val q = separatedByName.mapValues(_.map(
+        _.transform(xc.replace, (n: c.TermName) => n.toString) //[(String, ExtendedConstraint#Replacement), TermName, String]
+      ))
+
+      c.abort(NoPosition, showRaw(q))
     }
+  }
+
+  object VarsSeparatingConstrainsBuilder{
+    trait ConstraintPart[+T]
+    case class ConstraintPartLeaf[+T](part: T) extends ConstraintPart[T]
+
+    case class ConstraintPartComb[+T, +Op] (op: Op, left: ConstraintPart[T], right: ConstraintPart[T]) extends ConstraintPart[T]
+
+    implicit class ConstraintPartLeafOps[T](part: ConstraintPartLeaf[T]){
+      def transform[R](f: T => R): ConstraintPartLeaf[R] = part.copy(f(part.part))
+    }
+
+    implicit class ConstraintPartCombOps[T, Op](part: ConstraintPartComb[T, Op]){
+      def transform[R, OpR](f: T => R, fOp: Op => OpR): ConstraintPartComb[R, OpR] =
+        part.copy(fOp(part.op), transformPart(part.left, f, fOp), transformPart(part.right, f, fOp))
+    }
+
+    implicit class ConstraintPartOps[T](part: ConstraintPart[T]){
+      def transform[R, Op, OpR](f: T => R, fOp: Op => OpR): ConstraintPart[R] = transformPart(part, f, fOp)
+    }
+
+    private def transformPart[T, Op, R, OpR](part: ConstraintPart[T], f: T => R, fOp: Op => OpR) = part match {
+      case leaf: ConstraintPartLeaf[T] => leaf.transform(f)
+      case comb: ConstraintPartComb[T, _] => comb.asInstanceOf[ConstraintPartComb[T, Op]].transform(f, fOp)
+    }
+  }
+
+  object VarsSeparatingConstrainsBuilder2{
+    trait ConstraintPart[C <: whitebox.Context]{
+      def apply[CC <: C](c: CC): c.Tree
+    }
+    case class ConstraintPartLeaf[C <: whitebox.Context](tree: C#Tree) extends ConstraintPart[C]{
+      def apply[CC <: C](c: CC): c.Tree = tree.asInstanceOf[c.Tree]
+    }
+    trait ConstraintPartComb[C <: whitebox.Context] extends ConstraintPart[C]{
+      def left: ConstraintPart[C]
+      def right: ConstraintPart[C]
+      def op[CC <: C](c: CC): c.TermName
+
+      def apply[CC <: C](c: CC): c.Tree = {
+        import c.universe._
+        Apply(Select(left.apply[c.type](c), op[c.type](c)), List(right[c.type](c)))
+      }
+    }
+    case class ||[C <: whitebox.Context](left: ConstraintPart[C], right: ConstraintPart[C]) extends ConstraintPartComb[C]{ def op[CC <: C](c: CC): c.TermName = c.universe.TermName("$bar$bar") }
+    case class &&[C <: whitebox.Context](left: ConstraintPart[C], right: ConstraintPart[C]) extends ConstraintPartComb[C]{ def op[CC <: C](c: CC): c.TermName = c.universe.TermName("$amp$amp") }
+
   }
 }
 

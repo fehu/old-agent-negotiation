@@ -3,7 +3,7 @@ package feh.tec.agents.light.spec.macros
 import scala.reflect.macros.whitebox
 import feh.util._
 
-class Helper[C <: whitebox.Context](val c: C){
+class Helper[C <: whitebox.Context](protected val c: C){
   helper =>
 
   import c.universe._
@@ -91,5 +91,17 @@ class Helper[C <: whitebox.Context](val c: C){
     def selects(fullName: String) = helper.selects(t, fullName)
     def selectsSome(fullName: String) = helper.selectsSome(t, fullName)
 //    def selectsInBetween(fullName: String) = helper.selectsInBetween(t, fullName)
+  }
+
+  object AnonSelect{
+    def unapply(tree: c.Tree) = PartialFunction.condOpt(tree){
+      case Select(This(TypeName("$anon")), TermName(name)) => name
+    }
+  }
+
+  object AnonTypeApply{
+    def unapply(tree: c.Tree) = PartialFunction.condOpt(tree){
+      case TypeApply(AnonSelect(name), _) => name
+    }
   }
 }
