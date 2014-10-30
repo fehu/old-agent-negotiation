@@ -20,6 +20,8 @@ abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with
 
   implicit def owner: this.type = this
 
+  log.debug("negotiationsInit = " + negotiationsInit)
+
   /* should be defined by ExtendableDefinition */
 
   def nothingToPropose(neg: NegotiationId): Unit            = spec.nothingToPropose.get apply neg
@@ -35,7 +37,7 @@ abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with
   def start(): Unit                                         = spec.start.get
   def initialize(): Unit                                    = spec.initialize.get
 
-  val negotiationIds: Set[NegotiationId] = negotiationsInit.map(_.id)
+  lazy val negotiationIds: Set[NegotiationId] = negotiationsInit.map(_.id)
 
   lazy val priorityNegotiationHandler: PriorityNegotiationHandler[Lang] = new PriorityNegotiationHandlerImpl(
     spec.priorityNegotiationHandler.get, owner, this.get, this.sendToAll

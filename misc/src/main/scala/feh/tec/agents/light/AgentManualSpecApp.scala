@@ -62,4 +62,6 @@ object AgentManualSpecApp extends App{
   implicit val asys = ActorSystem()
 
   val ag = asys.actorOf(props)
+
+  ag ! SystemMessage.Initialize
 }

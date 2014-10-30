@@ -12,6 +12,7 @@ import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.{SimpleC
 import feh.tec.agents.light._
 import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.Raw.{DomainDef, VarDef, AgentNegDef}
 import feh.util._
+import scala.reflect.api.Scopes
 import scala.reflect.macros.whitebox
 import scala.concurrent.duration._
 
@@ -36,7 +37,9 @@ object NegotiationControllerBuilder {
     val dependenciesByRaw = specCompositionAndDependencies.mapValues(_._2).toMap
     val dependencyCallsByName = dependenciesByRaw.values.flatMap(_.mapValues(_._2)).toMap
 
-    val createInterfacesPropsByBody = specCompositionsByRaw map(p => p._1 -> builder.agentPropsExpr(p._2, p._1, dependencyCallsByName)) map {
+    val extraParents = tq"feh.tec.agents.light.impl.agent.DomainIteratorsDefault" :: Nil
+
+    val createInterfacesPropsByBody = specCompositionsByRaw map(p => p._1 -> builder.agentPropsExpr(p._2, p._1, dependencyCallsByName, extraParents)) map {
       case (agRawDef, agentPropsExpr) => agRawDef.name -> agentPropsExpr
     }
 
@@ -75,16 +78,39 @@ object NegotiationControllerBuilder {
       .map{ case (negName, iss) => c.Expr[(String, Seq[String])](q"$negName -> Seq(..$iss)") }
       .toList
     val initialAgents: List[c.Expr[(AgentDef, NegotiationEnvironmentController#CreateInterface => AgentRef)]] =
-      specCompositionsByRaw.keySet.toList.map{
-        rawAgDef =>
-          val (agTpe, langTpe) = builder.typesOf(rawAgDef)
+      specCompositionsByRaw.toList.map{
+        case (rawAgDef, SpecificationComposition(parts)) =>
+          val (agTpe, _langTpe) = parts.map(builder.typesOf).unzip
+          val langTpes = _langTpe.flatten.distinct
 
-          val (createNegotiationTree, negotiationTypeTree) = builder.createNegotiationAndNegotiationTypeTree(agTpe)
+          val langTpe = internal.refinedType(langTpes.toList, internal.newScopeWith())
+            //CompoundTypeTree( Template(langTpes.toList.distinct.map(TypeTree(_)), noSelfType, List()) ).tpe
+
+
+          val specSymbols = agTpe.flatMap(_.decls.filter(_.typeSignature.resultType <:< typeOf[AgentSpecification]))
+
+          val specSign = specSymbols.map(_.typeSignature)
+
+//          specSign map {
+//            case NullaryMethodType()
+//          }
+//
+//          c.abort(NoPosition, specSign.map(showRaw(_)).mkString("\n\t", "\n\t", ""))
+          //.map(_.baseClasses.flatMap(_.typeSignature.decls).filter(_.name == TermName("spec")))
+
+          val (negotiationTypeTree, createNegotiationTree) = builder.createNegotiationAndNegotiationTypeTree(agTpe.toSet, langTpe)
 //          c.abort(NoPosition, showRaw(q))
 
-          c.info(NoPosition, showCode(createNegotiationTree), true)
+          val defLangType = builder.defLangType(langTpe)
 
-          val body = negotiationTypeTree :: createNegotiationTree :: Nil
+          c.info(NoPosition,
+            "defLangType: " + showCode(defLangType) +
+            "\nnegotiationTypeTree: " + showCode(negotiationTypeTree) +
+            "\ncreateNegotiationTree: " + showCode(createNegotiationTree) +
+            "\nlangTpe: " + langTpe
+            , true)
+
+          val body = defLangType :: negotiationTypeTree :: createNegotiationTree :: Nil
 
 //          c.abort(NoPosition, showRaw(body))
 
@@ -92,6 +118,40 @@ object NegotiationControllerBuilder {
             q"${Raw.TreesBuilder.agents[c.type](c)(rawAgDef, raw)} -> ${agentsCreationExpressions(rawAgDef.name, body)}"
           )
       }
+/*
+
+NullaryMethodType(
+  TypeRef(
+    SingleType(ThisType(feh.tec.agents.light.spec), feh.tec.agents.light.spec.AgentSpecification),
+    feh.tec.agents.light.spec.AgentSpecification.PriorityAndProposalBased,
+    List(
+      ThisType(feh.tec.agents.light.impl.agent.PriorityAndProposalBasedAgent),
+      TypeRef(NoPrefix, TypeName("Lang"), List())
+    )
+  )
+)
+
+NullaryMethodType(
+  RefinedType(
+    List(
+      TypeRef(
+        SingleType(ThisType(feh.tec.agents.light.spec), feh.tec.agents.light.spec.AgentSpecification),
+        feh.tec.agents.light.spec.AgentSpecification.PriorityAndProposalBased,
+        List(
+          ThisType(feh.tec.agents.light.impl.agent.DomainIteratingAllVars),
+          TypeRef(NoPrefix, TypeName("Lang"), List())
+        )
+      ),
+      TypeRef(
+        SingleType(ThisType(feh.tec.agents.light.spec), feh.tec.agents.light.spec.AgentSpecification),
+        feh.tec.agents.light.spec.AgentSpecification.Iterating,
+        List(ThisType(feh.tec.agents.light.impl.agent.DomainIteratingAllVars), TypeRef(NoPrefix, TypeName("Lang"), List()))
+      )
+    ),
+    Scope()
+  )
+)
+*/
 
 //    c.info(NoPosition, "raw.agents = " + showRaw(raw.agents), true)
 //    c.info(NoPosition, "specCompositionsByRaw = " + specCompositionsByRaw.toString(), true)
@@ -140,91 +200,55 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
     }.toMap
 
   /** @return body@List[Tree] => Expr[Props] */
-  def agentPropsExpr(composition: SpecificationComposition, raw: Raw.AgentDef[c.type], dependenciesCalls: Map[String, c.Expr[_]]) = {
+  def agentPropsExpr(composition: SpecificationComposition,
+                     raw: Raw.AgentDef[c.type],
+                     dependenciesCalls: Map[String, c.Expr[_]],
+                     extraParents: List[c.Tree]) = {
     val args = composition.parts.flatMap(_.interface.descriptions.keys)
     val argsSeq = args.map(arg => q"$arg -> ${dependenciesCalls(arg)}")
     val argsMap = q"Map(Seq(..$argsSeq): _*)"
-
-/*
-RefinedType(
-  List(
-    TypeRef(ThisType(scala), TypeName("AnyRef"), List()),
-    TypeRef(SingleType(SingleType(ThisType(feh.tec.agents.light.impl.agent), create), PPI), AllVarsSpec, List())
-  ),
-  Scope()
-)
-*/
-
-/* tSign:
-ClassInfoType(
-  List(
-    TypeRef(ThisType(scala), TypeName("AnyRef"), List()),
-    TypeRef(
-      ThisType(feh.tec.agents.light.impl.spec),
-      feh.tec.agents.light.impl.spec.PriorityAndProposalBasedAgentSpec,
-      List(
-        TypeRef(ThisType(feh.tec.agents.light.impl.agent.create.PPI), TypeName("Ag"), List()),
-        TypeRef(ThisType(feh.tec.agents.light.impl.agent.create.PPI), TypeName("Lang"), List())
-      )
-    ),
-    TypeRef(
-      SingleType(ThisType(feh.tec.agents.light.impl.spec), feh.tec.agents.light.impl.spec.IteratingSpec),
-      feh.tec.agents.light.impl.spec.IteratingSpec.AllVars,
-      List(
-        TypeRef(ThisType(feh.tec.agents.light.impl.agent.create.PPI), TypeName("Ag"), List()),
-        TypeRef(ThisType(feh.tec.agents.light.impl.agent.create.PPI), TypeName("Lang"), List())
-      )
-    ),
-    TypeRef(
-      ThisType(feh.tec.agents.light.impl.agent.create),
-      feh.tec.agents.light.impl.agent.create.SpecExt,
-      List(
-        TypeRef(ThisType(feh.tec.agents.light.impl.agent.create.PPI), TypeName("Ag"), List())
-      )
-    )
-  ),
-  Scope(),
-  feh.tec.agents.light.impl.agent.create.PPI.AllVarsSpec
-)
-*/
 
     val constructor =
       (interface: CreateInterface) =>
         DefDef(
           Modifiers(),
           termNames.CONSTRUCTOR,
-          Nil,
-          Nil,
+          List(),
+          List(List()),
           TypeTree(),
           Block(
-            List(
-              Apply(
-                Select(Super(This(typeNames.EMPTY), typeNames.EMPTY), termNames.CONSTRUCTOR), {
-                  def selI(i: Int) = Select(interface.tree, TermName("_" + i))
-                  List(selI(1), selI(2), selI(3), argsMap)
-                }
-              )
-            ),
+            List(Apply(Select(Super(This(typeNames.EMPTY), typeNames.EMPTY), termNames.CONSTRUCTOR),
+            {
+              def selI(i: Int) = Select(interface.tree, TermName("_" + i))
+              List(selI(1), selI(2), selI(3), argsMap)
+            })),
             Literal(Constant(()))
           )
         )
+
+    def specDefTree = //ValDef(Modifiers(Flag.LAZY), TermName("spec"), TypeTree(),
+      q"""
+          implicit class ToResultWrapper(a: Any){ def anyResult[R]: R = a.asInstanceOf[R] }
+          lazy val spec = ${raw.spec.tree.asInstanceOf[c.Tree]}.anyResult
+      """
+//    )
+
     def template =
       (interface: CreateInterface, body: List[c.Tree]) =>
         Template(
-          parents = composition.parts.toList.map(_.parentTree[c.type](c)),
+          parents = AgentsParts.IteratingAllVars.parentTree[c.type](c) :: extraParents,// composition.parts.toList.map(_.parentTree[c.type](c)) ::: extraParents,
           self = noSelfType,
-          body = constructor(interface) :: body
+          body = constructor(interface) :: specDefTree :: body
         )
     def classDef =
       (interface: CreateInterface, body: List[c.Tree]) =>
         ClassDef(Modifiers(Flag.FINAL), TypeName("AnonAgentClass"), List(), template(interface, body))
 
-    
     (body: List[c.Tree]) =>
       q"""
         ((interface: CreateInterface) => {
           ${classDef(c.Expr(Ident(TermName("interface"))), body)}
-          akka.actor.Props(classOf[AnonAgentClass])
+          akka.actor.Props(new AnonAgentClass)
         })
       """
     }
@@ -244,47 +268,94 @@ ClassInfoType(
       name -> buildVar(domTraitTree)
   }
 
-  def typesOf(raw: Raw.AgentDef[c.type]) = {
+  def typesOf(part: AgentDefinitionPart) = {
 
-    val tSign = raw.specTpe match {
-      case RefinedType(tps, _) => tps.filter(_ <:< typeOf[AgentSpecification]).map(_.typeSymbol.asClass.typeSignature)
-    }
 
-    val (agTpe, langTpe) = tSign.flatMap{
-      case ClassInfoType(parents, _, _) => parents.filter(_ <:< typeOf[AgentSpecification]).map{
-        case TypeRef(pre, sym, tArgs) =>
-          val ag    = tArgs.filter(_ <:< typeOf[NegotiatingAgent[_]]).ensuring(_.size == 1).head
-          val lang  = tArgs.filter(_ <:< typeOf[NegotiationLanguage]).ensuring(_.size == 1).head
-          ag -> lang
+
+        //    {
+        //      case RefinedType(tps, _) => tps.filter(_ <:< typeOf[AgentSpecification]).map(_.typeSymbol.asClass.typeSignature)
+        //      case unkn => c.abort(c.enclosingPosition, showRaw(unkn))
+        //    }
+
+    val agTpe = part.tpe[c.type](c)
+
+    val langTpe = part.tpe[c.type](c) match {
+      case TypeRef(_, _, List(langType)) =>
+        langType match{
+          case RefinedType(parents, _) => parents
+          case _ => c.abort(NoPosition, s"#langTpe: ${showRaw(langType)}")
+        }
       }
-    }.unzip
+//      val (agTpe, langTpe) = tpe match {
+//      case ClassInfoType(parents, _, _) => parents.filter(_ <:< typeOf[AgentSpecification]).map{
+//        case TypeRef(pre, sym, tArgs) =>
+//          val ag    = tArgs.filter(_ <:< typeOf[NegotiatingAgent[_]]).ensuring(_.size == 1).head
+//          val lang  = tArgs.filter(_ <:< typeOf[NegotiationLanguage]).ensuring(_.size == 1).head
+//          ag -> lang
+//      }
+//    }.unzip
 
-    agTpe.toSet -> langTpe.toSet
+    agTpe -> langTpe
   }
 
-  def createNegotiationAndNegotiationTypeTree(agType: Set[c.Type]) = {
-    val neg = agType.flatMap(_.decls).withFilter(_.isType).map(_.asType).find(_.name == TypeName("Negotiation")).get
+  def createNegotiationAndNegotiationTypeTree(agType: Set[c.Type], langTpe: c.Type) = {
+    val negs = agType
+      .flatMap(_.decls).withFilter(_.isType).map(_.asType).filter(_.name == TypeName("Negotiation"))
+      .ensuring(_.nonEmpty, "#createNegotiationAndNegotiationTypeTree")
 
 
     //protected def createNegotiation(id: NegotiationId): Negotiation
 
     def idTree(id: c.Expr[NegotiationId]) = ValDef(Modifiers(), TermName("id"), TypeTree(typeOf[NegotiationId]), id.tree)
     def issuesTree(id: c.Expr[NegotiationId]) = ValDef(Modifiers(), TermName("issues"), TypeTree(typeOf[Set[Var]]),
-      q"negotiationsInit.find(_.id == $id).get.issues"
+      q"""
+         import feh.util._
+         negotiationsInit
+           .find(_.id == $id)
+           .getOrThrow("#issues //issuesTree:\n\tnegotiationsInit=" + negotiationsInit + "\n\tid=" + $id)
+           .issues
+       """
     )
     val scopeUpdateTree = DefDef(Modifiers(), TermName("scopeUpdated"), Nil, List(Nil), TypeTree(typeOf[Unit]), q"{}")
 
-    val negParents: List[c.Tree] = neg.typeSignature match {
+    val negParents: List[c.Tree] = negs.map(_.typeSignature).flatMap{
       case TypeBounds(_, RefinedType(upBounds)) => upBounds match {
         case (l: List[_], _) => l.asInstanceOf[List[c.Type]].map(TypeTree(_))
         case x => c.abort(NoPosition, "!!1!! " + showRaw(x))
       }
       case x => c.abort(NoPosition, "!!2!! " + showRaw(x))
-    }
+    }.toList
 
 //    c.abort(NoPosition,  "!!3!! " + showRaw(negParents))
 
-    val parents = tq"Negotiation.DynamicScope" :: negParents
+//    c.abort(NoPosition, "negParents: " + showRaw(negParents.map(_.tpe.typeArgs)))
+
+    def distinctNegParents = {
+      var contains = List.empty[c.Tree]
+      for{
+        p <- negParents
+        if !contains.exists(_.symbol.name == p.symbol.name)
+      } contains +:= p
+      contains
+    }
+
+    val parents = distinctNegParents map {
+      case tt@TypeTree() if tt.tpe.typeArgs.nonEmpty =>
+        val ttpe = tt.tpe match {
+          case TypeRef(pre, sym, args) =>
+            val newArgs = args map{
+              case tpe if tpe <:< typeOf[NegotiationLanguage] => langTpe
+              case tpe => tpe
+            }
+            internal.typeRef(pre, sym, newArgs)
+        }
+        TypeTree(ttpe)
+//        CompoundTypeTree(Template(q.map(TypeTree(_)), noSelfType, Nil))
+//        c.abort(NoPosition, "^^^ : " + showRaw(tt) + "\n" + showRaw(tt.tpe) + "\nq: " + showRaw(q) + "\nlangTpe: " + langTpe)
+      case p => p
+    }
+
+    c.info(NoPosition, s"negParents = $negParents\nparents = $parents", true)
 
     def negotiationTree(id: c.Expr[NegotiationId]): c.Tree ={
       val constructor =
@@ -309,46 +380,13 @@ ClassInfoType(
       Modifiers(Flag.PROTECTED),
       TermName("createNegotiation"),
       Nil,
-      List(ValDef(Modifiers(Flag.PARAM), TermName("id"), TypeTree(typeOf[NegotiationId]), EmptyTree) :: Nil),
+      List(ValDef(Modifiers(Flag.PARAM), TermName("negId"), TypeTree(typeOf[NegotiationId]), EmptyTree) :: Nil),
       TypeTree(Ident(TypeName("Negotiation")).tpe),
-      negotiationTree(c.Expr(Ident(TermName("id"))))
+      negotiationTree(c.Expr(Ident(TermName("negId"))))
     )
   }
 
-/*
-Block(
-  List(
-    ClassDef(
-      Modifiers(FINAL),
-      TypeName("$anon"),
-      List(),
-      Template(
-        List(
-          Select(Select(Select(Select(Select(Select(Select(Ident($line129.$read), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TypeName("C")),
-          Select(Select(Select(Select(Select(Select(Select(Ident($line130.$read), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TypeName("D")),
-          Select(Select(Select(Select(Select(Select(Select(Ident($line135.$read), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TypeName("E")),
-          Select(Select(Select(Select(Select(Select(Select(Ident($line136.$read), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TermName("$iw")), TypeName("F"))
-        ),
-        noSelfType,
-        List(
-          DefDef(
-            Modifiers(),
-            termNames.CONSTRUCTOR,
-            List(),
-            List(List()),
-            TypeTree(),
-            Block(
-              List(Apply(Select(Super(This(typeNames.EMPTY), typeNames.EMPTY), termNames.CONSTRUCTOR), List())),
-              Literal(Constant(()))
-            )
-          )
-        )
-      )
-    )
-  ),
-  Apply(Select(New(Ident(TypeName("$anon"))), termNames.CONSTRUCTOR), List())
-)
-*/
+  def defLangType(langTpe: c.Type) = q"type Lang = $langTpe"
 
   protected def typeCheck[T : c.TypeTag](tree: c.Tree) = c.typecheck(tree, c.TERMmode, c.typeOf[T], silent = true).nonEmpty
   protected def typeCheckOpt[T : c.TypeTag](tree: c.Tree, part: => AgentDefinitionPart) = if(typeCheck[T](tree)) Some(part) else None
@@ -357,6 +395,7 @@ Block(
 case class SpecificationComposition(parts: Seq[AgentDefinitionPart])
 
 abstract class AgentDefinitionPart(val canBeMixed: Boolean, val interface: AgentCreationInterfaceDescriptor){
-//  def parent: Option[AgentDefinitionPart]
+//  def langTpe[C <: whitebox.Context](c: C)
+  def tpe[C <: whitebox.Context](c: C): c.Type
   def parentTree[C <: whitebox.Context](c: C): c.Tree
 }

@@ -81,7 +81,7 @@ object NegotiationSpecificationBuilder{
         import c.universe._
 
         agDef match{
-          case AgentDef(name, role, negDefs, specExpr, specTpe) =>
+          case AgentDef(name, role, negDefs, specExpr/*, specTpe*/) =>
             val negs = negDefs map {
               case AgentNegDef(neg, _, interlExpr, constraints) =>
                 q"""
@@ -166,8 +166,8 @@ object NegotiationSpecificationBuilder{
     case class AgentDef[C <: whitebox.Context](name: String,
                                                role: String,
                                                negotiations: Seq[AgentNegDef[C]],
-                                               spec: C#Expr[AgentSpecification],
-                                               specTpe: C#Type)
+                                               spec: C#Expr[AgentSpecification])
+//                                               specTpe: C#Type
     case class AgentConstraintsDef[C <: whitebox.Context](constraints: Seq[C#Tree])
 
     case class TimeDefs[C <: whitebox.Context](mp: Map[String, C#Expr[FiniteDuration]])
@@ -200,7 +200,7 @@ object NegotiationSpecificationBuilder{
       NegotiationDef(name.decodedName.toString, iss)
     }
 
-    val agents = for ((name, role, negs, spec, specTpe) <- agentDefs) yield {
+    val agents = for ((name, role, negs, spec/*, specTpe*/) <- agentDefs) yield {
       val nr = negs.map{
         case ((negRaw, interlocutorsRaw), constraintsRaw) =>
           val neg = negRaw match { case Select(This(TypeName("$anon")), negName) => negName.decodedName.toString }
@@ -212,7 +212,7 @@ object NegotiationSpecificationBuilder{
 
           Raw.AgentNegDef[C](neg, InterlocutorsByRoles(interlocutors), c.Expr(q"InterlocutorsByRoles($interlocutors)"), List(constraints))
       }
-      Raw.AgentDef[C](name.decodedName.toString, role, nr, c.Expr(spec), specTpe)
+      Raw.AgentDef[C](name.decodedName.toString, role, nr, c.Expr(spec)/*, specTpe*/)
     }
 
     val spawnsRaw = Raw.SpawnDefs[C](b.extractSpawns(applications) map (Raw.SingleSpawnDef.apply[C] _).tupled)
@@ -295,7 +295,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
     case (name, Apply(sel: Select, vars)) if h.selects(sel, "$anon.negotiation.over") => name -> vars
   }
 
-  /**  Seq( (name, role, List[constraint name -> constraintsTree], AgentSpec, Type[AgentSpec]) ) */
+  /**  Seq( (name, role, List[constraint name -> constraintsTree], AgentSpec) ) */ //, Type[AgentSpec]
   def extractAgents(definitions: Seq[(c.TermName, c.Tree)]) = definitions collect{
     case (name, Apply(
                   Select(
@@ -343,7 +343,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
           }
           negotiationsAndInterlocutors -> constraints
       }
-      (name, role, negs, agentSpec, specTTree.tpe)
+      (name, role, negs, agentSpec/*, specTTree.tpe*/)
   }
 
   /** Seq(name -> count) */

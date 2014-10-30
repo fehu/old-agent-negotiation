@@ -1,8 +1,10 @@
 package feh.tec.agents.light.impl.agent
 
 import akka.actor.{ActorSystem, Props}
+import feh.tec.agents.light.impl.agent.create.PPI.Lang
 import feh.tec.agents.light.impl.spec.{PriorityAndProposalBasedAgentSpec, IteratingSpec}
 import feh.tec.agents.light._
+import feh.tec.agents.light.spec.AgentSpecification.{Iterating, PriorityAndProposalBased}
 import feh.tec.agents.light.spec.MonoDefinition
 
 object create {
