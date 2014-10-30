@@ -10,8 +10,9 @@ trait DomainIteratingAllVars[Lang <: Language.ProposalBased with Language.HasPri
   extends PriorityAndProposalBasedAgent[Lang] with DomainIterating[Lang]
 {
   type Negotiation <: Negotiation.DynamicScope with Negotiation.HasPriority with Negotiation.HasProposal[Lang] with Negotiation.HasIterator
+  type Agent <: PriorityAndProposalBasedAgent[Lang] with DomainIteratingAllVars[Lang]
 
-  override val spec: AgentSpecification.PriorityAndProposalBased[this.type, Lang] with AgentSpecification.Iterating[this.type, Lang]
+  override val spec: AgentSpecification.PriorityAndProposalBased[Agent, Lang] with AgentSpecification.Iterating[Agent, Lang]
 
   def newIterator(neg: NegotiationId): DomainIterator = spec.newIterator.get apply neg
 }

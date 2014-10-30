@@ -48,7 +48,10 @@ object NegotiationControllerBuilder {
         {case (uniqueName, role, negInits) => AgentRef(
           Agent.Id(uniqueName, role),
           implicitly[ActorSystem].actorOf(
-            ${createInterfacesPropsByBody(name)(body)}(uniqueName, role, negInits))
+            ${
+        val f = createInterfacesPropsByBody(name)(body)
+        c.info(NoPosition, "agentsCreationExpressions:f = " + showCode(f), true)
+        f}(uniqueName, role, negInits))
           )}
       """
     )
@@ -110,7 +113,7 @@ object NegotiationControllerBuilder {
             "\nlangTpe: " + langTpe
             , true)
 
-          val body = defLangType :: negotiationTypeTree :: createNegotiationTree :: Nil
+          val body = /*defLangType :: */negotiationTypeTree :: createNegotiationTree :: Nil
 
 //          c.abort(NoPosition, showRaw(body))
 
@@ -226,19 +229,57 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
           )
         )
 
-    def specDefTree = //ValDef(Modifiers(Flag.LAZY), TermName("spec"), TypeTree(),
-      q"""
-          implicit class ToResultWrapper(a: Any){ def anyResult[R]: R = a.asInstanceOf[R] }
-          lazy val spec = ${raw.spec.tree.asInstanceOf[c.Tree]}.anyResult
-      """
+//    def specDefTree = //ValDef(Modifiers(Flag.LAZY), TermName("spec"), TypeTree(),
+//      q"""
+//          implicit class ToResultWrapper(a: Any){ def anyResult[R]: R = a.asInstanceOf[R] }
+//          lazy val spec = ${raw.spec.tree.asInstanceOf[c.Tree]}.anyResult
+//      """
 //    )
+
+    val (agTpe, _langTpe) = composition.parts.map(typesOf).unzip
+    val langTpe = langsTpe(_langTpe.flatten)
+
+    val agentType = internal.refinedType(agTpe.toList, internal.newScopeWith())
+    //CompoundTypeTree(Template(agTpe.toList.map(TypeTree(_)), noSelfType, Nil))
+
+    val specSymbols = agTpe.flatMap(_.decls.filter(_.typeSignature.resultType <:< typeOf[AgentSpecification]))
+    val specSignatures = specSymbols.map(_.typeSignature)
+
+    def specResTpes = specSignatures.flatMap{
+      case NullaryMethodType(ref: TypeRef) => replaceSpecSignature(ref) :: Nil
+      case NullaryMethodType(RefinedType(tpes, _)) => tpes.map{
+        case ref: TypeRef => replaceSpecSignature(ref)
+        case other => c.abort(NoPosition, "#specResTpe: " + showRaw(other))
+      }
+      case other => c.abort(NoPosition, "#specResTpe2: " + showRaw(other))
+    }
+
+//    c.abort(NoPosition, "agentType.tpe = " + agentType)
+
+    def replaceSpecSignature(in: TypeRef) = in match {
+      case TypeRef(pre, sym, targs) =>
+        val newArgs = targs map {
+          case TypeRef(_, sm, _) if sm.name == TypeName("Lang") => langTpe
+          case TypeRef(ThisType(thisSm), sm, _) if sm.name == TypeName("Agent") => agentType
+          case other => c.abort(NoPosition, "#replaceSpecSignature2: " + showRaw(other)) //other
+        }
+        internal.typeRef(pre, sym, newArgs)
+      case other => c.abort(NoPosition, "#replaceSpecSignature3: " + showRaw(other))
+    }
+
+    def specResTpe = CompoundTypeTree(Template(specResTpes.toList.map(TypeTree(_)), noSelfType, Nil))
+
+    def agentTypeDef = q"type Agent = $agentType"
+    def specDef = q"lazy val spec: $specResTpe = ${raw.spec.tree.asInstanceOf[c.Tree]}.asInstanceOf[$specResTpe]"
+
+
 
     def template =
       (interface: CreateInterface, body: List[c.Tree]) =>
         Template(
           parents = AgentsParts.IteratingAllVars.parentTree[c.type](c) :: extraParents,// composition.parts.toList.map(_.parentTree[c.type](c)) ::: extraParents,
           self = noSelfType,
-          body = constructor(interface) :: specDefTree :: body
+          body = constructor(interface) :: agentTypeDef :: specDef :: body
         )
     def classDef =
       (interface: CreateInterface, body: List[c.Tree]) =>
@@ -385,6 +426,8 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
       negotiationTree(c.Expr(Ident(TermName("negId"))))
     )
   }
+
+  def langsTpe(_langTpe: Seq[c.Type]) = internal.refinedType(_langTpe.distinct.toList, internal.newScopeWith())
 
   def defLangType(langTpe: c.Type) = q"type Lang = $langTpe"
 
