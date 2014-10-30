@@ -45,14 +45,20 @@ object NegotiationControllerBuilder {
 
     def agentsCreationExpressions(name: String, body: List[c.Tree]): c.Expr[(String, NegotiationRole, Set[NegotiationInit]) => AgentRef] = c.Expr(
       q"""
-        {case (uniqueName, role, negInits) => AgentRef(
-          Agent.Id(uniqueName, role),
-          implicitly[ActorSystem].actorOf(
-            ${
-        val f = createInterfacesPropsByBody(name)(body)
-        c.info(NoPosition, "agentsCreationExpressions:f = " + showCode(f), true)
-        f}(uniqueName, role, negInits))
-          )}
+        {case (uniqueName, role, negInits) =>
+          val props = ${
+            val f = createInterfacesPropsByBody(name)(body)
+            c.info(NoPosition, "agentsCreationExpressions:f = " + showCode(f), true)
+            f}(uniqueName, role, negInits)
+          AgentRef(
+            Agent.Id(uniqueName, role),
+            {
+              val acRef = implicitly[ActorSystem].actorOf(props , uniqueName)
+              log.debug("actor just created (agentsCreationExpressions) props=" + props + ", acRef= " + acRef)
+              acRef
+            }
+          )
+        }
       """
     )
 
@@ -161,6 +167,7 @@ NullaryMethodType(
     c.Expr(
       q"""
         import feh.tec.agents.light.spec.NegotiationSpecification._
+        import feh.tec.agents.light.impl.NegotiationEnvironmentController
         akka.actor.Props(
           new NegotiationEnvironmentController{
             protected lazy val spawns: Map[String, Int] = $spawns
@@ -272,14 +279,14 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
     def agentTypeDef = q"type Agent = $agentType"
     def specDef = q"lazy val spec: $specResTpe = ${raw.spec.tree.asInstanceOf[c.Tree]}.asInstanceOf[$specResTpe]"
 
-
+    def logOnCreate = q"""log.info("I've been created")"""
 
     def template =
       (interface: CreateInterface, body: List[c.Tree]) =>
         Template(
           parents = AgentsParts.IteratingAllVars.parentTree[c.type](c) :: extraParents,// composition.parts.toList.map(_.parentTree[c.type](c)) ::: extraParents,
           self = noSelfType,
-          body = constructor(interface) :: agentTypeDef :: specDef :: body
+          body = constructor(interface) :: logOnCreate :: agentTypeDef :: specDef :: body
         )
     def classDef =
       (interface: CreateInterface, body: List[c.Tree]) =>
@@ -289,7 +296,9 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
       q"""
         ((interface: CreateInterface) => {
           ${classDef(c.Expr(Ident(TermName("interface"))), body)}
-          akka.actor.Props(new AnonAgentClass)
+          val props = akka.actor.Props(new AnonAgentClass)
+          log.debug("Agent class defined " + classOf[AnonAgentClass] + "; it's props =  " + props)
+          props
         })
       """
     }

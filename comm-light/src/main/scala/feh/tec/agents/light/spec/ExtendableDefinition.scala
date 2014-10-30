@@ -28,11 +28,10 @@ class HiddenMonoDefinition[Owner, Def](default: Owner => Def) extends MonoDefini
 
 object ExtendableDefinition{
 
-  trait BeforeAndAfter[Def]{
-    self: ExtendableDefinition[_, Def] =>
+  trait BeforeAndAfter[Owner, Def] extends ExtendableDefinition[Owner, Def] {
 
-    var BeforeExtension = ExtensionEntry({})
-    var AfterExtension = ExtensionEntry[Def => Def](identity)
+    var BeforeExtension = ExtensionEntry[Owner => Unit](_ => {})
+    var AfterExtension = ExtensionEntry[Owner => (Def => Def)](_ => identity)
 
     def extensionPoints: Map[String, ExtensionEntry[Any]] = Map("before" -> BeforeExtension, "after" -> AfterExtension)
   }

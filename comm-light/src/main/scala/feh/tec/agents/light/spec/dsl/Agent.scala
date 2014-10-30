@@ -22,11 +22,11 @@ abstract class Agent {
     def :=(d: Def) = eDef.DefExtension = eDef.DefExtension.copy(`override` = Some((ow: Ow) => d))
   }
 
-  def after[Def](eDef: ExtendableDefinition.BeforeAndAfter[Def])(d: Def): Unit = ???
-  def transform[Def](eDef: ExtendableDefinition.BeforeAndAfter[Def])(f: Def => Def): Unit = ???
-                //eDef.AfterExtension = eDef.AfterExtension.copy(`override` = Some(f))
-  def before[Def](eDef: ExtendableDefinition.BeforeAndAfter[Def])(u: => Unit): Unit = ???
-                //eDef.BeforeExtension = eDef.BeforeExtension.copy(`override` = Some(u))
+  def after[Ow, Def](eDef: ExtendableDefinition.BeforeAndAfter[Ow, Def])(d: Def): Unit = ???
+  def transform[Ow, Def](eDef: ExtendableDefinition.BeforeAndAfter[Ow, Def])(f: Def => Def): Unit = ???
+  //eDef.AfterExtension = eDef.AfterExtension.copy(`override` = Some(f))
+  def before[Ow, Def](eDef: ExtendableDefinition.BeforeAndAfter[Ow, Def])(u: => Unit): Unit = ???
+  //eDef.BeforeExtension = eDef.BeforeExtension.copy(`override` = Some(u))
 
   def when[T](cond: WhenCondition, act: WhenAction[T]): When[T] = ???
   def when[T](cond: WhenCondition)(act: => Unit): Unit = ???

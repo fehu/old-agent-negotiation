@@ -1,27 +1,29 @@
 package feh.tec.agents.light
 
 import akka.actor.ActorSystem
-import akka.util.Timeout
-import feh.tec.agents.light.impl.NegotiationEnvironmentController
 import feh.tec.agents.light.spec.dsl._
 import impl.agent._
 import scala.concurrent.duration._
 
 object AgentManualSpecApp extends App{
-  val agentSpec = new create.PPI.AllVarsSpec{
+  val agentSpec = new create.PPI.AllVarsSpec {
 
-      start <:= {
-        ag =>
-          import ag._
-          negotiations.foreach{
-            neg =>
-              val proposal = neg.currentProposal.getOrElse{
-                Message.Proposal(Message.ProposalId.rand, neg.id, neg.currentPriority(), neg.currentValues())
-              }
-              sendToAll(proposal)
-          }
-      }
+    initialize after { ag => _ => ag.log.info("initialized") }
+    start andThen {
+      ag =>
+        import ag._
+        negotiations.foreach {
+          neg =>
+            val proposal = neg.currentProposal.getOrElse {
+              Message.Proposal(Message.ProposalId.rand, neg.id, neg.currentPriority(), neg.currentValues())
+            }
+            neg.currentState update NegotiationState.Negotiating
+            log.info(s"negotiation ${neg.id} started, scope = ${neg.scope}")
+            sendToAll(proposal)
+        }
     }
+
+  }
 
 //  val agentProps =
 //    AgentProps("test", NegotiationRole("test"), Set(), create.PriorityAndProposalBasedIteratingAllVars(agentSpec))

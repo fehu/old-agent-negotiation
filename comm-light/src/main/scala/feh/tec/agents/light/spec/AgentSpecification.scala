@@ -23,11 +23,11 @@ trait AgentSpecificationExt[Ag <: PriorityAndProposalBasedAgent[_]]{
   /** Directly Settable Hidden */
   class DefDSH[T](default: Ag => T) extends HiddenMonoDefinition[Ag, T](default) with DefExt[T]
   /** Has Before and After extensions, Directly Settable */
-  class DefBADS[T](default: Ag => T) extends DefDS[T](default) with ExtendableDefinition.BeforeAndAfter[T]{
+  class DefBADS[T](default: Ag => T) extends DefDS[T](default) with ExtendableDefinition.BeforeAndAfter[Ag, T]{
     override def extensionPoints = super[DefDS].extensionPoints ++ super[BeforeAndAfter].extensionPoints
     override def get(implicit owner: Ag): T = {
-      BeforeExtension.get
-      AfterExtension.get apply DefExtension.get(owner)
+      BeforeExtension.get.apply(owner)
+      AfterExtension.get(owner) apply DefExtension.get(owner)
     }
   }
 }
