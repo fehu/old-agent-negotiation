@@ -1,6 +1,7 @@
 package feh.tec.agents.light.spec
 
 import feh.tec.agents
+import feh.tec.agents.light.spec.NegotiationSpecification
 import scala.concurrent.duration.FiniteDuration
 
 object NegotiationSpecification{
@@ -24,9 +25,34 @@ object NegotiationSpecification{
                          interlocutors: Interlocutors,
                          extra: Seq[AgentNegPartialDef])
 
-  case class AgentConstraintDef(name: String, v: Seq[ConstraintParamDescription], test: Product => Boolean)
-  case class AgentConstraintsDef(constraints: Seq[AgentConstraintDef]) extends AgentNegPartialDef
+  trait ConstraintPart[+T]
+  case class ConstraintPartLeaf[+T](part: T) extends ConstraintPart[T]
 
+  case class ConstraintPartComb[+T, +Op] (op: Op, left: ConstraintPart[T], right: ConstraintPart[T]) extends ConstraintPart[T]
+
+  implicit class ConstraintPartLeafOps[T](part: ConstraintPartLeaf[T]){
+    def transform[R](f: T => R): ConstraintPartLeaf[R] = part.copy(f(part.part))
+  }
+
+  implicit class ConstraintPartCombOps[T, Op](part: ConstraintPartComb[T, Op]){
+    def transform[R, OpR](f: T => R, fOp: Op => OpR): ConstraintPartComb[R, OpR] =
+      part.copy(fOp(part.op), transformPart(part.left, f, fOp), transformPart(part.right, f, fOp))
+  }
+
+  implicit class ConstraintPartOps[T](part: ConstraintPart[T]){
+    def transform[R, Op, OpR](f: T => R, fOp: Op => OpR): ConstraintPart[R] = transformPart(part, f, fOp)
+  }
+
+  private def transformPart[T, Op, R, OpR](part: ConstraintPart[T], f: T => R, fOp: Op => OpR) = part match {
+    case leaf: ConstraintPartLeaf[T] => leaf.transform(f)
+    case comb: ConstraintPartComb[T, _] => comb.asInstanceOf[ConstraintPartComb[T, Op]].transform(f, fOp)
+  }
+
+  case class AgentConstraintsDef(constraints: Seq[AgentConstraintDef]) extends AgentNegPartialDef
+  case class AgentConstraintDef(name: String, parts: ConstraintPart[AgentVarConstraintDef])
+  case class AgentVarConstraintDef(varsOrdered: Seq[ConstraintParamDescription], test: Product => Boolean){
+    lazy val vars = varsOrdered.toSet.map((_: NegotiationSpecification.ConstraintParamDescription).varName)
+  }
   case class ConstraintParamDescription(tpe: String, varName: String, argName: String)
 
   sealed trait SpawnDef extends ConfigureDef
