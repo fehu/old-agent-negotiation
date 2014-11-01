@@ -18,7 +18,7 @@ object NegotiationRole{ def apply(name: String): NegotiationRole = new Role(name
 trait SystemRole extends Role
 object SystemRole{ def apply(name: String): SystemRole = new Role(name) with SystemRole }
 
-case class AgentRef(id: Agent.Id, ref: ActorRef)
+case class AgentRef(id: Agent.Id, protected[light] val ref: ActorRef)
 
 trait SpeakingAgent[Lang <: Language] extends AbstractAgent{
   implicit val ref: AgentRef

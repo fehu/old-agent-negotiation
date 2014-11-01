@@ -1,6 +1,7 @@
 package feh.tec.agents.light
 
 import feh.tec.agents.light.NegotiationState.Stopped
+import feh.util._
 
 import scala.collection.mutable
 
@@ -10,7 +11,7 @@ trait AbstractNegotiation {
 
   def scope: IdentStateVar[Set[AgentRef]]
 
-  protected abstract class StateVar[Repr, Get, Upd](newRepr: Repr, get: Repr => Get){
+  protected abstract class StateVar[Repr, Get, Upd](val name: String, newRepr: Repr, get: Repr => Get){
     private var repr = newRepr
 
     def raw = repr
@@ -23,21 +24,45 @@ trait AbstractNegotiation {
     }
     def update(f: Get => Upd) = repr = {
       reset()
-      upd(f(apply()), repr)
+      val old = apply()
+      val n = f(apply())
+      val newRepr = upd(n, repr)
+      stateVarChanged(name, old -> n)
+      newRepr
     }
 
     def reset() = repr = newRepr
   }
 
-  protected class IdentStateVar[T](newRepr: T,
+  protected object VarUpdateHooks{
+    type HookName = String
+    type StateVarName = String
+    type OldValue = Any
+    type NewValue = Any
+    type Change = (OldValue, NewValue)
+    type Hook = Map[StateVarName, Change] => Unit
+
+    protected var hooks: Map[HookName, Hook] = Map()
+
+    def addHook(name: String, hook: Hook): Unit = hooks += name -> hook
+    def rmHook(name: String): Unit = hooks -= name
+
+    def runHooks(changes: Map[StateVarName, Change]): Unit = hooks.mapValues(_(changes))
+  }
+
+  protected def stateVarChanged(name: String, change: VarUpdateHooks.Change) = { /* stub */ }
+
+  protected class IdentStateVar[T](name: String,
+                                   newRepr: T,
                                    get: T => T = identity[T] _,
-                                   _upd: (T,  T) => T = (t: T, _: T) => t) extends StateVar[T, T, T](newRepr, get){
+                                   _upd: (T,  T) => T = (t: T, _: T) => t) extends StateVar[T, T, T](name, newRepr, get){
     protected def upd = _upd
   }
 
-  protected class OptionStateVar[T](newRepr: Option[T] = None,
+  protected class OptionStateVar[T](name: String,
+                                    newRepr: Option[T] = None,
                                     get: Option[T] => T = (_: Option[T]).get,
-                                    _upd: (T,  Option[T]) => Option[T] = (t: T, _: Option[T]) => Option(t)) extends StateVar[Option[T], T, T](newRepr, get)
+                                    _upd: (T,  Option[T]) => Option[T] = (t: T, _: Option[T]) => Option(t)) extends StateVar[Option[T], T, T](name, newRepr, get)
   {
     protected def upd = _upd
     def opt = raw
@@ -46,7 +71,7 @@ trait AbstractNegotiation {
   }
 
   lazy val currentValues = new StateVar[mutable.HashMap[Var, Any], Map[Var, Any], Map[Var, Any]](
-    mutable.HashMap.empty[Var, Any], _.toMap
+    "values", mutable.HashMap.empty[Var, Any], _.toMap
   ){
     protected def upd = (values, map) =>
       if(currentValuesUpdateAllowed(values)) {
@@ -56,7 +81,7 @@ trait AbstractNegotiation {
       else sys.error("current values update not allowed")
   }
 
-  lazy val currentState = new IdentStateVar[NegotiationState](Stopped)
+  lazy val currentState = new IdentStateVar[NegotiationState]("state", Stopped)
 
   protected def currentValuesUpdateAllowed(values: Map[Var, Any]) = true
 }
@@ -86,20 +111,40 @@ object Priority{
 object Negotiation{
 
   trait HasProposal[Lang <: Language.ProposalBased] extends AbstractNegotiation{
-    lazy val currentProposal = new OptionStateVar[Lang#Proposal]()
+    lazy val currentProposal = new OptionStateVar[Lang#Proposal]("proposal")
   }
 
   trait HasPriority extends AbstractNegotiation{
-    lazy val currentPriority = new OptionStateVar[Priority]()
+    lazy val currentPriority = new OptionStateVar[Priority]("priority")
   }
 
   trait DynamicScope extends AbstractNegotiation{
-    val scope = new IdentStateVar[Set[AgentRef]](Set())
+    val scope = new IdentStateVar[Set[AgentRef]]("scope", Set())
 
     def scopeUpdated()
   }
 
   trait HasIterator extends AbstractNegotiation{
-    lazy val currentIterator = new OptionStateVar[ProposalEngine.DomainIterator]()
+    lazy val currentIterator = new OptionStateVar[ProposalEngine.DomainIterator]("domain-iterator")
+  }
+
+  trait ChangeHooks extends AbstractNegotiation{
+    protected object BulkChanging extends ThreadUnsafeScopedState[Boolean](false) {// no `thread locals` within actors
+      var currentBulk: Map[VarUpdateHooks.StateVarName, VarUpdateHooks.Change] = Map()
+
+      def runHooks() = {
+        VarUpdateHooks.runHooks(currentBulk)
+        currentBulk = Map()
+      }
+    }
+    def bulkUpdate[R](f: => R) = BulkChanging.doWith(true)(f) $$ { _ => BulkChanging.runHooks() }
+
+    override protected def stateVarChanged(name: String, change: VarUpdateHooks.Change) = 
+      if(BulkChanging.get) BulkChanging.currentBulk += name -> change else VarUpdateHooks.runHooks(Map(name -> change))
+    
+    object ChangeHooks{
+      def add(name: String, hook: VarUpdateHooks.Hook) = VarUpdateHooks.addHook(name, hook)
+      def rm = VarUpdateHooks.rmHook _
+    }
   }
 }

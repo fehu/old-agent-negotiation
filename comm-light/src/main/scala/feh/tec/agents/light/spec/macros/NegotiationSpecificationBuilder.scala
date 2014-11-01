@@ -82,7 +82,7 @@ object NegotiationSpecificationBuilder{
         agDef match{
           case AgentDef(name, role, negDefs, specExpr/*, specTpe*/) =>
             val negs = negDefs map {
-              case AgentNegDef(neg, _, interlExpr, constraints) =>
+              case AgentNegDef(neg, _, interlExpr, reportingToOpt /*ignored*/, constraints) =>
                 q"""
                     import feh.tec.agents.light.spec.NegotiationSpecification._
                     AgentNegDef(
@@ -161,6 +161,7 @@ object NegotiationSpecificationBuilder{
     case class AgentNegDef[C <: whitebox.Context](negotiation: String,
                                                   interlocutors: Interlocutors,
                                                   interlocutorsExpr: C#Expr[Interlocutors],
+                                                  reportingToOpt: Option[C#Tree],
                                                   constraints: Seq[AgentConstraintsDef[C]])
     case class AgentDef[C <: whitebox.Context](name: String,
                                                role: String,
@@ -201,7 +202,7 @@ object NegotiationSpecificationBuilder{
 
     val agents = for ((name, role, negs, spec/*, specTpe*/) <- agentDefs) yield {
       val nr = negs.map{
-        case ((negRaw, interlocutorsRaw), constraintsRaw) =>
+        case ((negRaw, interlocutorsRaw, reportingToOpt), constraintsRaw) => // todo
           val neg = negRaw match { case Select(This(TypeName("$anon")), negName) => negName.decodedName.toString }
           val interlocutors = interlocutorsRaw match {
             case Select(Select(This(TypeName("$anon")), TermName("the")), TermName("others")) => Set(role)
@@ -209,7 +210,7 @@ object NegotiationSpecificationBuilder{
           }
           val constraints = Raw.AgentConstraintsDef[C](constraintsRaw)
 
-          Raw.AgentNegDef[C](neg, InterlocutorsByRoles(interlocutors), c.Expr(q"InterlocutorsByRoles($interlocutors)"), List(constraints))
+          Raw.AgentNegDef[C](neg, InterlocutorsByRoles(interlocutors), c.Expr(q"InterlocutorsByRoles($interlocutors)"), reportingToOpt, List(constraints))
       }
       Raw.AgentDef[C](name.decodedName.toString, role, nr, c.Expr(spec)/*, specTpe*/)
     }
@@ -369,7 +370,9 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
     case (name, Apply(sel: Select, vars)) if h.selects(sel, "$anon.negotiation.over") => name -> vars
   }
 
-  /**  Seq( (name, role, List[constraint name -> constraintsTree], AgentSpec) ) */ //, Type[AgentSpec]
+  /**  Seq( (name, role, List[neg info], AgentSpec) )
+    *  neg info:  (negotiation, interlocutors, Option(reportingTo)) -> List[raw constraint]
+    */
   def extractAgents(definitions: Seq[(c.TermName, c.Tree)]) = definitions collect{
     case (name, Apply(
                   Select(
@@ -389,33 +392,53 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
                 )
           ) if h.selects(selWithRole, "$anon.agent.withRole") =>
 
+      object ExtractNegotiation{
+        def unapply(tree: c.Tree) = PartialFunction.condOpt(tree){
+          case Apply(
+                Apply(
+                  TypeApply(
+                    Select(
+                      Apply(selNeg: Select,//Select(Select(This(TypeName("$anon")), TermName("negotiates")), TermName("the")),
+                      List(negotiation)
+                      ),
+                    TermName("with")
+                    ),
+                  List(TypeTree())
+                  ),
+                List(interlocutors)
+                ),
+              _ //List(Select(This(TypeName("$anon")), TermName("TheRestOfSelectsInterlocutors")))
+              ) if h.selects(selNeg, "$anon.negotiates.the") => negotiation -> interlocutors
+        }
+      }
+
       val negs = negDefs map {
         case Apply(negDef, confDefs) =>
-          val negotiationsAndInterlocutors = negDef match {
+          val negotiationsAndMore = negDef match {
             case Select(
                   Apply(
-                    Apply(
-                      TypeApply(
-                        Select(
-                          Apply(selNeg: Select,//Select(Select(This(TypeName("$anon")), TermName("negotiates")), TermName("the")),
-                          List(negotiation)
-                          ),
-                        TermName("with")
-                        ),
-                      List(TypeTree())
-                      ),
-                    List(interlocutors)
-                    ),
-                  _ //List(Select(This(TypeName("$anon")), TermName("TheRestOfSelectsInterlocutors")))
+                    TypeApply(h.AnonSelect("chooseReporterToAgentNegPartialDef"), List(TypeTree())),
+                    List(ExtractNegotiation(negotiation, interlocutors))
                   ),
                 TermName("and")
-                ) if h.selects(selNeg, "$anon.negotiates.the") => negotiation -> interlocutors
+                ) => (negotiation, interlocutors, None)
+            case Select(
+                  Apply(
+                    Select(
+                      ExtractNegotiation(negotiation, interlocutors),
+                      TermName("reportingTo")
+                    ),
+                    List(reportingTo)
+                  ),
+                  TermName("and")
+                ) => (negotiation, interlocutors, Some(reportingTo))
+            case other => c.abort(NoPosition, "#extractAgents1 " + showRaw(other))
           }
 
           val constraints = confDefs flatMap {
             case Apply(sel: Select, constraintsTree) if h.selects(sel, "$anon.hasConstraints") => constraintsTree
           }
-          negotiationsAndInterlocutors -> constraints
+          negotiationsAndMore -> constraints
       }
       (name, role, negs, agentSpec/*, specTTree.tpe*/)
   }

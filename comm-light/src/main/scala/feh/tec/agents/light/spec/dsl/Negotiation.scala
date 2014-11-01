@@ -1,5 +1,6 @@
 package feh.tec.agents.light.spec.dsl
 
+import feh.tec.agents.light.ReportListenerRef
 import feh.tec.agents.light.spec.AgentSpecification
 
 trait Negotiation extends ConstraintsSpecification with CreationSpecification{
@@ -7,6 +8,10 @@ trait Negotiation extends ConstraintsSpecification with CreationSpecification{
 
   type ChooseVarDomain = {
     def `with`[T](domain: DomainDef[T]): AbstractVarDef[T]
+  }
+
+  type ChooseReporter = {
+    def reportingTo[R](r: ReportListenerRef[R]): AgentNegPartialDef // todo
   }
 
   type ChooseNegotiationOver = {
@@ -26,7 +31,7 @@ trait Negotiation extends ConstraintsSpecification with CreationSpecification{
   }
   type ChooseAgentNegotiation = {
     type ChooseWith = {
-      def `with`[S: SelectsInterlocutors](interlocutors: S*): AgentNegPartialDef
+      def `with`[S: SelectsInterlocutors](interlocutors: S*): ChooseReporter
     }
 
     def the(neg: String): ChooseWith
@@ -61,6 +66,7 @@ trait Negotiation extends ConstraintsSpecification with CreationSpecification{
   implicit object NeighboursSelectsInterlocutors extends SelectsInterlocutors[neighbours.type]
   implicit object TheRestOfSelectsInterlocutors extends SelectsInterlocutors[TheOthers.type]
 
+  implicit def chooseReporterToAgentNegPartialDef[T](rep: ChooseReporter): AgentNegPartialDef = ???
   //  implicit def extendedConstraintIsAgentConstraint[T](constraintFunc: (T, T) => Boolean): AgentConstraint = stub
 
 

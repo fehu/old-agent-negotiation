@@ -40,16 +40,31 @@ object NegotiationControllerBuilder {
     val extraParents = tq"feh.tec.agents.light.impl.agent.DomainIteratorsDefault" :: Nil
 
     val createInterfacesPropsByBody = specCompositionsByRaw map(p => p._1 -> builder.agentPropsExpr(p._2, p._1, dependencyCallsByName, extraParents)) map {
-      case (agRawDef, agentPropsExpr) => agRawDef.name -> agentPropsExpr
+      case (agRawDef, (reportTo, agentPropsExpr)) =>
+        val moreControllerParents = tq"feh.tec.agents.light.impl.service.ReportPrinterSupportBundle" :: Nil
+        val moreControllerBody =
+          q"""
+              import feh.util.Path._
+              def configInfo = feh.tec.agents.light.impl.service.SupportBundle.Config(${Configs.controller[c.type](c)})
+          """
+        val moreAgentArgs = {
+          val reportToEntries = reportTo.map{ case (negName, reportListenerRefTree) => q"$negName -> reportListener($reportListenerRefTree)" }
+          "reportTo" -> q"Map(Seq(..$reportToEntries):_*)"
+        }
+
+        agRawDef.name -> (agentPropsExpr -> Some((moreControllerParents, moreControllerBody, moreAgentArgs)))
+      case (agRawDef, (Nil, agentPropsExpr)) => agRawDef.name -> (agentPropsExpr -> Option.empty[(List[c.Tree], c.Tree, (String, c.Tree))])
     }
 
-    def agentsCreationExpressions(name: String, body: List[c.Tree]): c.Expr[(String, NegotiationRole, Set[NegotiationInit]) => AgentRef] = c.Expr(
-      q"""
+    def agentsCreationExpressions(name: String, body: List[c.Tree]): (c.Expr[(String, NegotiationRole, Set[NegotiationInit]) => AgentRef], Option[(List[c.Tree], c.Tree, (String, c.Tree))]) = {
+      val (ff, extrasOpt) = createInterfacesPropsByBody(name)
+      val f = ff(body)
+      c.info(NoPosition, "agentsCreationExpressions:f = " + showCode(f), true)
+
+      c.Expr(
+        q"""
         {case (uniqueName, role, negInits) =>
-          val props = ${
-            val f = createInterfacesPropsByBody(name)(body)
-            c.info(NoPosition, "agentsCreationExpressions:f = " + showCode(f), true)
-            f}(uniqueName, role, negInits)
+          val props = $f(uniqueName, role, negInits)
           AgentRef(
             Agent.Id(uniqueName, role),
             {
@@ -60,7 +75,8 @@ object NegotiationControllerBuilder {
           )
         }
       """
-    )
+      ) -> extrasOpt
+    }
 
     val timeoutExprByName = raw.timeouts.mp
     def timeoutOrDefault(name: String, default: => Timeout) = {
@@ -93,77 +109,21 @@ object NegotiationControllerBuilder {
           val langTpes = _langTpe.flatten.distinct
 
           val langTpe = internal.refinedType(langTpes.toList, internal.newScopeWith())
-            //CompoundTypeTree( Template(langTpes.toList.distinct.map(TypeTree(_)), noSelfType, List()) ).tpe
-
-
-          val specSymbols = agTpe.flatMap(_.decls.filter(_.typeSignature.resultType <:< typeOf[AgentSpecification]))
-
-          val specSign = specSymbols.map(_.typeSignature)
-
-//          specSign map {
-//            case NullaryMethodType()
-//          }
-//
-//          c.abort(NoPosition, specSign.map(showRaw(_)).mkString("\n\t", "\n\t", ""))
-          //.map(_.baseClasses.flatMap(_.typeSignature.decls).filter(_.name == TermName("spec")))
-
           val (negotiationTypeTree, createNegotiationTree) = builder.createNegotiationAndNegotiationTypeTree(agTpe.toSet, langTpe)
-//          c.abort(NoPosition, showRaw(q))
-
-          val defLangType = builder.defLangType(langTpe)
 
           c.info(NoPosition,
-            "defLangType: " + showCode(defLangType) +
-            "\nnegotiationTypeTree: " + showCode(negotiationTypeTree) +
-            "\ncreateNegotiationTree: " + showCode(createNegotiationTree) +
-            "\nlangTpe: " + langTpe
+            "negotiationTypeTree: " + showCode(negotiationTypeTree) +
+            "\ncreateNegotiationTree: " + showCode(createNegotiationTree)
             , true)
 
-          val body = /*defLangType :: */negotiationTypeTree :: createNegotiationTree :: Nil
+          val body = negotiationTypeTree :: createNegotiationTree :: Nil
 
-//          c.abort(NoPosition, showRaw(body))
-
-          c.Expr/*[(AgentDef, NegotiationEnvironmentController#CreateInterface => AgentRef)]*/(
-            q"${Raw.TreesBuilder.agents[c.type](c)(rawAgDef, raw)} -> ${agentsCreationExpressions(rawAgDef.name, body)}"
+          val (agExpr, extraOpt) = agentsCreationExpressions(rawAgDef.name, body)
+          c.Expr(
+            q"${Raw.TreesBuilder.agents[c.type](c)(rawAgDef, raw)} -> $agExpr"
           )
       }
-/*
 
-NullaryMethodType(
-  TypeRef(
-    SingleType(ThisType(feh.tec.agents.light.spec), feh.tec.agents.light.spec.AgentSpecification),
-    feh.tec.agents.light.spec.AgentSpecification.PriorityAndProposalBased,
-    List(
-      ThisType(feh.tec.agents.light.impl.agent.PriorityAndProposalBasedAgent),
-      TypeRef(NoPrefix, TypeName("Lang"), List())
-    )
-  )
-)
-
-NullaryMethodType(
-  RefinedType(
-    List(
-      TypeRef(
-        SingleType(ThisType(feh.tec.agents.light.spec), feh.tec.agents.light.spec.AgentSpecification),
-        feh.tec.agents.light.spec.AgentSpecification.PriorityAndProposalBased,
-        List(
-          ThisType(feh.tec.agents.light.impl.agent.DomainIteratingAllVars),
-          TypeRef(NoPrefix, TypeName("Lang"), List())
-        )
-      ),
-      TypeRef(
-        SingleType(ThisType(feh.tec.agents.light.spec), feh.tec.agents.light.spec.AgentSpecification),
-        feh.tec.agents.light.spec.AgentSpecification.Iterating,
-        List(ThisType(feh.tec.agents.light.impl.agent.DomainIteratingAllVars), TypeRef(NoPrefix, TypeName("Lang"), List()))
-      )
-    ),
-    Scope()
-  )
-)
-*/
-
-//    c.info(NoPosition, "raw.agents = " + showRaw(raw.agents), true)
-//    c.info(NoPosition, "specCompositionsByRaw = " + specCompositionsByRaw.toString(), true)
     c.Expr(
       q"""
         import feh.tec.agents.light.spec.NegotiationSpecification._
@@ -209,7 +169,7 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
       case (name, descr) => ???
     }.toMap
 
-  /** @return body@List[Tree] => Expr[Props] */
+  /** @return reports@Seq(neg name, Tree:ReportListenerRef) -> body@List[Tree] => Expr[Props] */
   def agentPropsExpr(composition: SpecificationComposition,
                      raw: Raw.AgentDef[c.type],
                      dependenciesCalls: Map[String, c.Expr[_]],
@@ -279,28 +239,45 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
     def agentTypeDef = q"type Agent = $agentType"
     def specDef = q"lazy val spec: $specResTpe = ${raw.spec.tree.asInstanceOf[c.Tree]}.asInstanceOf[$specResTpe]"
 
-    def logOnCreate = q"""log.info("I've been created")"""
+    def logOnCreate = q"""log.debug("I've been created")"""
+
+    val reports = raw.negotiations.collect{
+      case Raw.AgentNegDef(neg, _, _, Some(reportTo), _) => neg -> reportTo
+    }
+
+    def reports_? = reports.nonEmpty
+
+    val (reportsParents, reportsBody) =  if(reports_?){
+      List(tq"AutoReporting[$langTpe]") -> List(q"""lazy val reportingTo = args("reportingTo").asInstanceOf[Map[NegotiationId, AgentRef]]""")
+    } else Nil -> Nil
+
+    val moreParents = reportsParents
+    val moreBody = reportsBody
 
     def template =
       (interface: CreateInterface, body: List[c.Tree]) =>
         Template(
-          parents = AgentsParts.IteratingAllVars.parentTree[c.type](c) :: extraParents,// composition.parts.toList.map(_.parentTree[c.type](c)) ::: extraParents,
+          parents = composition.parts.toList.map(_.parentTree[c.type](c)) ::: moreParents ::: extraParents,
+//          parents = AgentsParts.IteratingAllVars.parentTree[c.type](c) :: extraParents,// composition.parts.toList.map(_.parentTree[c.type](c)) ::: extraParents,
           self = noSelfType,
-          body = constructor(interface) :: logOnCreate :: agentTypeDef :: specDef :: body
+          body = constructor(interface) :: logOnCreate :: agentTypeDef :: specDef :: moreBody ::: body
         )
     def classDef =
       (interface: CreateInterface, body: List[c.Tree]) =>
         ClassDef(Modifiers(Flag.FINAL), TypeName("AnonAgentClass"), List(), template(interface, body))
 
-    (body: List[c.Tree]) =>
-      q"""
-        ((interface: CreateInterface) => {
-          ${classDef(c.Expr(Ident(TermName("interface"))), body)}
-          val props = akka.actor.Props(new AnonAgentClass)
-          log.debug("Agent class defined " + classOf[AnonAgentClass] + "; it's props =  " + props)
-          props
-        })
-      """
+
+    reports ->
+      ((body: List[c.Tree]) =>
+        q"""
+          ((interface: CreateInterface) => {
+            ${classDef(c.Expr(Ident(TermName("interface"))), body)}
+            val props = akka.actor.Props(new AnonAgentClass)
+            log.debug("Agent class defined " + classOf[AnonAgentClass] + "; it's props =  " + props)
+            props
+          })
+        """
+      )
     }
 
   def buildVar = (_: Raw.VarDef[c.type]) match {
