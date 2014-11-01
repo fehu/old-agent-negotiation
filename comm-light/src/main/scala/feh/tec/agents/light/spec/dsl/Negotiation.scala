@@ -1,6 +1,6 @@
 package feh.tec.agents.light.spec.dsl
 
-import feh.tec.agents.light.ReportListenerRef
+import feh.tec.agents.light.{ReportListener, ReportListenerRef}
 import feh.tec.agents.light.spec.AgentSpecification
 
 trait Negotiation extends ConstraintsSpecification with CreationSpecification{
@@ -11,7 +11,7 @@ trait Negotiation extends ConstraintsSpecification with CreationSpecification{
   }
 
   type ChooseReporter = {
-    def reportingTo[R](r: ReportListenerRef[R]): AgentNegPartialDef // todo
+    def reportingTo[R <: ReportListener](r: ReportListenerRef[R]): AgentNegPartialDef // todo
   }
 
   type ChooseNegotiationOver = {

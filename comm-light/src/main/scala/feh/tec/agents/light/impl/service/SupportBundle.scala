@@ -25,4 +25,8 @@ trait ReportPrinterSupportBundle extends SupportBundle
   self: NegotiationEnvironmentController =>
 
   lazy val reportFile: File = new File(config.getString(controllerKey("report.file")))
+
+  if(!reportFile.exists()) reportFile.createNewFile()
+
+  log.debug(s"reportFile = $reportFile, ${reportFile.exists()}")
 }

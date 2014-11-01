@@ -424,9 +424,12 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C){
                 ) => (negotiation, interlocutors, None)
             case Select(
                   Apply(
-                    Select(
-                      ExtractNegotiation(negotiation, interlocutors),
-                      TermName("reportingTo")
+                    TypeApply(
+                      Select(
+                        ExtractNegotiation(negotiation, interlocutors),
+                        TermName("reportingTo")
+                      ),
+                      List(TypeTree())
                     ),
                     List(reportingTo)
                   ),

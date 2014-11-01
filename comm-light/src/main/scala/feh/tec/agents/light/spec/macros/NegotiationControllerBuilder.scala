@@ -37,26 +37,24 @@ object NegotiationControllerBuilder {
     val dependenciesByRaw = specCompositionAndDependencies.mapValues(_._2).toMap
     val dependencyCallsByName = dependenciesByRaw.values.flatMap(_.mapValues(_._2)).toMap
 
-    val extraParents = tq"feh.tec.agents.light.impl.agent.DomainIteratorsDefault" :: Nil
+    val extraAgentParents = tq"feh.tec.agents.light.impl.agent.DomainIteratorsDefault" :: Nil
 
-    val createInterfacesPropsByBody = specCompositionsByRaw map(p => p._1 -> builder.agentPropsExpr(p._2, p._1, dependencyCallsByName, extraParents)) map {
+    case class ControllerExtra(name: String, parents: List[c.Tree], body: List[c.Tree]){
+      override def equals(obj: scala.Any): Boolean = PartialFunction.cond(obj){ case ce: ControllerExtra => ce.name == this.name }
+      override def hashCode(): Int = name.hashCode
+    }
+
+    val createInterfacesPropsByBody = specCompositionsByRaw map(p => p._1 -> builder.agentPropsExpr(p._2, p._1, dependencyCallsByName, extraAgentParents)) map {
       case (agRawDef, (reportTo, agentPropsExpr)) =>
         val moreControllerParents = tq"feh.tec.agents.light.impl.service.ReportPrinterSupportBundle" :: Nil
         val moreControllerBody =
-          q"""
-              import feh.util.Path._
-              def configInfo = feh.tec.agents.light.impl.service.SupportBundle.Config(${Configs.controller[c.type](c)})
-          """
-        val moreAgentArgs = {
-          val reportToEntries = reportTo.map{ case (negName, reportListenerRefTree) => q"$negName -> reportListener($reportListenerRefTree)" }
-          "reportTo" -> q"Map(Seq(..$reportToEntries):_*)"
-        }
+          q"def configInfo = feh.tec.agents.light.impl.service.SupportBundle.Config(${Configs.controller[c.type](c)})" :: Nil
 
-        agRawDef.name -> (agentPropsExpr -> Some((moreControllerParents, moreControllerBody, moreAgentArgs)))
-      case (agRawDef, (Nil, agentPropsExpr)) => agRawDef.name -> (agentPropsExpr -> Option.empty[(List[c.Tree], c.Tree, (String, c.Tree))])
+        agRawDef.name -> (agentPropsExpr -> Some(ControllerExtra("reporting", moreControllerParents, moreControllerBody)))
+      case (agRawDef, (Nil, agentPropsExpr)) => agRawDef.name -> (agentPropsExpr -> Option.empty[ControllerExtra])
     }
 
-    def agentsCreationExpressions(name: String, body: List[c.Tree]): (c.Expr[(String, NegotiationRole, Set[NegotiationInit]) => AgentRef], Option[(List[c.Tree], c.Tree, (String, c.Tree))]) = {
+    def agentsCreationExpressions(name: String, body: List[c.Tree]): (c.Expr[(String, NegotiationRole, Set[NegotiationInit]) => AgentRef], Option[ControllerExtra]) = {
       val (ff, extrasOpt) = createInterfacesPropsByBody(name)
       val f = ff(body)
       c.info(NoPosition, "agentsCreationExpressions:f = " + showCode(f), true)
@@ -102,40 +100,48 @@ object NegotiationControllerBuilder {
     val issuesByNegotiation: List[c.Expr[(String, Seq[String])]] = negotiations
       .map{ case (negName, iss) => c.Expr[(String, Seq[String])](q"$negName -> Seq(..$iss)") }
       .toList
-    val initialAgents: List[c.Expr[(AgentDef, NegotiationEnvironmentController#CreateInterface => AgentRef)]] =
+    val initialAgentsAndExtra: (List[c.Expr[(AgentDef, NegotiationEnvironmentController#CreateInterface => AgentRef)]], List[Option[ControllerExtra]]) =
       specCompositionsByRaw.toList.map{
         case (rawAgDef, SpecificationComposition(parts)) =>
           val (agTpe, _langTpe) = parts.map(builder.typesOf).unzip
           val langTpes = _langTpe.flatten.distinct
 
           val langTpe = internal.refinedType(langTpes.toList, internal.newScopeWith())
-          val (negotiationTypeTree, createNegotiationTree) = builder.createNegotiationAndNegotiationTypeTree(agTpe.toSet, langTpe)
+//          val (negotiationTypeTree, createNegotiationTree) = builder.createNegotiationAndNegotiationTypeTree(agTpe.toSet, langTpe, )
+//
+//          c.info(NoPosition,
+//            "negotiationTypeTree: " + showCode(negotiationTypeTree) +
+//            "\ncreateNegotiationTree: " + showCode(createNegotiationTree)
+//            , true)
+//
+//          val body = negotiationTypeTree :: createNegotiationTree :: Nil
 
-          c.info(NoPosition,
-            "negotiationTypeTree: " + showCode(negotiationTypeTree) +
-            "\ncreateNegotiationTree: " + showCode(createNegotiationTree)
-            , true)
-
-          val body = negotiationTypeTree :: createNegotiationTree :: Nil
-
-          val (agExpr, extraOpt) = agentsCreationExpressions(rawAgDef.name, body)
+          val (agExpr, extraOpt) = agentsCreationExpressions(rawAgDef.name, Nil)
           c.Expr(
             q"${Raw.TreesBuilder.agents[c.type](c)(rawAgDef, raw)} -> $agExpr"
-          )
-      }
+          ) -> extraOpt
+      }.unzip
+
+    val initialAgents = initialAgentsAndExtra._1
+    val controllerExtras = initialAgentsAndExtra._2.flatten.toList.distinct
+
+    val extraControllerParents = controllerExtras.flatMap(_.parents)
+    val extraControllerBody    = controllerExtras.flatMap(_.body)
 
     c.Expr(
       q"""
         import feh.tec.agents.light.spec.NegotiationSpecification._
         import feh.tec.agents.light.impl.NegotiationEnvironmentController
         akka.actor.Props(
-          new NegotiationEnvironmentController{
+          new NegotiationEnvironmentController with ..$extraControllerParents {
             protected lazy val spawns: Map[String, Int] = $spawns
             protected lazy val issues: Map[String, Var] = Map(Seq(..$issues): _*)
             protected lazy val issuesByNegotiation: Map[String, Seq[String]] = Map(Seq(..$issuesByNegotiation): _*)
             protected lazy val initialAgents: List[(AgentDef, CreateInterface => AgentRef)] = List(..$initialAgents)
             protected lazy val systemAgentsInit: Set[() => AgentRef] = Set()
             protected lazy val timeouts = $timeouts
+
+            ..$extraControllerBody
           }
         )
        """
@@ -174,11 +180,15 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
                      raw: Raw.AgentDef[c.type],
                      dependenciesCalls: Map[String, c.Expr[_]],
                      extraParents: List[c.Tree]) = {
-    val args = composition.parts.flatMap(_.interface.descriptions.keys)
-    val argsSeq = args.map(arg => q"$arg -> ${dependenciesCalls(arg)}")
-    val argsMap = q"Map(Seq(..$argsSeq): _*)"
+    val descriptionsDefinedArgs = composition.parts.flatMap(_.interface.descriptions.keys)
+    val argsDependancies = descriptionsDefinedArgs.map(arg => arg -> dependenciesCalls(arg).tree).toMap
 
-    val constructor =
+    def argsMap(m: Map[String, c.Tree]) = {
+      val entries = m.map{case (k, v) => q"$k -> $v"}
+      q"Map(Seq(..$entries): _*)"
+    }
+
+    def constructor(args: Map[String, c.Tree]) =
       (interface: CreateInterface) =>
         DefDef(
           Modifiers(),
@@ -190,7 +200,7 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
             List(Apply(Select(Super(This(typeNames.EMPTY), typeNames.EMPTY), termNames.CONSTRUCTOR),
             {
               def selI(i: Int) = Select(interface.tree, TermName("_" + i))
-              List(selI(1), selI(2), selI(3), argsMap)
+              List(selI(1), selI(2), selI(3), argsMap(args))
             })),
             Literal(Constant(()))
           )
@@ -247,12 +257,31 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
 
     def reports_? = reports.nonEmpty
 
-    val (reportsParents, reportsBody) =  if(reports_?){
-      List(tq"AutoReporting[$langTpe]") -> List(q"""lazy val reportingTo = args("reportingTo").asInstanceOf[Map[NegotiationId, AgentRef]]""")
-    } else Nil -> Nil
+    val (reportsParents, reportsBody, reportsArgs) =  if(reports_?){
+      (
+        List(tq"AutoReporting[$langTpe]"),
+        List(q"""lazy val reportingTo = args("reportingTo").asInstanceOf[Map[NegotiationId, AgentRef]]"""),
+        List({
+          val reportToEntries = reports.map{ case (negName, reportListenerRefTree) => q"$negName -> reportListener($reportListenerRefTree)" }
+          "reportTo" -> q"Map(Seq(..$reportToEntries):_*)"
+        })
+      )
+    } else (Nil, Nil, Nil)
 
-    val moreParents = reportsParents
-    val moreBody = reportsBody
+    val extraNegotiationParents = if(reports_?) tq"Negotiation.ChangeHooks" :: Nil else Nil
+    val (negotiationTypeTree, createNegotiationTree) = createNegotiationAndNegotiationTypeTree(agTpe.toSet, langTpe, extraNegotiationParents)
+
+    c.info(NoPosition,
+      "negotiationTypeTree: " + showCode(negotiationTypeTree) +
+      "\ncreateNegotiationTree: " + showCode(createNegotiationTree) +
+      "\nextraNegotiationParents: " + extraNegotiationParents.map(showCode(_)).mkString("\n")
+      , true)
+
+
+    val moreParents = reportsParents ::: Nil
+    val moreBody = negotiationTypeTree :: createNegotiationTree :: reportsBody
+
+    val args = argsDependancies ++ reportsArgs
 
     def template =
       (interface: CreateInterface, body: List[c.Tree]) =>
@@ -260,7 +289,7 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
           parents = composition.parts.toList.map(_.parentTree[c.type](c)) ::: moreParents ::: extraParents,
 //          parents = AgentsParts.IteratingAllVars.parentTree[c.type](c) :: extraParents,// composition.parts.toList.map(_.parentTree[c.type](c)) ::: extraParents,
           self = noSelfType,
-          body = constructor(interface) :: logOnCreate :: agentTypeDef :: specDef :: moreBody ::: body
+          body = constructor(args)(interface) :: logOnCreate :: agentTypeDef :: specDef :: moreBody ::: body
         )
     def classDef =
       (interface: CreateInterface, body: List[c.Tree]) =>
@@ -325,7 +354,7 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
     agTpe -> langTpe
   }
 
-  def createNegotiationAndNegotiationTypeTree(agType: Set[c.Type], langTpe: c.Type) = {
+  def createNegotiationAndNegotiationTypeTree(agType: Set[c.Type], langTpe: c.Type, extraParents: List[c.Tree]) = {
     val negs = agType
       .flatMap(_.decls).withFilter(_.isType).map(_.asType).filter(_.name == TypeName("Negotiation"))
       .ensuring(_.nonEmpty, "#createNegotiationAndNegotiationTypeTree")
@@ -366,7 +395,7 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
       contains
     }
 
-    val parents = distinctNegParents map {
+    val parentsByNegType = distinctNegParents map {
       case tt@TypeTree() if tt.tpe.typeArgs.nonEmpty =>
         val ttpe = tt.tpe match {
           case TypeRef(pre, sym, args) =>
@@ -381,6 +410,8 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
 //        c.abort(NoPosition, "^^^ : " + showRaw(tt) + "\n" + showRaw(tt.tpe) + "\nq: " + showRaw(q) + "\nlangTpe: " + langTpe)
       case p => p
     }
+
+    val parents = parentsByNegType ::: extraParents
 
     c.info(NoPosition, s"negParents = $negParents\nparents = $parents", true)
 

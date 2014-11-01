@@ -77,7 +77,7 @@ trait ReportListenerControllerSupport {
 
   protected val listeners = mutable.HashMap.empty[ReportListenerRef[_], AgentRef]
 
-  def reportListener[R](ref: ReportListenerRef[R])(implicit builder: ReportListenerBuilder[R]) =
+  def reportListener[R <: ReportListener](ref: ReportListenerRef[R])(implicit builder: ReportListenerBuilder[R]) =
     listeners.getOrElseUpdate(ref, builder.build(ref.clazz))
 }
 
