@@ -260,7 +260,14 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
     val (reportsParents, reportsBody, reportsArgs) =  if(reports_?){
       (
         List(tq"AutoReporting[$langTpe]"),
-        List(q"""lazy val reportingTo = args("reportingTo").asInstanceOf[Map[NegotiationId, AgentRef]]"""),
+        List(
+          q"""
+            lazy val reportingTo = {
+              log.debug("args = " + args)
+              args("reportingTo").asInstanceOf[Map[NegotiationId, AgentRef]]
+            }
+          """
+        ),
         List({
           val reportToEntries = reports.map{ case (negName, reportListenerRefTree) => q"$negName -> reportListener($reportListenerRefTree)" }
           "reportTo" -> q"Map(Seq(..$reportToEntries):_*)"

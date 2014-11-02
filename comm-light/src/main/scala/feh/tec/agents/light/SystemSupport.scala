@@ -1,9 +1,10 @@
 package feh.tec.agents.light
 
+import akka.actor.ActorLogging
 import feh.tec.agents.light.SystemMessage.ScopeUpdate
 import feh.util.AbstractScopedState
 
-trait AgentHelpers[Lang <: NegotiationLanguage]{
+trait AgentHelpers[Lang <: NegotiationLanguage] extends ActorLogging{
   self: NegotiatingAgent[Lang] with SpeakingAgent[Lang] =>
 
   protected object hooks{
@@ -40,7 +41,10 @@ trait AgentHelpers[Lang <: NegotiationLanguage]{
   def sendToAll(msg: Lang#Msg) = get(msg.negotiation).scope().foreach(_ ! msg)
 
   private lazy val negotiationsCache = negotiations.map(n => n.id -> n).toMap
-  def get(neg: NegotiationId): Negotiation = negotiationsCache(neg)
+  def get(neg: NegotiationId): Negotiation = {
+    log.debug("negotiationsCache = " + negotiationsCache)
+    negotiationsCache(neg)
+  }
   def getOpt(neg: NegotiationId) = negotiationsCache.get(neg)
 }
 

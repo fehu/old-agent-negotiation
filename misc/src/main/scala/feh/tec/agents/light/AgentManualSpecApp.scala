@@ -8,7 +8,11 @@ import scala.concurrent.duration._
 object AgentManualSpecApp extends App{
   val agentSpec = new create.PPI.AllVarsSpec {
 
-    initialize after { ag => _ => ag.log.info("initialized") }
+    initialize after {
+      ag => _ =>
+        ag.negotiations.foreach(_.currentPriority update new Priority(1))
+        ag.log.info("initialized")
+    }
     start andThen {
       ag =>
         import ag._
@@ -18,7 +22,7 @@ object AgentManualSpecApp extends App{
               Message.Proposal(Message.ProposalId.rand, neg.id, neg.currentPriority(), neg.currentValues())
             }
             neg.currentState update NegotiationState.Negotiating
-            log.info(s"negotiation ${neg.id} started, scope = ${neg.scope}")
+            log.info(s"negotiation ${neg.id} started, scope = ${neg.scope()}")
             sendToAll(proposal)
         }
     }
@@ -64,7 +68,9 @@ object AgentManualSpecApp extends App{
 
   implicit val asys = ActorSystem()
 
-  val ag = asys.actorOf(props)
+  val c = asys.actorOf(props)
 
-  ag ! SystemMessage.Initialize
+  c ! SystemMessage.Initialize
+  Thread sleep 100
+  c ! SystemMessage.Start
 }

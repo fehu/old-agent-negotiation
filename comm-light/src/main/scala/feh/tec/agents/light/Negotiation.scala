@@ -61,8 +61,7 @@ trait AbstractNegotiation {
 
   protected class OptionStateVar[T](name: String,
                                     newRepr: Option[T] = None,
-                                    get: Option[T] => T = (_: Option[T]).get,
-                                    _upd: (T,  Option[T]) => Option[T] = (t: T, _: Option[T]) => Option(t)) extends StateVar[Option[T], T, T](name, newRepr, get)
+                                    _upd: (T,  Option[T]) => Option[T] = (t: T, _: Option[T]) => Option(t)) extends StateVar[Option[T], T, T](name, newRepr, (_: Option[T]).getOrThrow(s"$name is not defined"))
   {
     protected def upd = _upd
     def opt = raw
@@ -84,6 +83,8 @@ trait AbstractNegotiation {
   lazy val currentState = new IdentStateVar[NegotiationState]("state", Stopped)
 
   protected def currentValuesUpdateAllowed(values: Map[Var, Any]) = true
+
+  override def toString: String = s"Negotiation(${id.name}})"
 }
 
 trait NegotiationState

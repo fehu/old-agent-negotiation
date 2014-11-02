@@ -29,8 +29,16 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
   }
 
   /** (this, that) => Boolean */
-  def comparePriority(msg: Lang#Msg, f: (Priority, Priority) => Boolean): Boolean =
-    f(get(msg.negotiation).currentPriority(), msg.priority)
+  def comparePriority(msg: Lang#Msg, f: (Priority, Priority) => Boolean): Boolean = {
+    log.debug(s"comparePriority: msg=$msg")
+    val negId = msg.negotiation
+    log.debug(s"comparePriority: negId=$negId")
+    val neg = get(negId)
+    val priority = neg.currentPriority()
+    log.debug(s"comparePriority: neg=$neg, priority=$priority")
+    f(priority, msg.priority)
+  }
+
 
   def process: PartialFunction[Lang#Msg, Any] = {
     case prop: Lang#Proposal   => onProposal lift prop

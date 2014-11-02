@@ -27,9 +27,11 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
 
   //    lazy val nextValues: DefBADS[NegotiationId => Option[Map[Var, Any]]] = new DefBADS[NegotiationId => Option[Map[Var, Any]]](???) // todo
 
-  lazy val onProposal = new DefDS[PartialFunction[Lang#Proposal, Any]](Map())
-  lazy val onAcceptance = new DefDS[PartialFunction[Lang#Acceptance, Any]](Map())
-  lazy val onRejection = new DefDS[PartialFunction[Lang#Rejection, Any]](Map())
+  private def noDefErr[Msg](in: String): Ag => PartialFunction[Msg, Any] = (ag: Ag) => {case _: Msg => sys.error(s"no `$in` behavior defined") }
+
+  lazy val onProposal = new DefDS[PartialFunction[Lang#Proposal, Any]](noDefErr("onProposal"))
+  lazy val onAcceptance = new DefDS[PartialFunction[Lang#Acceptance, Any]](noDefErr("onAcceptance"))
+  lazy val onRejection = new DefDS[PartialFunction[Lang#Rejection, Any]](noDefErr("onRejection"))
 
   def proposal(negId: NegotiationId)(implicit owner: Ag) = owner.get(negId) |> {
     neg =>
@@ -47,8 +49,10 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
     implicit owner => id => priorityNegotiationHandler.get.start.get apply id
   )
 
-  lazy val priorityNegotiationHandler = new DefDSH[AgentSpecification.PriorityNegotiationHandler[Ag, Lang]](o =>
-    new PriorityNegotiationHandlerSpec[Ag, Lang](???) // todo
+  lazy val priorityNegotiationHandlerEvidence = new DefDS[NegotiationId => Any](???) // todo
+
+  lazy val priorityNegotiationHandler = new DefDSH[AgentSpecification.PriorityNegotiationHandler[Ag, Lang]](
+    implicit owner => new PriorityNegotiationHandlerSpec[Ag, Lang](priorityNegotiationHandlerEvidence.get)
   )
 
   lazy val initialize = new DefBADS[Unit](_.negotiations.foreach(_.ensuring(_.scope().nonEmpty).currentState update Initialized ))
