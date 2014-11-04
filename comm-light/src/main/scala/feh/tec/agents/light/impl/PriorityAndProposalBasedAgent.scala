@@ -55,7 +55,9 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
 
   def requestPriorityRaise(neg: NegotiationId): Lang#PriorityRaiseRequest = {
     log.debug(s"requestPriorityRaise $neg")
-    priorityNegotiationHandler.start(neg)
+    val req = priorityNegotiationHandler.start(neg)
+    sendToAll(req)
+    req
   }
 
   def respond(msg: Lang#Msg) = {
@@ -82,6 +84,10 @@ trait PriorityNegotiationHandlerImpl[Lang <: Language.ProposalBased with Languag
   }
   protected def requestsMap(neg: NegotiationId) = mutable.HashMap(get(neg).scope().toSeq.zipMap(_ => Option.empty[Lang#PriorityRaiseRequest]): _*)
   def allRequests(id: PriorityRaiseRequestId): Boolean = requests.get(id).exists(_.forall(_._2.isDefined))
+
+  protected def onStart(id: PriorityRaiseRequestId) = {
+    requests.ensuringNot(_.contains(id))
+  }
 
   def process = {
     case req: Lang#PriorityRaiseRequest =>

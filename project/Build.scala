@@ -93,15 +93,10 @@ object  Build extends sbt.Build {
 
 
     object feh{
-      lazy val util = "feh.util" %% "util" % "1.0.5"
+      lazy val util = ProjectRef( uri("git://github.com/fehu/util.git"), "util")
 
       object utils{
-        lazy val compiler = "feh.util" %% "scala-compiler-utils" % "0.1"
-      }
-
-      object dsl{
-        lazy val swing = "feh.dsl" %% "swing" % "1.2"
-        lazy val graphviz = "feh.dsl" %% "graphviz" % "0.1"
+        lazy val compiler = ProjectRef( uri("git://github.com/fehu/util.git"), "scala-compiler-utils")
       }
     }
 
@@ -123,15 +118,15 @@ object  Build extends sbt.Build {
       }
     )
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(comm, oldcomm, coloring, misc, webFrontend, webBackend, commLight)
+   .aggregate(comm, misc, webFrontend, webBackend, commLight)
 
   lazy val comm = Project(
     id = "comm",
     base = file("comm"),
     settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(akka, feh.util, scala.reflectApi)
+      libraryDependencies ++= Seq(akka, scala.reflectApi)
     )
-  )
+  ) dependsOn feh.util
 
   lazy val misc = Project(
     id = "misc",
@@ -140,28 +135,6 @@ object  Build extends sbt.Build {
       libraryDependencies ++= Seq()
     )
   ) dependsOn (comm, webBackend, commLight)
-
-
-  lazy val oldcomm = Project(
-    id = "oldcomm",
-    base = file("oldcomm"),
-    settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(akka, feh.util)
-    )
-  )
-
-  lazy val coloring = Project(
-    id = "coloring",
-    base = file("coloring"),
-    settings = buildSettings ++ Seq(
-      resolvers += Snapshot.sonatype,
-      libraryDependencies ++= Seq(
-        feh.util,
-        feh.dsl.swing,
-        feh.utils.compiler
-      ) ++ jung.all
-    )
-  ) dependsOn oldcomm
 
   lazy val webCommon = Project("web-common", file("web/common"),
     settings = buildSettings ++ Seq(
@@ -174,24 +147,24 @@ object  Build extends sbt.Build {
     base = file("web/frontend"),
     settings = buildSettings ++ Web.frontend ++ Seq(
       Web.packDir := file("web/packed"),
-      libraryDependencies ++= Seq(feh.util, scala.libAll),
+      libraryDependencies ++= Seq(scala.libAll),
       unmanagedSourceDirectories in Compile <+= (sourceDirectory in webCommon)
 
     )
-  ) dependsOn webCommon
+  ) dependsOn (feh.util, webCommon)
 
   lazy val webBackend = Project(
     id = "web-backend",
     base = file("web/backend"),
     settings = buildSettings ++ Web.backend ++ Seq(
       resolvers ++= Seq(Snapshot.spray, Release.spray),
-      libraryDependencies ++= Seq(feh.util, spray.websocket, spray.json)
+      libraryDependencies ++= Seq(spray.websocket, spray.json)
     )
-  ) dependsOn webCommon
+  ) dependsOn (feh.util, webCommon)
 
   lazy val commLight = Project("comm-light", file("comm-light"),
     settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(akka, feh.util, scala.reflectApi)
+      libraryDependencies ++= Seq(akka, scala.reflectApi)
     )
-  )
+  ) dependsOn feh.util
 }
