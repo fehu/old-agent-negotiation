@@ -23,15 +23,15 @@ The specification defines the aspects of agent's behavior as [ExtendableDefiniti
     which can be extended/overridden using implicit methods from [create.Extendable***DefinitionWrapper](comm-light/src/main/scala/feh/tec/agents/light/impl/agent/create.scala).
 
 Most of definitions are instances of *MonoDefinition* class and support following extension methods:
-     * **<:=** ― override main extension  point, provides a reference to the agent
-     * **:=**  ― override main extension  point, does NOT provide a reference to the agent
-     * **andThen** ― aggregate an expression to the main extension point
+- **<:=** ― override main extension  point, provides a reference to the agent
+- **:=**  ― override main extension  point, does NOT provide a reference to the agent
+- **andThen** ― aggregate an expression to the main extension point
       
 Some of the definitions extend also *ExtendableDefinition.BeforeAndAfter* trait, that provides two extra extension points.
   They can be overridden with methods **before** and **after**.
 
 ([source](misc/src/main/scala/feh/tec/agents/light/QueenSpec.scala)):
-```
+```scala
 import feh.tec.agents.light.impl.agent.create
 
 object QueenSpec extends create.PPI.AllVarsSpec{
@@ -85,7 +85,8 @@ object QueenSpec extends create.PPI.AllVarsSpec{
 Defines variables and negotiations, references *Agent Specification*, defines the number of agents to create.  
 
 ([source](misc/src/main/scala/feh/tec/agents/light/QueenNegotiationApp.scala)):
-```
+```scala
+
 import feh.tec.agents.light.spec.dsl._
 import impl.agent._
 import scala.concurrent.duration._
