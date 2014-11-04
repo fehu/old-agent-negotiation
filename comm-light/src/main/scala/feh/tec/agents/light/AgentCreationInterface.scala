@@ -31,7 +31,9 @@ object AgentCreationInterface{
 
   case class SystemAgentRef(role: SystemRole) extends ArgDescription[AgentRef]
 
-  case class NegotiationInit(id: NegotiationId, issues: Set[Var])
+  case class NegotiationInit(id: NegotiationId, issues: Set[Var]){
+    def tuple = id -> issues
+  }
   case class NegotiationInitExtended(init: NegotiationInit, scope: Interlocutors) {
     def id = init.id
     def issues = init.issues

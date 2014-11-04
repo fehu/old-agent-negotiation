@@ -53,7 +53,10 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
     case priority: Lang#Priority => priorityNegotiationHandler.process(priority)
   }
 
-  def requestPriorityRaise(neg: NegotiationId): Lang#PriorityRaiseRequest = priorityNegotiationHandler.start(neg)
+  def requestPriorityRaise(neg: NegotiationId): Lang#PriorityRaiseRequest = {
+    log.debug(s"requestPriorityRaise $neg")
+    priorityNegotiationHandler.start(neg)
+  }
 
   def respond(msg: Lang#Msg) = {
     val sender = Option(currentMessage).getOrThrow("cannot respond: no incoming message registered").sender

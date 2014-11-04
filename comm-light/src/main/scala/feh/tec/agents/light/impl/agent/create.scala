@@ -38,6 +38,7 @@ object create {
     trait AllVarsSpec extends PriorityAndProposalBasedAgentSpec[Ag, Lang] with IteratingSpec.AllVars[Ag, Lang] with SpecExt[Ag]
   }
 
+/*
   trait PriorityAndProposalBasedIteratingAllVars
     extends impl.agent.PriorityAndProposalBasedAgent[PPI.Lang] with impl.agent.DomainIteratingAllVars[PPI.Lang]
   {
@@ -45,6 +46,7 @@ object create {
 
     protected def createNegotiation(id: NegotiationId): Negotiation = ???
   }
+*/
 
 //  def PriorityAndProposalBasedIteratingAllVars(
 //                                    specification: PriorityAndProposalBasedAgentSpec[PPI.Ag, PPI.Lang] with IteratingSpec.AllVars[PPI.Ag, PPI.Lang]

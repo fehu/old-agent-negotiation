@@ -12,7 +12,7 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
   extends AgentSpecification.PriorityAndProposalBased[Ag, Lang]   {
   //    type BuildArgs =
 
-  lazy val nothingToPropose = new DefBADS[NegotiationId => Unit](_ => id => sys.error(s"$id failed: nothing to propose"))
+  lazy val nothingToPropose = new DefBADS[NegotiationId => Unit](_ => id => sys.error(s"$id: nothing to propose"))
 
   lazy val beforeEachMessage = new DefDS[Lang#Msg => Unit](_ => _ => {})
 
@@ -20,8 +20,10 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
     implicit owner => {
       negId =>
         val neg = owner.get(negId)
-        nextValues.get.apply(negId)
-          .map{ neg.currentValues.update } getOrElse nothingToPropose.get.apply(negId)
+        val nextVals = owner.nextValues(negId)
+        owner.log.debug(s"setNextProposal for $negId, $nextVals")
+        nextVals.map{ neg.currentValues.update } getOrElse owner.nothingToPropose(negId) //nothingToPropose.get.apply(negId)
+        neg.currentProposal update Message.Proposal(Message.ProposalId.rand, negId, neg.currentPriority(), nextVals.get)(owner.ref)
     }
   )
 
@@ -51,8 +53,13 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
 
   lazy val priorityNegotiationHandlerEvidence = new DefDS[NegotiationId => Any](_ => _ => None) // todo
 
-  lazy val priorityNegotiationHandler = new DefDSH[AgentSpecification.PriorityNegotiationHandler[Ag, Lang]](
-    implicit owner => new PriorityNegotiationHandlerSpec[Ag, Lang](priorityNegotiationHandlerEvidence.get)
+  protected var priorityNegotiationHandlerSetup = List.empty[AgentSpecification.PriorityNegotiationHandler[Ag, Lang] => Unit]
+  def priorityNegotiationHandler[R](f: AgentSpecification.PriorityNegotiationHandler[Ag, Lang] => Unit) = priorityNegotiationHandlerSetup ::= f
+
+  protected[light] lazy val priorityNegotiationHandler = new DefDSH[AgentSpecification.PriorityNegotiationHandler[Ag, Lang]](
+    implicit owner =>
+      new PriorityNegotiationHandlerSpec[Ag, Lang](priorityNegotiationHandlerEvidence.get) $$
+        (spec => priorityNegotiationHandlerSetup.reverse.foreach(_(spec)))
   )
 
   lazy val initialize = new DefBADS[Unit](_.negotiations.foreach(_.ensuring(_.scope().nonEmpty).currentState update Initialized ))

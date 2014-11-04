@@ -20,7 +20,7 @@ object IteratingSpec{
       owner => {
         negId =>
           val neg = owner.get(negId)
-          val dItByVar = neg.currentValues().keys.toSeq.zipMap(owner.domainIterators)
+          val dItByVar = owner.varsByNeg(negId).toSeq.zipMap(owner.domainIterators)
           val it = DomainIteratorBuilder overSeq dItByVar.map(_._2)
           val vars = dItByVar.map(_._1)
           val i2i: Seq[Any] => Map[Var, Any] = seq => {
@@ -28,15 +28,19 @@ object IteratingSpec{
             vars.zip(seq).toMap
           }
           val domains = dItByVar.map(_._1.domain)
-          it.apply(domains).map(i2i)
-
+          val dit = it.apply(domains).map(i2i)
+          owner.log.debug(s"created domain iterator $dit")
+          dit
       })
 
     lazy val nextValues = new DefBADS[NegotiationId => Option[Map[Var, Any]]](
       owner =>
-        negId => owner.get(negId).currentIterator.raw.collectFirst({
-          case it if it.hasNext => it.next()
-        })
+        negId => {
+          owner.log.debug(s"getting next values for $negId: ${owner.get(negId).currentIterator.raw}")
+          owner.get(negId).currentIterator.raw.collectFirst({
+            case it if it.hasNext => it.next()
+          })
+        }
     )
   }
 }

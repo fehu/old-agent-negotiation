@@ -61,7 +61,8 @@ trait AbstractNegotiation {
 
   protected class OptionStateVar[T](name: String,
                                     newRepr: Option[T] = None,
-                                    _upd: (T,  Option[T]) => Option[T] = (t: T, _: Option[T]) => Option(t)) extends StateVar[Option[T], T, T](name, newRepr, (_: Option[T]).getOrThrow(s"$name is not defined"))
+                                    _upd: (T,  Option[T]) => Option[T] = (t: T, _: Option[T]) => Option(t))
+    extends StateVar[Option[T], T, T](name, newRepr, (_: Option[T]).getOrThrow(s"$name is not defined"))
   {
     protected def upd = _upd
     def opt = raw

@@ -58,7 +58,8 @@ object AgentSpecification{
 
     def nothingToPropose: DefBADS[NegotiationId => Unit]
 
-    def priorityNegotiationHandler: DefExt[AgentSpecification.PriorityNegotiationHandler[Ag, Lang]]
+    def priorityNegotiationHandler[R](f: AgentSpecification.PriorityNegotiationHandler[Ag, Lang] => Unit)
+    protected[light] def priorityNegotiationHandler: DefExt[AgentSpecification.PriorityNegotiationHandler[Ag, Lang]]
 
 //    def requestPriorityRaise: ExtDef[NegotiationId => Lang#PriorityRaiseRequest]
 
