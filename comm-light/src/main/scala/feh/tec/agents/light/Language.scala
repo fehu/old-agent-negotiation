@@ -3,7 +3,7 @@ package feh.tec.agents.light
 import java.util.UUID
 
 trait Language{
-  type Msg
+  type Msg <: AnyRef
 }
 
 trait NegotiationLanguage extends Language{

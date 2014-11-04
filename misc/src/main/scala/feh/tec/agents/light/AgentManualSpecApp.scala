@@ -27,6 +27,25 @@ object AgentManualSpecApp extends App{
         }
     }
 
+    def respondToProposal(msg: Message.Proposal)(implicit ag: create.PPI.Ag) = {
+      import ag._
+      msg match{
+        case Message.Proposal(propId, negId, _, values) =>
+          val response =
+            if(msg.satisfiesConstraints) Message.Accepted(negId, propId, get(negId).currentPriority(), get(negId).currentValues())
+            else Message.Rejected(negId, propId, get(negId).currentPriority(), get(negId).currentValues())
+          respond(response)
+      }
+    }
+
+    onProposal <:= {
+      implicit ag =>{
+        case msg if ag.myPriority isHigherThenOf msg => respondToProposal(msg)
+        case msg if ag.myPriority isLowerThenOf  msg => respondToProposal(msg)
+        case samePriority => ag.requestPriorityRaise(samePriority.negotiation)
+      }
+    }
+
   }
 
 //  val agentProps =

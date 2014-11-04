@@ -48,7 +48,9 @@ object NegotiationSpecification{
     case comb: ConstraintPartComb[T, _] => comb.asInstanceOf[ConstraintPartComb[T, Op]].transform(f, fOp)
   }
 
-  case class AgentConstraintsDef(constraints: Seq[AgentConstraintDef]) extends AgentNegPartialDef
+  case class AgentConstraintsDef(constraints: Seq[AgentConstraintDef]) extends AgentNegPartialDef{
+    def ++(that: AgentConstraintsDef) = AgentConstraintsDef(this.constraints ++ that.constraints)
+  }
   case class AgentConstraintDef(name: String, parts: ConstraintPart[AgentVarConstraintDef])
   case class AgentVarConstraintDef(varsOrdered: Seq[ConstraintParamDescription], test: Product => Boolean){
     lazy val vars = varsOrdered.toSet.map((_: NegotiationSpecification.ConstraintParamDescription).varName)

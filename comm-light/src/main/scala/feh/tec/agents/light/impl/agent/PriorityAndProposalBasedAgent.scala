@@ -1,6 +1,7 @@
 package feh.tec.agents.light.impl.agent
 
 import feh.tec.agents.light.AgentCreationInterface.NegotiationInit
+import feh.tec.agents.light.impl.ConstraintsSatisfactionChecks
 import feh.tec.agents.light.spec.AgentSpecification
 import feh.tec.agents.light._
 import feh.tec.agents.light.spec.AgentSpecification.PriorityAndProposalBased
@@ -57,12 +58,4 @@ class PriorityNegotiationHandlerImpl[Owner <: PriorityAndProposalBasedAgent[Lang
   def onPriorityUpdate(f: (NegotiationId, Option[Priority])): Any                            = spec.onPriorityUpdate.get.tupled(f)
   def decide(requests: Map[AgentRef, Lang#PriorityRaiseRequest]): Lang#PriorityRaiseResponse = spec.decide.get apply requests
   def start(neg: NegotiationId): Lang#PriorityRaiseRequest                                   = spec.start.get apply neg
-}
-
-trait PriorityAndProposalBasedAgentSpecTypeless {
-  self: PriorityAndProposalBasedAgent[_] =>
-
-  protected val _specUntyped: AgentSpecification
-
-  lazy val spec = _specUntyped.asInstanceOf
 }

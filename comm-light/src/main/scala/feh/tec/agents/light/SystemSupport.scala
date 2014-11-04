@@ -18,7 +18,9 @@ trait AgentHelpers[Lang <: NegotiationLanguage] extends ActorLogging{
 
       def withHooks[R](hooks: ((AgentRef, Lang#Msg) => Unit)*)(f: => R) = {
         val old = get
+        log.debug(s"withHooks: old: $old, aggregate: $hooks" )
         this.hooks ++= hooks
+        log.debug("withHooks: running with OnSend hooks: " + this.hooks)
         val res = f
         this.hooks = old
         res
@@ -34,11 +36,16 @@ trait AgentHelpers[Lang <: NegotiationLanguage] extends ActorLogging{
   implicit def agentRefWrapper(ref: AgentRef): AgentRefWrapper = new AgentRefWrapper(ref) {
     def !(msg: Lang#Msg) = {
       ref.ref ! msg
+      log.debug("executing hooks.OnSend: " + hooks.OnSend.get)
       hooks.OnSend.get foreach (_(ref, msg))
     }
   }
 
-  def sendToAll(msg: Lang#Msg) = get(msg.negotiation).scope().foreach(_ ! msg)
+  def sendToAll(msg: Lang#Msg) = {
+    val scope = get(msg.negotiation).scope()
+    log.debug(s"sendToAll scope=$scope")
+    scope.foreach(_ ! msg)
+  }
 
   private lazy val negotiationsCache = negotiations.map(n => n.id -> n).toMap
   def get(neg: NegotiationId): Negotiation = {
@@ -66,9 +73,16 @@ trait SystemSupport extends AbstractAgent{
 trait SpeakingSystemSupport[Lang <: Language] extends SystemSupport{
   self: SpeakingAgent[Lang] =>
 
+  private var _currentMessage: Lang#Msg = null.asInstanceOf[Lang#Msg]
+  def currentMessage = _currentMessage
+
   def receive = {
     case sys: SystemMessage => processSys(sys)
-    case msg: Lang#Msg      => beforeEachMessage(msg); process(msg)
+    case msg: Lang#Msg      =>
+      _currentMessage = msg
+      beforeEachMessage(msg)
+      process(msg)
+      _currentMessage = null.asInstanceOf[Lang#Msg]
   }
   
   protected def beforeEachMessage(msg: Lang#Msg)

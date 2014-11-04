@@ -2,7 +2,7 @@ package feh.tec.agents.light
 
 import java.io.{FileWriter, BufferedWriter, File}
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.actor.Actor.Receive
 import feh.tec.agents.light.impl.NegotiationEnvironmentController
 import org.apache.commons.io.IOUtils
@@ -31,19 +31,36 @@ object AgentReport{
 }
 
 
-trait AgentReporting[Lang <: NegotiationLanguage] extends NegotiatingAgent[Lang] with SpeakingSystemSupport[Lang]{
+trait AgentReporting[Lang <: NegotiationLanguage] extends NegotiatingAgent[Lang] with SpeakingSystemSupport[Lang] with ActorLogging{
   val reportingTo: Map[NegotiationId, AgentRef]
-  protected def report(r: AgentReport) = reportingTo.get(r.negotiation).foreach(_.ref ! r)
+
+  log.debug("reportingTo " + reportingTo)
+
+  protected def report(r: AgentReport) = {
+    val negId = r.negotiation
+    val repTo = reportingTo.get(negId)
+    log.debug(s"reporting to $repTo, keys=${reportingTo.keySet}, negId=$negId")
+    repTo foreach (_.ref ! r)
+  }
 }
 
 object AgentReporting{
 
-  trait AutoMessage[Lang <: NegotiationLanguage] extends AgentReporting[Lang] with AgentHelpers[Lang] {
-    protected def messageReportHook(to: AgentRef, msg: Lang#Msg) = report(MessageReport(msg, to))
+  trait AutoMessage[Lang <: NegotiationLanguage] extends AgentReporting[Lang] with AgentHelpers[Lang] with SystemSupport {
+    protected def messageReportHook(to: AgentRef, msg: Lang#Msg) = {
+      log.debug(s"messageReportHook: msg=$msg, to=$to")
+      report(MessageReport(msg, to))
+    }
 
     abstract override def process: PartialFunction[Lang#Msg, Any] = {
-      case msg if super.process.isDefinedAt(msg) => hooks.OnSend.withHooks(messageReportHook)(super.process(msg))
-    }    
+      case msg if super.process.isDefinedAt(msg) =>
+        log.debug("abstract override def process: withHooks")
+        hooks.OnSend.withHooks(messageReportHook)(super.process(msg))
+    }
+
+    abstract override def start(): Unit = hooks.OnSend.withHooks(messageReportHook)(super.start())
+    abstract override def stop(): Unit = hooks.OnSend.withHooks(messageReportHook)(super.stop())
+    abstract override def reset(): Unit = hooks.OnSend.withHooks(messageReportHook)(super.reset())
   }
   
   trait StateByDemand[Lang <: NegotiationLanguage] extends AgentReporting[Lang]{
@@ -77,15 +94,20 @@ trait ReportListenerControllerSupport {
 
   protected val listeners = mutable.HashMap.empty[ReportListenerRef[_], AgentRef]
 
-  def reportListener[R <: ReportListener](ref: ReportListenerRef[R])(implicit builder: ReportListenerBuilder[R]) =
+  def reportListener[R <: ReportListener](ref: ReportListenerRef[R])(implicit builder: ReportListenerBuilder[R]) = synchronized{
+    log.debug(s"create reportListener: ref=$ref, listeners=$listeners")
     listeners.getOrElseUpdate(ref, builder.build(ref.clazz))
+  }
+
 }
 
-trait ReportListener extends SystemAgent{
+trait ReportListener extends SystemAgent with ActorLogging{
   def reportReceived(r: AgentReport)
 
   def receive: Actor.Receive = {
-    case r: AgentReport => reportReceived(r)
+    case r: AgentReport =>
+      log.debug("ReportListener: reportReceived = " + r)
+      reportReceived(r)
   }
 }
 
@@ -96,7 +118,12 @@ trait ReportPrinter extends ReportListener{
 trait ReportWriter extends ReportPrinter{
   val writeTo: File
 
-  def reportReceived(r: AgentReport): Unit = IOUtils.write(print(r), writer)
+  def reportReceived(r: AgentReport): Unit = {
+    log.debug(s"ReportWriter: writing to log")
+    IOUtils.write(print(r), writer)
+    writer.newLine()
+    writer.flush()
+  }
 
   private lazy val writer = new BufferedWriter(new FileWriter(writeTo))
 }
@@ -109,5 +136,8 @@ trait ReportForwarder extends ReportListener{
     case AgentReport.StopForward(to)  => forwardTo -= to
   }
 
-  abstract override def reportReceived(r: AgentReport): Unit = forwardTo foreach (_ ! r)
+  abstract override def reportReceived(r: AgentReport): Unit = {
+    super.reportReceived(r)
+    forwardTo foreach (_ ! r)
+  }
 }

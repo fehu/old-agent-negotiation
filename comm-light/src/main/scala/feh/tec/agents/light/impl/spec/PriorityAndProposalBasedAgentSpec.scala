@@ -49,7 +49,7 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
     implicit owner => id => priorityNegotiationHandler.get.start.get apply id
   )
 
-  lazy val priorityNegotiationHandlerEvidence = new DefDS[NegotiationId => Any](???) // todo
+  lazy val priorityNegotiationHandlerEvidence = new DefDS[NegotiationId => Any](_ => _ => None) // todo
 
   lazy val priorityNegotiationHandler = new DefDSH[AgentSpecification.PriorityNegotiationHandler[Ag, Lang]](
     implicit owner => new PriorityNegotiationHandlerSpec[Ag, Lang](priorityNegotiationHandlerEvidence.get)

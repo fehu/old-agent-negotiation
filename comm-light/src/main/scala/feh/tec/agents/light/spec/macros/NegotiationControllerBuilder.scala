@@ -8,7 +8,8 @@ import feh.tec.agents.light.impl.NegotiationEnvironmentController.Timeouts
 import feh.tec.agents.light.impl.spec.{IteratingSpec, PriorityAndProposalBasedAgentSpec}
 import feh.tec.agents.light.spec.AgentSpecification
 import feh.tec.agents.light.spec.NegotiationSpecification.{AgentDef, NegotiationDef}
-import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.{VarsSeparatingConstrainsBuilder, SimpleConstrainsBuilder, Raw}
+import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.Raw.TreesBuilder.ConstraintsBuilder
+import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.{VarsSeparatingConstraintsBuilder, SimpleConstraintsBuilder, Raw}
 import feh.tec.agents.light._
 import feh.tec.agents.light.spec.macros.NegotiationSpecificationBuilder.Raw.{DomainDef, VarDef, AgentNegDef}
 import feh.util._
@@ -22,7 +23,7 @@ object NegotiationControllerBuilder {
 
     val builder = new NegotiationControllerBuilder[c.type](c)
     val raw = NegotiationSpecificationBuilder.raw[c.type](c)(dsl)
-    implicit val cb = new VarsSeparatingConstrainsBuilder
+    implicit val cb = new VarsSeparatingConstraintsBuilder
     
     val specCompositionAndDependencies = raw.agents.zipMap{
       rawAgDef =>
@@ -44,7 +45,7 @@ object NegotiationControllerBuilder {
       override def hashCode(): Int = name.hashCode
     }
 
-    val createInterfacesPropsByBody = specCompositionsByRaw map(p => p._1 -> builder.agentPropsExpr(p._2, p._1, dependencyCallsByName, extraAgentParents)) map {
+    val createInterfacesPropsByBody = specCompositionsByRaw map(p => p._1 -> builder.agentPropsExpr(p._2, p._1, dependencyCallsByName, extraAgentParents, raw)) map {
       case (agRawDef, (reportTo, agentPropsExpr)) =>
         val moreControllerParents = tq"feh.tec.agents.light.impl.service.ReportPrinterSupportBundle" :: Nil
         val moreControllerBody =
@@ -128,6 +129,8 @@ object NegotiationControllerBuilder {
     val extraControllerParents = controllerExtras.flatMap(_.parents)
     val extraControllerBody    = controllerExtras.flatMap(_.body)
 
+    c.info(NoPosition, "initialAgents: " + initialAgents.map(_.tree).map(showCode(_)).mkString("\n", "\n", ""), true)
+
     c.Expr(
       q"""
         import feh.tec.agents.light.spec.NegotiationSpecification._
@@ -179,9 +182,11 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
   def agentPropsExpr(composition: SpecificationComposition,
                      raw: Raw.AgentDef[c.type],
                      dependenciesCalls: Map[String, c.Expr[_]],
-                     extraParents: List[c.Tree]) = {
+                     extraParents: List[c.Tree],
+                     fullRaw: Raw[c.type])
+                    (implicit cb: ConstraintsBuilder) = {
     val descriptionsDefinedArgs = composition.parts.flatMap(_.interface.descriptions.keys)
-    val argsDependancies = descriptionsDefinedArgs.map(arg => arg -> dependenciesCalls(arg).tree).toMap
+    val argsDependencies = descriptionsDefinedArgs.map(arg => arg -> dependenciesCalls(arg).tree).toMap
 
     def argsMap(m: Map[String, c.Tree]) = {
       val entries = m.map{case (k, v) => q"$k -> $v"}
@@ -251,6 +256,15 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
 
     def logOnCreate = q"""log.debug("I've been created")"""
 
+    def constraintMapEntries = raw.negotiations.map{
+      aNeg =>
+        val constr = aNeg.constraints.map(cb.build[c.type](c)(_, fullRaw)).reduce((acc, v) => c.Expr(q"$acc ++ $v"))
+//        c.abort(NoPosition, "constr = " + showRaw(constr))
+        q"NegotiationId(${aNeg.negotiation}) -> $constr"
+    }
+    def constraintMapDef = q"lazy val constraintsByNegotiation = Map(Seq(..$constraintMapEntries): _*)"
+
+
     val reports = raw.negotiations.collect{
       case Raw.AgentNegDef(neg, _, _, Some(reportTo), _) => neg -> reportTo
     }
@@ -269,8 +283,8 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
           """
         ),
         List({
-          val reportToEntries = reports.map{ case (negName, reportListenerRefTree) => q"$negName -> reportListener($reportListenerRefTree)" }
-          "reportTo" -> q"Map(Seq(..$reportToEntries):_*)"
+          val reportToEntries = reports.map{ case (negName, reportListenerRefTree) => q"NegotiationId($negName) -> reportListener($reportListenerRefTree)" }
+          "reportingTo" -> q"Map(Seq(..$reportToEntries):_*)"
         })
       )
     } else (Nil, Nil, Nil)
@@ -286,9 +300,9 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
 
 
     val moreParents = reportsParents ::: Nil
-    val moreBody = negotiationTypeTree :: createNegotiationTree :: reportsBody
+    val moreBody = negotiationTypeTree :: createNegotiationTree :: constraintMapDef :: reportsBody
 
-    val args = argsDependancies ++ reportsArgs
+    val args = argsDependencies ++ reportsArgs
 
     def template =
       (interface: CreateInterface, body: List[c.Tree]) =>

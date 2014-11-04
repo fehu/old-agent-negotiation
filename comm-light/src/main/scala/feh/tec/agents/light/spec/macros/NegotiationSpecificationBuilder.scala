@@ -15,7 +15,7 @@ object NegotiationSpecificationBuilder{
   def build(c: whitebox.Context)(dsl: c.Expr[spec.dsl.Negotiation]): c.Expr[spec.NegotiationSpecification] = {
     import c.universe._
 
-    implicit val cb: ConstraintsBuilder = new SimpleConstrainsBuilder
+    implicit val cb: ConstraintsBuilder = new SimpleConstraintsBuilder
 
     val ExtractRaw = Raw.BuildTrees[c.type](c)
     val ExtractRaw(vars, negotiations, agents, spawns, timeouts) = raw[c.type](c)(dsl)
@@ -71,7 +71,7 @@ object NegotiationSpecificationBuilder{
       }
 
       trait ConstraintsBuilder{
-        def build[C <: whitebox.Context](c: C)(agDef: Raw.AgentConstraintsDef[c.type], raw: Raw[c.type]): c.Expr[AgentConstraintDef]
+        def build[C <: whitebox.Context](c: C)(agDef: Raw.AgentConstraintsDef[c.type], raw: Raw[c.type]): c.Expr[NS.AgentConstraintsDef]
       }
 
       def agents[C <: whitebox.Context](c: C)
@@ -225,9 +225,9 @@ object NegotiationSpecificationBuilder{
   }
 
 
-  class SimpleConstrainsBuilder extends ConstraintsBuilder{
+  class SimpleConstraintsBuilder extends ConstraintsBuilder{
 
-    def build[C <: whitebox.Context](c: C)(agDef: Raw.AgentConstraintsDef[c.type], raw: Raw[c.type]): c.Expr[AgentConstraintDef] = {
+    def build[C <: whitebox.Context](c: C)(agDef: Raw.AgentConstraintsDef[c.type], raw: Raw[c.type]): c.Expr[AgentConstraintsDef] = {
 
       val xc = new ExtendedConstraint[c.type](c)
         import c.universe._
@@ -245,9 +245,9 @@ object NegotiationSpecificationBuilder{
       }
   }
 
-  class VarsSeparatingConstrainsBuilder extends ConstraintsBuilder{
+  class VarsSeparatingConstraintsBuilder extends ConstraintsBuilder{
 
-    def build[C <: whitebox.Context](c: C)(agConstrDef: Raw.AgentConstraintsDef[c.type], raw: Raw[c.type]): c.Expr[AgentConstraintDef] = {
+    def build[C <: whitebox.Context](c: C)(agConstrDef: Raw.AgentConstraintsDef[c.type], raw: Raw[c.type]): c.Expr[AgentConstraintsDef] = {
       import c.universe._
 
       val h = new Helper[c.type](c)

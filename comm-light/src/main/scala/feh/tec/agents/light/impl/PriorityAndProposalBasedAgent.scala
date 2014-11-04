@@ -9,8 +9,14 @@ import scala.collection.mutable
 
 /** template dor generation */
 trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language.HasPriority]
-  extends PriorityProposalBasedAgent[Lang] with DynamicScopeSupport[Lang] with SpeakingSystemSupport[Lang] with ActorLogging
+  extends PriorityProposalBasedAgent[Lang]
+  with DynamicScopeSupport[Lang]
+  with SpeakingSystemSupport[Lang]
+  with ConstraintsSatisfactionChecks
+  with ActorLogging
 {
+  agent =>
+
   type Negotiation <: Negotiation.DynamicScope with Negotiation.HasPriority with Negotiation.HasProposal[Lang]
 
   def negotiationIds: Set[NegotiationId]
@@ -48,6 +54,16 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
   }
 
   def requestPriorityRaise(neg: NegotiationId): Lang#PriorityRaiseRequest = priorityNegotiationHandler.start(neg)
+
+  def respond(msg: Lang#Msg) = {
+    val sender = Option(currentMessage).getOrThrow("cannot respond: no incoming message registered").sender
+    sender ! msg
+  }
+
+  implicit class SatisfiesConstraintsWrapper(proposal: Lang#Proposal){
+    def satisfiesConstraints: Boolean = agent.satisfiesConstraints(proposal.negotiation, proposal.get)
+  }
+
 }
 
 trait PriorityNegotiationHandlerImpl[Lang <: Language.ProposalBased with Language.HasPriority] extends PriorityNegotiationHandler[Lang]
