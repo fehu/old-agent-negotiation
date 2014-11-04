@@ -5,19 +5,8 @@ A Thesis Project at *Monterrey Institute of Technology and Higher Education* ([I
 -[Project API](http://fehu.github.io/agent-negotiation/unidoc/package.html)
 
 ##### todo:
-  * [coloring](coloring/todo.md)
   * [comm](comm/todo.md)
   * [web-frontend](web/frontend/todo.md)
-
-### Coloring Negotiation (old)
-*based on old __oldcomm__ package*
-
-Agent negotiation over graph node colors, in order to run it, execute
-```
-user:project_root> sbt
-> project coloring
-> run
-```
 
 ### Queens' negotiation
 
@@ -26,7 +15,7 @@ that is implemented upon [akka](http://akka.io) actors.
 
 It is described by
 
-#### Agent Specification
+#### Agent Specification (light)
 Defines agent behaviour.
 
 The `feh.tec.agents.light.impl.agent.create` object provides some specifications bases with very simple or stubbed behaviour.
@@ -92,7 +81,7 @@ object QueenSpec extends create.PPI.AllVarsSpec{
 }
 ```
 
-#### Negotiation Specification
+#### Negotiation Specification  (light)
 Defines variables and negotiations, references *Agent Specification*, defines the number of agents to create.  
 
 ([source](misc/src/main/scala/feh/tec/agents/light/QueenNegotiationApp.scala)):
@@ -140,6 +129,7 @@ in sbt execute:
 ```
 > project misc
 > run
+-- choose the app to run --
 ```
 
 ### Visualisation
