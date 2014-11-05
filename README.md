@@ -8,10 +8,11 @@ A Thesis Project at *Monterrey Institute of Technology and Higher Education* ([I
   * [comm](comm/todo.md)
   * [web-frontend](web/frontend/todo.md)
 
-### Queens' negotiation (obsolete - needs update)
+### ~~Queens' negotiation~~
+**(information here is obsolete - needs update)**
 
-The negotiation is run by [GenericNegotiatingAgents](misc/src/main/scala/feh/tec/agents/GenericNegotiatingAgent.scala),
-that is implemented upon [akka](http://akka.io) actors.
+The negotiation is ~~run by [GenericNegotiatingAgents](misc/src/main/scala/feh/tec/agents/GenericNegotiatingAgent.scala),
+that is~~ implemented upon [akka](http://akka.io) actors.
 
 It is described by
 
