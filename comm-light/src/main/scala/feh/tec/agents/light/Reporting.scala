@@ -12,8 +12,8 @@ import scala.collection.mutable
 trait AgentReport extends Message { def at: Long }
 
 case class MessageReport(msg: NegotiationLanguage#Msg, to: AgentRef, at: Long = System.currentTimeMillis()) extends AgentReport{
-  def negotiation = msg.negotiation
-  def sender = msg.sender
+  val negotiation = msg.negotiation
+  val sender = msg.sender
   def asString = s"""MessageReport("$msg" to $to)"""
 }
 

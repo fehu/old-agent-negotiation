@@ -12,7 +12,9 @@ trait ConstraintsSatisfactionChecks {
 
   def satisfiesConstraints(of: NegotiationId, values: Map[Var, Any]): Boolean = constraintsByNegotiation(of).constraints forall {
     case AgentConstraintDef(cName, parts) =>
-      satisfiesParts(parts, values, get(of).currentValues()) $$
+      val myValues = get(of).currentValues()
+      log.debug(s"satisfiesConstraints values=$values, myValues=$myValues")
+      satisfiesParts(parts, values, myValues) $$
         { r => log.debug(s"constrain $cName ${if(r) "" else "NOT "} satisfied") }
   }
 

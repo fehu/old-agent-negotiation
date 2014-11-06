@@ -69,57 +69,77 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
 class PriorityNegotiationHandlerSpec[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
   extends AgentSpecification.PriorityNegotiationHandler[Ag, Lang]
 {
-  protected lazy val requests = mutable.HashMap.empty[PriorityRaiseRequestId, mutable.Map[AgentRef, Option[Lang#PriorityRaiseRequest]]]
-  protected lazy val confirmations = mutable.HashMap.empty[PriorityRaiseRequestId, mutable.Map[AgentRef, Option[Lang#PriorityRaiseResponse]]]
-  protected def clear(id: PriorityRaiseRequestId) = {
-    requests -= id
-    confirmations -= id
+  protected var raiseRequestId: Option[PriorityRaiseRequestId] = None
+  protected lazy val requests = mutable.HashMap.empty[AgentRef, Option[Lang#PriorityRaiseRequest]]
+  protected lazy val confirmations = mutable.HashMap.empty[AgentRef, Option[Lang#PriorityRaiseResponse]]
+  protected def clear() = {
+    raiseRequestId = None
+    requests.clear()
+    confirmations.clear()
   }
-  protected def emptyMap[T](neg: Ag#Negotiation)(implicit owner: Ag) =
-    mutable.HashMap((neg.scope() + owner.ref).toSeq.zipMap(_ => Option.empty[T]): _*)
+  protected def emptyMap[T <: Lang#Msg](msg: T)(implicit owner: Ag) =
+    mutable.HashMap((owner.get(msg.negotiation).scope() + owner.ref).toSeq.zipMap{
+      case msg.sender => Some(msg)
+      case _          => None
+    }: _*)
 
-  def allRequests(id: PriorityRaiseRequestId): Boolean = requests.get(id).exists(_.forall(_._2.isDefined))
-  def allConfirmations(id: PriorityRaiseRequestId): Boolean = confirmations.get(id).exists(_.forall(_._2.isDefined))
+  def allRequests(id: PriorityRaiseRequestId) = raiseRequestId.contains(id) && requests.forall(_._2.isDefined)
+  def allConfirmations(id: PriorityRaiseRequestId) = raiseRequestId.contains(id) && confirmations.forall(_._2.isDefined)
 
   protected def addReqEntry(req: Lang#PriorityRaiseRequest)(implicit owner: Ag) ={
     val snd = req.sender
     owner.log.debug(s"adding priority raise request by $snd")
-    requests.getOrElseUpdate(req.id, emptyMap(owner.get(req.negotiation))) += snd -> Some(req)
+    // if there are already requests guarded, select the created first
+    if(raiseRequestId.isEmpty || (req.id.initializedAt before raiseRequestId.get.initializedAt)){
+      clear()
+      raiseRequestId = Some(req.id)
+      requests ++= emptyMap(req)
+    }
+//    else if (req.id.initializedAt == raiseRequestId.get.initializedAt && req.id.get != raiseRequestId.get.get){
+//      choose the one with hash-code
+//    }
+    else {
+//      assert(requests(req.sender).isEmpty || requests(req.sender) == Some(req), s"the request is already defined for agent ${req.sender} with ${req.id}; requests=$requests")
+//      assert(requests(req.sender).isEmpty, s"the request is already defined for agent ${req.sender} with ${req.id}; requests=$requests")
+      requests(req.sender) = Some(req)
+    }
   }
 
-//  protected def confirmationsMap(neg: Ag#Negotiation)(implicit owner: Ag) =
-//    mutable.HashMap((neg.scope() + owner.ref).toSeq.zipMap(_ => Option.empty[Lang#PriorityRaiseResponse]): _*)
-  
   protected def addConfirmEntry(resp: Lang#PriorityRaiseResponse)(implicit owner: Ag) ={
-    val snd = resp.sender
-    owner.log.debug(s"adding priority raise request by $snd")
-    confirmations.getOrElseUpdate(resp.respondingTo, emptyMap(owner.get(resp.negotiation))) += snd -> Some(resp)
+    val sndr = resp.sender
+    owner.log.debug(s"adding priority raise request by $sndr")
+//    assert(raiseRequestId.contains(resp.respondingTo), s"the $raiseRequestId doesn't match $resp, ${resp.respondingTo}")
+    if(confirmations.isEmpty) confirmations ++= emptyMap(resp)
+    else {
+//      assert(confirmations(sndr).isEmpty, s"the response is already defined for ${resp.sender} for ${resp.respondingTo}; confirmations=$confirmations")
+      confirmations(sndr) = Some(resp)
+    }
   }
 
   lazy val process = new DefDS[PartialFunction[Lang#Priority, Any]](
     implicit owner => {
       case req: Lang#PriorityRaiseRequest =>
         import owner.{log, ref, sendToAll}
+        owner.get(req.negotiation).currentState update NegotiationState.NegotiatingPriority
         addReqEntry(req)
         log.debug(s"PriorityNegotiationHandlerSpec: process: $req by ${req.sender}")
-        log.debug(s"requests(req.id)(ref)=${requests(req.id)(ref)} in ${requests(req.id)} ")
-        if(requests(req.id)(ref).isEmpty) {
+        if(requests(ref).isEmpty) {
           log.debug("sending my priority raise request")
           sendToAll(start.get apply req.negotiation copy(id = req.id))
         }
         if(allRequests(req.id)) {
-          val resp = decide.get apply req.negotiation apply requests(req.id).toMap.mapValues(_.get)
+          val resp = decide.get apply req.negotiation apply requests.toMap.mapValues(_.get)
           addConfirmEntry(resp)
           log.debug(s"PriorityNegotiationHandlerSpec: process: resp=$resp")
           sendToAll(resp)
         }
-        else log.debug(s"requests = ${requests.get(req.id)}")
-      case resp: Lang#PriorityRaiseResponse =>
+        else log.debug(s"requests = $requests")
+      case resp: Lang#PriorityRaiseResponse if owner.get(resp.negotiation).currentState() == NegotiationState.NegotiatingPriority =>
         import owner.log
         addConfirmEntry(resp)
         if(allConfirmations(resp.respondingTo))
-          onPriorityUpdate.get apply(resp.negotiation, confirmations(resp.respondingTo).toMap.mapValues(_.get))
-        else log.debug(s"confirmations = ${confirmations(resp.respondingTo)}")
+          onPriorityUpdate.get apply(resp.negotiation, confirmations.toMap.mapValues(_.get))
+        else log.debug(s"confirmations = $confirmations")
     }
   )
   lazy val evidence = new DefDS[NegotiationId => Any](_ => ???)
@@ -132,8 +152,9 @@ class PriorityNegotiationHandlerSpec[Ag <: PriorityAndProposalBasedAgent[Lang], 
     implicit owner => {
       neg =>
         implicit def sender = owner.ref
+        owner.get(neg).currentState update NegotiationState.NegotiatingPriority
         owner.log.debug(s"owner.ref = " + sender)
-        val reqId = Message.PriorityRaiseRequestId.rand
+        val reqId = Message.PriorityRaiseRequestId()
         val msg = Message.PriorityRaiseRequest(reqId, neg, owner.get(neg).currentPriority(), evidence.get.apply(neg))(sender).asInstanceOf[Lang#PriorityRaiseRequest]
         //requests += reqId -> (requestsMap(owner.get(neg)) += owner.ref -> Some(msg))//mutable.Map.empty[AgentRef, Option[Lang#PriorityRaiseRequest]].withDefaultValue(None)
         addReqEntry(msg)

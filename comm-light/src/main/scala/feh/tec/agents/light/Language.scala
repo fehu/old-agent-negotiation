@@ -1,6 +1,6 @@
 package feh.tec.agents.light
 
-import java.util.UUID
+import java.util.{Date, UUID}
 
 trait Language{
   type Msg <: AnyRef
@@ -30,8 +30,8 @@ object Language{
 }
 
 trait Message extends NegotiationMessage{
-  def sender: AgentRef
-  def negotiation: NegotiationId
+  val sender: AgentRef
+  val negotiation: NegotiationId
 
   def asString: String
 
@@ -51,7 +51,7 @@ object Message{
   
   case class Proposal(id: ProposalId, negotiation: NegotiationId, priority: Priority, get: Map[Var, Any])
                      (implicit val sender: AgentRef) extends Message.HasPriority{
-    def asString = s"I would like to set values: $get, are you ok with it?"
+    def asString = s"I would like to set values: $get, are you ok with it? ($priority)"
   }
 
   trait ProposalResponse extends Message.HasPriority{
@@ -61,16 +61,19 @@ object Message{
 
   case class Accepted(negotiation: NegotiationId, respondingTo: ProposalId, priority: Priority, myValues: Map[Var, Any])
                      (implicit val sender: AgentRef) extends ProposalResponse {
-    def asString = "I accept your offer"
+    def asString = "I accept your offer ($priority)"
   }
   case class Rejected(negotiation: NegotiationId, respondingTo: ProposalId, priority: Priority, myValues: Map[Var, Any])
                      (implicit val sender: AgentRef) extends ProposalResponse {
-    def asString = "I reject your offer"
+    def asString = "I reject your offer ($priority)"
   }
 
-  case class PriorityRaiseRequestId(get: UUID)
+  class PriorityRaiseRequestId{
+    val initializedAt = new Date
+    override def toString: String = s"PriorityRaiseRequestId(${initializedAt.getTime})"
+  }
   object PriorityRaiseRequestId{
-    def rand = PriorityRaiseRequestId(UUID.randomUUID())
+    def apply() = new PriorityRaiseRequestId
   }
 
   case class PriorityRaiseRequest[Ev](id: PriorityRaiseRequestId, negotiation: NegotiationId, priority: Priority, evidence: Ev)

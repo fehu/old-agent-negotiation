@@ -152,8 +152,8 @@ object NegotiationControllerBuilder {
   }
 
   object TimeoutsDefault extends Timeouts{
-    def initialize: Timeout = 100.millis
-    def start: Timeout      = 30.millis
+    def initialize: Timeout = 200.millis
+    def start: Timeout      = 50.millis
     def stop: Timeout       = 30.millis
     def reset: Timeout      = 30.millis
   }
