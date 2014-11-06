@@ -46,13 +46,13 @@ object NegotiationControllerBuilder {
     }
 
     val createInterfacesPropsByBody = specCompositionsByRaw map(p => p._1 -> builder.agentPropsExpr(p._2, p._1, dependencyCallsByName, extraAgentParents, raw)) map {
+      case (agRawDef, (Nil, agentPropsExpr)) => agRawDef.name -> (agentPropsExpr -> Option.empty[ControllerExtra])
       case (agRawDef, (reportTo, agentPropsExpr)) =>
         val moreControllerParents = tq"feh.tec.agents.light.impl.service.ReportPrinterSupportBundle" :: Nil
         val moreControllerBody =
           q"def configInfo = feh.tec.agents.light.impl.service.SupportBundle.Config(${Configs.controller[c.type](c)})" :: Nil
 
         agRawDef.name -> (agentPropsExpr -> Some(ControllerExtra("reporting", moreControllerParents, moreControllerBody)))
-      case (agRawDef, (Nil, agentPropsExpr)) => agRawDef.name -> (agentPropsExpr -> Option.empty[ControllerExtra])
     }
 
     def agentsCreationExpressions(name: String, body: List[c.Tree]): (c.Expr[(String, NegotiationRole, Set[NegotiationInit]) => AgentRef], Option[ControllerExtra]) = {

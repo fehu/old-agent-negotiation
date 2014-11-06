@@ -18,17 +18,16 @@ trait AbstractNegotiation {
     protected def upd: (Upd, Repr) => Repr
 
     def apply(): Get = get(repr)
-    def update(u: Upd) = repr = {
-      reset()
-      upd(u, repr)
-    }
-    def update(f: Get => Upd) = repr = {
-      reset()
-      val old = apply()
-      val n = f(apply())
-      val newRepr = upd(n, repr)
-      stateVarChanged(name, old -> n)
-      newRepr
+    def update(u: Upd): Unit = repr = {
+//        reset()
+        val newRepr = upd(u, repr)
+        stateVarChanged(name, raw -> newRepr)
+        newRepr
+      }
+
+    def update(f: Get => Upd): Unit = {
+//      reset()
+      update(f(apply()))
     }
 
     def reset() = repr = newRepr
@@ -47,7 +46,7 @@ trait AbstractNegotiation {
     def addHook(name: String, hook: Hook): Unit = hooks += name -> hook
     def rmHook(name: String): Unit = hooks -= name
 
-    def runHooks(changes: Map[StateVarName, Change]): Unit = hooks.mapValues(_(changes))
+    def runHooks(changes: Map[StateVarName, Change]): Unit = hooks.foreach(_._2(changes))
   }
 
   protected def stateVarChanged(name: String, change: VarUpdateHooks.Change) = { /* stub */ }
@@ -141,9 +140,9 @@ object Negotiation{
     }
     def bulkUpdate[R](f: => R) = BulkChanging.doWith(true)(f) $$ { _ => BulkChanging.runHooks() }
 
-    override protected def stateVarChanged(name: String, change: VarUpdateHooks.Change) = 
+    override protected def stateVarChanged(name: String, change: VarUpdateHooks.Change) =
       if(BulkChanging.get) BulkChanging.currentBulk += name -> change else VarUpdateHooks.runHooks(Map(name -> change))
-    
+
     object ChangeHooks{
       def add(name: String, hook: VarUpdateHooks.Hook) = VarUpdateHooks.addHook(name, hook)
       def rm = VarUpdateHooks.rmHook _

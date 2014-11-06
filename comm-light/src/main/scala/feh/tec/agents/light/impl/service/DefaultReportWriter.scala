@@ -8,17 +8,13 @@ import akka.actor.{ActorLogging, Props}
 import feh.tec.agents.light._
 import feh.tec.agents.light.impl.NegotiationEnvironmentController
 
-trait DefaultReportPrinter extends ReportPrinter with ActorLogging{
+trait DefaultReportPrinter extends ReportPrinter{
   protected lazy val DateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
-  def print(r: AgentReport): String = {
-    val report = s"[${DateFormat.format(new Date(r.at))}] $r"
-    log.debug(s"report $report")
-    report
-  }
+  def print(r: AgentReport): String = s"[${DateFormat.format(new Date(r.at))}] $r"
 }
 
-class DefaultReportWriter(val writeTo: File) extends ReportWriter with DefaultReportPrinter with ReportForwarder {
+class DefaultReportWriter(val writeTo: File) extends ReportWriter with DefaultReportPrinter with ReportForwarder with ActorLogging{
   val name = DefaultReportWriter.Name
   override val role = DefaultReportWriter.Role
   log.debug("DefaultReportWriter started")

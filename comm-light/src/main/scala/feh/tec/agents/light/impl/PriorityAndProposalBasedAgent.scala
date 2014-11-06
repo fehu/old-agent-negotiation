@@ -71,6 +71,7 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
 
 }
 
+/*
 trait PriorityNegotiationHandlerImpl[Lang <: Language.ProposalBased with Language.HasPriority] extends PriorityNegotiationHandler[Lang]
 {
   protected def get: NegotiationId => AbstractNegotiation
@@ -85,13 +86,10 @@ trait PriorityNegotiationHandlerImpl[Lang <: Language.ProposalBased with Languag
   protected def requestsMap(neg: NegotiationId) = mutable.HashMap(get(neg).scope().toSeq.zipMap(_ => Option.empty[Lang#PriorityRaiseRequest]): _*)
   def allRequests(id: PriorityRaiseRequestId): Boolean = requests.get(id).exists(_.forall(_._2.isDefined))
 
-  protected def onStart(id: PriorityRaiseRequestId) = {
-    requests.ensuringNot(_.contains(id))
-  }
-
-  def process = {
-    case req: Lang#PriorityRaiseRequest =>
-      requests.getOrElseUpdate(req.id, requestsMap(req.negotiation))(req.sender) = Some(req)
-      if(allRequests(req.id)) sendAll(decide(requests(req.id).toMap.mapValues(_.get)).asInstanceOf[Lang#Msg])
-  }
+//  def process = {
+//    case req: Lang#PriorityRaiseRequest =>
+//      requests.getOrElseUpdate(req.id, requestsMap(req.negotiation))(req.sender) = Some(req)
+//      if(allRequests(req.id)) sendAll(decide(requests(req.id).toMap.mapValues(_.get)).asInstanceOf[Lang#Msg])
+//  }
 }
+*/

@@ -16,7 +16,7 @@ trait AgentCreationInterface {
   val negotiationsInit: Set[NegotiationInit]
   val args: Args
 
-  val name: String = uniqueName
+  lazy val name: String = uniqueName
 }
 
 case class AgentCreationInterfaceDescriptor(descriptions: Map[String, ArgDescription[_]]){

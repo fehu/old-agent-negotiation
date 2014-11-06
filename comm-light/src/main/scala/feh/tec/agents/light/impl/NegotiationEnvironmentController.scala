@@ -126,7 +126,7 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
   def initialAgentsCreated(ag: Map[AgentRef, Map[NegotiationId, Interlocutors]]): Unit = ag foreach{
     case (ref, negotiations) => negotiations foreach{
       case (negId, InterlocutorsByRoles(roles)) =>
-        val scope = currentAgents.filter(roles contains _.id.role.name)
+        val scope = currentAgents.filter(roles contains _.id.role.name).filter(_.id != ref.id)
         newScope(ref, scope, negId)
     }
   }

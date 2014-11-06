@@ -23,10 +23,7 @@ The `feh.tec.agents.light.impl.agent.create` object provides some specifications
 The specification defines the aspects of agent's behavior as [ExtendableDefinition](comm-light/src/main/scala/feh/tec/agents/light/spec/ExtendableDefinition.scala),
     which can be extended/overridden using implicit methods from [create.Extendable***DefinitionWrapper](comm-light/src/main/scala/feh/tec/agents/light/impl/agent/create.scala).
 
-Most of definitions are instances of *MonoDefinition* class and support following extension methods:
-- **<:=** ― override main extension  point, provides a reference to the agent
-- **:=**  ― override main extension  point, does NOT provide a reference to the agent
-- **andThen** ― aggregate an expression to the main extension point
+Most of definitions are instances of *MonoDefinition* class and support following extension methods: **<:=**, **:=**, **andThen**.
       
 Some of the definitions extend also *ExtendableDefinition.BeforeAndAfter* trait, that provides two extra extension points.
   They can be overridden with methods **before** and **after**.

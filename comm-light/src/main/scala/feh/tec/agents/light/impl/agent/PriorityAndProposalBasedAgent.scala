@@ -53,9 +53,11 @@ class PriorityNegotiationHandlerImpl[Owner <: PriorityAndProposalBasedAgent[Lang
                 protected val get: NegotiationId => AbstractNegotiation,
                 protected val sendAll: Lang#Msg => Unit
               )
-  extends impl.PriorityNegotiationHandlerImpl[Lang]
+  extends PriorityNegotiationHandler[Lang]
 {
-  def onPriorityUpdate(f: (NegotiationId, Option[Priority])): Any                            = spec.onPriorityUpdate.get.tupled(f)
-  def decide(requests: Map[AgentRef, Lang#PriorityRaiseRequest]): Lang#PriorityRaiseResponse = spec.decide.get apply requests
-  def start(neg: NegotiationId): Lang#PriorityRaiseRequest                                   = spec.start.get apply neg
+  def updatePriority(neg: NegotiationId, responses: Map[AgentRef, Lang#PriorityRaiseResponse]): Unit              = spec.onPriorityUpdate.get apply (neg, responses)
+  def decide(neg: NegotiationId, requests: Map[AgentRef, Lang#PriorityRaiseRequest]): Lang#PriorityRaiseResponse  = spec.decide.get apply neg apply requests
+  def start(neg: NegotiationId): Lang#PriorityRaiseRequest                                                        = spec.start.get apply neg
+
+  def process: PartialFunction[Lang#Priority, Any]                                                                = spec.process.get
 }

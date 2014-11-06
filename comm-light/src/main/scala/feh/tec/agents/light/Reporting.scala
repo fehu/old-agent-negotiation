@@ -14,7 +14,7 @@ trait AgentReport extends Message { def at: Long }
 case class MessageReport(msg: NegotiationLanguage#Msg, to: AgentRef, at: Long = System.currentTimeMillis()) extends AgentReport{
   def negotiation = msg.negotiation
   def sender = msg.sender
-  def asString = s"MessageReport($msg to $to)"
+  def asString = s"""MessageReport("$msg" to $to)"""
 }
 
 case class StateReport(negotiation: NegotiationId, state: Map[String, Any], description: String, at: Long = System.currentTimeMillis())
@@ -31,31 +31,19 @@ object AgentReport{
 }
 
 
-trait AgentReporting[Lang <: NegotiationLanguage] extends NegotiatingAgent[Lang] with SpeakingSystemSupport[Lang] with ActorLogging{
+trait AgentReporting[Lang <: NegotiationLanguage] extends NegotiatingAgent[Lang] with SpeakingSystemSupport[Lang]{
   val reportingTo: Map[NegotiationId, AgentRef]
 
-  log.debug("reportingTo " + reportingTo)
-
-  protected def report(r: AgentReport) = {
-    val negId = r.negotiation
-    val repTo = reportingTo.get(negId)
-    log.debug(s"reporting to $repTo, keys=${reportingTo.keySet}, negId=$negId")
-    repTo foreach (_.ref ! r)
-  }
+  protected def report(r: AgentReport) = reportingTo.get(r.negotiation) foreach (_.ref ! r)
 }
 
 object AgentReporting{
 
   trait AutoMessage[Lang <: NegotiationLanguage] extends AgentReporting[Lang] with AgentHelpers[Lang] with SystemSupport {
-    protected def messageReportHook(to: AgentRef, msg: Lang#Msg) = {
-      log.debug(s"messageReportHook: msg=$msg, to=$to")
-      report(MessageReport(msg, to))
-    }
+    protected def messageReportHook(to: AgentRef, msg: Lang#Msg) = report(MessageReport(msg, to))
 
     abstract override def process: PartialFunction[Lang#Msg, Any] = {
-      case msg if super.process.isDefinedAt(msg) =>
-        log.debug("abstract override def process: withHooks")
-        hooks.OnSend.withHooks(messageReportHook)(super.process(msg))
+      case msg if super.process.isDefinedAt(msg) => hooks.OnSend.withHooks(messageReportHook)(super.process(msg))
     }
 
     abstract override def start(): Unit = hooks.OnSend.withHooks(messageReportHook)(super.start())
@@ -94,20 +82,18 @@ trait ReportListenerControllerSupport {
 
   protected val listeners = mutable.HashMap.empty[ReportListenerRef[_], AgentRef]
 
-  def reportListener[R <: ReportListener](ref: ReportListenerRef[R])(implicit builder: ReportListenerBuilder[R]) = synchronized{
-    log.debug(s"create reportListener: ref=$ref, listeners=$listeners")
-    listeners.getOrElseUpdate(ref, builder.build(ref.clazz))
-  }
+  def reportListener[R <: ReportListener](ref: ReportListenerRef[R])(implicit builder: ReportListenerBuilder[R]) =
+    synchronized{
+      listeners.getOrElseUpdate(ref, builder.build(ref.clazz))
+    }
 
 }
 
-trait ReportListener extends SystemAgent with ActorLogging{
+trait ReportListener extends SystemAgent{
   def reportReceived(r: AgentReport)
 
   def receive: Actor.Receive = {
-    case r: AgentReport =>
-      log.debug("ReportListener: reportReceived = " + r)
-      reportReceived(r)
+    case r: AgentReport => reportReceived(r)
   }
 }
 
@@ -119,7 +105,6 @@ trait ReportWriter extends ReportPrinter{
   val writeTo: File
 
   def reportReceived(r: AgentReport): Unit = {
-    log.debug(s"ReportWriter: writing to log")
     IOUtils.write(print(r), writer)
     writer.newLine()
     writer.flush()

@@ -69,14 +69,15 @@ object AgentSpecification{
   trait PriorityNegotiationHandler[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.HasPriority with Language.ProposalBased]
     extends AgentSpecificationExt[Ag]
   {
-    def onPriorityUpdate: DefBADS[(NegotiationId, Option[Priority]) => Unit]
+    def onPriorityUpdate: DefBADS[(NegotiationId, Map[AgentRef, Lang#PriorityRaiseResponse]) => Unit]
 
-    def decide: DefDS[Map[AgentRef, Lang#PriorityRaiseRequest] => Lang#PriorityRaiseResponse]
+    def decide: DefDS[NegotiationId => Map[AgentRef, Lang#PriorityRaiseRequest] => Lang#PriorityRaiseResponse]
 
     def start: DefDS[NegotiationId => Lang#PriorityRaiseRequest]
 
     def process: DefDS[PartialFunction[Lang#Priority, Any]]
 
+    def evidence: DefDS[NegotiationId => Any]
   }
 
   trait Iterating[Ag <: PriorityAndProposalBasedAgent[Lang] with ProposalEngine.Iterating[Lang], Lang <: Language.HasPriority with Language.ProposalBased]

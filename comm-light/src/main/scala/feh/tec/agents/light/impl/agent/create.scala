@@ -15,10 +15,10 @@ object create {
       def <:=(d: Ow => Def) = eDef.DefExtension = eDef.DefExtension.copy(`override` = Some(d))
       /** override main ext point */
       def :=(d: Def) = eDef.DefExtension = eDef.DefExtension.copy(`override` = Some((ow: Ow) => d))
-      /** aggregate to main ext point */
-      def andThen(d: Ow => Def) = eDef.DefExtension = eDef.DefExtension.`override` match {
-        case Some(overr) => eDef.DefExtension.copy(`override` = Some({overr; d}))
-        case None => eDef.DefExtension.copy(`override` = Some({eDef.DefExtension.default; d}))
+      /** override main ext point */
+      def andThen(d: Ow => ((Ow => Def) => Def)) = eDef.DefExtension = eDef.DefExtension.`override` match {
+        case Some(overr) => eDef.DefExtension.copy(`override` = Some((ow: Ow) => d(ow)(overr)))
+        case None => eDef.DefExtension.copy(`override` = Some((ow: Ow) => d(ow)(eDef.DefExtension.default)))
       }
     }
 
