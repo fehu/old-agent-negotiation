@@ -1,4 +1,4 @@
-package feh.tec.agents.light.spec.mcro
+package feh.tec.agents.light.spec.macros
 
 import feh.tec.agents.light.spec
 import feh.tec.agents.light.spec.{NegotiationSpecification, AgentSpecification}
@@ -21,33 +21,33 @@ trait NegotiationBuildingMacro[C <: whitebox.Context] extends MacroContext[C]{
     type NegotiationDef = NegotiationSpecification.NegotiationDef
 
     case class VarDef(name: String, domain: DomainDef)
-    case class DomainDef(domain: C#Tree, tpe: C#Type, domTpe: C#Type)
+    case class DomainDef(domain: c.Tree, tpe: c.Type, domTpe: c.Type)
 
-    case class SingleSpawnDef(name: String, count: C#Expr[Int])
+    case class SingleSpawnDef(name: String, count: c.Expr[Int])
     case class SpawnDefs(defs: Seq[SingleSpawnDef])
 
     case class AgentDef(name: String,
                         role: String,
                         negotiations: Seq[AgentNegDef],
-                        spec: C#Expr[AgentSpecification])
+                        spec: c.Expr[AgentSpecification])
 
     case class AgentNegDef(negotiation: String,
                            interlocutors: Interlocutors,
-                           interlocutorsExpr: C#Expr[Interlocutors],
-                           reportingToOpt: Option[C#Tree],
+                           interlocutorsExpr: c.Expr[Interlocutors],
+                           reportingToOpt: Option[c.Tree],
                            constraints: Seq[AgentConstraintsDef])
-    case class AgentConstraintsDef(constraints: Seq[C#Tree])
+    case class AgentConstraintsDef(constraints: Seq[c.Tree])
 
-    case class TimeDefs(mp: Map[String, C#Expr[FiniteDuration]])
+    case class TimeDefs(mp: Map[String, c.Expr[FiniteDuration]])
   }
 
-  def build(dsl: C#Expr[spec.dsl.Negotiation]): NegotiationRaw
+  def build(dsl: c.Expr[spec.dsl.Negotiation]): NegotiationRaw
 
 }
 
 trait NegotiationBuildingMacroImpl[C <: whitebox.Context] extends NegotiationBuildingMacro[C]{
-  def build(dsl: C#Expr[spec.dsl.Negotiation]): NegotiationRaw = {
-    val b = new NegotiationSpecificationBuilder[C](c)
+  def build(dsl: c.Expr[spec.dsl.Negotiation]): NegotiationRaw = {
+    val b = new NegotiationSpecificationBuilder[c.type](c)
     b.build(dsl).asInstanceOf[NegotiationRaw]
   }
 }
@@ -239,7 +239,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
   }
 
 
-  def build(dsl: C#Expr[spec.dsl.Negotiation]): NegotiationRaw = {
+  def build(dsl: c.Expr[spec.dsl.Negotiation]): NegotiationRaw = {
     import c.universe._
 
     val h = new Helper[c.type](c)

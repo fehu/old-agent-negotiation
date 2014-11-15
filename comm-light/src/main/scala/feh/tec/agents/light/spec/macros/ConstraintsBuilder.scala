@@ -1,4 +1,4 @@
-package feh.tec.agents.light.spec.mcro
+package feh.tec.agents.light.spec.macros
 
 import feh.tec.agents.light.spec.NegotiationSpecification
 import feh.tec.agents.light.spec.NegotiationSpecification.{ConstraintPartLeaf, ConstraintPartComb, ConstraintPart}
@@ -8,7 +8,7 @@ import scala.reflect.macros.whitebox
 trait HasConstraintsBuilder[C <: whitebox.Context] extends NegotiationBuildingMacro[C] {
 
   trait ConstraintsBuilder{
-    def build(agDef: Raw.AgentConstraintsDef, raw: NegotiationRaw): C#Expr[NegotiationSpecification.AgentConstraintsDef]
+    def build(agDef: Raw.AgentConstraintsDef, raw: NegotiationRaw): c.Expr[NegotiationSpecification.AgentConstraintsDef]
   }
 
 }
@@ -16,11 +16,11 @@ trait HasConstraintsBuilder[C <: whitebox.Context] extends NegotiationBuildingMa
 trait HasSimpleConstraintsBuilder[C <: whitebox.Context] extends HasConstraintsBuilder[C] {
 
   class SimpleConstraintsBuilder extends ConstraintsBuilder{
-    def build(dsl: C#Expr[Negotiation]): NegotiationRaw = ???
+    def build(dsl: c.Expr[Negotiation]): NegotiationRaw = ???
 
-    def build(agDef: Raw.AgentConstraintsDef, raw: NegotiationRaw): C#Expr[NegotiationSpecification.AgentConstraintsDef] = {
+    def build(agDef: Raw.AgentConstraintsDef, raw: NegotiationRaw): c.Expr[NegotiationSpecification.AgentConstraintsDef] = {
 
-      val xc = new ExtendedConstraint[C](c)
+      val xc = new ExtendedConstraint[c.type](c)
       import c.universe._
 
       val constraints = agDef.constraints map xc.extractConstraintsDef map {
@@ -48,10 +48,10 @@ trait HasVarsSeparatingConstraintsBuilder[C <: whitebox.Context] extends HasCons
     def build(agConstrDef: Raw.AgentConstraintsDef, raw: NegotiationRaw): c.Expr[NegotiationSpecification.AgentConstraintsDef] = {
       import c.universe._
 
-      val h = new Helper(c)
+      val h = new Helper[c.type](c)
       import h._
 
-      val xc = new ExtendedConstraint(c)
+      val xc = new ExtendedConstraint[c.type](c)
 
       implicit object TreeConstraintPartIsLiftable extends Liftable[ConstraintPart[c.Tree]]{
 

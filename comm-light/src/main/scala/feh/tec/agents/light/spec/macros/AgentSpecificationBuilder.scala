@@ -1,9 +1,9 @@
 package feh.tec.agents.light.spec.macros
 
-import feh.tec.agents.light.{NegotiationId, spec}
 import feh.tec.agents.light.spec.NegotiationSpecification.NegotiationDef
+import feh.tec.agents.light.{NegotiationId, spec}
+
 import scala.reflect.macros.whitebox
-import feh.util._
 
 object AgentSpecificationBuilder {
   def build(c: whitebox.Context)(dsl: c.Expr[spec.dsl.Agent]): c.Expr[spec.AgentSpecification] = {
@@ -297,7 +297,6 @@ abstract class AgentSpecificationSyntaxTransformations[C <: whitebox.Context](va
 
 class PriorityAndProposalBasedBuilder[C <: whitebox.Context](_c: C)
   extends AgentSpecificationBuilder[C](_c){
-  import c.universe._
 
   def build(tr: List[c.Tree], negotiationDef: Option[c.Expr[NegotiationDef]]): List[ConstructionPart] = Nil // todo
 }

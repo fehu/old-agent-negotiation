@@ -32,7 +32,7 @@ class ExtendedConstraint[C <: whitebox.Context](val c: C) {
     def valueArgName(s: String) = "$_value_" + s
     def valueArg(s: String) = TermName(valueArgName(s))
 
-    def param(name: TermName, tpe: c.Type) = ValDef(Modifiers(Flag.PARAM), name, Ident(tpe.typeSymbol), EmptyTree)
+    def param(name: TermName, tpe: c.Type) = ValDef(Modifiers(Flag.PARAM), name, Ident(tpe.typeSymbol.asInstanceOf[c.Symbol]), EmptyTree)
 
     var args: Seq[(String, String, TermName)] = Nil
 
@@ -57,7 +57,7 @@ class ExtendedConstraint[C <: whitebox.Context](val c: C) {
       args.toList map {
         case (_, name, arg) => param(arg, types(name))
       },
-      transformed
+      transformed.asInstanceOf[c.Tree]
     )
 
     val descr = args.toList map (Description.apply _).tupled
@@ -65,7 +65,7 @@ class ExtendedConstraint[C <: whitebox.Context](val c: C) {
     Replacement(descr, func)
   }
 
-  case class Description(tpe: String, varName: String, arg: c.TermName)
+  case class Description(tpe: String, varName: String, arg: C#TermName)
                                                              // Map[var name, var's type]
   case class Replacement(description: List[Description], build: Map[String, c.Type] => c.Tree)
 }

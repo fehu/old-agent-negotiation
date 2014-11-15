@@ -1,4 +1,4 @@
-package feh.tec.agents.light.spec.mcro
+package feh.tec.agents.light.spec.macros
 
 
 import akka.actor.Props
@@ -32,18 +32,10 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
 {
   import c.universe._
 
-  def controllerPropsExpr(dsl: C#Expr[spec.dsl.Negotiation], trees: Trees, cBuilder: ConstraintsBuilder): C#Expr[Props] = {
-    val Trees(controller, ags) = segments(build(dsl), cBuilder)(trees)
-    import c.universe._
-
-    val x = c.Expr[Props](q"""${actorCreatePropsExpr(controller).tree.asInstanceOf[c.Tree]}(Map())""").asInstanceOf[C#Expr[Props]]
-//    c.info(NoPosition, "x = " + showCode(x.tree.asInstanceOf[c.Tree]), true)
-//    val y = ags.mapValues(actorCreatePropsExpr)
-//    val tr = x.tree.asInstanceOf[c.Tree]
-//    c.info(NoPosition, "## controller = " + tr + "\nagTrees = " + showRaw(ags) + "\nags = " + showRaw(y), true)
-    x
+  def controllerPropsExpr(dsl: c.Expr[spec.dsl.Negotiation], trees: Trees, cBuilder: ConstraintsBuilder): c.Expr[Props] = {
+    val Trees(controller, _) = segments(build(dsl), cBuilder)(trees)
+    c.Expr[Props](q"""${actorCreatePropsExpr(controller).tree.asInstanceOf[c.Tree]}(Map())""").asInstanceOf[c.Expr[Props]]
   }
-  //= segments _ andThen(ss => ss.apply _) //(negRaw: NegotiationRaw)(trees: Trees) = segments(negRaw)(trees)
 
   def segments(negRaw: NegotiationRaw, cBuilder: ConstraintsBuilder): MacroBuildingSeq = MacroBuildingSeq(
     EmptyAgentTrees(negRaw) ::
@@ -179,15 +171,7 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
             feh.tec.agents.light.spec.NegotiationSpecification
               .AgentDef($name, $role, Seq(..$negotiations), ${spec.tree.asInstanceOf[c.Tree]})"""
 
-//          c.abort(NoPosition,
-//            s"""ags = ${showRaw(ags)}
-//               |agents = ${showRaw(agents)}
-//               |sysAgents = ${showRaw(sysAgents)}
-//               |raw.agents = ${showRaw(raw.agents)}
-//             """.stripMargin)
-
           val agentTrees = agents(name)
-
           val actorProps = actorCreatePropsExpr(agentTrees)
 
           val buildTree = q"""

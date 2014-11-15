@@ -1,4 +1,4 @@
-package feh.tec.agents.light.spec.mcro
+package feh.tec.agents.light.spec.macros
 
 import feh.util._
 import scala.reflect.macros.whitebox
@@ -12,9 +12,9 @@ class Helper[C <: whitebox.Context](protected val c: C){
 
   import c.universe._
 
-  def transform(t: C#Tree, f: PartialFunction[C#Tree, C#Tree]): C#Tree = {
+  def transform(t: c.Tree, f: PartialFunction[c.Tree, c.Tree]): c.Tree = {
 
-    def transformIn = transform(_: C#Tree, f).asInstanceOf[c.Tree]
+    def transformIn = transform(_: c.Tree, f).asInstanceOf[c.Tree]
     t match {
       case tree if f isDefinedAt tree => f(tree)
       case Function(params, body) => Function(params, transformIn(body))
@@ -27,8 +27,8 @@ class Helper[C <: whitebox.Context](protected val c: C){
   }
 
 
-  def extract[R](from: C#Tree, f: PartialFunction[C#Tree, R]): List[R] = {
-    def extractFrom = extract(_: C#Tree, f)
+  def extract[R](from: c.Tree, f: PartialFunction[c.Tree, R]): List[R] = {
+    def extractFrom = extract(_: c.Tree, f)
 
     from match {
       case tree if f isDefinedAt tree => f(tree) :: Nil
@@ -41,12 +41,12 @@ class Helper[C <: whitebox.Context](protected val c: C){
     }
   }
 
-  def extractOne[R](from: C#Tree, f: PartialFunction[C#Tree, R]): Option[R] = extract(from, f) match {
+  def extractOne[R](from: c.Tree, f: PartialFunction[c.Tree, R]): Option[R] = extract(from, f) match {
     case e :: Nil => Some(e)
     case _ => None
   }
 
-  def selects(in: C#Tree, what: String): Boolean = selectsInner(in, what){
+  def selects(in: c.Tree, what: String): Boolean = selectsInner(in, what){
     rec => (tree, path) =>
       PartialFunction.cond(path, tree){
         case (p :: tail, Select(next, name)) if p == name.decodedName.toString => rec(next, tail)
@@ -57,7 +57,7 @@ class Helper[C <: whitebox.Context](protected val c: C){
       }
   }
 
-  def selectsSome(in: C#Tree, what: String) = selectsInner(in, what){
+  def selectsSome(in: c.Tree, what: String) = selectsInner(in, what){
     rec => (tree, path) =>
       PartialFunction.cond(path, tree){
         case (p :: tail, Select(next, name)) if p == name.decodedName.toString => rec(next, tail)
@@ -71,13 +71,13 @@ class Helper[C <: whitebox.Context](protected val c: C){
       }
   }
 
-  protected def selectsInner(in: C#Tree, what: String)
-                            (isTheOneSearched_? : Y2[C#Tree, Seq[String], Boolean]): Boolean = {
+  protected def selectsInner(in: c.Tree, what: String)
+                            (isTheOneSearched_? : Y2[c.Tree, Seq[String], Boolean]): Boolean = {
     val w = what.split('.').reverse.toList
 
-    def search(sel: C#Tree) = isTheOneSearched_?(Y2(isTheOneSearched_?))(sel, w)
+    def search(sel: c.Tree) = isTheOneSearched_?(Y2(isTheOneSearched_?))(sel, w)
 
-    def rec(t: C#Tree): Boolean =
+    def rec(t: c.Tree): Boolean =
       PartialFunction.cond(t) {
         case Function(_, body)    => rec(body)
         case Apply(fun, args)     => rec(fun) || args.exists(rec)
@@ -88,23 +88,23 @@ class Helper[C <: whitebox.Context](protected val c: C){
     rec(in)
   }
 
-  implicit class Wrapper(t: C#Tree){
-    def transform(f: PartialFunction[C#Tree, C#Tree]) = helper.transform(t, f)
-    def extract[R](f: PartialFunction[C#Tree, R]) = helper.extract(t, f)
-    def extractOne[R](f: PartialFunction[C#Tree, R]) = helper.extractOne(t, f)
+  implicit class Wrapper(t: c.Tree){
+    def transform(f: PartialFunction[c.Tree, c.Tree]) = helper.transform(t, f)
+    def extract[R](f: PartialFunction[c.Tree, R]) = helper.extract(t, f)
+    def extractOne[R](f: PartialFunction[c.Tree, R]) = helper.extractOne(t, f)
     def selects(fullName: String) = helper.selects(t, fullName)
     def selectsSome(fullName: String) = helper.selectsSome(t, fullName)
     //    def selectsInBetween(fullName: String) = helper.selectsInBetween(t, fullName)
   }
 
   object AnonSelect{
-    def unapply(tree: C#Tree) = PartialFunction.condOpt(tree){
+    def unapply(tree: c.Tree) = PartialFunction.condOpt(tree){
       case Select(This(TypeName("$anon")), TermName(name)) => name
     }
   }
 
   object AnonTypeApply{
-    def unapply(tree: C#Tree) = PartialFunction.condOpt(tree){
+    def unapply(tree: c.Tree) = PartialFunction.condOpt(tree){
       case TypeApply(AnonSelect(name), _) => name
     }
   }
