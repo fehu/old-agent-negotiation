@@ -38,7 +38,6 @@ object AgentSpecificationBuilder {
       case ext: ExtDefOverride[_] => transformations.transform(ext.asInstanceOf[ExtDefOverride[c.type]])
       case other => other
     }
-//    println(${parts.map(showRaw(_)) mkString "\n"})
 
     c.Expr(q""" {
       println(${parts mkString "\n\n"})
@@ -159,7 +158,6 @@ object OwnerDependent {
 
 abstract class AgentSpecificationBuilder[C <: whitebox.Context](val c: C){
   lazy val h = new Helper[c.type](c)
-//  implicit def hWrapper(t: c.Tree) = new h.Wrapper(t)
 
   def build(tr: List[c.Tree], negotiationDef: Option[c.Expr[NegotiationDef]]): List[ConstructionPart]
 }
@@ -172,18 +170,7 @@ class AgentSpecificationSyntaxBuilder[C <: whitebox.Context](_c: C) extends Agen
     case Apply(sel, List(arg)) if sel selectsSome "$anon.ExtendableMonoDefinitionWrapper" => extendableMonoDefinitionWrapper(sel, arg, negotiationDef)
     case Apply(Apply(AnonTypeApply("after"), List(after)), List(arg)) => extendableAfter(after, arg, negotiationDef)
     case Apply(TypeApply(sel, List(TypeTree())), args) if sel selectsSome "$anon.negotiationDefHasForeach" => forNegotiation(sel, args)
-//    case x3 => TestPart("todo", x3) :: Nil
   }.flatten
-
-/*
-  case class OwnerDependent(bodyByOwnerTerm: Ident => c.Tree){
-    def body(ownerTerm: TermName) = bodyByOwnerTerm(Ident(ownerTerm))
-    def toFunction(ownerTerm: TermName) = Function(
-      ValDef(Modifiers(Flag.PARAM), ownerTerm, TypeTree(), EmptyTree) :: Nil,
-      body(ownerTerm)
-    )
-  }
-*/
 
   protected def extendableMonoDefinitionWrapper(tree: c.Tree, body: c.Tree, negotiationDef: Option[c.Expr[NegotiationDef]]) = tree match{
     case Select(
@@ -227,12 +214,6 @@ class AgentSpecificationSyntaxBuilder[C <: whitebox.Context](_c: C) extends Agen
       }
     case _ => c.abort(c.enclosingPosition, showRaw(selTree))
   }
-
-//  protected def process(tr: c.Tree) = tr.transform{
-//    case AnonSelect("log") => TermName("owner") |> {
-//      ow => ownerExtFunc(ow, Select(Ident(ow), TermName("log")))
-//    }
-//  }
 }
 
 abstract class AgentSpecificationSyntaxTransformations[C <: whitebox.Context](val c: C){
@@ -257,8 +238,6 @@ abstract class AgentSpecificationSyntaxTransformations[C <: whitebox.Context](va
     }
 
   def transform: ExtDefOverride[c.type] => ExtDefOverride[c.type] = {
-//    case ext@ExtDefOverride(name, extPoint, tree, negOpt) if containsDslCalls(tree.asInstanceOf[c.Tree]) =>
-//      ext.copy[c.type](upd = applyTransforms(ext))
     case ext => ext.copy[c.type](upd = applyTransforms(ext))
   }
 
@@ -283,16 +262,7 @@ abstract class AgentSpecificationSyntaxTransformations[C <: whitebox.Context](va
       (upd /: transforms) {
         case (defAcc, Transform(treeTransform)) => defAcc.ops[c.type](c).flatTransform(treeTransform(xdo))
       }
-      
-//    case ExtDefOverride(name, extPoint, RawExtDef(tree), negOpt) =>
-//    case ExtDefOverride(name, extPoint, OwnerDependent(tree), negOpt) =>
   }
-
-//    (ext: ExtDefOverride[c.type]) => (tr /: transforms){
-//    case (acc, Transform(replace)) =>
-//      val q = replace(ext)
-//      acc transform q
-//  }
 }
 
 class PriorityAndProposalBasedBuilder[C <: whitebox.Context](_c: C)

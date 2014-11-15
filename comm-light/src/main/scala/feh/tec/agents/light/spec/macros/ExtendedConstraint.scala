@@ -32,7 +32,7 @@ class ExtendedConstraint[C <: whitebox.Context](val c: C) {
     def valueArgName(s: String) = "$_value_" + s
     def valueArg(s: String) = TermName(valueArgName(s))
 
-    def param(name: TermName, tpe: c.Type) = ValDef(Modifiers(Flag.PARAM), name, Ident(tpe.typeSymbol.asInstanceOf[c.Symbol]), EmptyTree)
+    def param(name: TermName, tpe: c.Type) = ValDef(Modifiers(Flag.PARAM), name, Ident(tpe.typeSymbol), EmptyTree)
 
     var args: Seq[(String, String, TermName)] = Nil
 

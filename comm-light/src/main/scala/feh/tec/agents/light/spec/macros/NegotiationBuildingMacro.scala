@@ -249,7 +249,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
       "feh.tec.agents.light.spec.dsl.Negotiation"
     )
 
-    val (definitions, applications) = b.extractRoot(dsl.tree.asInstanceOf[c.Tree], KnownDSLNames)
+    val (definitions, applications) = b.extractRoot(dsl.tree, KnownDSLNames)
 
     val varsAndDomains = b.extractVars(definitions)
     val negotiationsAndIssues = b.extractNegotiations(definitions)
@@ -284,7 +284,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
     val spawns = q"""SimpleSpawnDef(Map(..${b.extractSpawns(applications)}))"""
 
     val timeoutDefs = b.extractTimeouts(applications)
-    val timeouts = Raw.TimeDefs(timeoutDefs.toMap.mapValues(c.Expr(_))) //q"""TimeoutsDef(Map(..$timeoutDefs))"""
+    val timeouts = Raw.TimeDefs(timeoutDefs.toMap.mapValues(c.Expr(_)))
 
     NegotiationRaw(vars.toList, negotiations.toList, agents.toList, spawnsRaw :: Nil, timeouts :: Nil)
   }

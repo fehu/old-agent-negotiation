@@ -14,7 +14,7 @@ class Helper[C <: whitebox.Context](protected val c: C){
 
   def transform(t: c.Tree, f: PartialFunction[c.Tree, c.Tree]): c.Tree = {
 
-    def transformIn = transform(_: c.Tree, f).asInstanceOf[c.Tree]
+    def transformIn = transform(_: c.Tree, f)
     t match {
       case tree if f isDefinedAt tree => f(tree)
       case Function(params, body) => Function(params, transformIn(body))

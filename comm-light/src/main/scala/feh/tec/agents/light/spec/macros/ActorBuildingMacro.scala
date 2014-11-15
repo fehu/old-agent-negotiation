@@ -45,19 +45,19 @@ trait ActorBuildingMacroImpl[C <: whitebox.Context] extends ActorBuildingMacro[C
     import c.universe._
 
     val (pClasses, pTraits) = trees.parents.partition(_.decls.exists(_.name == termNames.CONSTRUCTOR))
-    val pTraitsTrees = pTraits.map(_.asInstanceOf[c.Type]).map(TypeTree(_))
+    val pTraitsTrees = pTraits.map(TypeTree(_))
     val pClassOpt = pClasses.ensuring(pClasses.size <= 1).headOption
 
     val (extendsName, extendsTArgs, extendsArgs, withStatements) = pClassOpt map {
       pClass =>
-        val nme = pClass.typeSymbol.asType.asInstanceOf[c.universe.TypeSymbol] //.name.asInstanceOf[c.TypeName]
+        val nme = pClass.typeSymbol.asType
         val args = pClass.decl(termNames.CONSTRUCTOR).asMethod.paramLists.ensuring(_.size == 1).head
           .map(s => Ident(s.name.asInstanceOf[c.Name]))
-        val targs = pClass.typeArgs.map(_.asInstanceOf[c.Type])
+        val targs = pClass.typeArgs
         (nme, targs, args, pTraitsTrees)
       } getOrElse {
           val h = pTraits.head
-          (h.typeSymbol.asType.asInstanceOf[c.universe.TypeSymbol], h.typeArgs.map(_.asInstanceOf[c.Type]), Nil, pTraitsTrees.tail)
+          (h.typeSymbol.asType, h.typeArgs, Nil, pTraitsTrees.tail)
       }
 
 
@@ -69,7 +69,7 @@ trait ActorBuildingMacroImpl[C <: whitebox.Context] extends ActorBuildingMacro[C
       class ${TypeName(trees.className)}(..$paramStatements)
         extends $extendsName[..$extendsTArgs](..$extendsArgs) with ..$withStatements
       {
-        ..${trees.body.map(_.asInstanceOf[c.Tree])}
+        ..${trees.body}
       }
     """
 

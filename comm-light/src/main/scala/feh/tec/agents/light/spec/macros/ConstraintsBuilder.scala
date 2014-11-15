@@ -25,8 +25,6 @@ trait HasSimpleConstraintsBuilder[C <: whitebox.Context] extends HasConstraintsB
 
       val constraints = agDef.constraints map xc.extractConstraintsDef map {
         case (cName, xc.Replacement(descr, f)) =>
-          //        val varsAndDomains = raw.vars.map()
-          //        val func = f(raw.varsAndDomains.map(tr => tr._1.decodedName.toString.trim -> tr._2).toMap)
           val func = f(raw.vars.map{ case Raw.VarDef(name, Raw.DomainDef(_, tpe, _)) => name -> tpe }.toMap)
           val descriptions = descr map {
             case xc.Description(tpe, varName, arg) =>
@@ -66,17 +64,13 @@ trait HasVarsSeparatingConstraintsBuilder[C <: whitebox.Context] extends HasCons
         }
       }
 
-      //      val constraints = agConstrDef.constraints.asInstanceOf[Seq[c.Tree]] map xc.extractConstraintsDef map {
-      //        case (cName, xc.Replacement(descr, f)) =>
-      //      }
-
       def separateAndOr(in: c.Tree): ConstraintPart[c.Tree] = in match {
         case Apply(Select(left, op@(TermName("$bar$bar") | TermName("$amp$amp"))), List(right)) =>
           ConstraintPartComb[c.Tree, c.TermName](op.asInstanceOf[c.TermName], separateAndOr(left), separateAndOr(right))
         case other if other.tpe == typeOf[Boolean] => ConstraintPartLeaf[c.Tree](other)
       }
 
-      val separatedByName = agConstrDef.constraints.asInstanceOf[Seq[c.Tree]].map{
+      val separatedByName = agConstrDef.constraints.map{
         case Apply(
               Select(
                 Apply(
@@ -88,10 +82,10 @@ trait HasVarsSeparatingConstraintsBuilder[C <: whitebox.Context] extends HasCons
               List(constraintTree)
         ) =>
           constraintName -> separateAndOr(constraintTree)
-      }.toMap//groupBy(_._1).mapValues(_.map(_._2))
+      }.toMap
 
       val replacementsByName = separatedByName.mapValues(
-        _.transform(xc.replace, (n: c.TermName) => n.toString) //[(String, ExtendedConstraint#Replacement), TermName, String]
+        _.transform(xc.replace, (n: c.TermName) => n.toString)
       )
 
       val agentVarConstraintDefByName = replacementsByName.mapValues{

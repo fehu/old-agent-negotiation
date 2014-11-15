@@ -34,7 +34,7 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
 
   def controllerPropsExpr(dsl: c.Expr[spec.dsl.Negotiation], trees: Trees, cBuilder: ConstraintsBuilder): c.Expr[Props] = {
     val Trees(controller, _) = segments(build(dsl), cBuilder)(trees)
-    c.Expr[Props](q"""${actorCreatePropsExpr(controller).tree.asInstanceOf[c.Tree]}(Map())""").asInstanceOf[c.Expr[Props]]
+    c.Expr[Props](q"""${actorCreatePropsExpr(controller)}(Map())""")
   }
 
   def segments(negRaw: NegotiationRaw, cBuilder: ConstraintsBuilder): MacroBuildingSeq = MacroBuildingSeq(
@@ -163,13 +163,13 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
         case Raw.AgentDef(name, role, negs, spec) =>
           val negotiations = negs map {
             case Raw.AgentNegDef(negName, scope, scopeExpr, reportToExprOpt, constraints) =>
-              val constraintsTrees = constraints map (cBuilder.build(_, raw)) map (_.tree.asInstanceOf[c.Tree])
+              val constraintsTrees = constraints map (cBuilder.build(_, raw)) map (_.tree)
               val extraTrees = constraintsTrees
-              q"feh.tec.agents.light.spec.NegotiationSpecification.AgentNegDef($negName, ${scopeExpr.tree.asInstanceOf[c.Tree]}, Seq(..$extraTrees))"
+              q"feh.tec.agents.light.spec.NegotiationSpecification.AgentNegDef($negName, $scopeExpr, Seq(..$extraTrees))"
           }
           val agentDef = q"""
             feh.tec.agents.light.spec.NegotiationSpecification
-              .AgentDef($name, $role, Seq(..$negotiations), ${spec.tree.asInstanceOf[c.Tree]})"""
+              .AgentDef($name, $role, Seq(..$negotiations), $spec)"""
 
           val agentTrees = agents(name)
           val actorProps = actorCreatePropsExpr(agentTrees)
@@ -177,7 +177,7 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
           val buildTree = q"""
             (propsArgs: Map[String, Any]) => {
               val name = propsArgs("uniqueName").asInstanceOf[String]
-              val props = ${actorProps.tree.asInstanceOf[c.Tree]}(propsArgs)
+              val props = $actorProps(propsArgs)
               val actorRef = implicitly[ActorSystem].actorOf(props, name)
               ??? //AgentRef(Agent.Id(name, propsArgs("role")), actorRef)
             }
