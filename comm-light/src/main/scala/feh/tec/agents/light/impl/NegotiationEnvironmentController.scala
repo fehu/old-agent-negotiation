@@ -9,8 +9,10 @@ import feh.tec.agents.light.spec.NegotiationSpecification.{AgentNegDef, AgentDef
 import scala.concurrent.{Await, Future}
 import akka.pattern.ask
 
+import scala.reflect.ClassTag
+
 trait NegotiationEnvironmentController extends EnvironmentController with DynamicEnvironmentController with ActorLogging{
-  type CreateInterface = (String, NegotiationRole, Set[NegotiationInit])
+  type CreateInterface = Map[String, Any]
   implicit def asys: ActorSystem = context.system
 
 //  protected val initialAgents: List[(AgentDef, () => AgentRef)]
@@ -20,6 +22,7 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
   protected val initialAgents: List[(AgentDef, CreateInterface => AgentRef)]
   protected val timeouts: Timeouts
   protected val systemAgentsInit: Set[() => AgentRef]
+  protected def extraArgs(agent: String): Map[String, Any]
 
   protected var state: NegotiationState = NegotiationState.Created
   protected var currentAgents: Set[AgentRef] = null
@@ -48,7 +51,7 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
   var sysAgentByRole: Map[SystemRole, AgentRef] = null
 
 
-  def createAgent(c: Int, d: AgentDef, f: CreateInterface => AgentRef) = d match {
+  def createAgent(c: Int, d: AgentDef, f: CreateInterface => AgentRef, priority: Priority) = d match {
     case AgentDef(nme, rle, negDefs, _) =>
       val uniqueName = s"$nme-$c"
       val negInits = negDefs.toSet.map{
@@ -56,9 +59,15 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
           case AgentNegDef(negName, scope, extra) =>
             NegotiationInit(NegotiationId(negName), issuesByNegotiation(negName).map(issues).toSet)
         }: (AgentNegDef => NegotiationInit)}
+      val args = extraArgs(nme)
 
-        log.debug("negInits = " + negInits)
-        f((uniqueName, NegotiationRole(rle), negInits)) -> d
+      log.debug("negInits = " + negInits)
+      f(Map(
+        "uniqueName" -> uniqueName,
+        "role" -> NegotiationRole(rle),
+        "negotiationsInit" -> negInits,
+        "args" -> args
+      )) -> d
     }
 
   def initialize(): Unit =
@@ -74,7 +83,7 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
           val (agDef, f) = initialAgentsByName(agName)
           log.debug(s"agName = $agName, count = $count, agDef = $agDef, f = $f")
           for (c <- 1 to count)
-            yield createAgent(c, agDef, f)
+            yield createAgent(c, agDef, f, new Priority(c))
       }
       currentAgents = refsAndDefs.keySet
 

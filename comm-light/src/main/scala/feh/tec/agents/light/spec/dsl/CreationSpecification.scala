@@ -29,7 +29,7 @@ trait CreationSpecification{
   def configure(c: ConfDef*) = stub
   def timeout: ChooseTimeout = stub
 
-  implicit class TimingDefWrapper(f: ChooseTimeout => TimeoutIdent){
-    def >>(time: FiniteDuration): TimeoutDef = stub
-  }
+//  implicit class TimingDefWrapper(f: ChooseTimeout => TimeoutIdent){
+//    def >>(time: FiniteDuration): TimeoutDef = stub
+//  }
 }

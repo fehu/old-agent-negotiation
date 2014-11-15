@@ -86,3 +86,10 @@ object AgentSpecification{
     def newIterator: DefBADS[NegotiationId => ProposalEngine.DomainIterator]
   }
 }
+
+// is a marker
+@deprecated("is related to a negotiation, not the entire agent")
+trait RequiresDistinctPriority{
+  self: AgentSpecification =>
+
+}

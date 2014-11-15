@@ -12,7 +12,7 @@ trait DomainIteratingAllVars[Lang <: Language.ProposalBased with Language.HasPri
   type Negotiation <: Negotiation.DynamicScope with Negotiation.HasPriority with Negotiation.HasProposal[Lang] with Negotiation.HasIterator
   type Agent <: PriorityAndProposalBasedAgent[Lang] with DomainIteratingAllVars[Lang]
 
-  val varsByNeg: Map[NegotiationId, Set[Var]] = negotiationsInit.map(_.tuple).toMap
+  val varsByNeg: Map[NegotiationId, Set[Var]] = negotiationsInit.map(_.pair).toMap
 
   override val spec: AgentSpecification.PriorityAndProposalBased[Agent, Lang] with AgentSpecification.Iterating[Agent, Lang]
 

@@ -16,6 +16,7 @@ import feh.util._
 import scala.reflect.api.Scopes
 import scala.reflect.macros.whitebox
 import scala.concurrent.duration._
+import feh.tec.agents.light
 
 object NegotiationControllerBuilder {
   def build(c: whitebox.Context)(dsl: c.Expr[spec.dsl.Negotiation]): c.Expr[Props] = {
@@ -104,7 +105,7 @@ object NegotiationControllerBuilder {
     val initialAgentsAndExtra: (List[c.Expr[(AgentDef, NegotiationEnvironmentController#CreateInterface => AgentRef)]], List[Option[ControllerExtra]]) =
       specCompositionsByRaw.toList.map{
         case (rawAgDef, SpecificationComposition(parts)) =>
-          val (agTpe, _langTpe) = parts.map(builder.typesOf).unzip
+          val (_, _langTpe) = parts.map(builder.typesOf).unzip
           val langTpes = _langTpe.flatten.distinct
 
           val langTpe = internal.refinedType(langTpes.toList, internal.newScopeWith())
@@ -169,12 +170,14 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
   def determineSpecificationComposition(spec: c.Expr[AgentSpecification]) = SpecificationComposition(
     Seq(
       typeCheckOpt[PriorityAndProposalBasedAgentSpec[_, _]](spec.tree, AgentsParts.PriorityAndProposalBased),
-      typeCheckOpt[IteratingSpec.AllVars[_, _]](spec.tree, AgentsParts.IteratingAllVars)
+      typeCheckOpt[IteratingSpec.AllVars[_, _]](spec.tree, AgentsParts.IteratingAllVars),
+      typeCheckOpt[light.spec.RequiresDistinctPriority](spec.tree, AgentsParts.RequiresDistinctPriority)
     ).flatten
   )
 
   def dependenciesWithCalls(comp: SpecificationComposition): Map[String, (c.Tree, c.Expr[_])] =
     comp.parts.flatMap(_.interface.descriptions).map{
+//      case ("initial-priority", AgentCreationInterface.InitialDistinctPriority) => "initial-priority" -> (???, ???)
       case (name, descr) => ???
     }.toMap
 
@@ -307,7 +310,7 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
     def template =
       (interface: CreateInterface, body: List[c.Tree]) =>
         Template(
-          parents = composition.parts.toList.map(_.parentTree[c.type](c)) ::: moreParents ::: extraParents,
+          parents = composition.parts.toList.map(_.typeTree[c.type](c)) ::: moreParents ::: extraParents,
 //          parents = AgentsParts.IteratingAllVars.parentTree[c.type](c) :: extraParents,// composition.parts.toList.map(_.parentTree[c.type](c)) ::: extraParents,
           self = noSelfType,
           body = constructor(args)(interface) :: logOnCreate :: agentTypeDef :: specDef :: moreBody ::: body
@@ -356,7 +359,7 @@ class NegotiationControllerBuilder[C <: whitebox.Context](val c: C){
 
     val agTpe = part.tpe[c.type](c)
 
-    val langTpe = part.tpe[c.type](c) match {
+    val langTpe = agTpe match {
       case TypeRef(_, _, List(langType)) =>
         langType match{
           case RefinedType(parents, _) => parents
@@ -478,5 +481,6 @@ case class SpecificationComposition(parts: Seq[AgentDefinitionPart])
 abstract class AgentDefinitionPart(val canBeMixed: Boolean, val interface: AgentCreationInterfaceDescriptor){
 //  def langTpe[C <: whitebox.Context](c: C)
   def tpe[C <: whitebox.Context](c: C): c.Type
-  def parentTree[C <: whitebox.Context](c: C): c.Tree
+  def typeTree[C <: whitebox.Context](c: C) = c.universe.TypeTree(tpe[c.type](c))
+//  def parentTree[C <: whitebox.Context](c: C): c.Tree
 }

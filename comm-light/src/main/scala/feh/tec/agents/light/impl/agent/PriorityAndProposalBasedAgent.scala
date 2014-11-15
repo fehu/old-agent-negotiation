@@ -61,3 +61,10 @@ class PriorityNegotiationHandlerImpl[Owner <: PriorityAndProposalBasedAgent[Lang
 
   def process: PartialFunction[Lang#Priority, Any]                                                                = spec.process.get
 }
+
+@deprecated("is related to a negotiation, not the entire agent")
+trait RequiresDistinctPriority{
+  self: PriorityProposalBasedAgent[_] =>
+
+  def initialPriority: Map[NegotiationId, Priority]
+}

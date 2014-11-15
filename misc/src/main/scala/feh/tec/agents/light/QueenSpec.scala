@@ -1,10 +1,11 @@
 package feh.tec.agents.light
 
 import feh.tec.agents.light.impl.agent.create
+import feh.tec.agents.light.spec.RequiresDistinctPriority
 
 import scala.collection.mutable
 
-object QueenSpec extends create.PPI.AllVarsSpec with PriorityNegotiationHandlerSetup{
+object QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
 
   val priorities = mutable.HashMap.empty[AgentRef, Priority]
   val proposalAcceptance = mutable.HashMap.empty[NegotiationId, mutable.HashMap[AgentRef, Message.ProposalResponse]]
@@ -50,7 +51,7 @@ object QueenSpec extends create.PPI.AllVarsSpec with PriorityNegotiationHandlerS
     implicit ag =>{
       case msg if ag.myPriority isHigherThenOf msg => respondToProposal(msg)
       case msg if ag.myPriority isLowerThenOf  msg => respondToProposal(msg)
-      case samePriority => ag.requestPriorityRaise(samePriority.negotiation)
+      case samePriority => sys.error("All agents must have a **distinct** priority assigned")
     }
   }
 
@@ -68,6 +69,7 @@ object QueenSpec extends create.PPI.AllVarsSpec with PriorityNegotiationHandlerS
 }
 
 
+@deprecated("the priority negotiation scheme must be reconsidered")
 trait PriorityNegotiationHandlerSetup {
   self: create.PPI.AllVarsSpec =>
 
