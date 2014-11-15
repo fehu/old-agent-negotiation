@@ -1,4 +1,5 @@
 package feh.tec.agents
+/*
 
 import akka.actor.{Props, ActorSystem}
 import feh.tec.agents.impl.ProposalEngine.SharingKnowledge
@@ -104,4 +105,4 @@ class NQueenWebSocketPushServerBuilder(host: String, port: Int, negotiationId: N
   extends WebSocketPushServerInitialization(host, port)
 {
   override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, 250 millis)) // todo: should be configurable
-}
+}*/

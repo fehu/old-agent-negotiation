@@ -1,4 +1,5 @@
 package feh.tec.agents
+/*
 
 import akka.actor.ActorLogging
 import feh.tec.agents.impl.Agent.AgentReportingMessagesAndState
@@ -43,4 +44,4 @@ class GenericNegotiatingAgent(arg: GenericIteratingAgentCreation.Args)
   def knowledgeShare = arg.knowledgeShare
 
   def resetIterator(negId: NegotiationId) = resetIterator(get(negId))
-}
+}*/

@@ -1,4 +1,5 @@
 package feh.tec.agents
+/*
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import feh.tec.agents.impl.ProposalEngine.SharingKnowledge
@@ -81,4 +82,4 @@ trait AutoRestart extends Controller{
 
   override protected def negotiationFinishedMessage(neg: NegotiationId) =
     SystemMessage.NegotiationFinishedAutoRestart(neg, restartDelay)
-}
+}*/

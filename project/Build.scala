@@ -118,15 +118,14 @@ object  Build extends sbt.Build {
       }
     )
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(comm, misc, webFrontend, webBackend, commLight)
+   .aggregate(commLight, misc, webFrontend, webBackend)
 
-  lazy val comm = Project(
-    id = "comm",
-    base = file("comm"),
+  lazy val commLight = Project("comm-light", file("comm-light"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(akka, scala.reflectApi)
     )
   ) dependsOn feh.util
+
 
   lazy val misc = Project(
     id = "misc",
@@ -134,7 +133,7 @@ object  Build extends sbt.Build {
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq()
     )
-  ) dependsOn (comm, webBackend, commLight)
+  ) dependsOn (webBackend, commLight)
 
   lazy val webCommon = Project("web-common", file("web/common"),
     settings = buildSettings ++ Seq(
@@ -161,10 +160,4 @@ object  Build extends sbt.Build {
       libraryDependencies ++= Seq(spray.websocket, spray.json)
     )
   ) dependsOn (feh.util, webCommon)
-
-  lazy val commLight = Project("comm-light", file("comm-light"),
-    settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(akka, scala.reflectApi)
-    )
-  ) dependsOn feh.util
 }
