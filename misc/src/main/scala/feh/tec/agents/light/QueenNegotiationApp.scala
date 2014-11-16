@@ -17,7 +17,7 @@ object QueenNegotiationApp extends App{
       def `queen's position` = negotiation over(x, y)
 
       def Queen = agent withRole "chess queen" definedBy QueenSpec that (
-        negotiates the `queen's position` `with` the.others reportingTo reporter.default and
+        negotiates the `queen's position` `with` the.others/* reportingTo reporter.default*/ and
           hasConstraints(
             "direct-line sight" | {
               /* Constraints that can be run independently for vars should be separated by && or ||, or defined separately */

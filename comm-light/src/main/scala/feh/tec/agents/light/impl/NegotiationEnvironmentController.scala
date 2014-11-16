@@ -12,6 +12,8 @@ import akka.pattern.ask
 import scala.reflect.ClassTag
 
 trait NegotiationEnvironmentController extends EnvironmentController with DynamicEnvironmentController with ActorLogging{
+//  controller =>
+
   type CreateInterface = Map[String, Any]
   implicit def asys: ActorSystem = context.system
 

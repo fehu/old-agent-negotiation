@@ -136,7 +136,7 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
 
   def ExtraArgsValues = MacroSegment{
     case trees@Trees(controller, ags) =>
-      val liftedArgsByNameAndAg = ags map { case (agName, _) => agName -> q"${agentArgsRequired(agName).mapValues(p => q"() => $p")}" }
+      val liftedArgsByNameAndAg = ags map { case (agName, _) => agName -> q"${agentArgsRequired(agName).mapValues(p => q"() => ${p._2}")}" }
 
       val extraArgs = q"""
         private val liftedArgsByNameAndAg: Map[String, Map[String, () => Any]] =
@@ -370,15 +370,6 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
   def replaceLanguageTypeArg(in: c.Type, forAgent: ActorTrees) = {
     val langTpe = agentLang(forAgent)
     replaceTypeArg(in, typeOf[Language], langTpe)
-//    in map{
-//      case TypeRef(pre, sym, args) =>
-//        val newArgs = args.map{
-//          case lang if lang <:< typeOf[Language] => langTpe
-//          case other => other
-//        }
-//        internal.typeRef(pre, sym, newArgs)
-//      case other => other
-//    }
   }
 
   def TypesDefinitionsAgentSegment = MacroSegment{
@@ -403,17 +394,8 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
             .mapValues(_.unzip._2.flatten.distinctBy(_.typeSymbol.name))
             .filter(_._2.nonEmpty)
 
-//          val langTpe = agentLang(tr)
           val typeDefs = abstractTypeMembers
-            .mapValues(_.map{ replaceLanguageTypeArg(_, tr)
-//              case TypeRef(pre, sym, args) =>
-//                val newArgs = args.map{
-//                  case lang if lang <:< typeOf[Language] => langTpe
-//                  case other => other
-//                }
-//                internal.typeRef(pre, sym, newArgs)
-//              case t => c.abort(NoPosition, "##!! " + showRaw(t))
-              })
+            .mapValues(_.map(replaceLanguageTypeArg(_, tr)))
             .toList.map{ case (tName, ext :: mix) => q"type $tName = $ext with ..$mix" }
 
           name -> tr.prepend.body(typeDefs: _*)
@@ -471,24 +453,26 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
 
   // requires EmbedIssuesAndDomainIteratorsCreators
   def DomainIteratorsAgentSegment = {
-
+    def domainIteratorsArg = "domain-iterators"
+    def domainIteratorsType = typeOf[Map[Var, DomainIteratorBuilder[Any, Any]]]
+    def getDomainIterators = q"""
+      issues.values.map(v => v -> domainIteratorsCreators(v.name)).toMap
+    """
+    def addDomainIteratorsArg(agName: String) = addAgentArgs(agName, domainIteratorsArg, domainIteratorsType, getDomainIterators)
     def domainIteratorsTree = q"""
-      def domainIterators: Map[Var, DomainIteratorBuilder[Var#Domain, Var#Tpe]] =
-        issues.values.map(v => v -> domainIteratorsCreators(v.name)).toMap
+      def domainIterators = args($domainIteratorsArg).asInstanceOf[Map[Var, DomainIteratorBuilder[Var#Domain, Var#Tpe]]]
     """
 
     MacroSegment{
       case trees@Trees(_, ags) =>
         val newAgs = transformIfHasMember(ags)(
-          isAbstract(TermName("domainIterators")), _._2.append.body(domainIteratorsTree)
+          isAbstract(TermName("domainIterators")),
+          {
+            case (name, tr) =>
+              addDomainIteratorsArg(name)
+              tr.append.body(domainIteratorsTree)
+          }
         )
-
-//          ags.mapValues{
-//          ag =>
-//            if(ag.parents.exists(_.members.exists(m => m.isAbstract && m.name == TermName("domainIterators"))))
-//              ag.append.body(domainIteratorsTree)
-//            else ag
-//        }
         trees.copy(agents = newAgs)
     }
 
