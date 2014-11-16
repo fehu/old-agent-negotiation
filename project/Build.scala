@@ -95,15 +95,17 @@ object  Build extends sbt.Build {
     object feh{
       lazy val util = ProjectRef( uri("git://github.com/fehu/util.git"), "util")
 
-      object utils{
-        lazy val compiler = ProjectRef( uri("git://github.com/fehu/util.git"), "scala-compiler-utils")
-      }
+//      object utils{
+//        lazy val compiler = ProjectRef( uri("git://github.com/fehu/util.git"), "scala-compiler-utils")
+//      }
     }
 
     object js{
       lazy val jquery = "org.webjars" % "jquery" % "2.1.1"
       lazy val bootstrap = "org.webjars" % "bootstrap" % "3.2.0"
     }
+
+    lazy val GitDependencies = feh.util :: Nil //feh.utils.compiler
   }
 
   // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
@@ -118,6 +120,7 @@ object  Build extends sbt.Build {
       }
     )
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
+   .aggregate(GitDependencies: _*)
    .aggregate(commLight, misc, webFrontend, webBackend)
 
   lazy val commLight = Project("comm-light", file("comm-light"),

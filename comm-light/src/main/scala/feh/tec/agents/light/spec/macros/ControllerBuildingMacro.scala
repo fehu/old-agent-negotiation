@@ -8,7 +8,8 @@ import feh.tec.agents.light.impl.spec.{IteratingSpec, PriorityAndProposalBasedAg
 import feh.tec.agents.light.spec.NegotiationSpecification.NegotiationDef
 import feh.tec.agents.light.spec.{NegotiationSpecification, AgentSpecification}
 import feh.util._
-import scala.collection.mutable
+import scala.collection.immutable.HashSet
+import scala.collection.{IterableLike, mutable}
 import scala.reflect.macros.whitebox
 
 trait ControllerBuildingMacro[C <: whitebox.Context] extends ActorBuildingMacro[C] {
@@ -43,7 +44,7 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
   def segments(negRaw: NegotiationRaw, cBuilder: ConstraintsBuilder): MacroBuildingSeq = MacroBuildingSeq(
     AgentBuildSegments(negRaw) :::
     ControllerParent ::
-    EmbedIssues(negRaw) ::
+    EmbedIssuesAndDomainIteratorsCreators(negRaw) ::
     EmbedAgentsProps(negRaw, cBuilder) ::
     ExtraArgsValues ::
     EmbedSpawnsAndTimeouts(negRaw) ::
@@ -57,21 +58,25 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
       Trees(newController, ags)
   }
 
-  def EmbedIssues(raw: NegotiationRaw) = MacroSegment{
+  def EmbedIssuesAndDomainIteratorsCreators(raw: NegotiationRaw) = MacroSegment{
     case trees@Trees(controller, _) =>
-      val issues = raw.vars.map{
+      val (issues, domainIteratorsCreators) = raw.vars.map{
         case Raw.VarDef(name, Raw.DomainDef(domain, tpe, domTpe)) =>
-          val domainMix = domTpe match {
-            case t if t <:< typeOf[Range]   => tq"Domain.Range"
-            case t if t <:< tq"Set[$tpe]".tpe  => tq"Domain.Small[$tpe]"
+          val (domainMix, iteratorBuilder) = domTpe match {
+            case t if t <:< typeOf[Range]     => tq"Domain.Range"       -> tq"DomainIteratorBuilder.Range"
+            case t if t <:< tq"Set[$tpe]".tpe => tq"Domain.Small[$tpe]" -> tq"DomainIteratorBuilder.Generic"
           }
-          q"$name -> new Var($name, _.isInstanceOf[$tpe]) with $domainMix { def domain: $domTpe = $domain }"
-      }
+          val issue = q"$name -> new Var($name, _.isInstanceOf[$tpe]) with $domainMix { def domain: $domTpe = $domain }"
+          val domainIteratorsCreator = q"$name -> (new $iteratorBuilder).asInstanceOf[DomainIteratorBuilder[Var#Domain, Var#Tpe]]"
+
+          issue -> domainIteratorsCreator
+      }.unzip
       val issuesByNeg = raw.negotiations.map{ case NegotiationDef(name, i) => q"$name -> Seq(..$i)" }
 
       trees.copy(controller = controller.append.body(q"""
         protected val issues: Map[String, Var] = Map(..$issues)
         protected val issuesByNegotiation: Map[String, Seq[String]] = Map(..$issuesByNeg)
+        protected val domainIteratorsCreators: Map[String, DomainIteratorBuilder[Var#Domain, Var#Tpe]] = Map(..$domainIteratorsCreators)
       """
       ))
   }
@@ -151,17 +156,17 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
           case Raw.SingleSpawnDef(name, count) => q"$name -> $count"
         }
       }
-      val timeouts = raw.time.flatMap(_.mp).toMap
+      val timeouts = raw.time.flatMap(_.mp.mapValues(dur => q"akka.util.Timeout($dur)")).toMap
 
       trees.copy(controller = controller.append.body(
         q"protected val spawns: Map[String, Int] = Map(..$spawns)",
         q"""
             import feh.tec.agents.light.impl.NegotiationEnvironmentController._
             protected val timeouts: Timeouts = new Timeouts {
-              lazy val initialize = ${timeouts.getOrElse("initialize", c.Expr(q"DefaultTimeouts.initialize"))}
-              lazy val start = ${timeouts.getOrElse("start", c.Expr(q"DefaultTimeouts.start"))}
-              lazy val stop = ${timeouts.getOrElse("stop", c.Expr(q"DefaultTimeouts.stop"))}
-              lazy val reset = ${timeouts.getOrElse("reset", c.Expr(q"DefaultTimeouts.reset"))}
+              lazy val initialize = ${timeouts.getOrElse("initialize", q"DefaultTimeouts.initialize")}
+              lazy val start = ${timeouts.getOrElse("start", q"DefaultTimeouts.start")}
+              lazy val stop = ${timeouts.getOrElse("stop", q"DefaultTimeouts.stop")}
+              lazy val reset = ${timeouts.getOrElse("reset", q"DefaultTimeouts.reset")}
          }"""
       ))
   }
@@ -182,13 +187,17 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
 trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends ControllerBuildingAgentsMacro[C]{
   import c.universe._
 
-  def AgentBuildSegments(negRaw: NegotiationRaw) =
-    EmptyAgentTrees(negRaw) ::
-    PriorityAndProposalBasedAgentSegment(negRaw) ::
-    IteratingAllVarsAgentSegment(negRaw) ::
-    RequiresDistinctPriorityAgentSegment(negRaw) ::
-    ReportingAgent(negRaw) ::
-    TypesDefinitions :: Nil
+  def AgentBuildSegments(raw: NegotiationRaw) =
+    EmptyAgentTrees(raw) ::
+    PriorityAndProposalBasedAgentSegment(raw) ::
+    IteratingAllVarsAgentSegment(raw) ::
+    RequiresDistinctPriorityAgentSegment(raw) ::
+    ReportingAgentSegment(raw) ::
+    TypesDefinitionsAgentSegment ::
+    CreateNegotiationAgentSegment ::
+    DomainIteratorsAgentSegment ::
+    ConstraintsByNegotiationAgentSegment ::
+    SpecAgentSegment(raw) :: Nil
 
 
   protected def transform(in: List[Raw.AgentDef])(f: (ActorTrees, Raw.AgentDef) => ActorTrees): I[(AgentName, ActorTrees)] =
@@ -297,7 +306,7 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
     .sortWith(_ <:< _).lastOption getOrThrow s"no language type parameter found in $trees"
 
 
-  def ReportingAgent(raw: NegotiationRaw) = {
+  def ReportingAgentSegment(raw: NegotiationRaw) = {
     val reportingAgents = raw.agents.filter(_.negotiations.exists(_.reportingToOpt.isDefined))
 
     def agentParent(agTrees: ActorTrees): c.Type = typeOf[AutoReporting[NegotiationLanguage]] match {
@@ -348,7 +357,31 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
     }
   }
 
-  def TypesDefinitions = MacroSegment{
+  def replaceTypeArg(in: c.Type, ofType: c.Type, replacement: c.Type) = in map{
+    case TypeRef(pre, sym, args) =>
+      val newArgs = args.map{
+        case tpe if tpe <:< ofType => replacement
+        case other => other
+      }
+      internal.typeRef(pre, sym, newArgs)
+    case other => other
+  }
+
+  def replaceLanguageTypeArg(in: c.Type, forAgent: ActorTrees) = {
+    val langTpe = agentLang(forAgent)
+    replaceTypeArg(in, typeOf[Language], langTpe)
+//    in map{
+//      case TypeRef(pre, sym, args) =>
+//        val newArgs = args.map{
+//          case lang if lang <:< typeOf[Language] => langTpe
+//          case other => other
+//        }
+//        internal.typeRef(pre, sym, newArgs)
+//      case other => other
+//    }
+  }
+
+  def TypesDefinitionsAgentSegment = MacroSegment{
     case trees@Trees(_, ags) =>
 
       val newAgs = ags.map{
@@ -367,30 +400,22 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
                       })
                 )
             ).groupBy(_._1)
-            .mapValues(_.unzip._2.flatten.distinct).filter(_._2.nonEmpty)
+            .mapValues(_.unzip._2.flatten.distinctBy(_.typeSymbol.name))
+            .filter(_._2.nonEmpty)
 
-          val langTpe = agentLang(tr)
-//          c.abort(NoPosition, "##!!M " + showRaw(parents.zipMap(p => scala.util.Try{p.member(TypeName("Negotiation")).typeSignature})))
+//          val langTpe = agentLang(tr)
           val typeDefs = abstractTypeMembers
-            .mapValues(_.map{
-              case TypeRef(pre, sym, args) =>
-                val newArgs = args.map{
-                  case lang if lang <:< typeOf[Language] => langTpe
-                  case other => other
-                }
-                internal.typeRef(pre, sym, newArgs)
-              case t => c.abort(NoPosition, "##!! " + showRaw(t))
-//              tpe => tpe
-//                .typeArgs.find(_ <:< typeOf[Language])
-//                .map{
-//                  case TypeRef(_, tName, )
-////                  t => c.abort(NoPosition, "##!! + " + showRaw(t))
+            .mapValues(_.map{ replaceLanguageTypeArg(_, tr)
+//              case TypeRef(pre, sym, args) =>
+//                val newArgs = args.map{
+//                  case lang if lang <:< typeOf[Language] => langTpe
+//                  case other => other
 //                }
-//                .getOrElse(tpe)
+//                internal.typeRef(pre, sym, newArgs)
+//              case t => c.abort(NoPosition, "##!! " + showRaw(t))
               })
             .toList.map{ case (tName, ext :: mix) => q"type $tName = $ext with ..$mix" }
 
-//          c.abort(NoPosition, "##!!2 " + showRaw(typeDefs))
           name -> tr.prepend.body(typeDefs: _*)
         case system => system
       }
@@ -398,4 +423,140 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
       trees.copy(agents = newAgs)
   }
 
+  // depends on TypesDefinitions
+  def CreateNegotiationAgentSegment = {
+
+    def negotiationScopeUpdatedTree = q"{}"
+
+    def createNegotiationTreeOpt(ag: ActorTrees) = {
+      val implTpesOpt = ag.body
+        .collect{
+          case TypeDef(_, TypeName("Negotiation"), Nil, tree) =>
+            tree match {
+              case CompoundTypeTree(Template(tpes, _, _)) => tpes
+            }
+        }
+        .ensuring(_.size <= 1).headOption
+
+      implTpesOpt map {
+        impl =>
+          q"""protected def createNegotiation(nId: NegotiationId): Negotiation = new ${impl.head} with ..${impl.tail} {
+            val id = nId
+            val issues: Set[Var] = args("negotiationsInit")
+              .asInstanceOf[Set[feh.tec.agents.light.AgentCreationInterface.NegotiationInit]]
+              .find(_.id == id).get.issues
+            def scopeUpdated(): Unit = $negotiationScopeUpdatedTree
+          }"""
+      }
+    }
+
+    MacroSegment{
+      case trees@Trees(_, ags) =>
+        val newAgs = ags map {
+          case (name, agTr) =>
+            val opt = createNegotiationTreeOpt(agTr)
+            name -> agTr.append.body(opt.toSeq: _*)
+        }
+        trees.copy(agents = newAgs)
+    }
+  }
+
+  def transformIfHasMember(ags: Map[String, ActorTrees])(cond: Symbol => Boolean, f: ((String, ActorTrees)) => ActorTrees) =
+    ags.map{
+      case (name, ag) =>
+        name -> ( if(ag.parents.exists(_.members.exists(cond))) f(name -> ag) else ag )
+    }
+
+  def isAbstract(name: Name): Symbol => Boolean = sym => sym.isAbstract && sym.name == name
+
+  // requires EmbedIssuesAndDomainIteratorsCreators
+  def DomainIteratorsAgentSegment = {
+
+    def domainIteratorsTree = q"""
+      def domainIterators: Map[Var, DomainIteratorBuilder[Var#Domain, Var#Tpe]] =
+        issues.values.map(v => v -> domainIteratorsCreators(v.name)).toMap
+    """
+
+    MacroSegment{
+      case trees@Trees(_, ags) =>
+        val newAgs = transformIfHasMember(ags)(
+          isAbstract(TermName("domainIterators")), _._2.append.body(domainIteratorsTree)
+        )
+
+//          ags.mapValues{
+//          ag =>
+//            if(ag.parents.exists(_.members.exists(m => m.isAbstract && m.name == TermName("domainIterators"))))
+//              ag.append.body(domainIteratorsTree)
+//            else ag
+//        }
+        trees.copy(agents = newAgs)
+    }
+
+  }
+
+  def ConstraintsByNegotiationAgentSegment = {
+
+    def constraintsByNegotiationArg = "constraints-by-negotiation"
+    def constraintsByNegotiationType = typeOf[Map[NegotiationId, NegotiationSpecification.AgentConstraintsDef]]
+    def getConstraintsByNegotiation(agName: String) = q"""
+      import feh.tec.agents.light.spec.NegotiationSpecification
+
+      initialAgents.find(_._1.name == $agName).get._1.negotiations.map{
+        case NegotiationSpecification.AgentNegDef(negName, _, extra) =>
+          val constraints = extra.collect{
+            case c: NegotiationSpecification.AgentConstraintsDef => c
+          }
+          NegotiationId(negName) -> constraints.ensuring(_.size == 1, constraints.size + " AgentConstraintsDef defined").head
+      }.toMap
+    """
+
+    def addConstraintsByNegotiationArg(agName: String) =
+      addAgentArgs(agName, constraintsByNegotiationArg, constraintsByNegotiationType, getConstraintsByNegotiation(agName))
+
+    def constraintsByNegotiationTree = q"""
+      val constraintsByNegotiation = args($constraintsByNegotiationArg).asInstanceOf[$constraintsByNegotiationType]
+      """
+
+    MacroSegment{
+      case trees@Trees(_, ags) =>
+        val newAgs = transformIfHasMember(ags)(
+          isAbstract(TermName("constraintsByNegotiation")),
+          {
+            case (name, tr) =>
+              addConstraintsByNegotiationArg(name)
+              tr.append.body(constraintsByNegotiationTree)
+          }
+        )
+        trees.copy(agents = newAgs)
+    }
+
+  }
+
+  // depends on TypesDefinitionsAgentSegment
+  def SpecAgentSegment(raw: NegotiationRaw) = {
+    val specByAgentName = raw.agents.map(ag => ag.name -> ag.spec).toMap
+
+    MacroSegment{
+      case trees@Trees(_, ags) =>
+        val newAgs = ags.map{
+          case (name, tr) if specByAgentName contains name =>
+            val agentType = tr.body.collect{
+              case TypeDef(_, TypeName("Agent"), Nil, CompoundTypeTree(Template(parents, _, _))) =>
+                internal.refinedType(parents.map(_.tpe), internal.newScopeWith())
+            }.head
+            val specTpe = tr.parents
+              .flatMap(_.members.find(isAbstract(TermName("spec"))))
+              .map(_.typeSignature.resultType).sortWith(_ <:< _)
+              .last
+              .pipe(replaceLanguageTypeArg(_, tr))
+              .pipe(replaceTypeArg(_, typeOf[AbstractAgent], agentType))
+
+
+            val sepcDef = q"val spec = ${specByAgentName(name)}.asInstanceOf[$specTpe]"
+            name -> tr.append.body(sepcDef)
+          case other => other
+        }
+        trees.copy(agents = newAgs)
+    }
+  }
 }
