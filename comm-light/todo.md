@@ -2,3 +2,4 @@
 [x] agent reporting for light
 [ ] connect web backend
 [x] provide constraints checking helper
+[ ] change DomainIterator > DomainValuesStream 

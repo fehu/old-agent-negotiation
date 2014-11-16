@@ -15,9 +15,10 @@ trait CreationSpecification{
   protected trait TimeoutDef extends ConfDef
 
   type ChooseTimeout = {
-    def creation: TimeoutIdent
-    def startup: TimeoutIdent
-    def `resolve conflict`: TimeoutIdent
+    def initialize: TimeoutIdent
+    def start: TimeoutIdent
+    def stop: TimeoutIdent
+    def reset: TimeoutIdent
   }
 
   def spawn:{

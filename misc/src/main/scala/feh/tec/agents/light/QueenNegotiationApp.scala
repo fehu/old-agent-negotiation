@@ -7,8 +7,6 @@ import impl.agent._
 import scala.concurrent.duration._
 
 object QueenNegotiationApp extends App{
-//  val agentProps =
-//    AgentProps("test", NegotiationRole("test"), Set(), create.PriorityAndProposalBasedIteratingAllVars(agentSpec))
 
   def negController(boardSize: Int) = controller {
     new Negotiation {
@@ -36,8 +34,8 @@ object QueenNegotiationApp extends App{
         )
 
       configure(
-        timeout.creation <= 100.millis,
-        timeout.`resolve conflict` <= 100.millis
+        timeout.initialize <= 100.millis,
+        timeout.start <= 100.millis
       )
     }
   }

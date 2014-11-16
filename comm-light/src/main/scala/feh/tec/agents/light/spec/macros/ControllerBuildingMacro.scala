@@ -120,7 +120,7 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
       }
 
       val newController = controller
-        .prepend.body(q"""
+        .append.body(q"""
            import feh.tec.agents.light.spec.NegotiationSpecification._
            protected val initialAgents: List[(AgentDef, CreateInterface => AgentRef)] = List(..$initialAgents)
            protected val systemAgentsInit: Set[() => AgentRef] = Set(..$systemAgentsInit)
@@ -187,7 +187,8 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
     PriorityAndProposalBasedAgentSegment(negRaw) ::
     IteratingAllVarsAgentSegment(negRaw) ::
     RequiresDistinctPriorityAgentSegment(negRaw) ::
-    ReportingAgent(negRaw) :: Nil
+    ReportingAgent(negRaw) ::
+    TypesDefinitions :: Nil
 
 
   protected def transform(in: List[Raw.AgentDef])(f: (ActorTrees, Raw.AgentDef) => ActorTrees): I[(AgentName, ActorTrees)] =
@@ -293,7 +294,7 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
 
   protected def agentLang(trees: ActorTrees): c.Type = trees.parents
     .flatMap(_.typeArgs.filter(_ <:< typeOf[NegotiationLanguage]))
-    .sortWith(_ <:< _).last
+    .sortWith(_ <:< _).lastOption getOrThrow s"no language type parameter found in $trees"
 
 
   def ReportingAgent(raw: NegotiationRaw) = {
@@ -328,8 +329,8 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
             }
 
             val tr = trees
-              .prepend.parents(agentParent(trees))
-              .prepend.body(q"val reportingTo: Map[NegotiationId, AgentRef] = Map(..$reportingTo)")
+              .append.parents(agentParent(trees))
+              .append.body(q"val reportingTo: Map[NegotiationId, AgentRef] = Map(..$reportingTo)")
               .add.constructorArgs("report-to" -> typeOf[AgentRef])
             addAgentArgs(name, "report-to", typeOf[AgentRef], reportToTree)
             name -> tr
@@ -341,10 +342,60 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
           reportSysAgent :: Nil
         } else Nil
 
-        val newController = controller.prepend.parents(typeOf[impl.service.ReportPrinterSupportBundle])
+        val newController = controller.append.parents(typeOf[impl.service.ReportPrinterSupportBundle])
 
         Trees(newController, newAgs ++ sys)
     }
+  }
+
+  def TypesDefinitions = MacroSegment{
+    case trees@Trees(_, ags) =>
+
+      val newAgs = ags.map{
+        case (name, tr@ActorTrees(_, parents, _, _)) if !parents.exists(_ <:< typeOf[SystemAgent]) =>
+          val abstractTypeMembers = parents
+            .flatMap(
+              _.members
+                .withFilter(d => d.name.isTypeName && d.isAbstract)
+                .map(
+                  sym =>
+                    sym.asType.name ->
+                      (sym.typeSignature match {
+                        case TypeBounds(_, RefinedType(tpes, _)) => tpes
+                        case TypeBounds(_, ref: TypeRef) => ref :: Nil
+                        case _ => Nil
+                      })
+                )
+            ).groupBy(_._1)
+            .mapValues(_.unzip._2.flatten.distinct).filter(_._2.nonEmpty)
+
+          val langTpe = agentLang(tr)
+//          c.abort(NoPosition, "##!!M " + showRaw(parents.zipMap(p => scala.util.Try{p.member(TypeName("Negotiation")).typeSignature})))
+          val typeDefs = abstractTypeMembers
+            .mapValues(_.map{
+              case TypeRef(pre, sym, args) =>
+                val newArgs = args.map{
+                  case lang if lang <:< typeOf[Language] => langTpe
+                  case other => other
+                }
+                internal.typeRef(pre, sym, newArgs)
+              case t => c.abort(NoPosition, "##!! " + showRaw(t))
+//              tpe => tpe
+//                .typeArgs.find(_ <:< typeOf[Language])
+//                .map{
+//                  case TypeRef(_, tName, )
+////                  t => c.abort(NoPosition, "##!! + " + showRaw(t))
+//                }
+//                .getOrElse(tpe)
+              })
+            .toList.map{ case (tName, ext :: mix) => q"type $tName = $ext with ..$mix" }
+
+//          c.abort(NoPosition, "##!!2 " + showRaw(typeDefs))
+          name -> tr.prepend.body(typeDefs: _*)
+        case system => system
+      }
+
+      trees.copy(agents = newAgs)
   }
 
 }
