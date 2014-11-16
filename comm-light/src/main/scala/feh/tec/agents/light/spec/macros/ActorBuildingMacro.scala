@@ -62,7 +62,8 @@ trait ActorBuildingMacroImpl[C <: whitebox.Context] extends ActorBuildingMacro[C
 
 
     val paramStatements = trees.constructorArgs.map {
-      case (name, tpe) => ValDef(Modifiers(Flag.PARAM), TermName(name), TypeTree(tpe.asInstanceOf[c.Type]), EmptyTree)
+      case (name, tpe) =>
+        ValDef(Modifiers(Flag.PARAM | Flag.PRIVATE | Flag.LOCAL), TermName(name), TypeTree(tpe.asInstanceOf[c.Type]), EmptyTree)
     }
 
     val classDef = q"""

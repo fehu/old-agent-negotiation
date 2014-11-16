@@ -168,4 +168,13 @@ object NegotiationEnvironmentController{
 
   lazy val Name = "NegotiationEnvironmentController"
   lazy val Role = SystemRole(Name)
+
+  object DefaultTimeouts extends Timeouts {
+    import scala.concurrent.duration._
+
+    def initialize = Timeout(100 millis)
+    def start = Timeout(100 millis)
+    def stop = Timeout(50 millis)
+    def reset = Timeout(50 millis)
+  }
 }

@@ -15,6 +15,6 @@ object NegotiationMacros {
   }
 
   class ControllerMacro[C <: whitebox.Context](val c: C)
-    extends NegotiationBuildingMacroImpl[C] with ControllerBuildingMacroImpl[C] with ActorBuildingMacroImpl[C]
-    with HasVarsSeparatingConstraintsBuilder[C]
+    extends NegotiationBuildingMacroImpl[C] with ControllerBuildingMacroImpl[C] with ControllerBuildingAgentsMacroImpl[C]
+    with ActorBuildingMacroImpl[C] with HasVarsSeparatingConstraintsBuilder[C]
 }
