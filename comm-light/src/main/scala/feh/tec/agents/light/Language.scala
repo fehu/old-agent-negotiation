@@ -61,11 +61,11 @@ object Message{
 
   case class Accepted(negotiation: NegotiationId, respondingTo: ProposalId, priority: Priority, myValues: Map[Var, Any])
                      (implicit val sender: AgentRef) extends ProposalResponse {
-    def asString = "I accept your offer ($priority)"
+    def asString = s"I accept your offer ($priority)"
   }
   case class Rejected(negotiation: NegotiationId, respondingTo: ProposalId, priority: Priority, myValues: Map[Var, Any])
                      (implicit val sender: AgentRef) extends ProposalResponse {
-    def asString = "I reject your offer ($priority)"
+    def asString = s"I reject your offer ($priority)"
   }
 
   class PriorityRaiseRequestId{

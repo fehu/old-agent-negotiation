@@ -1,6 +1,7 @@
 package feh.tec.agents.light
 
 import feh.tec.agents.light.impl.agent.create
+import feh.util._
 import feh.tec.agents.light.spec.RequiresDistinctPriority
 
 import scala.collection.mutable
@@ -11,9 +12,19 @@ object QueenSpec{
 
 class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
 
-  val priorities = mutable.HashMap.empty[AgentRef, Priority]
-  val proposalAcceptance = mutable.HashMap.empty[NegotiationId, mutable.HashMap[AgentRef, Message.ProposalResponse]]
+//  val priorities = mutable.HashMap.empty[AgentRef, Priority]
+  private val proposalAcceptance = mutable.HashMap.empty[NegotiationId, mutable.HashMap[AgentRef, Option[Boolean]]]
 
+  def setProposalAcceptance(neg: NegotiationId, ref: AgentRef)(v: Boolean)(implicit ag: create.PPI.Ag) = proposalAcceptance
+    .getOrElseUpdate(neg, mutable.HashMap(ag.get(neg).scope().zipMap(_ => Option.empty[Boolean]).toSeq: _*))(ref) = Option(v)
+  def clearProposalAcceptance(neg: NegotiationId) = proposalAcceptance -= neg
+  def allAccepted(neg: NegotiationId) = proposalAcceptance.exists(_._2.forall(_._2.exists(identity)))
+
+  def whenProposalAccepted(neg: NegotiationId)(implicit ag: create.PPI.Ag) = if(allAccepted(neg)){
+    ag.log.info("all accepted, setting state to **Waiting** + " + proposalAcceptance(neg))
+    ag.get(neg).currentState update NegotiationState.Waiting
+  }
+  
   initialize after {
     ag => _ =>
 //      ag.negotiations.foreach(_.currentPriority update new Priority(1))
@@ -46,7 +57,7 @@ class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
         val response =
           if(msg.satisfiesConstraints) Message.Accepted(negId, propId, get(negId).currentPriority(), get(negId).currentValues())
           else Message.Rejected(negId, propId, get(negId).currentPriority(), get(negId).currentValues())
-        priorities += msg.sender -> msg.priority
+//        priorities += msg.sender -> msg.priority
         respond(response)
     }
   }
@@ -55,18 +66,45 @@ class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
     implicit ag =>{
       case msg if ag.myPriority isHigherThenOf msg => respondToProposal(msg)
       case msg if ag.myPriority isLowerThenOf  msg => respondToProposal(msg)
-      case samePriority => sys.error("All agents must have a **distinct** priority assigned")
     }
   }
 
-  protected def onAcceptanceAndRejectionIfMyPriorityIsHigher(resp: Message.ProposalResponse) = {
-    proposalAcceptance.getOrElseUpdate(resp.negotiation, mutable.HashMap.empty) += resp.sender -> resp
-    priorities += resp.sender -> resp.priority
+  onRejection <:= {
+    implicit ag => {
+      case msg if msg.respondingTo != ag.get(msg.negotiation).currentProposal().id => ag.log.debug(s"!!!!Old message ignored: msg.respondingTo = ${msg.respondingTo}, mine=${ag.get(msg.negotiation).currentProposal().id}") //ignore
+      case msg if ag.myPriority isHigherThenOf msg =>
+        //mark as accepted
+        setProposalAcceptance(msg.negotiation, msg.sender)(true)
+        whenProposalAccepted(msg.negotiation)
+        ag.log.debug("rejected: myPriority isHigherThenOf " + msg)
+      case msg if ag.myPriority isLowerThenOf  msg =>
+        setProposalAcceptance(msg.negotiation, msg.sender)(false)
+        whenProposalAccepted(msg.negotiation)
+        ag.log.debug("!!!!!!!!!!!!!! rejected")
+        val prop = ag.setNextProposal(msg.negotiation)
+        ag.log.debug("rejected: spam new proposal " + prop)
+        ag.sendToAll(prop)
+    }
   }
+
+  setNextProposal andThen {
+    ag =>
+      overridden =>
+        negId =>
+          clearProposalAcceptance(negId)
+          overridden(ag)(negId)
+  }
+
+//  protected def onAcceptanceAndRejectionIfMyPriorityIsHigher(resp: Message.ProposalResponse) = {
+//    proposalAcceptance.getOrElseUpdate(resp.negotiation, mutable.HashMap.empty) += resp.sender -> resp
+//    priorities += resp.sender -> resp.priority
+//  }
 
   onAcceptance <:= {
     implicit ag => {
-      case msg if ag.myPriority isHigherThenOf msg =>
+      case msg =>
+        setProposalAcceptance(msg.negotiation, msg.sender)(true)
+        whenProposalAccepted(msg.negotiation)
     }
   }
 

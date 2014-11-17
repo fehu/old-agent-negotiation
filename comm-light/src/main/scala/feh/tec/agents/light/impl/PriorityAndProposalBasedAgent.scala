@@ -56,13 +56,15 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
   }
 
   def process: PartialFunction[Lang#Msg, Any] = {
-    case prop: Lang#Proposal if hasState(prop, NegotiationState.Negotiating)   => onProposal lift prop
+    case prop: Lang#Proposal if hasState(prop, NegotiationState.Negotiating, NegotiationState.Waiting)   => onProposal lift prop
     case resp: Lang#Acceptance if hasState(resp, NegotiationState.Negotiating) => onAcceptance lift resp
     case resp: Lang#Rejection if hasState(resp, NegotiationState.Negotiating)  => onRejection lift resp
     case priority: Lang#Priority if hasState(priority, NegotiationState.Negotiating, NegotiationState.NegotiatingPriority) =>
       priorityNegotiationHandler.process(priority)
     case msg if hasState(msg, NegotiationState.Initializing, NegotiationState.Initialized, NegotiationState.Starting) =>
+      log.debug("added delayed message " + msg)
       delayedMessages += msg
+    case msg => unhandled(msg)
   }
 
   def requestPriorityRaise(neg: NegotiationId): Lang#PriorityRaiseRequest = {

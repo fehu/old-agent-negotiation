@@ -52,7 +52,7 @@ object AgentSpecification{
 
     def nextValues: DefBADS[NegotiationId => Option[Map[Var, Any]]]
 
-    def setNextProposal: DefBADS[NegotiationId => Unit]
+    def setNextProposal: DefBADS[NegotiationId => Lang#Proposal]
 
     def updateCurrentProposal: DefBADS[NegotiationId => Unit]
 

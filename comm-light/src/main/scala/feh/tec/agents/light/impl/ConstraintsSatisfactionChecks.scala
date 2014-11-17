@@ -16,7 +16,7 @@ trait ConstraintsSatisfactionChecks {
       val myValues = neg.currentValues()
       log.debug(s"satisfiesConstraints values=$values, myValues=$myValues, neg=$neg")
       satisfiesParts(parts, values, myValues) $$
-        { r => log.debug(s"constrain $cName ${if(r) "" else "NOT "} satisfied") }
+        { r => log.debug(s"constrain $cName ${if(r) "" else "NOT "}satisfied") }
   }
 
   protected def ifConstraintLeafForOtherVars = true

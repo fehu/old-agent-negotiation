@@ -31,7 +31,7 @@ abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with
 
   def nothingToPropose(neg: NegotiationId): Unit            = spec.nothingToPropose.get apply neg
   protected def beforeEachMessage(msg: Lang#Msg): Unit      = spec.beforeEachMessage.get apply msg
-  def setNextProposal(neg: NegotiationId): Unit             = spec.setNextProposal.get apply neg
+  def setNextProposal(neg: NegotiationId): Lang#Proposal    = spec.setNextProposal.get apply neg
   def nextValues(neg: NegotiationId): Option[Map[Var, Any]] = spec.nextValues.get apply neg
   def onProposal: PartialFunction[Lang#Proposal, Any]       = spec.onProposal.get
   def onRejection: PartialFunction[Lang#Rejection, Any]     = spec.onRejection.get
