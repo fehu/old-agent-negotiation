@@ -46,26 +46,29 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
   }
 
 
-  protected def hasState(msg: NegotiationMessage, s: NegotiationState*) = s.contains(get(msg.negotiation).currentState())
+  def hasState(msg: NegotiationMessage, s: NegotiationState*) = s.contains(get(msg.negotiation).currentState())
   private val delayedMessages = mutable.HashSet.empty[Lang#Msg]
-
+  def guardDelayedMessage(msg: Lang#Msg) = {
+    log.debug("added delayed message " + msg)
+    delayedMessages += msg
+  }
   def resendDelayedMessages() = {
     log.debug("resendDelayedMessages " + delayedMessages)
     delayedMessages.foreach(msg => self.tell(msg, msg.sender.ref))
     delayedMessages.clear()
   }
 
-  def process: PartialFunction[Lang#Msg, Any] = {
+  def process: PartialFunction[Lang#Msg, Any] = ({
     case prop: Lang#Proposal if hasState(prop, NegotiationState.Negotiating, NegotiationState.Waiting)   => onProposal lift prop
     case resp: Lang#Acceptance if hasState(resp, NegotiationState.Negotiating) => onAcceptance lift resp
     case resp: Lang#Rejection if hasState(resp, NegotiationState.Negotiating)  => onRejection lift resp
     case priority: Lang#Priority if hasState(priority, NegotiationState.Negotiating, NegotiationState.NegotiatingPriority) =>
       priorityNegotiationHandler.process(priority)
-    case msg if hasState(msg, NegotiationState.Initializing, NegotiationState.Initialized, NegotiationState.Starting) =>
-      log.debug("added delayed message " + msg)
-      delayedMessages += msg
-    case msg => unhandled(msg)
-  }
+    case msg if hasState(msg, NegotiationState.Initializing, NegotiationState.Initialized, NegotiationState.Starting) => guardDelayedMessage(msg)
+  }: PartialFunction[Lang#Msg, Any])
+    .orElse(moreProcess).orElse{case x => unhandled(x)}
+
+  def moreProcess: PartialFunction[Lang#Msg, Any]
 
   def requestPriorityRaise(neg: NegotiationId): Lang#PriorityRaiseRequest = {
     log.debug(s"requestPriorityRaise $neg")

@@ -19,7 +19,7 @@ trait SystemRole extends Role
 object SystemRole{ def apply(name: String): SystemRole = new Role(name) with SystemRole }
 
 case class AgentRef(id: Agent.Id, protected[light] val ref: ActorRef){
-  override def toString: String = s"Agent(${id.name}})"
+  override def toString: String = s"Agent(${id.name})"
 }
 
 trait SpeakingAgent[Lang <: Language] extends AbstractAgent{

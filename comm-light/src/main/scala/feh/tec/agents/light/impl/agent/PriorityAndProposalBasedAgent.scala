@@ -36,6 +36,7 @@ abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with
   def onProposal: PartialFunction[Lang#Proposal, Any]       = spec.onProposal.get
   def onRejection: PartialFunction[Lang#Rejection, Any]     = spec.onRejection.get
   def onAcceptance: PartialFunction[Lang#Acceptance, Any]   = spec.onAcceptance.get
+  def moreProcess: PartialFunction[Lang#Msg, Any]           = spec.moreProcess.get
   def updateCurrentProposal(neg: NegotiationId): Unit       = spec.updateCurrentProposal.get apply neg
   def stop(): Unit                                          = spec.stop.get
   def reset(): Unit                                         = spec.reset.get

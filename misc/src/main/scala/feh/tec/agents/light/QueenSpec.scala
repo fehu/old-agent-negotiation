@@ -1,5 +1,7 @@
 package feh.tec.agents.light
 
+import java.util.UUID
+
 import feh.tec.agents.light.impl.agent.create
 import feh.util._
 import feh.tec.agents.light.spec.RequiresDistinctPriority
@@ -12,7 +14,13 @@ object QueenSpec{
 
 class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
 
-//  val priorities = mutable.HashMap.empty[AgentRef, Priority]
+  val priorities = mutable.HashMap.empty[NegotiationId, mutable.HashMap[AgentRef, Option[Priority]]]
+
+  def allPrioritiesKnown(neg: NegotiationId) = priorities(neg).forall(_._2.isDefined)
+  def maxPriority(neg: NegotiationId)(implicit ag: create.PPI.Ag) =
+    (priorities(neg) + (ag.ref -> ag.get(neg).currentPriority.raw))
+      .mapValues(_.get).maxBy(_._2.get)
+
   private val proposalAcceptance = mutable.HashMap.empty[NegotiationId, mutable.HashMap[AgentRef, Option[Boolean]]]
 
   def setProposalAcceptance(neg: NegotiationId, ref: AgentRef)(v: Boolean)(implicit ag: create.PPI.Ag) = proposalAcceptance
@@ -23,6 +31,71 @@ class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
   def whenProposalAccepted(neg: NegotiationId)(implicit ag: create.PPI.Ag) = if(allAccepted(neg)){
     ag.log.info("all accepted, setting state to **Waiting** + " + proposalAcceptance(neg))
     ag.get(neg).currentState update NegotiationState.Waiting
+  }
+
+  case class FallbackRequest(negotiation: NegotiationId, priority: Priority, id: UUID)(implicit val sender: AgentRef) extends Message.HasPriority{
+    def asString: String = s"I have no more values to propose in $negotiation ($priority)"
+  }
+  case class IWillMove(negotiation: NegotiationId, priority: Priority, respondingTo: UUID)(implicit val sender: AgentRef) extends Message.HasPriority{
+    def asString: String = s"I will move in $negotiation as you asked ($priority)"
+  }
+  
+  case object FallbackState extends NegotiationState
+
+  moreProcess <:= {
+    implicit ag => {
+      case msg: FallbackRequest if ag.hasState(msg, NegotiationState.Negotiating, NegotiationState.Waiting) => onFallbackRequest(msg)
+      /* Fallback State */
+      case msg: IWillMove if ag.hasState(msg, FallbackState) =>
+        val neg = ag.get(msg.negotiation)
+        neg.currentIterator update ag.newIterator(neg.id)
+        ag.setNextProposal(neg.id)
+        neg.currentState update NegotiationState.Negotiating
+        ag.resendDelayedMessages()
+        ag.sendToAll(neg.currentProposal())
+      case msg: FallbackRequest if ag.hasState(msg, FallbackState) => ag.guardDelayedMessage(msg)
+      case msg: Message.Proposal if ag.hasState(msg, FallbackState) => ag.guardDelayedMessage(msg)
+      case msg if ag.hasState(msg, FallbackState) => // do nothing
+    }
+  }
+
+  def onFallbackRequest(req: FallbackRequest)(implicit ag: create.PPI.Ag): Unit = req match {
+    case req@FallbackRequest(negId, pr, id) =>
+      import ag._
+      val neg = get(negId)
+      if(neg.currentPriority().get == pr.get + 1 && neg.currentState() == NegotiationState.Waiting) {
+        neg.currentState update NegotiationState.Negotiating
+        ag.setNextProposal(negId)
+        val resp = IWillMove(negId, neg.currentPriority(), id)
+        req.sender ! resp
+        sendToAll(neg.currentProposal())
+      }
+  }
+  
+  def nothingToProposeIfHasMaxPriority(negId: NegotiationId)(implicit ag: create.PPI.Ag): Option[Unit] =
+    if(maxPriority(negId)._1 == ag.ref) Some{
+      sys.error("Failed to resolve negotiation")
+    } else None
+
+  beforeEachMessage andThen {
+    ag => overridden => msg =>
+      overridden(ag)(msg)
+      priorities
+        .getOrElseUpdate(
+          msg.negotiation, mutable.HashMap(ag.get(msg.negotiation).scope().toSeq.zipMap(_ => Option.empty[Priority]): _*)
+      ) += msg.sender -> Some(msg.priority)
+  }
+
+  nothingToPropose <:= {
+    implicit ag => {
+      negId =>
+        nothingToProposeIfHasMaxPriority(negId).getOrElse{
+          val neg = ag.get(negId)
+          neg.currentState update FallbackState
+          val req = FallbackRequest(negId, neg.currentPriority(), UUID.randomUUID())(ag.ref)
+          ag.sendToAll(req)  
+        }
+    }
   }
   
   initialize after {
