@@ -3,7 +3,9 @@ package feh.tec.agents.light
 sealed trait AbstractMessage
 
 trait SystemMessage extends AbstractMessage
-trait NegotiationMessage extends AbstractMessage
+trait NegotiationMessage extends AbstractMessage{
+  def negotiation: NegotiationId
+}
 trait UserMessage extends AbstractMessage
 
 

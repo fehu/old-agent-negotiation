@@ -27,13 +27,13 @@ trait ControllerBuildingMacro[C <: whitebox.Context] extends ActorBuildingMacro[
   }
 }
 
-trait ControllerBuildingAgentsMacro[C <: whitebox.Context] extends ControllerBuildingMacro[C] with NegotiationBuildingMacro[C]{
+trait AgentsBuildingMacro[C <: whitebox.Context] extends ControllerBuildingMacro[C] with NegotiationBuildingMacro[C]{
   def AgentBuildSegments(negRaw: NegotiationRaw): List[MacroSegment]
   protected def agentArgsRequired(agent: String): Map[String, (c.Type, c.Tree)]
 }
 
 
-trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuildingAgentsMacro[C] with HasConstraintsBuilder[C]{
+trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro[C] with HasConstraintsBuilder[C]{
   import c.universe._
 
   def controllerPropsExpr(dsl: c.Expr[spec.dsl.Negotiation], trees: Trees, cBuilder: ConstraintsBuilder): c.Expr[Props] = {
@@ -139,11 +139,17 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
       val liftedArgsByNameAndAg = ags map { case (agName, _) => agName -> q"${agentArgsRequired(agName).mapValues(p => q"() => ${p._2}")}" }
 
       val extraArgs = q"""
-        private val liftedArgsByNameAndAg: Map[String, Map[String, () => Any]] =
+        log.debug("initialAgents = " + initialAgents)
+        private lazy val liftedArgsByNameAndAg: Map[String, Map[String, () => Any]] =
           Map(..${
             liftedArgsByNameAndAg.map{ case (name, tree) => q"$name -> $tree" }
           })
-        protected def extraArgs(agent: String): Map[String, Any] = liftedArgsByNameAndAg(agent).mapValues(_())
+        protected def extraArgs(agent: String): Map[String, Any] = liftedArgsByNameAndAg(agent).map{
+          case (n, f) =>
+            val v = f()
+            log.debug("arg(" + n + ")=" + v)
+            n -> v
+        }
       """
 
       trees.copy(controller = controller.append.body(extraArgs))
@@ -184,7 +190,7 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
 }
 
 
-trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends ControllerBuildingAgentsMacro[C]{
+trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro[C]{
   import c.universe._
 
   def AgentBuildSegments(raw: NegotiationRaw) =
@@ -269,10 +275,12 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
 
     val controllerExtra = q"""
       protected object InitialPriority {
-        private var p = Map.empty[NegotiationId, Priority].withDefault(_ => new Priority(0))
-        def next(neg: NegotiationId) = {
-          p += neg -> p(neg).raise()
-          p(neg)
+        private var p = Map.empty[NegotiationId, Priority]
+        def next(neg: NegotiationId) = synchronized{
+          val pr = p.getOrElse(neg, new Priority(0)).raise()
+          p += neg -> pr
+          log.debug("InitialPriority.next called for negotiation " + neg + " priority given = " + pr)
+          pr
         }
       }
     """
@@ -294,7 +302,9 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
               (trees, raw) =>
                 trees
                   .append.parents(c.typeOf[agent.RequiresDistinctPriority])
-                  .append.body( q"""val initialPriority = args("initial-priority").asInstanceOf[Map[NegotiationId, Priority]]""")
+                  .append.body(
+                    q"""lazy val initialPriority = args("initial-priority").asInstanceOf[Map[NegotiationId, Priority]]"""
+                  )
             }(ag)
         }
         Trees(if (requireDistinctPriority.nonEmpty) controller.append.body(controllerExtra) else controller, newAgs)
@@ -340,7 +350,6 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
             val tr = trees
               .append.parents(agentParent(trees))
               .append.body(q"val reportingTo: Map[NegotiationId, AgentRef] = Map(..$reportingTo)")
-              .add.constructorArgs("report-to" -> typeOf[AgentRef])
             addAgentArgs(name, "report-to", typeOf[AgentRef], reportToTree)
             name -> tr
           case p => p
@@ -420,16 +429,26 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
         }
         .ensuring(_.size <= 1).headOption
 
+      val negotiationCreation = ag.parents.exists(_ <:< typeOf[impl.agent.NegotiationCreation])
+
+      c.info(NoPosition, "!!!!!!!!!!!negotiationCreation = " + negotiationCreation, true)
+
       implTpesOpt map {
         impl =>
-          q"""protected def createNegotiation(nId: NegotiationId): Negotiation = new ${impl.head} with ..${impl.tail} {
-            val id = nId
-            val issues: Set[Var] = args("negotiationsInit")
-              .asInstanceOf[Set[feh.tec.agents.light.AgentCreationInterface.NegotiationInit]]
-              .find(_.id == id).get.issues
-            def scopeUpdated(): Unit = $negotiationScopeUpdatedTree
-          }"""
+          q"""
+            protected def createNegotiation(nId: NegotiationId): Negotiation = {
+              val neg = new ${impl.head} with ..${impl.tail} {
+                val id = nId
+                val issues: Set[Var] = negotiationsInit.find(_.id == id).get.issues
+                def scopeUpdated(): Unit = $negotiationScopeUpdatedTree
+              }
+              ${if(negotiationCreation) q"negotiationCreated(neg)" else q"" }
+              log.debug("neg created(macro): " + neg)
+              neg
+            }
+          """
       }
+
     }
 
     MacroSegment{
@@ -497,8 +516,15 @@ trait ControllerBuildingAgentsMacroImpl[C <: whitebox.Context] extends Controlle
     def addConstraintsByNegotiationArg(agName: String) =
       addAgentArgs(agName, constraintsByNegotiationArg, constraintsByNegotiationType, getConstraintsByNegotiation(agName))
 
+    def seqToTuple = q"""
+      (s: Seq[Any]) => ${
+        Match(q"s", (for(i <- 2 to 22) yield
+          cq"seq if seq.length == $i => ${TermName("Tuple"+i)}(..${for (j <- 0 until i) yield q"seq($j)"})".asInstanceOf[CaseDef]).toList)
+    }"""
+
     def constraintsByNegotiationTree = q"""
       val constraintsByNegotiation = args($constraintsByNegotiationArg).asInstanceOf[$constraintsByNegotiationType]
+      protected def seqToTuple(seq: Seq[Any]): Product = $seqToTuple(seq)
       """
 
     MacroSegment{

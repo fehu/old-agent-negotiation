@@ -23,7 +23,8 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
         val nextVals = owner.nextValues(negId)
         owner.log.debug(s"setNextProposal for $negId, $nextVals")
         nextVals.map{ neg.currentValues.update } getOrElse owner.nothingToPropose(negId) //nothingToPropose.get.apply(negId)
-        neg.currentProposal update Message.Proposal(Message.ProposalId.rand, negId, neg.currentPriority(), nextVals.get)(owner.ref)
+        owner.updateCurrentProposal(negId)
+//        neg.currentProposal update Message.Proposal(Message.ProposalId.rand, negId, neg.currentPriority(), nextVals.get)(owner.ref)
     }
   )
 
@@ -35,17 +36,22 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
   lazy val onAcceptance = new DefDS[PartialFunction[Lang#Acceptance, Any]](noDefErr("onAcceptance"))
   lazy val onRejection = new DefDS[PartialFunction[Lang#Rejection, Any]](noDefErr("onRejection"))
 
-  def proposal(negId: NegotiationId)(implicit owner: Ag) = owner.get(negId) |> {
-    neg =>
-      Message.Proposal(ProposalId.rand, negId, neg.currentPriority(), neg.currentValues())(owner.ref)
+  def proposal(negId: NegotiationId)(implicit owner: Ag) = {
+      val neg = owner.get(negId)
+      val pr = neg.currentPriority()
+      val prop = Message.Proposal(ProposalId.rand, negId, pr, neg.currentValues())(owner.ref)
+      owner.log.debug(s"created proposal(spec): $prop, neg = $neg")
+      prop
 
   }
 
   lazy val updateCurrentProposal = new DefBADS[NegotiationId => Unit](
-    implicit owner =>
-      negId => owner.get(negId).currentProposal update proposal(negId)
-
-  )
+    implicit owner => {
+      negId =>
+        val p = proposal(negId)
+        owner.log.debug("updateCurrentProposal(spec): " + p)
+        owner.get(negId).currentProposal update p
+    })
 
   lazy val requestPriorityRaise = new DefBADS[NegotiationId => Lang#PriorityRaiseRequest](
     implicit owner => id => priorityNegotiationHandler.get.start.get apply id
@@ -151,6 +157,7 @@ class PriorityNegotiationHandlerSpec[Ag <: PriorityAndProposalBasedAgent[Lang], 
   lazy val start = new DefDS[(NegotiationId) => Lang#PriorityRaiseRequest](
     implicit owner => {
       neg =>
+        owner.resendDelayedMessages()
         implicit def sender = owner.ref
         owner.get(neg).currentState update NegotiationState.NegotiatingPriority
         owner.log.debug(s"owner.ref = " + sender)

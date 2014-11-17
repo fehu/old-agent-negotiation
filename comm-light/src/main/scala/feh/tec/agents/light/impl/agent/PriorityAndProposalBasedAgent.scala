@@ -1,5 +1,6 @@
 package feh.tec.agents.light.impl.agent
 
+import akka.actor.ActorLogging
 import feh.tec.agents.light.AgentCreationInterface.NegotiationInit
 import feh.tec.agents.light.impl.ConstraintsSatisfactionChecks
 import feh.tec.agents.light.spec.AgentSpecification
@@ -19,11 +20,12 @@ abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with
   type Negotiation <: Negotiation.DynamicScope with Negotiation.HasPriority with Negotiation.HasProposal[Lang]
   type Agent <: PriorityAndProposalBasedAgent[Lang]
 
+  log.debug("negotiationsInit = " + negotiationsInit)
+  log.debug("args = " + args)
+
   val spec: AgentSpecification.PriorityAndProposalBased[Agent, Lang]
 
   implicit def owner: Agent = this.asInstanceOf[Agent]
-
-  log.debug("negotiationsInit = " + negotiationsInit)
 
   /* should be defined by ExtendableDefinition */
 
@@ -62,9 +64,23 @@ class PriorityNegotiationHandlerImpl[Owner <: PriorityAndProposalBasedAgent[Lang
   def process: PartialFunction[Lang#Priority, Any]                                                                = spec.process.get
 }
 
-@deprecated("is related to a negotiation, not the entire agent")
-trait RequiresDistinctPriority{
+trait NegotiationCreation {
   self: PriorityProposalBasedAgent[_] =>
 
+  def negotiationCreated(neg: Negotiation) = {}
+}
+
+@deprecated("is related to a negotiation, not the entire agent")
+trait RequiresDistinctPriority extends NegotiationCreation{
+  self: PriorityProposalBasedAgent[_] with ActorLogging =>
+
   def initialPriority: Map[NegotiationId, Priority]
+
+  log.debug(s"initialPriority = $initialPriority, negotiations = $negotiations")
+
+  override def negotiationCreated(neg: Negotiation) = {
+    super.negotiationCreated(neg)
+    neg.currentPriority update initialPriority(neg.id)
+    log.debug(s"neg.currentPriority = ${neg.currentPriority.raw}, neg.currentProposal = ${neg.currentProposal.raw}")
+  }
 }

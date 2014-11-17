@@ -53,7 +53,7 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
   var sysAgentByRole: Map[SystemRole, AgentRef] = null
 
 
-  def createAgent(c: Int, d: AgentDef, f: CreateInterface => AgentRef, priority: Priority) = d match {
+  def createAgent(c: Int, d: AgentDef, f: CreateInterface => AgentRef) = d match {
     case AgentDef(nme, rle, negDefs, _) =>
       val uniqueName = s"$nme-$c"
       val negInits = negDefs.toSet.map{
@@ -61,7 +61,9 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
           case AgentNegDef(negName, scope, extra) =>
             NegotiationInit(NegotiationId(negName), issuesByNegotiation(negName).map(issues).toSet)
         }: (AgentNegDef => NegotiationInit)}
+      log.debug("extraArgs in createAgent")
       val args = extraArgs(nme)
+      log.debug("extraArgs in createAgent = " + args)
 
       log.debug("negInits = " + negInits)
       f(Map(
@@ -85,7 +87,7 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
           val (agDef, f) = initialAgentsByName(agName)
           log.debug(s"agName = $agName, count = $count, agDef = $agDef, f = $f")
           for (c <- 1 to count)
-            yield createAgent(c, agDef, f, new Priority(c))
+            yield createAgent(c, agDef, f)
       }
       currentAgents = refsAndDefs.keySet
 

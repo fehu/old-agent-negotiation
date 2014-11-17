@@ -11,6 +11,8 @@ trait AbstractNegotiation {
 
   def scope: IdentStateVar[Set[AgentRef]]
 
+  def statesAsString: List[String] = List(currentValues, currentState).map(_.toString)
+
   protected abstract class StateVar[Repr, Get, Upd](val name: String, newRepr: Repr, get: Repr => Get){
     private var repr = newRepr
 
@@ -31,6 +33,8 @@ trait AbstractNegotiation {
     }
 
     def reset() = repr = newRepr
+
+    override def toString: String = s"StateVar($name = $repr)"
   }
 
   protected object VarUpdateHooks{
@@ -84,7 +88,7 @@ trait AbstractNegotiation {
 
   protected def currentValuesUpdateAllowed(values: Map[Var, Any]) = true
 
-  override def toString: String = s"Negotiation(${id.name}})"
+  override def toString: String = s"Negotiation(${id.name}, ${statesAsString.mkString(", ")}})"
 }
 
 trait NegotiationState
@@ -113,20 +117,28 @@ object Negotiation{
 
   trait HasProposal[Lang <: Language.ProposalBased] extends AbstractNegotiation{
     lazy val currentProposal = new OptionStateVar[Lang#Proposal]("proposal")
+
+    override def statesAsString: List[String] = super.statesAsString ::: List(currentProposal).map(_.toString)
   }
 
   trait HasPriority extends AbstractNegotiation{
     lazy val currentPriority = new OptionStateVar[Priority]("priority")
+
+    override def statesAsString: List[String] = super.statesAsString ::: List(currentPriority).map(_.toString)
   }
 
   trait DynamicScope extends AbstractNegotiation{
     val scope = new IdentStateVar[Set[AgentRef]]("scope", Set())
 
     def scopeUpdated()
+
+    override def statesAsString: List[String] = super.statesAsString ::: List(scope).map(_.toString)
   }
 
   trait HasIterator extends AbstractNegotiation{
     lazy val currentIterator = new OptionStateVar[ProposalEngine.DomainIterator]("domain-iterator")
+
+    override def statesAsString: List[String] = super.statesAsString ::: List(currentIterator).map(_.toString)
   }
 
   trait ChangeHooks extends AbstractNegotiation{

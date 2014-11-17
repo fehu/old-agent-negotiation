@@ -5,14 +5,18 @@ import feh.tec.agents.light.spec.RequiresDistinctPriority
 
 import scala.collection.mutable
 
-object QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
+object QueenSpec{
+  def apply() = new QueenSpec
+}
+
+class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
 
   val priorities = mutable.HashMap.empty[AgentRef, Priority]
   val proposalAcceptance = mutable.HashMap.empty[NegotiationId, mutable.HashMap[AgentRef, Message.ProposalResponse]]
 
   initialize after {
     ag => _ =>
-      ag.negotiations.foreach(_.currentPriority update new Priority(1))
+//      ag.negotiations.foreach(_.currentPriority update new Priority(1))
       ag.log.info("initialized")
   }
   start andThen {

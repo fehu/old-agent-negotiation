@@ -93,6 +93,7 @@ trait HasVarsSeparatingConstraintsBuilder[C <: whitebox.Context] extends HasCons
         {
           case xc.Replacement(descr, f) =>
             val func = f(raw.vars.map{ case Raw.VarDef(name, Raw.DomainDef(_, tpe, _)) => name -> tpe }.toMap)
+            c.info(NoPosition, "agentVarConstraintDefByName Replacement func" + showCode(func), true)
             val descriptions = descr map {
               case xc.Description(tpe, varName, arg) =>
                 q"""ConstraintParamDescription($tpe, $varName, ${arg.decodedName.toString})"""

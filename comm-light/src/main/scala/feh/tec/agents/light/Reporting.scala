@@ -14,13 +14,13 @@ trait AgentReport extends Message { def at: Long }
 case class MessageReport(msg: NegotiationLanguage#Msg, to: AgentRef, at: Long = System.currentTimeMillis()) extends AgentReport{
   val negotiation = msg.negotiation
   val sender = msg.sender
-  def asString = s"""MessageReport("$msg" to $to)"""
+  def asString = s"""MessageReport by $sender to $to: "$msg" """
 }
 
 case class StateReport(negotiation: NegotiationId, state: Map[String, Any], description: String, at: Long = System.currentTimeMillis())
                       (implicit val sender: AgentRef) extends AgentReport{
 
-  def asString = s"StateReport($negotiation, $state) by $sender"
+  def asString = s"StateReport by $sender: $negotiation -> $state"
 }
 
 object AgentReport{
