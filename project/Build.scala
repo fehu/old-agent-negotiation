@@ -50,7 +50,11 @@ object  Build extends sbt.Build {
   }
 
   object Dependencies{
-    lazy val akka = "com.typesafe.akka" %% "akka-actor" % "2.3.3"
+    def AkkaVersion = "2.3.3"
+    lazy val akka = "com.typesafe.akka" %% "akka-actor" % AkkaVersion
+    lazy val akkaSlf4j = "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion
+    lazy val slf4j = "org.slf4j" % "slf4j-log4j12" % "1.7.7"
+
     lazy val shapeless = "com.chuusai" % "shapeless_2.10.2" % "2.0.0-M1"
 
     object scala{
@@ -134,7 +138,7 @@ object  Build extends sbt.Build {
     id = "misc",
     base = file("misc"),
     settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq()
+      libraryDependencies ++= Seq(akkaSlf4j, slf4j)
     )
   ) dependsOn (webBackend, commLight)
 
