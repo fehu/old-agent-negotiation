@@ -189,7 +189,12 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
 
             val tr = trees
               .append.parents(agentParent(trees))
-              .append.body(q"val reportingTo: Map[NegotiationId, AgentRef] = Map(..$reportingTo)")
+              .append.body(
+                q"val reportingTo: Map[NegotiationId, AgentRef] = Map(..$reportingTo)",
+                q"def extraMessage: Map[String, Any] = Map()",
+                q"""def stateReport(negId: NegotiationId) =
+                      feh.tec.agents.light.StateReport(negId, get(negId).report(), "by demand")"""
+              )
             addAgentArgs(name, "report-to", typeOf[AgentRef], reportToTree)
             name -> tr
           case p => p

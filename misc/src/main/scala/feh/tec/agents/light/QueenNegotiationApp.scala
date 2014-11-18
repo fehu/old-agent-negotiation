@@ -2,9 +2,10 @@ package feh.tec.agents.light
 
 import feh.tec.agents.{NQueenWebSocketPushServerBuilder, NQueenWebSocketPushServer}
 import feh.tec.web.WebSocketPushServer
+import feh.tec.web.WebSocketPushServer.OnConnection
 import feh.tec.web.common.{NQueenMessages, WebsocketConf}
 import feh.util._
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{ActorRef, Props, ActorSystem}
 import feh.tec.agents.light.spec.dsl._
 import impl.agent._
 import spray.can.websocket.frame.TextFrame
@@ -49,23 +50,26 @@ object QueenNegotiationApp extends App with WebsocketConf{
 
   implicit val asys = ActorSystem()
 
-  def pushServerBuilder = new NQueenWebSocketPushServerBuilder(
-    wsConf.back.host("n-queen"),
-    wsConf.back.port("n-queen"),
-    negotiationId = NegotiationId("queen's position"),
-    flushFrequency = 200 millis
-  )
+  def pushServerBuilder = {
+    val initMessage = NQueenMessages.Init(for(i <- 1 to N) yield NQueenMessages.Queen(i) -> "Queen")
 
-  lazy val WebPushServer = pushServerBuilder.server $$ {
-    web =>
-      import spray.json._
-      import feh.tec.web.NQueenProtocol._
+    import spray.json._
+    import feh.tec.web.NQueenProtocol._
 
-      def initMessage = NQueenMessages.Init(for(i <- 1 to N) yield NQueenMessages.Queen(i) -> "Queen")
-      web ! WebSocketPushServer.OnConnection(List(
-        Left(TextFrame(initMessage.toJson.toString()))
-      ))
+    new NQueenWebSocketPushServerBuilder(
+
+      wsConf.back.host("n-queen"),
+      wsConf.back.port("n-queen"),
+      negotiationId = NegotiationId("queen's position"),
+      flushFrequency = 200 millis,
+      OnConnection(implicit self => {
+        c ! AgentReport.StateRequest(NegotiationId("queen's position"))
+        TextFrame(initMessage.toJson.toString())
+      })
+    )
   }
+
+  lazy val WebPushServer: ActorRef = pushServerBuilder.server
 
   val props = negController(N)
 

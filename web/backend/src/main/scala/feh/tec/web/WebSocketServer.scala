@@ -5,6 +5,7 @@ import akka.io.IO
 import spray.can.server.UHttp
 import spray.can.{websocket, Http}
 import spray.routing.HttpServiceActor
+import feh.util._
 
 import scala.collection.mutable
 
@@ -30,13 +31,17 @@ abstract class WebSocketWorker(val serverConnection: ActorRef) extends HttpServi
   with websocket.WebSocketServerWorker
 
 
-trait WebSocketServerInitialization{
+trait WebSocketServerCreation{
   implicit val asys: ActorSystem
 
   def uniqueName: String
   def serverProps: Props
   def bind: Http.Bind
 
-  lazy val server = asys.actorOf(serverProps, uniqueName)
+  lazy val server = create()
+  protected def create() = asys.actorOf(serverProps, uniqueName) $$ initPushServer _
+
   def bindTheServer() = IO(UHttp) ! bind
+  
+  protected def initPushServer(srv: ActorRef)
 }

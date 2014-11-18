@@ -43,6 +43,8 @@ trait NQueenSocketListener extends SocketConnections{
         case "PositionProvenFailure" =>
           val arr = json.pos.asInstanceOf[js.Array[Int]]
           chessBoard.positionProvenFailure(arr(0) -> arr(1))
+        // initial agent data
+        case "ChangeReport" => bulkReport(BulkReport(getBulkable(json).toSeq))
       }
   }
 
@@ -82,10 +84,7 @@ trait NQueenSocketListener extends SocketConnections{
 
   protected def getMessageReportExtra(json: js.Dynamic): Option[MessageExtraReport] = json match {
     case j if js.isUndefined(j)=> None
-    case weighted if !js.isUndefined(json.weight) => Option(ReportWeight(
-      json.weight.asInstanceOf[js.Array[js.Array[_]]].map{
-        (arr: js.Array[_]) => Some(arr(0).asInstanceOf[Boolean]) -> arr(1).asInstanceOf[Double]
-      }))
+    case _ => None
   }
 
   private def getPosition(dyn: js.Dynamic) = dyn.position.asInstanceOf[js.Array[Int]](0) -> dyn.position.asInstanceOf[js.Array[Int]](1)

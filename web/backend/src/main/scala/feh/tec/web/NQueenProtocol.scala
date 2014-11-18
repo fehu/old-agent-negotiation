@@ -37,10 +37,11 @@ object NQueenProtocol extends DefaultJsonProtocol{
   })
 
   implicit object MessageExtraReportFormat extends RootJsonFormat[MessageExtraReport]{
-    lazy val ReportWeightFormat = new NamedFormat[ReportWeight](jsonFormat1(ReportWeight)) {}
+//    lazy val SomeFormat = new NamedFormat[???](jsonFormat1(???)) {}
 
     def write(obj: MessageExtraReport) = obj match{
-      case rep@ReportWeight(weight) => ReportWeightFormat.write(rep)
+      case _ => ???
+//      case rep@???(weight) => SomeFormat.write(rep)
     }
     def read(json: JsValue) = ???
   }

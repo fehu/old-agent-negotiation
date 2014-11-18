@@ -11,18 +11,21 @@ import spray.json.JsonFormat
 object WebSocketPushServer{
   protected[web] case class WorkerConnectionClosed(msg: ConnectionClosed)
   case class Push(msg: WebSocketMessages#Msg, format: JsonFormat[WebSocketMessages#Msg])
-  case class OnConnection(frames: List[Either[Frame, () => Any]])
+  case class OnConnection(frames: List[ActorRef => Frame])
+  object OnConnection{
+    def apply(frames: (ActorRef => Frame)*) = new OnConnection(frames.toList)
+  }
 }
 
 class WebSocketPushServer extends WebSocketServer{
   import WebSocketPushServer._
 
-  var sendOnConnection: Option[List[Either[Frame, () => Any]]] = None
+  var sendOnConnection: List[ActorRef => Frame] = Nil
 
-  def workerFor(connection: ActorRef) = Props(new WebSocketPushWorker(connection, self, sendOnConnection))
+  def workerFor(connection: ActorRef) = Props(new WebSocketPushWorker(connection, self, sendOnConnection.map(f => () => f(self))))
 
   override def receive: PartialFunction[Any, Unit] = super.receive orElse{
-    case OnConnection(frames) => sendOnConnection = Option(frames)
+    case OnConnection(frames) => sendOnConnection :::= frames
     case p: Push =>
       workers foreach(_ forward p)
     case WorkerConnectionClosed(reason) =>
@@ -35,28 +38,28 @@ class WebSocketPushServer extends WebSocketServer{
 
 class WebSocketPushWorker(serverConnection: ActorRef,
                           supervisor: ActorRef,
-                          sendOnConnection: Option[List[Either[Frame, () => Any]]])
+                          sendOnConnection: List[() => Frame])
   extends WebSocketWorker(serverConnection)
 {
   import WebSocketPushServer._
 
   def businessLogic: Receive = {
     case Push(msg, format) => send(TextFrame(format.write(msg).toString()))
-    case UpgradedToWebSocket => sendOnConnection.foreach(_ foreach {
-      case Left(frame) => send(frame)
-      case Right(func) => func()
-    })
+    case UpgradedToWebSocket => sendOnConnection.foreach(f => send(f()))
     case closed: ConnectionClosed => supervisor ! WorkerConnectionClosed(closed)
     case msg                      => log.info("message received: " + msg)
   }
 
 }
 
-class WebSocketPushServerInitialization(host: String, port: Int, val uniqueName: String)
-                                       (implicit val asys: ActorSystem) extends WebSocketServerInitialization
+class WebSocketPushServerCreation(host: String, port: Int, val uniqueName: String, onConnection: WebSocketPushServer.OnConnection)
+                                 (implicit val asys: ActorSystem) extends WebSocketServerCreation
 {
+
   def bind = Http.Bind(server, host, port)
   def serverProps = Props(new WebSocketPushServer())
 
   bindTheServer()
+
+  protected def initPushServer(srv: ActorRef): Unit = srv ! onConnection
 }

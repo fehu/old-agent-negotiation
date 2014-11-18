@@ -11,7 +11,11 @@ import scala.collection.mutable
 
 trait AgentReport extends Message { def at: Long }
 
-case class MessageReport(msg: NegotiationLanguage#Msg, to: AgentRef, at: Long = System.currentTimeMillis()) extends AgentReport{
+case class MessageReport(msg: NegotiationLanguage#Msg,
+                         to: AgentRef,
+                         extraMessage: Map[String, Any],
+                         at: Long = System.currentTimeMillis()
+                          ) extends AgentReport{
   val negotiation = msg.negotiation
   val sender = msg.sender
   def asString = s"""MessageReport by $sender to $to: "$msg" """
@@ -42,7 +46,7 @@ trait AgentReporting[Lang <: NegotiationLanguage] extends NegotiatingAgent[Lang]
 object AgentReporting{
 
   trait AutoMessage[Lang <: NegotiationLanguage] extends AgentReporting[Lang] with AgentHelpers[Lang] with SystemSupport {
-    protected def messageReportHook(to: AgentRef, msg: Lang#Msg) = { report(MessageReport(msg, to)); true }
+    protected def messageReportHook(to: AgentRef, msg: Lang#Msg) = { report(MessageReport(msg, to, extraMessage)); true }
 
     abstract override def process: PartialFunction[Lang#Msg, Any] = {
       case msg if super.process.isDefinedAt(msg) => hooks.OnSend.withHooks(messageReportHook)(super.process(msg))
@@ -51,14 +55,21 @@ object AgentReporting{
     abstract override def start(): Unit = hooks.OnSend.withHooks(messageReportHook)(super.start())
     abstract override def stop(): Unit = hooks.OnSend.withHooks(messageReportHook)(super.stop())
     abstract override def reset(): Unit = hooks.OnSend.withHooks(messageReportHook)(super.reset())
+
+    def extraMessage: Map[String, Any]
   }
   
   trait StateByDemand[Lang <: NegotiationLanguage] extends AgentReporting[Lang]{
+    self: ActorLogging =>
 
     def stateReport(negId: NegotiationId): StateReport
     
     override def processSys = super.processSys orElse{
-      case AgentReport.StateRequest(negId) => sender() ! stateReport(negId)
+      case AgentReport.StateRequest(negId) =>
+        val s = sender()
+        val rep = stateReport(negId)
+        log.debug(s"StateRequest: s=$s, rep=$rep")
+        s ! rep
     }
   }
 
@@ -71,7 +82,8 @@ object AgentReporting{
   }
 }
 
-trait AutoReporting[Lang <: NegotiationLanguage] extends AgentReporting.AutoMessage[Lang] with AgentReporting.AutoState[Lang]
+trait AutoReporting[Lang <: NegotiationLanguage] extends AgentReporting.AutoMessage[Lang]
+  with AgentReporting.AutoState[Lang] with AgentReporting.StateByDemand[Lang]
 
 case class ReportListenerRef[T <: ReportListener](clazz: Class[T], forward: List[ActorRef])
 

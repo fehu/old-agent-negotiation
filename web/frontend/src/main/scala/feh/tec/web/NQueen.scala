@@ -60,7 +60,6 @@ object NQueen extends JSApp with NQueenSocketListener{
         if(reps.nonEmpty) {
           val max = reps.maxBy(_.at)
           queensInfo(n).updatePriority(max)
-          chessBoard.updatePositions(max)
         }
     }}
   }

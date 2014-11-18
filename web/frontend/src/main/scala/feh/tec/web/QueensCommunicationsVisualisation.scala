@@ -172,7 +172,6 @@ trait QueensCommunicationsTemplates{
       th(`class` := "priority                  group-false",                                        "Priority"),
       th(`class` := "position                  group-false",                                        "Position"),
       th(`class` := "type                      group-false", "data-placeholder".attr := "Select",   "Type"    ),
-      th(`class` := "weighted                  group-false", "data-placeholder".attr := "Select",   "Weighted"),
       th(`class` := "r            filter-false group-false")
     )
   )
@@ -180,7 +179,7 @@ trait QueensCommunicationsTemplates{
     tfoot(
       tr(
         th(`class` := "l"),
-        th("colspan".attr := 5, `class` := "ts-pager form-horizontal",
+        th("colspan".attr := 4, `class` := "ts-pager form-horizontal",
           button(`class` := "btn first", `type` := "button",
             i(`class` := "icon-step-backward glyphicon glyphicon-step-backward")),
 
@@ -221,23 +220,10 @@ trait QueensCommunicationsTemplates{
         td( `class` := "priority",    report.msg.priority),
         td( `class` := "position",    pos.toString),
         td( `class` := "type",        tpe),
-        td( `class` := "weighted",    extractExtraWeighted(report.extra)),
         td( `class` := "r")
       )
     ReportRow(html, report.by, report.to, report.id.toString(), isProp)
   }
-
-  protected def extractExtraWeighted(extra: Option[MessageExtraReport]) = extra.collectFirst{
-    case ReportWeight(weight) if weight.size == 1 =>
-      span(weight.head._2*100 + "% " + { if(weight.head._1.get) "acceptance" else "rejection" }) :: Nil
-    case ReportWeight(weight) if weight.size == 2 && weight.forall(_._2 == 0) =>
-      unknownSpan :: Nil
-    case ReportWeight(weight) =>
-      val wm = weight.toMap
-      wm.get(Some(true)).map { w => span(`class` := "acceptance", s"acceptance: ${w*100}%") }.getOrElse(raw("")) ::
-        wm.get(Some(false)).map{ w => span(`class` := "rejection",  s"rejection:  ${w*100}%") }.getOrElse(raw("")) ::
-        wm.get(None).map       { w => span(`class` := "rejection",  s"unknown:    ${w*100}%") }.getOrElse(raw("")) :: Nil
-  }.getOrElse(unknownSpan :: Nil)
 
   private def unknownSpan = span(`class` := "unknown", "unknown")
 

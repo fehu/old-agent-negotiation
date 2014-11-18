@@ -154,9 +154,10 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
 
   def receive: Receive = {
     case SystemMessage.Initialize => initialize()
-    case SystemMessage.Start      => start()
-    case SystemMessage.Stop       => stop()
-    case SystemMessage.Reset      => reset()
+    case SystemMessage.Start            => start()
+    case SystemMessage.Stop             => stop()
+    case SystemMessage.Reset            => reset()
+    case req: AgentReport.StateRequest  => currentAgents.foreach(_.ref forward req)
   }
 
   val name = NegotiationEnvironmentController.Name

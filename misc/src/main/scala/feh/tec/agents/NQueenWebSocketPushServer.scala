@@ -4,7 +4,7 @@ import akka.actor.{Props, ActorSystem}
 import feh.tec.agents.light.Message.ProposalId
 import feh.tec.agents.light._
 import scala.concurrent.duration._
-import feh.tec.web.{WebSocketPushServerInitialization, WebSocketPushServer}
+import feh.tec.web.{WebSocketPushServerCreation, WebSocketPushServer}
 import feh.tec.web.WebSocketPushServer.Push
 import feh.tec.web.common.{WebSocketMessages, NQueenMessages}
 import spray.json.JsonFormat
@@ -28,7 +28,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
       q
   }
 
-  lazy val timeReference = System.currentTimeMillis()
+  val timeReference = System.currentTimeMillis()
   def timeDiff(time: Long) = (timeReference - time).toInt
 
   def push[Msg <: NQueenMessages.Msg : JsonFormat](msg: Msg) =
@@ -48,7 +48,16 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
 
         val rep = NQueenMessages.ChangeReport(q, timeDiff(time), posOpt, stateOpt)
         Some(rep)
-      case rep@MessageReport(msg, _to, time) =>
+      case msg@StateReport(`neg`, vals, "by demand", time) =>
+        val ref = msg.sender
+        val q = indexMap.getOrElse(ref, addNewIndex(ref))
+
+        val rep = NQueenMessages.ChangeReport(q, timeDiff(time),
+          Some(getPosXY(vals("values").asInstanceOf[Map[Var, Any]])),
+          Some(vals("state").asInstanceOf[NegotiationState].toString)
+          )
+        Some(rep)
+      case rep@MessageReport(msg, _to, extra, time) =>
         val by = indexMap.getOrElse(rep.msg.sender, addNewIndex(rep.msg.sender))
         val to = indexMap.getOrElse(_to, addNewIndex(_to))
         def buildMessage(content: NQueenMessages.type => NQueenMessages.MessageContent) =
@@ -67,7 +76,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
 //          case AgentReports.WeightReport(weighted) =>
 //            NQueenMessages.ReportWeight(weighted.mapValues(_.d).toList)
 //        }
-        message map (NQueenMessages.MessageReport(by, to, _, None))
+        message map (NQueenMessages.MessageReport(by, to, _, PartialFunction.condOpt(extra)(Map())))
     }
   }
 
@@ -80,12 +89,13 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
     // guard the reports until
     case rep@StateReport(`neg`, _, "changes", _) =>
       reportsBuff += rep
-    case rep@MessageReport(msg, _, _) if msg.negotiation == neg =>
+    case rep@MessageReport(msg, _, _, _) if msg.negotiation == neg =>
       reportsBuff += rep
     // this one is sent on connection; should be passed intact
-    case AgentReport.Bulk(reports) =>
-      val bulk = NQueenMessages.BulkReport(reports flatMap reportToBulkable)
-      super.receive(push(bulk))
+    case rep@StateReport(`neg`, _, "by demand", _) => super.receive(push(reportToBulkable(rep).get))
+//    case AgentReport.Bulk(reports) =>
+//      val bulk = NQueenMessages.BulkReport(reports flatMap reportToBulkable)
+//      super.receive(push(bulk))
     // bulk send buff contents and clear
     case FlushReports =>
       val bulk = NQueenMessages.BulkReport(reportsBuff.toList flatMap reportToBulkable)
@@ -105,9 +115,13 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
   scheduleFlush()
 }
 
-class NQueenWebSocketPushServerBuilder(host: String, port: Int, negotiationId: NegotiationId, flushFrequency: FiniteDuration)
+class NQueenWebSocketPushServerBuilder(host: String, port: Int,
+                                       negotiationId: NegotiationId,
+                                       flushFrequency: FiniteDuration,
+                                       onConnection: WebSocketPushServer.OnConnection
+                                        )
                                       (implicit asys: ActorSystem)
-  extends WebSocketPushServerInitialization(host, port, "NQueenWebServer")
+  extends WebSocketPushServerCreation(host, port, "NQueenWebServer", onConnection)
 {
   override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, flushFrequency))
 }

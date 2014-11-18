@@ -60,8 +60,6 @@ object NQueenMessages extends WebSocketMessages{
   case object Rejection extends MessageType
 
   trait MessageExtraReport
-  
-  case class ReportWeight(weight: Seq[(Option[Boolean], Double)]) extends MessageExtraReport
 
   case object NegotiationFinished extends Msg
   case class NegotiationFinishedAutoRestart(delay: Int) extends Msg
