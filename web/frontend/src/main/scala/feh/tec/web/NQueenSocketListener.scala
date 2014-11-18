@@ -3,6 +3,7 @@ package feh.tec.web
 import feh.tec.web.common.NQueenMessages._
 import org.scalajs.dom.WebSocket
 
+import scala.reflect.ClassTag
 import scala.scalajs.js
 import scala.scalajs.js.{Dynamic, JSON}
 
@@ -46,17 +47,16 @@ trait NQueenSocketListener extends SocketConnections{
   }
 
   protected def getBulkable(json: js.Dynamic) = PartialFunction.condOpt(json.$t.asInstanceOf[String]){
-    case "StateReport" =>
-      StateReport(
+    case "ChangeReport" =>
+      ChangeReport(
         by = Queen(json.by.n.asInstanceOf[Int]),
-        position = getPosition(json),
-        priority = json.priority.asInstanceOf[Int],
-        proposalAcceptance = json.proposalAcceptance.asInstanceOf[js.Array[js.Array[_]]].map(
-          (x: js.Array[_]) => Queen(x(0).asInstanceOf[js.Dynamic].n.asInstanceOf[Int]) -> x(1).asInstanceOf[Boolean]
-        ),
         at = json.at.asInstanceOf[Int],
-        acceptanceFlag = json.acceptanceFlag.asInstanceOf[Boolean],
-        topPriorityFlag = json.topPriorityFlag.asInstanceOf[Boolean]
+        position = optional[js.Array[js.Number]](json.position).map {
+          arr =>
+            assert(arr.size == 2)
+            (arr(0).toInt, arr(1).toInt)
+        },
+        state = optional[String](json.state)
       )
     case "MessageReport" =>
       MessageReport(
@@ -66,12 +66,14 @@ trait NQueenSocketListener extends SocketConnections{
           at = json.msg.at.asInstanceOf[Int],
           priority = json.msg.priority.asInstanceOf[Int],
           content = json.msg.content.$t.asInstanceOf[String] match{
-            case "Proposal" => Proposal(json.id.asInstanceOf[String], getPosition(json.msg.content))
-            case "Response" => Response(json.msg.content.proposal.asInstanceOf[String],
+            case "Proposal" => Proposal(json.msg.content.proposal.asInstanceOf[String], getPosition(json.msg.content))
+            case "Response" => Response(
+              json.msg.content.proposal.asInstanceOf[String],
               json.msg.content.tpe.asInstanceOf[String] match{
                 case "Acceptance" => Acceptance
                 case "Rejection"  => Rejection
-              })
+              },
+              getPosition(json.msg.content))
           }
         ),
         extra = getMessageReportExtra(json.extra)
@@ -87,4 +89,5 @@ trait NQueenSocketListener extends SocketConnections{
   }
 
   private def getPosition(dyn: js.Dynamic) = dyn.position.asInstanceOf[js.Array[Int]](0) -> dyn.position.asInstanceOf[js.Array[Int]](1)
+  private def optional[T : ClassTag](dyn: js.Dynamic) = if(dyn == js.undefined) None else Some(dyn.asInstanceOf[T])
 }

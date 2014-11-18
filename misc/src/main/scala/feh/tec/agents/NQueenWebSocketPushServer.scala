@@ -54,13 +54,13 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
         def buildMessage(content: NQueenMessages.type => NQueenMessages.MessageContent) =
           NQueenMessages.Message(timeDiff(time), msg.asInstanceOf[Message.HasPriority].priority.get, content(NQueenMessages))
 
-        val message = msg match{
+        val message = PartialFunction.condOpt(msg){
           case prop@Message.Proposal(ProposalId(id), `neg`, _, vals) =>
-            Some(buildMessage(_.Proposal(id.toString, getPosXY(vals))))
-          case acc@Message.Accepted(`neg`, offer, _, _) =>
-            Some(buildMessage(_.Response(offer.id, _.Acceptance)))
-          case rej@Message.Rejected(`neg`, offer, _, _)  =>
-            Some(buildMessage(_.Response(offer.id, _.Rejection)))
+            buildMessage(_.Proposal(id.toString, getPosXY(vals)))
+          case acc@Message.Accepted(`neg`, offer, _, vals) =>
+            buildMessage(_.Response(offer.id, getPosXY(vals), _.Acceptance))
+          case rej@Message.Rejected(`neg`, offer, _, vals)  =>
+            buildMessage(_.Response(offer.id, getPosXY(vals), _.Rejection))
 //          case conflict: Message.Conflict => None // todo
         }
 //        val newExtra = extra collectFirst {

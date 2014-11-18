@@ -22,7 +22,7 @@ object  Build extends sbt.Build {
 //    scalacOptions ++= Seq("-deprecation"),
 //    scalacOptions ++= Seq("-Ydebug"),
 //    scalacOptions ++= Seq("-Xlog-free-terms"),
-    scalacOptions ++= Seq("-Ymacro-debug-lite"),
+//    scalacOptions ++= Seq("-Ymacro-debug-lite"),
     scalacOptions in (Compile, doc) ++= Seq("-diagrams", "-diagrams-max-classes", "50", "-diagrams-max-implicits", "20")
 //     resolvers += Release.spray,
 //     mainClass in Compile := Some("")

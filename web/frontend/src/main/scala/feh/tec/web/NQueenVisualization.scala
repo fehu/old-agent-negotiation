@@ -1,6 +1,8 @@
 package feh.tec.web
 
-import feh.tec.web.common.NQueenMessages.{Queen, StateReport}
+import feh.tec.web.common.NQueenMessages.{MessageReport, ChangeReport, Queen}
+import feh.tec.web.common.{NQueenMessages, WebSocketMessages}
+import scala.scalajs.js.Dynamic
 import scalajs.js
 import org.scalajs.dom
 import org.scalajs.jquery._
@@ -31,10 +33,10 @@ object NQueenTemplates{
       for (i <- 1 to n)
       yield tags2.style(
         *.`type`  := "text/css",
-        *.disabled  := true,
+//        *.disabled  := "disabled",
         *.id      := id(i),
         raw(style(i))
-      )
+      ).toString() + "\n" + tags.script(s"$$('#${id(i)}').prop('disabled', true)")
     ).mkString("\n")
   }
 }
@@ -81,7 +83,12 @@ class ChessBoard(size: Int) {
 
   protected def selectSquare(x: Int, y: Int) = jQuery(s".chess-board tr:nth-child(${y+1}) td:nth-child(${x+1})")
 
-  def updatePositions(state: StateReport): Any = updatePositions(Map(state.by.n -> state.position))
+  def updatePositions(msg: NQueenMessages.CanBulk): Any = msg match {
+    case NQueenMessages.ChangeReport(Queen(by), _, posOpt, _) =>
+      posOpt.map(pos => updatePositions(Map(by -> pos)))
+    case NQueenMessages.MessageReport(Queen(by), _, NQueenMessages.Message(_, _, content), _) =>
+      updatePositions(Map(by -> content.position))
+  }
   def updatePositions(posUpdate: Map[Int, (Int, Int)]): Any = {
     if (posUpdate.forall(upd => placedQueens.exists(upd ==))) return {}
     placedQueens ++= posUpdate.toSeq
@@ -111,13 +118,18 @@ object QueenInfo{
 
 class QueenInfo(name: String, val n: Int, selection: QueenInfo.Selection){
 
-  def updateState(state: StateReport) = state match {
-    case StateReport(Queen(q), pos, pr, _, _, acceptFlag, topPriorityFlag) =>
-      sel.queenInfo(q) children ".priority" children "dd" text pr.toString
-      sel.queenInfo(q) children ".position" children "dd" text pos.toString
+  def updatePriority(rep: MessageReport) = {
+    sel.queenInfo(rep.by.n) children ".priority" children "dd" text rep.msg.priority.toString
+  }
 
-      jQuery("#" + QueenFlagStyles.acceptance(q)).prop("disabled", !acceptFlag || topPriorityFlag)
-      jQuery("#" + QueenFlagStyles.topPriority(q)).prop("disabled", !topPriorityFlag)
+  def updateState(rep: ChangeReport) = rep match {
+    case ChangeReport(Queen(q), at, posOpt, stateOpt) =>
+
+//      for (pos <- posOpt) sel.queenInfo(q) children ".position" children "dd" text pos.toString
+      for (state <- stateOpt) yield {
+        val b = state != "Waiting"
+        jQuery("#" + QueenFlagStyles.acceptance(q)).prop("disabled", b)
+      }
   }
 
   def updateSelection() = for(i <- 1 to n ){

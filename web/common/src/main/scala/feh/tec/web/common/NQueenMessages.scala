@@ -30,21 +30,7 @@ object NQueenMessages extends WebSocketMessages{
 
     def id = at -> by
   }
-  @deprecated("must guard values as map")
-  case class StateReport(by: Queen,
-                         position: (Int, Int),
-                         priority: Int,
-                         proposalAcceptance: Seq[(Queen, Boolean)],
-                         at: Int, // system time in millis
-                         acceptanceFlag: Boolean,
-                         topPriorityFlag: Boolean
-                          ) extends CanBulk
-  {
-    def reportsState = true
-    def reportsMessage = false
 
-    def id = at -> by
-  }
   case class MessageReport(by: Queen, to: Queen, msg: Message, extra: Option[MessageExtraReport]) extends CanBulk
   {
     def reportsState = false
@@ -58,11 +44,15 @@ object NQueenMessages extends WebSocketMessages{
   case class Message(at: Int, priority: Int, content: MessageContent){
     def isProposal = content.isInstanceOf[Proposal]
   }
-  sealed trait MessageContent
-  case class Proposal(id: String, position: (Int, Int)) extends MessageContent
-  case class Response(proposal: String, tpe: MessageType) extends MessageContent
+  sealed trait MessageContent{
+    def proposal: String
+    def position: (Int, Int)
+  }
+  case class Proposal(proposal: String, position: (Int, Int)) extends MessageContent
+  case class Response(proposal: String, tpe: MessageType, position: (Int, Int)) extends MessageContent
   object Response{
-    def apply(proposal: UUID, tpe: NQueenMessages.type => MessageType): Response = Response(proposal.toString, tpe(NQueenMessages))
+    def apply(proposal: UUID, position: (Int, Int), tpe: NQueenMessages.type => MessageType): Response =
+      Response(proposal.toString, tpe(NQueenMessages), position)
   }
 
   sealed trait MessageType
