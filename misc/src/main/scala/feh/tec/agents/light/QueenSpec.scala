@@ -89,8 +89,8 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
     case req@FallbackRequest(negId, pr, id) =>
       import ag._
       val neg = get(negId)
-      if(neg.currentPriority().get == pr.get + 1 && neg.currentState() == NegotiationState.Waiting) {
-        neg.currentState update NegotiationState.Negotiating
+      if(neg.currentPriority().get == pr.get + 1) {
+        if(neg.currentState() == NegotiationState.Waiting) neg.currentState update NegotiationState.Negotiating
         ag.setNextProposal(negId)
         val resp = IWillMove(negId, neg.currentPriority(), id)
         req.sender ! resp
