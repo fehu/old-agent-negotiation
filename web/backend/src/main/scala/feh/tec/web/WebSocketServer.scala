@@ -33,10 +33,10 @@ abstract class WebSocketWorker(val serverConnection: ActorRef) extends HttpServi
 trait WebSocketServerInitialization{
   implicit val asys: ActorSystem
 
+  def uniqueName: String
   def serverProps: Props
-  lazy val server = asys.actorOf(serverProps)
-
   def bind: Http.Bind
 
+  lazy val server = asys.actorOf(serverProps, uniqueName)
   def bindTheServer() = IO(UHttp) ! bind
 }

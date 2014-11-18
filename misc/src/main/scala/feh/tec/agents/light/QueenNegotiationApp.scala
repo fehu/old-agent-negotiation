@@ -1,13 +1,14 @@
 package feh.tec.agents.light
 
-import feh.tec.agents.NQueenWebSocketPushServer
+import feh.tec.agents.{NQueenWebSocketPushServerBuilder, NQueenWebSocketPushServer}
+import feh.tec.web.common.WebsocketConf
 import feh.util._
 import akka.actor.{Props, ActorSystem}
 import feh.tec.agents.light.spec.dsl._
 import impl.agent._
 import scala.concurrent.duration._
 
-object QueenNegotiationApp extends App{
+object QueenNegotiationApp extends App with WebsocketConf{
 
   def negController(boardSize: Int) = controller {
     new Negotiation {
@@ -36,16 +37,30 @@ object QueenNegotiationApp extends App{
 
       configure(
         timeout.initialize <= 100.millis,
-        timeout.start <= 100.millis
+        timeout.start <= 100.millis,
+        timeout.`response delay` <= 200.millis
       )
     }
   }
 
-  val props = negController(4)
-
   implicit val asys = ActorSystem()
 
-  lazy val WebPushServer = asys.actorOf(Props(new NQueenWebSocketPushServer(NegotiationId("queen's position"), 200 millis)))
+  def pushServerBuilder = new NQueenWebSocketPushServerBuilder(
+    wsConf.back.host("n-queen"),
+    wsConf.back.port("n-queen"),
+    negotiationId = NegotiationId("queen's position"),
+    flushFrequency = 200 millis
+  )
+
+  lazy val WebPushServer = pushServerBuilder.server
+//    asys.actorOf(
+//    Props(new NQueenWebSocketPushServer(, )),
+//    "WebPushServer"
+//  )
+
+  val props = negController(4)
+
+  WebPushServer
 
   val c = asys.actorOf(props)
 

@@ -52,7 +52,7 @@ class WebSocketPushWorker(serverConnection: ActorRef,
 
 }
 
-class WebSocketPushServerInitialization(host: String, port: Int)
+class WebSocketPushServerInitialization(host: String, port: Int, val uniqueName: String)
                                        (implicit val asys: ActorSystem) extends WebSocketServerInitialization
 {
   def bind = Http.Bind(server, host, port)

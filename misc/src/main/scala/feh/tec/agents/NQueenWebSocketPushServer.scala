@@ -98,16 +98,16 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
 //      reportsBuff.clear()
 //      super.receive(push(NQueenMessages.NegotiationFinishedAutoRestart(delay.toMillis.toInt)))
     case NQueenMessages.Restart => super.receive(push(NQueenMessages.Restart))
-//    case SharingKnowledge.ConfigurationProvenFailure(_, pos) =>
-//      super.receive(push(NQueenMessages.PositionProvenFailure(getPosXY(pos))))
+    case _: QueenSpec.FallbackRequest => // do nothing
+    case _: QueenSpec.IWillMove       => // do nothing
   }
 
   scheduleFlush()
 }
 
-class NQueenWebSocketPushServerBuilder(host: String, port: Int, negotiationId: NegotiationId)
+class NQueenWebSocketPushServerBuilder(host: String, port: Int, negotiationId: NegotiationId, flushFrequency: FiniteDuration)
                                       (implicit asys: ActorSystem)
-  extends WebSocketPushServerInitialization(host, port)
+  extends WebSocketPushServerInitialization(host, port, "NQueenWebServer")
 {
-  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, 250 millis)) // todo: should be configurable
+  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, flushFrequency))
 }
