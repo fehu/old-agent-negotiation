@@ -21,7 +21,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
 
       def `queen's position` = negotiation over(x, y)
 
-      def Queen = agent withRole "chess queen" definedBy QueenSpec() that (
+      def Queen = agent withRole "chess queen" definedBy QueenSpec(150 millis) that (
         negotiates the `queen's position` `with` the.others reportingTo reporter.forwarding(WebPushServer) and
           hasConstraints(
             "direct-line sight" | {
@@ -41,7 +41,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
       configure(
         timeout.initialize <= 100.millis,
         timeout.start <= 100.millis,
-        timeout.`response delay` <= 200.millis
+        timeout.`response delay` <= 100.millis
       )
     }
   }

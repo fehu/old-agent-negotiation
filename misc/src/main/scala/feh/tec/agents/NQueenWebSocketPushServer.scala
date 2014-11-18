@@ -29,7 +29,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
   }
 
   val timeReference = System.currentTimeMillis()
-  def timeDiff(time: Long) = (timeReference - time).toInt
+  def timeDiff(time: Long) = (time - timeReference).toInt
 
   def push[Msg <: NQueenMessages.Msg : JsonFormat](msg: Msg) =
     Push(msg, implicitly[JsonFormat[Msg]].asInstanceOf[JsonFormat[WebSocketMessages#Msg]])

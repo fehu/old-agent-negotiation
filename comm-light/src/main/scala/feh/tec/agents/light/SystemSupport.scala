@@ -70,12 +70,15 @@ trait SpeakingSystemSupport[Lang <: Language] extends SystemSupport{
 
   def receive = {
     case sys: SystemMessage => processSys(sys)
+    case msg: UserMessage   => processUserMessage(msg)
     case msg: Lang#Msg      =>
       _currentMessage = msg
       beforeEachMessage(msg)
       process(msg)
       _currentMessage = null.asInstanceOf[Lang#Msg]
   }
+
+  def processUserMessage: PartialFunction[UserMessage, Any]
   
   protected def beforeEachMessage(msg: Lang#Msg)
 }

@@ -52,6 +52,7 @@ object AgentSpecification{
     def onRejection: DefDS[PartialFunction[Lang#Rejection, Any]]
 
     def moreProcess: DefDS[PartialFunction[Lang#Msg, Any]]
+    def processUserMessage: DefDS[PartialFunction[UserMessage, Any]]
 
     def nextValues: DefBADS[NegotiationId => Option[Map[Var, Any]]]
 

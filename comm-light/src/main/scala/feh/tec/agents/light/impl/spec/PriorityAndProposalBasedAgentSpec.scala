@@ -38,6 +38,7 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
   lazy val onRejection = new DefDS[PartialFunction[Lang#Rejection, Any]](noDefErr("onRejection"))
 
   lazy val moreProcess = new DefDS[PartialFunction[Lang#Msg, Any]](_ => Map())
+  lazy val processUserMessage = new DefDS[PartialFunction[UserMessage, Any]](_ => Map())
 
   protected def proposal(negId: NegotiationId)(implicit owner: Ag) = {
       val neg = owner.get(negId)
