@@ -22,12 +22,12 @@ object NQueenTemplates{
 
   object QueenFlagStyles{
     def acceptance(i: Int) = s"style-acceptance-flag-$i"
-    def topPriority(i: Int) = s"style-top-priority-flag-$i"
+    def fallback(i: Int) = s"style-fallback-flag-$i"
 
     def generate(n: Int): String = generateAcceptance(n) :: generateTopPriority(n) :: Nil mkString "\n"
 
     def generateAcceptance(n: Int) =  generate(n, acceptance, i => s".queen-$i .name { color: green; }")
-    def generateTopPriority(n: Int) = generate(n, topPriority, i => s".queen-$i .name { color: orange; }")
+    def generateTopPriority(n: Int) = generate(n, fallback, i => s".queen-$i .name { color: orange; }")
 
     protected def generate(n: Int, id: Int => String, style: Int => String): String = (
       for (i <- 1 to n)
@@ -127,8 +127,10 @@ class QueenInfo(name: String, val n: Int, selection: QueenInfo.Selection){
 
 //      for (pos <- posOpt) sel.queenInfo(q) children ".position" children "dd" text pos.toString
       for (state <- stateOpt) yield {
-        val b = state != "Waiting"
-        jQuery("#" + QueenFlagStyles.acceptance(q)).prop("disabled", b)
+        val waiting = state != "Waiting"
+        val fallback = state != "FallbackState"
+        jQuery("#" + QueenFlagStyles.acceptance(q)).prop("disabled", waiting)
+        jQuery("#" + QueenFlagStyles.fallback(q)).prop("disabled", fallback)
       }
   }
 
