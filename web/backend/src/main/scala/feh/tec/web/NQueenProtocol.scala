@@ -46,7 +46,7 @@ object NQueenProtocol extends DefaultJsonProtocol{
   }
 
   implicit object MessageContent extends RootJsonFormat[MessageContent]{
-    lazy val ProposalFormat = new NamedFormat[Proposal](jsonFormat1(Proposal)) {}
+    lazy val ProposalFormat = new NamedFormat[Proposal](jsonFormat2(Proposal)) {}
     lazy val ResponseFormat = new NamedFormat[Response](jsonFormat2(Response(_: String, _: MessageType))) {}
 
     def write(obj: MessageContent) = obj match {
@@ -57,7 +57,7 @@ object NQueenProtocol extends DefaultJsonProtocol{
   }
 
   implicit lazy val MessageFormat: JsonFormat[Message] = new NamedFormat(jsonFormat3(Message)){}
-  implicit lazy val MessageSentFormat: JsonFormat[MessageReport] = new NamedFormat(jsonFormat5(MessageReport)){}
+  implicit lazy val MessageSentFormat: JsonFormat[MessageReport] = new NamedFormat(jsonFormat4(MessageReport)){}
 
   implicit object NegotiationFinishedFormat extends WriteOnlyFormat[NegotiationFinished.type](
     _ => JsObject("$t" -> JsString("NegotiationFinished"))

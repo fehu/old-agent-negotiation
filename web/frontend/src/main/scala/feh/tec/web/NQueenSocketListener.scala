@@ -63,10 +63,10 @@ trait NQueenSocketListener extends SocketConnections{
         by = Queen(json.by.n.asInstanceOf[Int]),
         to = Queen(json.to.n.asInstanceOf[Int]),
         msg = Message(
-          id = json.msg.id.asInstanceOf[String],
+          at = json.msg.at.asInstanceOf[Int],
           priority = json.msg.priority.asInstanceOf[Int],
           content = json.msg.content.$t.asInstanceOf[String] match{
-            case "Proposal" => Proposal(getPosition(json.msg.content))
+            case "Proposal" => Proposal(json.id.asInstanceOf[String], getPosition(json.msg.content))
             case "Response" => Response(json.msg.content.proposal.asInstanceOf[String],
               json.msg.content.tpe.asInstanceOf[String] match{
                 case "Acceptance" => Acceptance
@@ -74,7 +74,6 @@ trait NQueenSocketListener extends SocketConnections{
               })
           }
         ),
-        at = json.at.asInstanceOf[Int],
         extra = getMessageReportExtra(json.extra)
       )
   }

@@ -19,6 +19,18 @@ object NQueenMessages extends WebSocketMessages{
 
   case class Queen(n: Int)
   case class Init(queens: Seq[(Queen, String)]) extends Msg
+  case class ChangeReport(by: Queen,
+                          at: Int, // system time in millis
+                          position: Option[(Int, Int)],
+                          state: Option[String]
+                          ) extends CanBulk
+  {
+    def reportsState = true
+    def reportsMessage = false
+
+    def id = at -> by
+  }
+  @deprecated("must guard values as map")
   case class StateReport(by: Queen,
                          position: (Int, Int),
                          priority: Int,
@@ -33,20 +45,21 @@ object NQueenMessages extends WebSocketMessages{
 
     def id = at -> by
   }
-  case class MessageReport(by: Queen, to: Queen, msg: Message, at: Int, extra: Option[MessageExtraReport]) extends CanBulk
+  case class MessageReport(by: Queen, to: Queen, msg: Message, extra: Option[MessageExtraReport]) extends CanBulk
   {
     def reportsState = false
     def reportsMessage = true
+    def at: Int = msg.at
 
-    def id = msg.id
+    def id = (at, by, to)
   }
   case class BulkReport(messages: Seq[CanBulk]) extends Msg
 
-  case class Message(id: String, priority: Int, content: MessageContent){
+  case class Message(at: Int, priority: Int, content: MessageContent){
     def isProposal = content.isInstanceOf[Proposal]
   }
   sealed trait MessageContent
-  case class Proposal(position: (Int, Int)) extends MessageContent
+  case class Proposal(id: String, position: (Int, Int)) extends MessageContent
   case class Response(proposal: String, tpe: MessageType) extends MessageContent
   object Response{
     def apply(proposal: UUID, tpe: NQueenMessages.type => MessageType): Response = Response(proposal.toString, tpe(NQueenMessages))

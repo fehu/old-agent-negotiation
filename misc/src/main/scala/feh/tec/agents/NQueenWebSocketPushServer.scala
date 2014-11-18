@@ -1,12 +1,9 @@
 package feh.tec.agents
-/*
 
 import akka.actor.{Props, ActorSystem}
-import feh.tec.agents.impl.ProposalEngine.SharingKnowledge
+import feh.tec.agents.light.Message.ProposalId
+import feh.tec.agents.light._
 import scala.concurrent.duration._
-import feh.tec.agents.impl.Agent.Id
-import feh.tec.agents.impl.AgentReports.StateReportEntry
-import feh.tec.agents.impl.{ReportArchive, AgentReports, AgentReport, AgentRef}
 import feh.tec.web.{WebSocketPushServerInitialization, WebSocketPushServer}
 import feh.tec.web.WebSocketPushServer.Push
 import feh.tec.web.common.{WebSocketMessages, NQueenMessages}
@@ -25,11 +22,14 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
 
   protected lazy val RefNameRegex = """.+\-(\d+)""".r
   protected def addNewIndex(ref: AgentRef) = ref match {
-    case AgentRef(Id.named(RefNameRegex(i), role, uuid), _) =>
+    case AgentRef(Agent.Id(RefNameRegex(i), role), _) =>
       val q = NQueenMessages.Queen(i.toInt)
       indexMap += ref -> q
       q
   }
+
+  lazy val timeReference = System.currentTimeMillis()
+  def timeDiff(time: Long) = (timeReference - time).toInt
 
   def push[Msg <: NQueenMessages.Msg : JsonFormat](msg: Msg) =
     Push(msg, implicitly[JsonFormat[Msg]].asInstanceOf[JsonFormat[WebSocketMessages#Msg]])
@@ -39,30 +39,35 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
 
   protected def reportToBulkable(report: AgentReport): Option[NQueenMessages.CanBulk] = {
     report match {
-      case AgentReports.StateReport(ref, entries, time, _) =>
+      case msg@StateReport(`neg`, changes, "changes", time) =>
+        val ref = msg.sender
         val q = indexMap.getOrElse(ref, addNewIndex(ref))
-        val StateReportEntry(priority, vals, scope, acceptance, topPriority, extra) = entries(neg)
-        Some(NQueenMessages.StateReport(q, getPosXY(vals), priority.get, Nil, time.diff, acceptance, topPriority))
-      case rep@AgentReports.MessageReport(_to, msg, at, extra) =>
+        val valsOpt = changes.get("values").map(_.asInstanceOf[(Map[Var, Any], Map[Var, Any])])
+        val posOpt = valsOpt.map(_._2).map(getPosXY)
+        val stateOpt = changes.get("state").map(_.asInstanceOf[NegotiationState].toString)
+
+        val rep = NQueenMessages.ChangeReport(q, timeDiff(time), posOpt, stateOpt)
+        Some(rep)
+      case rep@MessageReport(msg, _to, time) =>
         val by = indexMap.getOrElse(rep.msg.sender, addNewIndex(rep.msg.sender))
         val to = indexMap.getOrElse(_to, addNewIndex(_to))
         def buildMessage(content: NQueenMessages.type => NQueenMessages.MessageContent) =
-          NQueenMessages.Message(msg.id.toString, msg.priority, content(NQueenMessages))
+          NQueenMessages.Message(timeDiff(time), msg.asInstanceOf[Message.HasPriority].priority.get, content(NQueenMessages))
 
         val message = msg match{
-          case prop@Message.Proposal(_, vals) =>
-            Some(buildMessage(_.Proposal(getPosXY(vals))))
-          case acc@Message.Accepted(_, offer) =>
-            Some(buildMessage(_.Response(offer, _.Acceptance)))
-          case rej@Message.Rejected(_, offer)  =>
-            Some(buildMessage(_.Response(offer, _.Rejection)))
-          case conflict: Message.Conflict => None // todo
+          case prop@Message.Proposal(ProposalId(id), `neg`, _, vals) =>
+            Some(buildMessage(_.Proposal(id.toString, getPosXY(vals))))
+          case acc@Message.Accepted(`neg`, offer, _, _) =>
+            Some(buildMessage(_.Response(offer.id, _.Acceptance)))
+          case rej@Message.Rejected(`neg`, offer, _, _)  =>
+            Some(buildMessage(_.Response(offer.id, _.Rejection)))
+//          case conflict: Message.Conflict => None // todo
         }
-        val newExtra = extra collectFirst {
-          case AgentReports.WeightReport(weighted) =>
-            NQueenMessages.ReportWeight(weighted.mapValues(_.d).toList)
-        }
-        message map (NQueenMessages.MessageReport(by, to, _, at.diff, newExtra))
+//        val newExtra = extra collectFirst {
+//          case AgentReports.WeightReport(weighted) =>
+//            NQueenMessages.ReportWeight(weighted.mapValues(_.d).toList)
+//        }
+        message map (NQueenMessages.MessageReport(by, to, _, None))
     }
   }
 
@@ -73,12 +78,12 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
 
   override def receive = super.receive orElse{
     // guard the reports until
-    case rep@AgentReports.StateReport(_, entries, _, _) if entries contains neg =>
-      reportsBuff += rep.copy(report = Map(neg -> entries(neg)))
-    case rep@AgentReports.MessageReport(_, msg, _, _) if msg.negotiation == neg =>
+    case rep@StateReport(`neg`, _, "changes", _) =>
+      reportsBuff += rep
+    case rep@MessageReport(msg, _, _) if msg.negotiation == neg =>
       reportsBuff += rep
     // this one is sent on connection; should be passed intact
-    case ReportArchive.BulkReports(reports) =>
+    case AgentReport.Bulk(reports) =>
       val bulk = NQueenMessages.BulkReport(reports flatMap reportToBulkable)
       super.receive(push(bulk))
     // bulk send buff contents and clear
@@ -89,12 +94,12 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
     case _: SystemMessage.NegotiationFinished =>
       reportsBuff.clear()
       super.receive(push(NQueenMessages.NegotiationFinished))
-    case SystemMessage.NegotiationFinishedAutoRestart(_, delay) =>
-      reportsBuff.clear()
-      super.receive(push(NQueenMessages.NegotiationFinishedAutoRestart(delay.toMillis.toInt)))
+//    case SystemMessage.NegotiationFinishedAutoRestart(_, delay) =>
+//      reportsBuff.clear()
+//      super.receive(push(NQueenMessages.NegotiationFinishedAutoRestart(delay.toMillis.toInt)))
     case NQueenMessages.Restart => super.receive(push(NQueenMessages.Restart))
-    case SharingKnowledge.ConfigurationProvenFailure(_, pos) =>
-      super.receive(push(NQueenMessages.PositionProvenFailure(getPosXY(pos))))
+//    case SharingKnowledge.ConfigurationProvenFailure(_, pos) =>
+//      super.receive(push(NQueenMessages.PositionProvenFailure(getPosXY(pos))))
   }
 
   scheduleFlush()
@@ -105,4 +110,4 @@ class NQueenWebSocketPushServerBuilder(host: String, port: Int, negotiationId: N
   extends WebSocketPushServerInitialization(host, port)
 {
   override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, 250 millis)) // todo: should be configurable
-}*/
+}

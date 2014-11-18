@@ -28,6 +28,8 @@ object AgentReport{
 
   case class Forward(to: ActorRef) extends SystemMessage
   case class StopForward(to: ActorRef) extends SystemMessage
+
+  case class Bulk(reports: List[AgentReport]) extends SystemMessage
 }
 
 

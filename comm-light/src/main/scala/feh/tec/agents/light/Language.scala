@@ -44,7 +44,7 @@ object Message{
     def priority: Priority
   }
 
-  case class ProposalId(get: UUID)
+  case class ProposalId(id: UUID)
   object ProposalId{
     def rand = ProposalId(UUID.randomUUID())
   }
