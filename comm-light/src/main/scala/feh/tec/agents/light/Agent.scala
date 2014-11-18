@@ -44,7 +44,7 @@ trait ProposalBasedAgent[Lang <: Language.ProposalBased] extends NegotiatingAgen
   def updateCurrentProposal(neg: NegotiationId)
 }
 
-trait PriorityNegotiationHandler[Lang <: Language.HasPriority]{
+trait PriorityNegotiationHandler[Lang <: Language.HasPriorityNegotiation]{
   def process: PartialFunction[Lang#Priority, Any]
 
   def start(neg: NegotiationId): Lang#PriorityRaiseRequest
@@ -55,10 +55,12 @@ trait PriorityNegotiationHandler[Lang <: Language.HasPriority]{
 trait PriorityBasedAgent[Lang <: Language.HasPriority] extends NegotiatingAgent[Lang]{
   type Negotiation <: Negotiation.HasPriority
 
+  def comparePriority(msg: Lang#Msg, f: (Priority, Priority) => Boolean): Boolean
+}
+
+trait NegotiatesPriority[Lang <: Language.HasPriorityNegotiation] extends PriorityBasedAgent[Lang]{
   def requestPriorityRaise(neg: NegotiationId): Lang#PriorityRaiseRequest
   def priorityNegotiationHandler: PriorityNegotiationHandler[Lang]
-
-  def comparePriority(msg: Lang#Msg, f: (Priority, Priority) => Boolean): Boolean
 }
 
 trait PriorityProposalBasedAgent[Lang <: Language.ProposalBased with Language.HasPriority]

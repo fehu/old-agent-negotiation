@@ -19,13 +19,14 @@ object Language{
 
   trait HasPriority extends NegotiationLanguage{
     type Msg = Message.HasPriority
-
     type Priority               = Message.HasPriority
+  }
+
+  trait HasPriorityNegotiation extends HasPriority{
     type PriorityRaiseRequest   <: Msg with Message.PriorityRaiseRequest[_]
     type PriorityRaiseResponse  <: Msg with Message.PriorityRaiseResponse
     type PriorityKeeping        = Message.Keep
     type PriorityRaising        = Message.Raise
-
   }
 }
 

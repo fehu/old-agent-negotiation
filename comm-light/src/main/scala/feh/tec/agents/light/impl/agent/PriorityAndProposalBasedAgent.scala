@@ -45,12 +45,12 @@ abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with
 
   lazy val negotiationIds: Set[NegotiationId] = negotiationsInit.map(_.id)
 
-  lazy val priorityNegotiationHandler: PriorityNegotiationHandler[Lang] = new PriorityNegotiationHandlerImpl(
-    spec.priorityNegotiationHandler.get, owner, this.get, this.sendToAll
-  )
+//  lazy val priorityNegotiationHandler: PriorityNegotiationHandler[Lang] = new PriorityNegotiationHandlerImpl(
+//    spec.priorityNegotiationHandler.get, owner, this.get, this.sendToAll
+//  )
 }
 
-class PriorityNegotiationHandlerImpl[Owner <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriority](
+class PriorityNegotiationHandlerImpl[Owner <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriorityNegotiation](
                 val spec: AgentSpecification.PriorityNegotiationHandler[Owner , Lang],
                 implicit val owner: Owner,
                 protected val get: NegotiationId => AbstractNegotiation,

@@ -3,6 +3,7 @@ package feh.tec.agents.light.impl
 import akka.actor.ActorLogging
 import feh.tec.agents.light.Message.PriorityRaiseRequestId
 import feh.tec.agents.light._
+import feh.tec.agents.light
 import feh.util._
 
 import scala.collection.mutable
@@ -62,20 +63,11 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
     case prop: Lang#Proposal if hasState(prop, NegotiationState.Negotiating, NegotiationState.Waiting)   => onProposal lift prop
     case resp: Lang#Acceptance if hasState(resp, NegotiationState.Negotiating) => onAcceptance lift resp
     case resp: Lang#Rejection if hasState(resp, NegotiationState.Negotiating)  => onRejection lift resp
-    case priority: Lang#Priority if hasState(priority, NegotiationState.Negotiating, NegotiationState.NegotiatingPriority) =>
-      priorityNegotiationHandler.process(priority)
     case msg if hasState(msg, NegotiationState.Initializing, NegotiationState.Initialized, NegotiationState.Starting) => guardDelayedMessage(msg)
   }: PartialFunction[Lang#Msg, Any])
     .orElse(moreProcess).orElse{case x => unhandled(x)}
 
   def moreProcess: PartialFunction[Lang#Msg, Any]
-
-  def requestPriorityRaise(neg: NegotiationId): Lang#PriorityRaiseRequest = {
-    log.debug(s"requestPriorityRaise $neg")
-    val req = priorityNegotiationHandler.start(neg)
-    sendToAll(req)
-    req
-  }
 
   def respond(msg: Lang#Msg) = {
     val sender = Option(currentMessage).getOrThrow("cannot respond: no incoming message registered").sender
@@ -86,6 +78,25 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
     def satisfiesConstraints: Boolean = agent.satisfiesConstraints(proposal.negotiation, proposal.get)
   }
 
+}
+
+object PriorityAndProposalBasedAgent{
+  trait NegotiatesPriority[Lang <: Language.ProposalBased with Language.HasPriorityNegotiation]
+    extends PriorityAndProposalBasedAgent[Lang] with light.NegotiatesPriority[Lang]
+  {
+
+    override def process: PartialFunction[Lang#Msg, Any] = super.process orElse{
+      case priority: Lang#Priority if hasState(priority, NegotiationState.Negotiating, NegotiationState.NegotiatingPriority) =>
+        priorityNegotiationHandler.process(priority)
+    }
+
+    def requestPriorityRaise(neg: NegotiationId): Lang#PriorityRaiseRequest = {
+      log.debug(s"requestPriorityRaise $neg")
+      val req = priorityNegotiationHandler.start(neg)
+      sendToAll(req)
+      req
+    }
+  }
 }
 
 /*

@@ -56,18 +56,6 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
         owner.get(negId).currentProposal update p
     })
 
-  lazy val requestPriorityRaise = new DefBADS[NegotiationId => Lang#PriorityRaiseRequest](
-    implicit owner => id => priorityNegotiationHandler.get.start.get apply id
-  )
-
-  protected var priorityNegotiationHandlerSetup = List.empty[AgentSpecification.PriorityNegotiationHandler[Ag, Lang] => Unit]
-  def priorityNegotiationHandler[R](f: AgentSpecification.PriorityNegotiationHandler[Ag, Lang] => Unit) = priorityNegotiationHandlerSetup ::= f
-
-  protected[light] lazy val priorityNegotiationHandler = new DefDSH[AgentSpecification.PriorityNegotiationHandler[Ag, Lang]](
-    implicit owner =>
-      new PriorityNegotiationHandlerSpec[Ag, Lang] $$ (spec => priorityNegotiationHandlerSetup.reverse.foreach(_(spec)))
-  )
-
   lazy val initialize = new DefBADS[Unit](_.negotiations.foreach(_.ensuring(_.scope().nonEmpty).currentState update Initialized ))
   lazy val start = new DefBADS[Unit](
     ag => {
@@ -81,7 +69,28 @@ trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang
 
 }
 
-class PriorityNegotiationHandlerSpec[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
+object PriorityAndProposalBasedAgentSpec{
+  trait NegotiatingPriority[Ag <: PriorityAndProposalBasedAgent.NegotiatesPriority[Lang], Lang <: Language.ProposalBased with Language.HasPriorityNegotiation]
+    extends PriorityAndProposalBasedAgentSpec[Ag, Lang] with AgentSpecification.NegotiatesPriority[Ag, Lang]
+  {
+    lazy val requestPriorityRaise = new DefBADS[NegotiationId => Lang#PriorityRaiseRequest](
+      implicit owner => id => priorityNegotiationHandler.get.start.get apply id
+    )
+
+    protected var priorityNegotiationHandlerSetup = List.empty[AgentSpecification.PriorityNegotiationHandler[Ag, Lang] => Unit]
+    def priorityNegotiationHandler[R](f: AgentSpecification.PriorityNegotiationHandler[Ag, Lang] => Unit) = priorityNegotiationHandlerSetup ::= f
+
+    protected[light] lazy val priorityNegotiationHandler = new DefDSH[AgentSpecification.PriorityNegotiationHandler[Ag, Lang]](
+      implicit owner =>
+        new PriorityNegotiationHandlerSpec[Ag, Lang] $$ (spec => priorityNegotiationHandlerSetup.reverse.foreach(_(spec)))
+    )
+  }
+}
+/*
+
+ */
+
+class PriorityNegotiationHandlerSpec[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriorityNegotiation]
   extends AgentSpecification.PriorityNegotiationHandler[Ag, Lang]
 {
   protected var raiseRequestId: Option[PriorityRaiseRequestId] = None

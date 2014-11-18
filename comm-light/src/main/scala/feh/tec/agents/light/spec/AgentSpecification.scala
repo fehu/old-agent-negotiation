@@ -3,6 +3,7 @@ package feh.tec.agents.light.spec
 import akka.actor.Props
 import feh.tec.agents.light.Message.{PriorityRaiseResponse, PriorityRaiseRequest}
 import feh.tec.agents.light._
+import feh.tec.agents.light
 import feh.tec.agents.light.impl.PriorityAndProposalBasedAgent
 
 trait AgentSpecification {
@@ -60,15 +61,19 @@ object AgentSpecification{
 
     def nothingToPropose: DefBADS[NegotiationId => Unit]
 
-    def priorityNegotiationHandler[R](f: AgentSpecification.PriorityNegotiationHandler[Ag, Lang] => Unit)
-    protected[light] def priorityNegotiationHandler: DefExt[AgentSpecification.PriorityNegotiationHandler[Ag, Lang]]
-
 //    def requestPriorityRaise: ExtDef[NegotiationId => Lang#PriorityRaiseRequest]
 
 //    def comparePriority: ExtDef[(Lang#Msg, (Priority, Priority) => Boolean) => Boolean]
   }
 
-  trait PriorityNegotiationHandler[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.HasPriority with Language.ProposalBased]
+  trait NegotiatesPriority[Ag <: PriorityAndProposalBasedAgent[Lang] with light.NegotiatesPriority[Lang], Lang <: Language.ProposalBased with Language.HasPriorityNegotiation]
+    extends AgentSpecificationExt[Ag]
+  {
+    def priorityNegotiationHandler[R](f: AgentSpecification.PriorityNegotiationHandler[Ag, Lang] => Unit)
+    protected[light] def priorityNegotiationHandler: DefExt[AgentSpecification.PriorityNegotiationHandler[Ag, Lang]]
+  }
+
+  trait PriorityNegotiationHandler[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.HasPriorityNegotiation with Language.ProposalBased]
     extends AgentSpecificationExt[Ag]
   {
     def onPriorityUpdate: DefBADS[(NegotiationId, Map[AgentRef, Lang#PriorityRaiseResponse]) => Unit]
