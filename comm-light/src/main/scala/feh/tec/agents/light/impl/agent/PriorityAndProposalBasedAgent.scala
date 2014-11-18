@@ -15,7 +15,7 @@ abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with
             val negotiationsInit: Set[NegotiationInit],
             val args: AgentCreationInterface#Args
           )
-  extends impl.PriorityAndProposalBasedAgent[Lang] with AgentCreationInterface
+  extends impl.PriorityAndProposalBasedAgent[Lang] with AgentCreationInterface with ResponseDelay[Lang]
 {
   type Negotiation <: Negotiation.DynamicScope with Negotiation.HasPriority with Negotiation.HasProposal[Lang]
   type Agent <: PriorityAndProposalBasedAgent[Lang]

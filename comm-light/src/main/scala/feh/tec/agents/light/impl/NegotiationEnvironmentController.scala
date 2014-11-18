@@ -6,6 +6,7 @@ import feh.tec.agents.light.AgentCreationInterface.NegotiationInit
 import feh.tec.agents.light.impl.NegotiationEnvironmentController._
 import feh.tec.agents.light._
 import feh.tec.agents.light.spec.NegotiationSpecification.{AgentNegDef, AgentDef, InterlocutorsByRoles, Interlocutors}
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Await, Future}
 import akka.pattern.ask
 
@@ -168,6 +169,7 @@ object NegotiationEnvironmentController{
     def start: Timeout
     def stop: Timeout
     def reset: Timeout
+    def `response delay`: FiniteDuration
   }
 
   lazy val Name = "NegotiationEnvironmentController"
@@ -180,5 +182,6 @@ object NegotiationEnvironmentController{
     def start = Timeout(100 millis)
     def stop = Timeout(50 millis)
     def reset = Timeout(50 millis)
+    def `response delay` = 0.millis
   }
 }

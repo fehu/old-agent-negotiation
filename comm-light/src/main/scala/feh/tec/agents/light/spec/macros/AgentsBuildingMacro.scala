@@ -8,6 +8,7 @@ import feh.tec.agents.light.spec.NegotiationSpecification
 import feh.util._
 
 import scala.collection.mutable
+import scala.concurrent.duration.FiniteDuration
 import scala.reflect.macros.whitebox
 
 trait AgentsBuildingMacro[C <: whitebox.Context] extends NegotiationBuildingMacro[C]{
@@ -33,7 +34,8 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
       CreateNegotiationAgentSegment ::
       DomainIteratorsAgentSegment ::
       ConstraintsByNegotiationAgentSegment ::
-      SpecAgentSegment(raw) :: Nil
+      SpecAgentSegment(raw) ::
+      ResponseDelayAgentSegment :: Nil
 
 
   protected def transform(in: List[Raw.AgentDef])(f: (ActorTrees, Raw.AgentDef) => ActorTrees): I[(AgentName, ActorTrees)] =
@@ -406,5 +408,27 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
         }
         trees.copy(agents = newAgs)
     }
+  }
+
+  def ResponseDelayAgentSegment = {
+
+    def responseDelayArgName = "response-delay"
+    def responseDelayArgType = typeOf[FiniteDuration]
+    def responseDelayAgBody = q"""protected lazy val responseDelay = args($responseDelayArgName).asInstanceOf[$responseDelayArgType]"""
+    def responseDelayControllerBody = q"timeouts.`response delay`"
+    def addResponseDelayArg(agName: String) = addAgentArgs(agName, responseDelayArgName, responseDelayArgType, responseDelayControllerBody)
+
+    MacroSegment{
+      case trees@Trees(_, ags) =>
+        val newAgs = ags.map{
+          case (name, tr@ActorTrees(_, parents, _, _)) if parents.exists(_ <:< typeOf[ResponseDelay[Language]].erasure) =>
+            addResponseDelayArg(name)
+            name -> tr.append.body(responseDelayAgBody)
+          case other => other
+        }
+
+        trees.copy(agents = newAgs)
+    }
+
   }
 }

@@ -42,7 +42,7 @@ trait AgentReporting[Lang <: NegotiationLanguage] extends NegotiatingAgent[Lang]
 object AgentReporting{
 
   trait AutoMessage[Lang <: NegotiationLanguage] extends AgentReporting[Lang] with AgentHelpers[Lang] with SystemSupport {
-    protected def messageReportHook(to: AgentRef, msg: Lang#Msg) = report(MessageReport(msg, to))
+    protected def messageReportHook(to: AgentRef, msg: Lang#Msg) = { report(MessageReport(msg, to)); true }
 
     abstract override def process: PartialFunction[Lang#Msg, Any] = {
       case msg if super.process.isDefinedAt(msg) => hooks.OnSend.withHooks(messageReportHook)(super.process(msg))

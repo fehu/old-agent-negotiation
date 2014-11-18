@@ -19,6 +19,7 @@ trait CreationSpecification{
     def start: TimeoutIdent
     def stop: TimeoutIdent
     def reset: TimeoutIdent
+    def `response delay`: TimeoutIdent
   }
 
   def spawn:{

@@ -170,6 +170,7 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
               lazy val start = ${timeouts.getOrElse("start", q"DefaultTimeouts.start")}
               lazy val stop = ${timeouts.getOrElse("stop", q"DefaultTimeouts.stop")}
               lazy val reset = ${timeouts.getOrElse("reset", q"DefaultTimeouts.reset")}
+              lazy val `response delay` = ${timeouts.get("response delay").map(t => q"$t.duration").getOrElse(q"DefaultTimeouts.`response delay`")}
          }"""
       ))
   }

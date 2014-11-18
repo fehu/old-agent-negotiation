@@ -4,19 +4,21 @@ import akka.actor.ActorLogging
 import feh.tec.agents.light.SystemMessage.ScopeUpdate
 import feh.util.AbstractScopedState
 
+import scala.concurrent.duration.FiniteDuration
+
 trait AgentHelpers[Lang <: NegotiationLanguage] extends ActorLogging{
   self: NegotiatingAgent[Lang] with SpeakingAgent[Lang] =>
 
   protected object hooks{
 
-    object OnSend extends AbstractScopedState[Set[(AgentRef, Lang#Msg) => Unit]]{
+    object OnSend extends AbstractScopedState[Set[(AgentRef, Lang#Msg) => Boolean]]{
       private var hooks = default
 
       protected def default = Set()
       def get = hooks
-      protected def state_=(t: Set[(AgentRef, Lang#Msg) => Unit]) = hooks = t
+      protected def state_=(t: Set[(AgentRef, Lang#Msg) => Boolean]) = hooks = t
 
-      def withHooks[R](hooks: ((AgentRef, Lang#Msg) => Unit)*)(f: => R) = {
+      def withHooks[R](hooks: ((AgentRef, Lang#Msg) => Boolean)*)(f: => R) = {
         val old = get
         this.hooks ++= hooks
         val res = f
@@ -33,8 +35,8 @@ trait AgentHelpers[Lang <: NegotiationLanguage] extends ActorLogging{
 
   implicit def agentRefWrapper(ref: AgentRef): AgentRefWrapper = new AgentRefWrapper(ref) {
     def !(msg: Lang#Msg) = {
-      ref.ref ! msg
-      hooks.OnSend.get foreach (_(ref, msg))
+      if(hooks.OnSend.get forall (_(ref, msg)))
+        ref.ref ! msg
     }
   }
 
@@ -89,5 +91,21 @@ trait DynamicScopeSupport[Lang <: NegotiationLanguage]
     case ScopeUpdate.NewScope(scope, neg) => get(neg).scope update scope;       get(neg).scopeUpdated()
     case ScopeUpdate.NewAgents(ag, neg)   => get(neg).scope update (_ ++ ag);   get(neg).scopeUpdated()
     case ScopeUpdate.RmAgents(ag, neg)    => get(neg).scope update (_ -- ag);   get(neg).scopeUpdated()
+  }
+}
+
+trait ResponseDelay[Lang <: NegotiationLanguage] extends AgentHelpers[Lang] with NegotiatingAgent[Lang] with SpeakingAgent[Lang] {
+  protected def responseDelay: FiniteDuration
+
+  private def responseDelayHook: (AgentRef, Lang#Msg) => Boolean = {
+    case (to, msg) if responseDelay.toMillis != 0 =>
+//      log.debug(s"delaying message $msg for $to")
+      context.system.scheduler.scheduleOnce(responseDelay, to.ref, msg)(context.dispatcher)
+      false
+    case _ => true
+  }
+
+  abstract override def process: PartialFunction[Lang#Msg, Any] = {
+    case msg if super.process.isDefinedAt(msg) => hooks.OnSend.withHooks(responseDelayHook)(super.process(msg))
   }
 }
