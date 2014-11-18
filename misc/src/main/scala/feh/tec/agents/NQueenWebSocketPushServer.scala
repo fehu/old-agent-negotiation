@@ -44,7 +44,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
         val q = indexMap.getOrElse(ref, addNewIndex(ref))
         val valsOpt = changes.get("values").map(_.asInstanceOf[(Map[Var, Any], Map[Var, Any])])
         val posOpt = valsOpt.map(_._2).map(getPosXY)
-        val stateOpt = changes.get("state").map(_.asInstanceOf[NegotiationState].toString)
+        val stateOpt = changes.get("state").map(_.asInstanceOf[(NegotiationState, NegotiationState)]._2.toString)
 
         val rep = NQueenMessages.ChangeReport(q, timeDiff(time), posOpt, stateOpt)
         Some(rep)

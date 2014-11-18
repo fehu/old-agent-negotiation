@@ -159,9 +159,17 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
         .getOrElse(sys.error("no system agent for with " + $reportListenerRoleTree + " found"))
     """
 
+    // todo
+    def reportSysAgentBody: List[c.Tree] = reportingAgents.map(_.negotiations.map(_.reportingToOpt.get).distinct).flatMap(
+      _.map{
+        tree =>
+          q"for(f <- $tree.forward) self ! feh.tec.agents.light.AgentReport.Forward(f)"
+      }
+    ).toList
+
     def reportSysAgent = "report-listener" -> ActorTrees("$ReportListener",
-      parents = typeOf[impl.service.DefaultReportWriter] :: Nil,
-      body = Nil,
+      parents = typeOf[impl.service.DefaultReportWriter] :: Nil, // todo: use ReportListenerRef
+      body = reportSysAgentBody,
       constructorArgs = Map("writeTo" -> typeOf[java.io.File])
     )
     def addReportSysAgent() = {

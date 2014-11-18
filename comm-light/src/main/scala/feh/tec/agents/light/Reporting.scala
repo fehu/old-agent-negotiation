@@ -73,7 +73,7 @@ object AgentReporting{
 
 trait AutoReporting[Lang <: NegotiationLanguage] extends AgentReporting.AutoMessage[Lang] with AgentReporting.AutoState[Lang]
 
-case class ReportListenerRef[T <: ReportListener](clazz: Class[T])
+case class ReportListenerRef[T <: ReportListener](clazz: Class[T], forward: List[ActorRef])
 
 trait ReportListenerControllerSupport {
   self: NegotiationEnvironmentController =>

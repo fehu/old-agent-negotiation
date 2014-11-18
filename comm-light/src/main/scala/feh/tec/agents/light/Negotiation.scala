@@ -23,9 +23,11 @@ trait AbstractNegotiation {
     def update(u: Upd): Unit = repr = {
 //        reset()
         val newRepr = upd(u, repr)
-        stateVarChanged(name, raw -> newRepr)
+        stateVarChanged(name, transformRawForReport(raw) -> transformRawForReport(newRepr))
         newRepr
       }
+
+    protected def transformRawForReport(in: Repr): Any = in
 
     def update(f: Get => Upd): Unit = {
 //      reset()
@@ -82,6 +84,8 @@ trait AbstractNegotiation {
         map ++= values
       }
       else sys.error("current values update not allowed")
+
+    override protected def transformRawForReport(in: mutable.HashMap[Var, Any]): Any = in.toMap
   }
 
   lazy val currentState = new IdentStateVar[NegotiationState]("state", Stopped)

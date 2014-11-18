@@ -1,7 +1,8 @@
 package feh.tec.agents.light
 
+import feh.tec.agents.NQueenWebSocketPushServer
 import feh.util._
-import akka.actor.ActorSystem
+import akka.actor.{Props, ActorSystem}
 import feh.tec.agents.light.spec.dsl._
 import impl.agent._
 import scala.concurrent.duration._
@@ -17,7 +18,7 @@ object QueenNegotiationApp extends App{
       def `queen's position` = negotiation over(x, y)
 
       def Queen = agent withRole "chess queen" definedBy QueenSpec() that (
-        negotiates the `queen's position` `with` the.others reportingTo reporter.default and
+        negotiates the `queen's position` `with` the.others reportingTo reporter.forwarding(WebPushServer) and
           hasConstraints(
             "direct-line sight" | {
               /* Constraints that can be run independently for vars should be separated by && or ||, or defined separately */
@@ -43,6 +44,8 @@ object QueenNegotiationApp extends App{
   val props = negController(4)
 
   implicit val asys = ActorSystem()
+
+  lazy val WebPushServer = asys.actorOf(Props(new NQueenWebSocketPushServer(NegotiationId("queen's position"), 200 millis)))
 
   val c = asys.actorOf(props)
 
