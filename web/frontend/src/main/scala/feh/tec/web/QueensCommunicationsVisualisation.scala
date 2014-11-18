@@ -238,7 +238,7 @@ object QueensCommunicationsSorter{
       "theme" -> "jui",
       "sortList" -> js.Array(js.Array(1, 0)),
       "headers" -> js.Dictionary(
-        "5" -> js.Dictionary(
+        "4" -> js.Dictionary(
           "sorter" -> false,
           "filter" -> true
         )
