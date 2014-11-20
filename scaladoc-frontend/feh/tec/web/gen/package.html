@@ -47,7 +47,11 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"></div>
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block diagram-container" id="content-diagram-container">
+                <span class="toggle diagram-link">Content Hierarchy</span>
+                <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#diagrams" target="_blank" class="diagram-help">Learn more about scaladoc diagrams</a>
+                <div class="diagram" id="content-diagram"><svg class="package-diagram" id="graph3" viewBox="0.00 0.00 282.00 96.00" height="96pt" width="282pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 92)" class="graph" id="graph1"><polygon points="-4,5 -4,-92 279,-92 279,5 -4,5" stroke="white" fill="white"></polygon><!-- node0 --><g class="node class" id="graph3_0"><a xlink:title="feh.tec.web.gen.NQueenLiteTemplate" xlink:href="NQueenLiteTemplate.html#inheritance-diagram"><polygon points="136,-26 0,-26 0,-0 136,-0 136,-26" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../lib/class_diagram.png" y="-21" x="10" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-11" x="32" text-anchor="start">NQueenLiteTemplate</text></a></g><!-- node1 --><g class="node class" id="graph3_1"><a xlink:title="feh.tec.web.gen.NQueenTemplate" xlink:href="NQueenTemplate.html#inheritance-diagram"><polygon points="273.5,-26 154.5,-26 154.5,-0 273.5,-0 273.5,-26" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../lib/class_diagram.png" y="-21" x="164" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-11" x="186" text-anchor="start">NQueenTemplate</text></a></g><!-- node2 --><g class="node trait" id="graph3_2"><a xlink:title="feh.tec.web.gen.NQueenTemplateCommon" xlink:href="NQueenTemplateCommon.html#inheritance-diagram"><polygon points="220.25,-88 61.75,-88 61.75,-62 220.25,-62 220.25,-88" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../lib/trait_diagram.png" y="-83" x="72" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-73" x="94" text-anchor="start">NQueenTemplateCommon</text></a></g><!-- node2&#45;&gt;node0 --><g class="edge inheritance" id="graph3_2_0"><a xlink:title="NQueenLiteTemplate is a subtype of NQueenTemplateCommon"><path d="M122.21,-58.5563C109.932,-48.4643 94.1238,-35.4716 82.7507,-26.1238" stroke="#d4d4d4" fill="none"></path><polygon points="121.253,-60.0352 126.227,-61.8581 123.476,-57.3313 121.253,-60.0352" stroke="#d4d4d4" fill="none"></polygon></a></g><!-- node2&#45;&gt;node1 --><g class="edge inheritance" id="graph3_2_1"><a xlink:title="NQueenTemplate is a subtype of NQueenTemplateCommon"><path d="M159.79,-58.5563C172.068,-48.4643 187.876,-35.4716 199.249,-26.1238" stroke="#d4d4d4" fill="none"></path><polygon points="158.524,-57.3313 155.773,-61.8581 160.747,-60.0352 158.524,-57.3313" stroke="#d4d4d4" fill="none"></polygon></a></g></g></svg></div>
+              </div></div>
         
 
       <div id="mbrsel">
@@ -66,8 +70,25 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="feh.tec.web.gen.NQueenTemplate" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="NQueenTemplateextendsGenTemplatewithWebsocketConf"></a>
+              <ol><li name="feh.tec.web.gen.NQueenLiteTemplate" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NQueenLiteTemplateextendsGenTemplatewithNQueenTemplateCommon"></a>
+      <a id="NQueenLiteTemplate:NQueenLiteTemplate"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="NQueenLiteTemplate.html"><span class="name">NQueenLiteTemplate</span></a><span class="result"> extends <a href="../util/GenTemplate.html" class="extype" name="feh.tec.web.util.GenTemplate">GenTemplate</a> with <a href="NQueenTemplateCommon.html" class="extype" name="feh.tec.web.gen.NQueenTemplateCommon">NQueenTemplateCommon</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.web.gen.package@NQueenLiteTemplateextendsGenTemplatewithNQueenTemplateCommon" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.tec.web.gen.NQueenTemplate" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NQueenTemplateextendsGenTemplatewithNQueenTemplateCommon"></a>
       <a id="NQueenTemplate:NQueenTemplate"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -75,10 +96,27 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="NQueenTemplate.html"><span class="name">NQueenTemplate</span></a><span class="result"> extends <a href="../util/GenTemplate.html" class="extype" name="feh.tec.web.util.GenTemplate">GenTemplate</a> with <a href="../common/WebsocketConf.html" class="extype" name="feh.tec.web.common.WebsocketConf">WebsocketConf</a></span>
+        <a href="NQueenTemplate.html"><span class="name">NQueenTemplate</span></a><span class="result"> extends <a href="../util/GenTemplate.html" class="extype" name="feh.tec.web.util.GenTemplate">GenTemplate</a> with <a href="NQueenTemplateCommon.html" class="extype" name="feh.tec.web.gen.NQueenTemplateCommon">NQueenTemplateCommon</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../index.html#feh.tec.web.gen.package@NQueenTemplateextendsGenTemplatewithWebsocketConf" title="Permalink" target="_top">
+      <a href="../../../../index.html#feh.tec.web.gen.package@NQueenTemplateextendsGenTemplatewithNQueenTemplateCommon" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.tec.web.gen.NQueenTemplateCommon" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="NQueenTemplateCommonextendsGenTemplatewithWebsocketConf"></a>
+      <a id="NQueenTemplateCommon:NQueenTemplateCommon"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="NQueenTemplateCommon.html"><span class="name">NQueenTemplateCommon</span></a><span class="result"> extends <a href="../util/GenTemplate.html" class="extype" name="feh.tec.web.util.GenTemplate">GenTemplate</a> with <a href="../common/WebsocketConf.html" class="extype" name="feh.tec.web.common.WebsocketConf">WebsocketConf</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.web.gen.package@NQueenTemplateCommonextendsGenTemplatewithWebsocketConf" title="Permalink" target="_top">
         <img src="../../../../lib/permalink.png" />
       </a>
     </span>
