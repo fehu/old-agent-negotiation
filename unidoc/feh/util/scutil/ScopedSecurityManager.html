@@ -1,0 +1,1370 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>ScopedSecurityManager - feh.util.scutil.ScopedSecurityManager</title>
+          <meta name="description" content="ScopedSecurityManager - feh.util.scutil.ScopedSecurityManager" />
+          <meta name="keywords" content="ScopedSecurityManager feh.util.scutil.ScopedSecurityManager" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      <script type="text/javascript" src="../../../lib/modernizr.custom.js"></script><script type="text/javascript" src="../../../lib/diagrams.js" id="diagrams-js"></script>
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'feh.util.scutil.ScopedSecurityManager';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img src="../../../lib/class_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="feh">feh</a>.<a href="../package.html" class="extype" name="feh.util">util</a>.<a href="package.html" class="extype" name="feh.util.scutil">scutil</a></p>
+        <h1>ScopedSecurityManager</h1> <span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ScopedSecurityManager</span><span class="result"> extends <span class="extype" name="java.lang.SecurityManager">SecurityManager</span> with <a href="../ScopedInThreadState.html" class="extype" name="feh.util.ScopedInThreadState">ScopedInThreadState</a>[<span class="extype" name="scala.Boolean">Boolean</span>]</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="../ScopedInThreadState.html" class="extype" name="feh.util.ScopedInThreadState">ScopedInThreadState</a>[<span class="extype" name="scala.Boolean">Boolean</span>], <a href="../AbstractScopedState.html" class="extype" name="feh.util.AbstractScopedState">AbstractScopedState</a>[<span class="extype" name="scala.Boolean">Boolean</span>], <span class="extype" name="java.lang.SecurityManager">SecurityManager</span>, <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block diagram-container" id="inheritance-diagram-container">
+                <span class="toggle diagram-link">Type Hierarchy</span>
+                <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#diagrams" target="_blank" class="diagram-help">Learn more about scaladoc diagrams</a>
+                <div class="diagram" id="inheritance-diagram"><svg class="class-diagram" id="graph404" viewBox="0.00 0.00 325.00 120.00" height="120pt" width="325pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 116)" class="graph" id="graph1"><polygon points="-4,5 -4,-116 322,-116 322,5 -4,5" stroke="white" fill="white"></polygon><g class="cluster" id="graph2"></g><g class="cluster" id="graph3"></g><!-- node0 --><g class="node this class" id="graph404_0"><a xlink:title="feh.util.scutil.ScopedSecurityManager (this class)" xlink:href="#inheritance-diagram"><polygon points="219,-50 67,-50 67,-24 219,-24 219,-50" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../lib/class_diagram.png" y="-45" x="77" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-35" x="99" text-anchor="start">ScopedSecurityManager</text></a></g><!-- node1 --><g class="node class" id="graph404_1"><a xlink:title="java.lang.SecurityManager"><polygon points="118.25,-112 -0.25,-112 -0.25,-86 118.25,-86 118.25,-112" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../lib/class_diagram.png" y="-107" x="10" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-97" x="32" text-anchor="start">SecurityManager</text></a></g><!-- node1&#45;&gt;node0 --><g class="edge inheritance" id="graph404_1_0"><a xlink:title="ScopedSecurityManager is a subtype of SecurityManager"><path d="M80.2536,-82.8189C94.4332,-72.6906 112.826,-59.5529 126.027,-50.1238" stroke="#d4d4d4" fill="none"></path><polygon points="79.0502,-81.5278 75.9987,-85.8581 81.0845,-84.3759 79.0502,-81.5278" stroke="#d4d4d4" fill="none"></polygon></a></g><!-- node2 --><g class="node trait" id="graph404_2"><a xlink:title="feh.util.ScopedInThreadState" xlink:href="../ScopedInThreadState.html#inheritance-diagram"><polygon points="317,-112 137,-112 137,-86 317,-86 317,-112" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../lib/trait_diagram.png" y="-107" x="147" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-97" x="169" text-anchor="start">ScopedInThreadState[Boolean]</text></a></g><!-- node2&#45;&gt;node0 --><g class="edge inheritance" id="graph404_2_0"><a xlink:title="ScopedSecurityManager is a subtype of ScopedInThreadState[Boolean]"><path d="M205.746,-82.8189C191.567,-72.6906 173.174,-59.5529 159.973,-50.1238" stroke="#d4d4d4" fill="none"></path><polygon points="204.915,-84.3759 210.001,-85.8581 206.95,-81.5278 204.915,-84.3759" stroke="#d4d4d4" fill="none"></polygon></a></g></g></svg></div>
+              </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="feh.util.scutil.ScopedSecurityManager"><span>ScopedSecurityManager</span></li><li class="in" name="feh.util.ScopedInThreadState"><span>ScopedInThreadState</span></li><li class="in" name="feh.util.AbstractScopedState"><span>AbstractScopedState</span></li><li class="in" name="java.lang.SecurityManager"><span>SecurityManager</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="feh.util.scutil.ScopedSecurityManager#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(restrictions:Set[feh.util.scutil.Restriction],enabledByDefault:Boolean):feh.util.scutil.ScopedSecurityManager"></a>
+      <a id="&lt;init&gt;:ScopedSecurityManager"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ScopedSecurityManager</span><span class="params">(<span name="restrictions">restrictions: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="Restriction.html" class="extype" name="feh.util.scutil.Restriction">Restriction</a>]</span>, <span name="enabledByDefault">enabledByDefault: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">false</span></span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@&lt;init&gt;(restrictions:Set[feh.util.scutil.Restriction],enabledByDefault:Boolean):feh.util.scutil.ScopedSecurityManager" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@##():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkAccept" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkAccept(x$1:String,x$2:Int):Unit"></a>
+      <a id="checkAccept(String,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkAccept</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkAccept(x$1:String,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkAccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkAccess(x$1:ThreadGroup):Unit"></a>
+      <a id="checkAccess(ThreadGroup):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkAccess</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.ThreadGroup">ThreadGroup</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkAccess(x$1:ThreadGroup):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkAccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkAccess(x$1:Thread):Unit"></a>
+      <a id="checkAccess(Thread):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkAccess</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.Thread">Thread</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkAccess(x$1:Thread):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkAwtEventQueueAccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkAwtEventQueueAccess():Unit"></a>
+      <a id="checkAwtEventQueueAccess():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkAwtEventQueueAccess</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkAwtEventQueueAccess():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkConnect" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkConnect(x$1:String,x$2:Int,x$3:Any):Unit"></a>
+      <a id="checkConnect(String,Int,Any):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkConnect</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>, <span name="arg2">arg2: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkConnect(x$1:String,x$2:Int,x$3:Any):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkConnect" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkConnect(x$1:String,x$2:Int):Unit"></a>
+      <a id="checkConnect(String,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkConnect</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkConnect(x$1:String,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkCreateClassLoader" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkCreateClassLoader():Unit"></a>
+      <a id="checkCreateClassLoader():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkCreateClassLoader</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkCreateClassLoader():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkDelete" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkDelete(x$1:String):Unit"></a>
+      <a id="checkDelete(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkDelete</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkDelete(x$1:String):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="feh.util.scutil.ScopedSecurityManager#checkExec" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkExec(cmd:String):Unit"></a>
+      <a id="checkExec(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkExec</span><span class="params">(<span name="cmd">cmd: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkExec(cmd:String):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.util.scutil.ScopedSecurityManager">ScopedSecurityManager</a> → SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkExit" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkExit(x$1:Int):Unit"></a>
+      <a id="checkExit(Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkExit</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkExit(x$1:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkLink" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkLink(x$1:String):Unit"></a>
+      <a id="checkLink(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkLink</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkLink(x$1:String):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkListen" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkListen(x$1:Int):Unit"></a>
+      <a id="checkListen(Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkListen</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkListen(x$1:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkMemberAccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkMemberAccess(x$1:Class[_],x$2:Int):Unit"></a>
+      <a id="checkMemberAccess(Class[_],Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkMemberAccess</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.Class">Class</span>[_]</span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkMemberAccess(x$1:Class[_],x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkMulticast" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkMulticast(x$1:java.net.InetAddress):Unit"></a>
+      <a id="checkMulticast(InetAddress):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkMulticast</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.net.InetAddress">InetAddress</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkMulticast(x$1:java.net.InetAddress):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="feh.util.scutil.ScopedSecurityManager#checkPackageAccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkPackageAccess(pkg:String):Unit"></a>
+      <a id="checkPackageAccess(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkPackageAccess</span><span class="params">(<span name="pkg">pkg: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkPackageAccess(pkg:String):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.util.scutil.ScopedSecurityManager">ScopedSecurityManager</a> → SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkPackageDefinition" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkPackageDefinition(x$1:String):Unit"></a>
+      <a id="checkPackageDefinition(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkPackageDefinition</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkPackageDefinition(x$1:String):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkPermission" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkPermission(x$1:java.security.Permission,x$2:Any):Unit"></a>
+      <a id="checkPermission(Permission,Any):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkPermission</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.security.Permission">Permission</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkPermission(x$1:java.security.Permission,x$2:Any):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkPermission" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkPermission(x$1:java.security.Permission):Unit"></a>
+      <a id="checkPermission(Permission):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkPermission</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.security.Permission">Permission</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkPermission(x$1:java.security.Permission):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkPrintJobAccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkPrintJobAccess():Unit"></a>
+      <a id="checkPrintJobAccess():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkPrintJobAccess</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkPrintJobAccess():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkPropertiesAccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkPropertiesAccess():Unit"></a>
+      <a id="checkPropertiesAccess():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkPropertiesAccess</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkPropertiesAccess():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkPropertyAccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkPropertyAccess(x$1:String):Unit"></a>
+      <a id="checkPropertyAccess(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkPropertyAccess</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkPropertyAccess(x$1:String):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkRead" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkRead(x$1:String,x$2:Any):Unit"></a>
+      <a id="checkRead(String,Any):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkRead</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkRead(x$1:String,x$2:Any):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkRead" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkRead(x$1:String):Unit"></a>
+      <a id="checkRead(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkRead</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkRead(x$1:String):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkRead" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkRead(x$1:java.io.FileDescriptor):Unit"></a>
+      <a id="checkRead(FileDescriptor):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkRead</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.io.FileDescriptor">FileDescriptor</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkRead(x$1:java.io.FileDescriptor):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkSecurityAccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkSecurityAccess(x$1:String):Unit"></a>
+      <a id="checkSecurityAccess(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkSecurityAccess</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkSecurityAccess(x$1:String):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkSetFactory" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkSetFactory():Unit"></a>
+      <a id="checkSetFactory():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkSetFactory</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkSetFactory():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkSystemClipboardAccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkSystemClipboardAccess():Unit"></a>
+      <a id="checkSystemClipboardAccess():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkSystemClipboardAccess</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkSystemClipboardAccess():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkTopLevelWindow" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkTopLevelWindow(x$1:Any):Boolean"></a>
+      <a id="checkTopLevelWindow(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkTopLevelWindow</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkTopLevelWindow(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkWrite" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkWrite(x$1:String):Unit"></a>
+      <a id="checkWrite(String):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkWrite</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkWrite(x$1:String):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#checkWrite" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkWrite(x$1:java.io.FileDescriptor):Unit"></a>
+      <a id="checkWrite(FileDescriptor):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkWrite</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.io.FileDescriptor">FileDescriptor</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkWrite(x$1:java.io.FileDescriptor):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@clone():Object" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="feh.util.scutil.ScopedSecurityManager#default" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="default:Boolean"></a>
+      <a id="default:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">default</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@default:Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.util.scutil.ScopedSecurityManager">ScopedSecurityManager</a> → <a href="../AbstractScopedState.html" class="extype" name="feh.util.AbstractScopedState">AbstractScopedState</a></dd></dl></div>
+    </li><li name="feh.util.scutil.ScopedSecurityManager#doWith" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="doWith[R](t:Boolean)(r:=&gt;R):R"></a>
+      <a id="doWith[R](Boolean)(⇒R):R"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">doWith</span><span class="tparams">[<span name="R">R</span>]</span><span class="params">(<span name="t">t: <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span name="r">r: ⇒ <span class="extype" name="feh.util.scutil.ScopedSecurityManager.doWith.R">R</span></span>)</span><span class="result">: <span class="extype" name="feh.util.scutil.ScopedSecurityManager.doWith.R">R</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@doWith[R](t:Boolean)(r:=&gt;R):R" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.util.scutil.ScopedSecurityManager">ScopedSecurityManager</a> → <a href="../AbstractScopedState.html" class="extype" name="feh.util.AbstractScopedState">AbstractScopedState</a></dd></dl></div>
+    </li><li name="feh.util.AbstractScopedState#doWith" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="doWith[R](t:T,f:T=&gt;R):R"></a>
+      <a id="doWith[R](Boolean,(Boolean)⇒R):R"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">doWith</span><span class="tparams">[<span name="R">R</span>]</span><span class="params">(<span name="t">t: <span class="extype" name="scala.Boolean">Boolean</span></span>, <span name="f">f: (<span class="extype" name="scala.Boolean">Boolean</span>) ⇒ <span class="extype" name="feh.util.AbstractScopedState.doWith.R">R</span></span>)</span><span class="result">: <span class="extype" name="feh.util.AbstractScopedState.doWith.R">R</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@doWith[R](t:T,f:T=&gt;R):R" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../AbstractScopedState.html" class="extype" name="feh.util.AbstractScopedState">AbstractScopedState</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="feh.util.ScopedInThreadState#get" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="get:T"></a>
+      <a id="get:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">get</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@get:T" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../ScopedInThreadState.html" class="extype" name="feh.util.ScopedInThreadState">ScopedInThreadState</a> → <a href="../AbstractScopedState.html" class="extype" name="feh.util.AbstractScopedState">AbstractScopedState</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#getClassContext" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClassContext():Array[Class[_]]"></a>
+      <a id="getClassContext():Array[Class[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClassContext</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="java.lang.Class">Class</span>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@getClassContext():Array[Class[_]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#getSecurityContext" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getSecurityContext():Object"></a>
+      <a id="getSecurityContext():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getSecurityContext</span><span class="params">()</span><span class="result">: <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@getSecurityContext():Object" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="java.lang.SecurityManager#getThreadGroup" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getThreadGroup():ThreadGroup"></a>
+      <a id="getThreadGroup():ThreadGroup"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getThreadGroup</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.ThreadGroup">ThreadGroup</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@getThreadGroup():ThreadGroup" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="feh.util.scutil.ScopedSecurityManager#secureScope" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="secureScope[R](f:=&gt;R):R"></a>
+      <a id="secureScope[R](⇒R):R"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">secureScope</span><span class="tparams">[<span name="R">R</span>]</span><span class="params">(<span name="f">f: ⇒ <span class="extype" name="feh.util.scutil.ScopedSecurityManager.secureScope.R">R</span></span>)</span><span class="result">: <span class="extype" name="feh.util.scutil.ScopedSecurityManager.secureScope.R">R</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@secureScope[R](f:=&gt;R):R" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.util.AbstractScopedState#state" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="state:T"></a>
+      <a id="state:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">state</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@state:T" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../AbstractScopedState.html" class="extype" name="feh.util.AbstractScopedState">AbstractScopedState</a></dd></dl></div>
+    </li><li name="feh.util.ScopedInThreadState#state_=" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="state_=(t:T):Unit"></a>
+      <a id="state_=(Boolean):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: state_$eq" class="name">state_=</span><span class="params">(<span name="t">t: <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@state_=(t:T):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../ScopedInThreadState.html" class="extype" name="feh.util.ScopedInThreadState">ScopedInThreadState</a> → <a href="../AbstractScopedState.html" class="extype" name="feh.util.AbstractScopedState">AbstractScopedState</a></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@toString():String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Deprecated Value Members</h3>
+              <ol><li name="java.lang.SecurityManager#checkMulticast" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkMulticast(x$1:java.net.InetAddress,x$2:Byte):Unit"></a>
+      <a id="checkMulticast(InetAddress,Byte):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">checkMulticast</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.net.InetAddress">InetAddress</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Byte">Byte</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@checkMulticast(x$1:java.net.InetAddress,x$2:Byte):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li><li name="java.lang.SecurityManager#classDepth" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="classDepth(x$1:String):Int"></a>
+      <a id="classDepth(String):Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">classDepth</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@classDepth(x$1:String):Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>SecurityManager</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li><li name="java.lang.SecurityManager#classLoaderDepth" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="classLoaderDepth():Int"></a>
+      <a id="classLoaderDepth():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">classLoaderDepth</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@classLoaderDepth():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>SecurityManager</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li><li name="java.lang.SecurityManager#currentClassLoader" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="currentClassLoader():ClassLoader"></a>
+      <a id="currentClassLoader():ClassLoader"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">currentClassLoader</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.ClassLoader">ClassLoader</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@currentClassLoader():ClassLoader" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>SecurityManager</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li><li name="java.lang.SecurityManager#currentLoadedClass" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="currentLoadedClass():Class[_]"></a>
+      <a id="currentLoadedClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">currentLoadedClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@currentLoadedClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>SecurityManager</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li><li name="java.lang.SecurityManager#getInCheck" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getInCheck():Boolean"></a>
+      <a id="getInCheck():Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">getInCheck</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@getInCheck():Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>SecurityManager</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li><li name="java.lang.SecurityManager#inClass" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="inClass(x$1:String):Boolean"></a>
+      <a id="inClass(String):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">inClass</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@inClass(x$1:String):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>SecurityManager</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li><li name="java.lang.SecurityManager#inClassLoader" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="inClassLoader():Boolean"></a>
+      <a id="inClassLoader():Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">inClassLoader</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#feh.util.scutil.ScopedSecurityManager@inClassLoader():Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>SecurityManager</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li></ol>
+            </div>
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="feh.util.ScopedInThreadState">
+              <h3>Inherited from <a href="../ScopedInThreadState.html" class="extype" name="feh.util.ScopedInThreadState">ScopedInThreadState</a>[<span class="extype" name="scala.Boolean">Boolean</span>]</h3>
+            </div><div class="parent" name="feh.util.AbstractScopedState">
+              <h3>Inherited from <a href="../AbstractScopedState.html" class="extype" name="feh.util.AbstractScopedState">AbstractScopedState</a>[<span class="extype" name="scala.Boolean">Boolean</span>]</h3>
+            </div><div class="parent" name="java.lang.SecurityManager">
+              <h3>Inherited from <span class="extype" name="java.lang.SecurityManager">SecurityManager</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <a href="../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

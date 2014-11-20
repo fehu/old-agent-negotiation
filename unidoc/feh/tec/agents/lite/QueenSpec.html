@@ -1,0 +1,1087 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>QueenSpec - feh.tec.agents.lite.QueenSpec</title>
+          <meta name="description" content="QueenSpec - feh.tec.agents.lite.QueenSpec" />
+          <meta name="keywords" content="QueenSpec feh.tec.agents.lite.QueenSpec" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../lib/tools.tooltip.js"></script>
+      <script type="text/javascript" src="../../../../lib/modernizr.custom.js"></script><script type="text/javascript" src="../../../../lib/diagrams.js" id="diagrams-js"></script>
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../index.html';
+            var hash = 'feh.tec.agents.lite.QueenSpec';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a href="QueenSpec$.html" title="Go to companion"><img src="../../../../lib/class_to_object_big.png" /></a>
+        <p id="owner"><a href="../../../package.html" class="extype" name="feh">feh</a>.<a href="../../package.html" class="extype" name="feh.tec">tec</a>.<a href="../package.html" class="extype" name="feh.tec.agents">agents</a>.<a href="package.html" class="extype" name="feh.tec.agents.lite">lite</a></p>
+        <h1><a href="QueenSpec$.html" title="Go to companion">QueenSpec</a></h1> <span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">QueenSpec</span><span class="result"> extends <a href="impl/agent/create$$PPI$$AllVarsSpec.html" class="extype" name="feh.tec.agents.lite.impl.agent.create.PPI.AllVarsSpec">AllVarsSpec</a> with <a href="spec/RequiresDistinctPriority.html" class="extype" name="feh.tec.agents.lite.spec.RequiresDistinctPriority">RequiresDistinctPriority</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="spec/RequiresDistinctPriority.html" class="extype" name="feh.tec.agents.lite.spec.RequiresDistinctPriority">RequiresDistinctPriority</a>, <a href="impl/agent/create$$PPI$$AllVarsSpec.html" class="extype" name="feh.tec.agents.lite.impl.agent.create.PPI.AllVarsSpec">AllVarsSpec</a>, <a href="impl/agent/create$$SpecExt.html" class="extype" name="feh.tec.agents.lite.impl.agent.create.SpecExt">SpecExt</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>], <a href="impl/spec/IteratingSpec$$AllVars.html" class="extype" name="feh.tec.agents.lite.impl.spec.IteratingSpec.AllVars">AllVars</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>, <a href="impl/agent/create$$PPI$.html#Lang=feh.tec.agents.lite.NegotiationLanguagewithfeh.tec.agents.lite.Language.ProposalBasedwithfeh.tec.agents.lite.Language.HasPriority" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Lang">Lang</a>], <a href="spec/AgentSpecification$$Iterating.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.Iterating">Iterating</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>, <a href="impl/agent/create$$PPI$.html#Lang=feh.tec.agents.lite.NegotiationLanguagewithfeh.tec.agents.lite.Language.ProposalBasedwithfeh.tec.agents.lite.Language.HasPriority" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Lang">Lang</a>], <a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>, <a href="impl/agent/create$$PPI$.html#Lang=feh.tec.agents.lite.NegotiationLanguagewithfeh.tec.agents.lite.Language.ProposalBasedwithfeh.tec.agents.lite.Language.HasPriority" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Lang">Lang</a>], <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>, <a href="impl/agent/create$$PPI$.html#Lang=feh.tec.agents.lite.NegotiationLanguagewithfeh.tec.agents.lite.Language.ProposalBasedwithfeh.tec.agents.lite.Language.HasPriority" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Lang">Lang</a>], <a href="spec/AgentSpecificationExt.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt">AgentSpecificationExt</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>], <a href="spec/AgentSpecification.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification">AgentSpecification</a>, <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block diagram-container" id="inheritance-diagram-container">
+                <span class="toggle diagram-link">Type Hierarchy</span>
+                <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#diagrams" target="_blank" class="diagram-help">Learn more about scaladoc diagrams</a>
+                <div class="diagram" id="inheritance-diagram"><svg class="class-diagram" id="graph4" viewBox="0.00 0.00 273.00 120.00" height="120pt" width="273pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 116)" class="graph" id="graph1"><polygon points="-4,5 -4,-116 270,-116 270,5 -4,5" stroke="white" fill="white"></polygon><g class="cluster" id="graph2"></g><g class="cluster" id="graph3"></g><!-- node0 --><g class="node this class" id="graph4_0"><a xlink:title="feh.tec.agents.lite.QueenSpec (this class)" xlink:href="#inheritance-diagram"><polygon points="168.25,-50 71.75,-50 71.75,-24 168.25,-24 168.25,-50" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../lib/class_diagram.png" y="-45" x="82" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-35" x="104" text-anchor="start">QueenSpec</text></a></g><!-- node1 --><g class="node trait" id="graph4_1"><a xlink:title="feh.tec.agents.lite.impl.agent.create.PPI.AllVarsSpec" xlink:href="impl/agent/create$$PPI$$AllVarsSpec.html#inheritance-diagram"><polygon points="98.25,-112 -0.25,-112 -0.25,-86 98.25,-86 98.25,-112" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../lib/trait_diagram.png" y="-107" x="10" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-97" x="32" text-anchor="start">AllVarsSpec</text></a></g><!-- node1&#45;&gt;node0 --><g class="edge inheritance" id="graph4_1_0"><a xlink:title="QueenSpec is a subtype of AllVarsSpec"><path d="M67.2751,-82.5563C79.2172,-72.4643 94.5919,-59.4716 105.653,-50.1238" stroke="#d4d4d4" fill="none"></path><polygon points="66.0573,-81.2941 63.3679,-85.8581 68.3165,-83.9674 66.0573,-81.2941" stroke="#d4d4d4" fill="none"></polygon></a></g><!-- node2 --><g class="node trait" id="graph4_2"><a xlink:title="feh.tec.agents.lite.spec.RequiresDistinctPriority" xlink:href="spec/RequiresDistinctPriority.html#inheritance-diagram"><polygon points="265,-112 117,-112 117,-86 265,-86 265,-112" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../lib/trait_diagram.png" y="-107" x="127" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-97" x="149" text-anchor="start">RequiresDistinctPriority</text></a></g><!-- node2&#45;&gt;node0 --><g class="edge inheritance" id="graph4_2_0"><a xlink:title="QueenSpec is a subtype of RequiresDistinctPriority"><path d="M172.725,-82.5563C160.783,-72.4643 145.408,-59.4716 134.347,-50.1238" stroke="#d4d4d4" fill="none"></path><polygon points="171.684,-83.9674 176.632,-85.8581 173.943,-81.2941 171.684,-83.9674" stroke="#d4d4d4" fill="none"></polygon></a></g></g></svg></div>
+              </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="feh.tec.agents.lite.QueenSpec"><span>QueenSpec</span></li><li class="in" name="feh.tec.agents.lite.spec.RequiresDistinctPriority"><span>RequiresDistinctPriority</span></li><li class="in" name="feh.tec.agents.lite.impl.agent.create.PPI.AllVarsSpec"><span>AllVarsSpec</span></li><li class="in" name="feh.tec.agents.lite.impl.agent.create.SpecExt"><span>SpecExt</span></li><li class="in" name="feh.tec.agents.lite.impl.spec.IteratingSpec.AllVars"><span>AllVars</span></li><li class="in" name="feh.tec.agents.lite.spec.AgentSpecification.Iterating"><span>Iterating</span></li><li class="in" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec"><span>PriorityAndProposalBasedAgentSpec</span></li><li class="in" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased"><span>PriorityAndProposalBased</span></li><li class="in" name="feh.tec.agents.lite.spec.AgentSpecificationExt"><span>AgentSpecificationExt</span></li><li class="in" name="feh.tec.agents.lite.spec.AgentSpecification"><span>AgentSpecification</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="feh.tec.agents.lite.QueenSpec#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;():feh.tec.agents.lite.QueenSpec"></a>
+      <a id="&lt;init&gt;:QueenSpec"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">QueenSpec</span><span class="params">()</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@&lt;init&gt;():feh.tec.agents.lite.QueenSpec" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DefBADS[T]extendsAgentSpecificationExt.this.DefDS[T]withExtendableDefinition.BeforeAndAfter[Ag,T]"></a>
+      <a id="DefBADS[T]:DefBADS[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="spec/AgentSpecificationExt$DefBADS.html"><span class="name">DefBADS</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="spec/AgentSpecificationExt$DefDS.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDS">DefDS</a>[<span class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS.T">T</span>] with <a href="spec/ExtendableDefinition$$BeforeAndAfter.html" class="extype" name="feh.tec.agents.lite.spec.ExtendableDefinition.BeforeAndAfter">BeforeAndAfter</a>[<span class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.Ag">Ag</span>, <span class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#feh.tec.agents.lite.spec.AgentSpecificationExt@DefBADS[T]extendsAgentSpecificationExt.this.DefDS[T]withExtendableDefinition.BeforeAndAfter[Ag,T]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Has Before and After extensions, Directly Settable</p><div class="fullcomment"><div class="comment cmt"><p>Has Before and After extensions, Directly Settable</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="spec/AgentSpecificationExt.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt">AgentSpecificationExt</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDS" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DefDS[T]extendsMonoDefinition[Ag,T]withAgentSpecificationExt.this.DefExt[T]"></a>
+      <a id="DefDS[T]:DefDS[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="spec/AgentSpecificationExt$DefDS.html"><span class="name">DefDS</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="spec/MonoDefinition.html" class="extype" name="feh.tec.agents.lite.spec.MonoDefinition">MonoDefinition</a>[<span class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.Ag">Ag</span>, <span class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDS.T">T</span>] with <a href="spec/AgentSpecificationExt$DefExt.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefExt">DefExt</a>[<span class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDS.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#feh.tec.agents.lite.spec.AgentSpecificationExt@DefDS[T]extendsMonoDefinition[Ag,T]withAgentSpecificationExt.this.DefExt[T]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Directly Settable</p><div class="fullcomment"><div class="comment cmt"><p>Directly Settable</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="spec/AgentSpecificationExt.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt">AgentSpecificationExt</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDSH" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="DefDSH[T]extendsHiddenMonoDefinition[Ag,T]withAgentSpecificationExt.this.DefExt[T]"></a>
+      <a id="DefDSH[T]:DefDSH[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="spec/AgentSpecificationExt$DefDSH.html"><span class="name">DefDSH</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="spec/HiddenMonoDefinition.html" class="extype" name="feh.tec.agents.lite.spec.HiddenMonoDefinition">HiddenMonoDefinition</a>[<span class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.Ag">Ag</span>, <span class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDSH.T">T</span>] with <a href="spec/AgentSpecificationExt$DefExt.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefExt">DefExt</a>[<span class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDSH.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#feh.tec.agents.lite.spec.AgentSpecificationExt@DefDSH[T]extendsHiddenMonoDefinition[Ag,T]withAgentSpecificationExt.this.DefExt[T]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Directly Settable Hidden</p><div class="fullcomment"><div class="comment cmt"><p>Directly Settable Hidden</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="spec/AgentSpecificationExt.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt">AgentSpecificationExt</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefExt" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="DefExt[T]extendsExtendableDefinition[Ag,T]"></a>
+      <a id="DefExt[T]:DefExt[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="spec/AgentSpecificationExt$DefExt.html"><span class="name">DefExt</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="spec/ExtendableDefinition.html" class="extype" name="feh.tec.agents.lite.spec.ExtendableDefinition">ExtendableDefinition</a>[<span class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.Ag">Ag</span>, <span class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefExt.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#feh.tec.agents.lite.spec.AgentSpecificationExt@DefExt[T]extendsExtendableDefinition[Ag,T]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="spec/AgentSpecificationExt.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt">AgentSpecificationExt</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.create.SpecExt.ExtendableBeforeAndAfterDefinitionWrapper" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ExtendableBeforeAndAfterDefinitionWrapper[Def]extendsAnyRef"></a>
+      <a id="ExtendableBeforeAndAfterDefinitionWrapper[Def]:ExtendableBeforeAndAfterDefinitionWrapper[Def]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="impl/agent/create$$SpecExt$ExtendableBeforeAndAfterDefinitionWrapper.html"><span class="name">ExtendableBeforeAndAfterDefinitionWrapper</span></a><span class="tparams">[<span name="Def">Def</span>]</span><span class="result"> extends <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.create$$SpecExt@ExtendableBeforeAndAfterDefinitionWrapper[Def]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/agent/create$$SpecExt.html" class="extype" name="feh.tec.agents.lite.impl.agent.create.SpecExt">SpecExt</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.create.SpecExt.ExtendableMonoDefinitionWrapper" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ExtendableMonoDefinitionWrapper[Def]extendsAnyRef"></a>
+      <a id="ExtendableMonoDefinitionWrapper[Def]:ExtendableMonoDefinitionWrapper[Def]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="impl/agent/create$$SpecExt$ExtendableMonoDefinitionWrapper.html"><span class="name">ExtendableMonoDefinitionWrapper</span></a><span class="tparams">[<span name="Def">Def</span>]</span><span class="result"> extends <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.create$$SpecExt@ExtendableMonoDefinitionWrapper[Def]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/agent/create$$SpecExt.html" class="extype" name="feh.tec.agents.lite.impl.agent.create.SpecExt">SpecExt</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@##():Int" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.QueenSpec#allAccepted" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="allAccepted(neg:feh.tec.agents.lite.NegotiationId,pid:feh.tec.agents.lite.Message.ProposalId):Boolean"></a>
+      <a id="allAccepted(NegotiationId,ProposalId):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">allAccepted</span><span class="params">(<span name="neg">neg: <a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>, <span name="pid">pid: <a href="Message$$ProposalId.html" class="extype" name="feh.tec.agents.lite.Message.ProposalId">ProposalId</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@allAccepted(neg:feh.tec.agents.lite.NegotiationId,pid:feh.tec.agents.lite.Message.ProposalId):Boolean" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.tec.agents.lite.QueenSpec#allPrioritiesKnown" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="allPrioritiesKnown(neg:feh.tec.agents.lite.NegotiationId):Boolean"></a>
+      <a id="allPrioritiesKnown(NegotiationId):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">allPrioritiesKnown</span><span class="params">(<span name="neg">neg: <a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@allPrioritiesKnown(neg:feh.tec.agents.lite.NegotiationId):Boolean" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#beforeEachMessage" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="beforeEachMessage:PriorityAndProposalBasedAgentSpec.this.DefDS[feh.tec.agents.lite.Message.HasPriority=&gt;Unit]"></a>
+      <a id="beforeEachMessage:DefDS[(HasPriority)⇒Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">beforeEachMessage</span><span class="result">: <a href="#DefDS[T]extendsMonoDefinition[Ag,T]withAgentSpecificationExt.this.DefExt[T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDS">DefDS</a>[(<a href="Message$$HasPriority.html" class="extype" name="feh.tec.agents.lite.Message.HasPriority">HasPriority</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@beforeEachMessage:PriorityAndProposalBasedAgentSpec.this.DefDS[feh.tec.agents.lite.Message.HasPriority=&gt;Unit]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.QueenSpec#clearProposalAcceptance" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="clearProposalAcceptance(neg:feh.tec.agents.lite.NegotiationId)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):scala.collection.mutable.HashMap[feh.tec.agents.lite.NegotiationId,(feh.tec.agents.lite.Message.ProposalId,scala.collection.mutable.HashMap[feh.tec.agents.lite.AgentRef,Option[Boolean]])]"></a>
+      <a id="clearProposalAcceptance(NegotiationId)(Ag):HashMap[NegotiationId,(ProposalId,HashMap[AgentRef,Option[Boolean]])]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clearProposalAcceptance</span><span class="params">(<span name="neg">neg: <a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ag">ag: <a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a></span>)</span><span class="result">: <span class="extype" name="scala.collection.mutable.HashMap">HashMap</span>[<a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a>, (<a href="Message$$ProposalId.html" class="extype" name="feh.tec.agents.lite.Message.ProposalId">ProposalId</a>, <span class="extype" name="scala.collection.mutable.HashMap">HashMap</span>[<a href="AgentRef.html" class="extype" name="feh.tec.agents.lite.AgentRef">AgentRef</a>, <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Boolean">Boolean</span>]])]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@clearProposalAcceptance(neg:feh.tec.agents.lite.NegotiationId)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):scala.collection.mutable.HashMap[feh.tec.agents.lite.NegotiationId,(feh.tec.agents.lite.Message.ProposalId,scala.collection.mutable.HashMap[feh.tec.agents.lite.AgentRef,Option[Boolean]])]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@clone():Object" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#initialize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="initialize:PriorityAndProposalBasedAgentSpec.this.DefBADS[Unit]"></a>
+      <a id="initialize:DefBADS[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">initialize</span><span class="result">: <a href="#DefBADS[T]extendsAgentSpecificationExt.this.DefDS[T]withExtendableDefinition.BeforeAndAfter[Ag,T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS">DefBADS</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@initialize:PriorityAndProposalBasedAgentSpec.this.DefBADS[Unit]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.QueenSpec#maxPriority" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="maxPriority(neg:feh.tec.agents.lite.NegotiationId)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):(feh.tec.agents.lite.AgentRef,feh.tec.agents.lite.Priority)"></a>
+      <a id="maxPriority(NegotiationId)(Ag):(AgentRef,Priority)"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">maxPriority</span><span class="params">(<span name="neg">neg: <a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ag">ag: <a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a></span>)</span><span class="result">: (<a href="AgentRef.html" class="extype" name="feh.tec.agents.lite.AgentRef">AgentRef</a>, <a href="Priority.html" class="extype" name="feh.tec.agents.lite.Priority">Priority</a>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@maxPriority(neg:feh.tec.agents.lite.NegotiationId)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):(feh.tec.agents.lite.AgentRef,feh.tec.agents.lite.Priority)" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#moreProcess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="moreProcess:PriorityAndProposalBasedAgentSpec.this.DefDS[PartialFunction[feh.tec.agents.lite.Message.HasPriority,Any]]"></a>
+      <a id="moreProcess:DefDS[PartialFunction[HasPriority,Any]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">moreProcess</span><span class="result">: <a href="#DefDS[T]extendsMonoDefinition[Ag,T]withAgentSpecificationExt.this.DefExt[T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDS">DefDS</a>[<span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="Message$$HasPriority.html" class="extype" name="feh.tec.agents.lite.Message.HasPriority">HasPriority</a>, <span class="extype" name="scala.Any">Any</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@moreProcess:PriorityAndProposalBasedAgentSpec.this.DefDS[PartialFunction[feh.tec.agents.lite.Message.HasPriority,Any]]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.spec.IteratingSpec.AllVars#newIterator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="newIterator:AllVars.this.DefBADS[feh.tec.agents.lite.NegotiationId=&gt;feh.tec.agents.lite.ProposalEngine.DomainIterator]"></a>
+      <a id="newIterator:DefBADS[(NegotiationId)⇒DomainIterator]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">newIterator</span><span class="result">: <a href="#DefBADS[T]extendsAgentSpecificationExt.this.DefDS[T]withExtendableDefinition.BeforeAndAfter[Ag,T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS">DefBADS</a>[(<a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a>) ⇒ <a href="ProposalEngine$.html#DomainIterator=Iterator[Map[feh.tec.agents.lite.Var,Any]]" class="extmbr" name="feh.tec.agents.lite.ProposalEngine.DomainIterator">DomainIterator</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@newIterator:AllVars.this.DefBADS[feh.tec.agents.lite.NegotiationId=&gt;feh.tec.agents.lite.ProposalEngine.DomainIterator]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/IteratingSpec$$AllVars.html" class="extype" name="feh.tec.agents.lite.impl.spec.IteratingSpec.AllVars">AllVars</a> → <a href="spec/AgentSpecification$$Iterating.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.Iterating">Iterating</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.spec.IteratingSpec.AllVars#nextValues" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="nextValues:AllVars.this.DefBADS[feh.tec.agents.lite.NegotiationId=&gt;Option[Map[feh.tec.agents.lite.Var,Any]]]"></a>
+      <a id="nextValues:DefBADS[(NegotiationId)⇒Option[Map[Var,Any]]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nextValues</span><span class="result">: <a href="#DefBADS[T]extendsAgentSpecificationExt.this.DefDS[T]withExtendableDefinition.BeforeAndAfter[Ag,T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS">DefBADS</a>[(<a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a>) ⇒ <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<a href="Var.html" class="extype" name="feh.tec.agents.lite.Var">Var</a>, <span class="extype" name="scala.Any">Any</span>]]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@nextValues:AllVars.this.DefBADS[feh.tec.agents.lite.NegotiationId=&gt;Option[Map[feh.tec.agents.lite.Var,Any]]]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/IteratingSpec$$AllVars.html" class="extype" name="feh.tec.agents.lite.impl.spec.IteratingSpec.AllVars">AllVars</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#nothingToPropose" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="nothingToPropose:PriorityAndProposalBasedAgentSpec.this.DefBADS[feh.tec.agents.lite.NegotiationId=&gt;Unit]"></a>
+      <a id="nothingToPropose:DefBADS[(NegotiationId)⇒Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nothingToPropose</span><span class="result">: <a href="#DefBADS[T]extendsAgentSpecificationExt.this.DefDS[T]withExtendableDefinition.BeforeAndAfter[Ag,T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS">DefBADS</a>[(<a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@nothingToPropose:PriorityAndProposalBasedAgentSpec.this.DefBADS[feh.tec.agents.lite.NegotiationId=&gt;Unit]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.QueenSpec#nothingToProposeIfHasMaxPriority" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="nothingToProposeIfHasMaxPriority(negId:feh.tec.agents.lite.NegotiationId)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Option[Unit]"></a>
+      <a id="nothingToProposeIfHasMaxPriority(NegotiationId)(Ag):Option[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nothingToProposeIfHasMaxPriority</span><span class="params">(<span name="negId">negId: <a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ag">ag: <a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@nothingToProposeIfHasMaxPriority(negId:feh.tec.agents.lite.NegotiationId)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Option[Unit]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#onAcceptance" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="onAcceptance:PriorityAndProposalBasedAgentSpec.this.DefDS[PartialFunction[feh.tec.agents.lite.Message.Accepted,Any]]"></a>
+      <a id="onAcceptance:DefDS[PartialFunction[Accepted,Any]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">onAcceptance</span><span class="result">: <a href="#DefDS[T]extendsMonoDefinition[Ag,T]withAgentSpecificationExt.this.DefExt[T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDS">DefDS</a>[<span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="Message$$Accepted.html" class="extype" name="feh.tec.agents.lite.Message.Accepted">Accepted</a>, <span class="extype" name="scala.Any">Any</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@onAcceptance:PriorityAndProposalBasedAgentSpec.this.DefDS[PartialFunction[feh.tec.agents.lite.Message.Accepted,Any]]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.QueenSpec#onFallbackRequest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="onFallbackRequest(req:feh.tec.agents.lite.QueenSpec.FallbackRequest)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Unit"></a>
+      <a id="onFallbackRequest(FallbackRequest)(Ag):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">onFallbackRequest</span><span class="params">(<span name="req">req: <a href="QueenSpec$$FallbackRequest.html" class="extype" name="feh.tec.agents.lite.QueenSpec.FallbackRequest">FallbackRequest</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ag">ag: <a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@onFallbackRequest(req:feh.tec.agents.lite.QueenSpec.FallbackRequest)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#onProposal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="onProposal:PriorityAndProposalBasedAgentSpec.this.DefDS[PartialFunction[feh.tec.agents.lite.Message.Proposal,Any]]"></a>
+      <a id="onProposal:DefDS[PartialFunction[Proposal,Any]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">onProposal</span><span class="result">: <a href="#DefDS[T]extendsMonoDefinition[Ag,T]withAgentSpecificationExt.this.DefExt[T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDS">DefDS</a>[<span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="Message$$Proposal.html" class="extype" name="feh.tec.agents.lite.Message.Proposal">Proposal</a>, <span class="extype" name="scala.Any">Any</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@onProposal:PriorityAndProposalBasedAgentSpec.this.DefDS[PartialFunction[feh.tec.agents.lite.Message.Proposal,Any]]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#onRejection" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="onRejection:PriorityAndProposalBasedAgentSpec.this.DefDS[PartialFunction[feh.tec.agents.lite.Message.Rejected,Any]]"></a>
+      <a id="onRejection:DefDS[PartialFunction[Rejected,Any]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">onRejection</span><span class="result">: <a href="#DefDS[T]extendsMonoDefinition[Ag,T]withAgentSpecificationExt.this.DefExt[T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDS">DefDS</a>[<span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="Message$$Rejected.html" class="extype" name="feh.tec.agents.lite.Message.Rejected">Rejected</a>, <span class="extype" name="scala.Any">Any</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@onRejection:PriorityAndProposalBasedAgentSpec.this.DefDS[PartialFunction[feh.tec.agents.lite.Message.Rejected,Any]]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.QueenSpec#priorities" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="priorities:scala.collection.mutable.HashMap[feh.tec.agents.lite.NegotiationId,scala.collection.mutable.HashMap[feh.tec.agents.lite.AgentRef,Option[feh.tec.agents.lite.Priority]]]"></a>
+      <a id="priorities:HashMap[NegotiationId,HashMap[AgentRef,Option[Priority]]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">priorities</span><span class="result">: <span class="extype" name="scala.collection.mutable.HashMap">HashMap</span>[<a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a>, <span class="extype" name="scala.collection.mutable.HashMap">HashMap</span>[<a href="AgentRef.html" class="extype" name="feh.tec.agents.lite.AgentRef">AgentRef</a>, <span class="extype" name="scala.Option">Option</span>[<a href="Priority.html" class="extype" name="feh.tec.agents.lite.Priority">Priority</a>]]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@priorities:scala.collection.mutable.HashMap[feh.tec.agents.lite.NegotiationId,scala.collection.mutable.HashMap[feh.tec.agents.lite.AgentRef,Option[feh.tec.agents.lite.Priority]]]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#processUserMessage" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="processUserMessage:PriorityAndProposalBasedAgentSpec.this.DefDS[PartialFunction[feh.tec.agents.lite.UserMessage,Any]]"></a>
+      <a id="processUserMessage:DefDS[PartialFunction[UserMessage,Any]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">processUserMessage</span><span class="result">: <a href="#DefDS[T]extendsMonoDefinition[Ag,T]withAgentSpecificationExt.this.DefExt[T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefDS">DefDS</a>[<span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="UserMessage.html" class="extype" name="feh.tec.agents.lite.UserMessage">UserMessage</a>, <span class="extype" name="scala.Any">Any</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@processUserMessage:PriorityAndProposalBasedAgentSpec.this.DefDS[PartialFunction[feh.tec.agents.lite.UserMessage,Any]]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#proposal" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="proposal(negId:feh.tec.agents.lite.NegotiationId)(implicitowner:Ag):feh.tec.agents.lite.Message.Proposal"></a>
+      <a id="proposal(NegotiationId)(Ag):Proposal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">proposal</span><span class="params">(<span name="negId">negId: <a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="owner">owner: <a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a></span>)</span><span class="result">: <a href="Message$$Proposal.html" class="extype" name="feh.tec.agents.lite.Message.Proposal">Proposal</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@proposal(negId:feh.tec.agents.lite.NegotiationId)(implicitowner:Ag):feh.tec.agents.lite.Message.Proposal" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#reset" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="reset:PriorityAndProposalBasedAgentSpec.this.DefBADS[Unit]"></a>
+      <a id="reset:DefBADS[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">reset</span><span class="result">: <a href="#DefBADS[T]extendsAgentSpecificationExt.this.DefDS[T]withExtendableDefinition.BeforeAndAfter[Ag,T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS">DefBADS</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@reset:PriorityAndProposalBasedAgentSpec.this.DefBADS[Unit]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.QueenSpec#respondToProposal" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="respondToProposal(msg:feh.tec.agents.lite.Message.Proposal)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Unit"></a>
+      <a id="respondToProposal(Proposal)(Ag):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">respondToProposal</span><span class="params">(<span name="msg">msg: <a href="Message$$Proposal.html" class="extype" name="feh.tec.agents.lite.Message.Proposal">Proposal</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ag">ag: <a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@respondToProposal(msg:feh.tec.agents.lite.Message.Proposal)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#setNextProposal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setNextProposal:PriorityAndProposalBasedAgentSpec.this.DefBADS[feh.tec.agents.lite.NegotiationId=&gt;feh.tec.agents.lite.Message.Proposal]"></a>
+      <a id="setNextProposal:DefBADS[(NegotiationId)⇒Proposal]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setNextProposal</span><span class="result">: <a href="#DefBADS[T]extendsAgentSpecificationExt.this.DefDS[T]withExtendableDefinition.BeforeAndAfter[Ag,T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS">DefBADS</a>[(<a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a>) ⇒ <a href="Message$$Proposal.html" class="extype" name="feh.tec.agents.lite.Message.Proposal">Proposal</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@setNextProposal:PriorityAndProposalBasedAgentSpec.this.DefBADS[feh.tec.agents.lite.NegotiationId=&gt;feh.tec.agents.lite.Message.Proposal]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.QueenSpec#setProposalAcceptance" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="setProposalAcceptance(msg:feh.tec.agents.lite.Message.ProposalResponse,v:Boolean)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Unit"></a>
+      <a id="setProposalAcceptance(ProposalResponse,Boolean)(Ag):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setProposalAcceptance</span><span class="params">(<span name="msg">msg: <a href="Message$$ProposalResponse.html" class="extype" name="feh.tec.agents.lite.Message.ProposalResponse">ProposalResponse</a></span>, <span name="v">v: <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ag">ag: <a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@setProposalAcceptance(msg:feh.tec.agents.lite.Message.ProposalResponse,v:Boolean)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#start" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="start:PriorityAndProposalBasedAgentSpec.this.DefBADS[Unit]"></a>
+      <a id="start:DefBADS[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">start</span><span class="result">: <a href="#DefBADS[T]extendsAgentSpecificationExt.this.DefDS[T]withExtendableDefinition.BeforeAndAfter[Ag,T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS">DefBADS</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@start:PriorityAndProposalBasedAgentSpec.this.DefBADS[Unit]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#stop" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="stop:PriorityAndProposalBasedAgentSpec.this.DefBADS[Unit]"></a>
+      <a id="stop:DefBADS[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stop</span><span class="result">: <a href="#DefBADS[T]extendsAgentSpecificationExt.this.DefDS[T]withExtendableDefinition.BeforeAndAfter[Ag,T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS">DefBADS</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@stop:PriorityAndProposalBasedAgentSpec.this.DefBADS[Unit]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@toString():String" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec#updateCurrentProposal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateCurrentProposal:PriorityAndProposalBasedAgentSpec.this.DefBADS[feh.tec.agents.lite.NegotiationId=&gt;Unit]"></a>
+      <a id="updateCurrentProposal:DefBADS[(NegotiationId)⇒Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateCurrentProposal</span><span class="result">: <a href="#DefBADS[T]extendsAgentSpecificationExt.this.DefDS[T]withExtendableDefinition.BeforeAndAfter[Ag,T]" class="extmbr" name="feh.tec.agents.lite.spec.AgentSpecificationExt.DefBADS">DefBADS</a>[(<a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a>) ⇒ <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@updateCurrentProposal:PriorityAndProposalBasedAgentSpec.this.DefBADS[feh.tec.agents.lite.NegotiationId=&gt;Unit]" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a> → <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a></dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="feh.tec.agents.lite.QueenSpec#whenProposalAccepted" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="whenProposalAccepted(neg:feh.tec.agents.lite.NegotiationId,pid:feh.tec.agents.lite.Message.ProposalId)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Unit"></a>
+      <a id="whenProposalAccepted(NegotiationId,ProposalId)(Ag):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">whenProposalAccepted</span><span class="params">(<span name="neg">neg: <a href="NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>, <span name="pid">pid: <a href="Message$$ProposalId.html" class="extype" name="feh.tec.agents.lite.Message.ProposalId">ProposalId</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ag">ag: <a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@whenProposalAccepted(neg:feh.tec.agents.lite.NegotiationId,pid:feh.tec.agents.lite.Message.ProposalId)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="feh.tec.agents.lite.QueenSpec#whenProposalAccepted" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="whenProposalAccepted(msg:feh.tec.agents.lite.Message.ProposalResponse)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Unit"></a>
+      <a id="whenProposalAccepted(ProposalResponse)(Ag):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">whenProposalAccepted</span><span class="params">(<span name="msg">msg: <a href="Message$$ProposalResponse.html" class="extype" name="feh.tec.agents.lite.Message.ProposalResponse">ProposalResponse</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ag">ag: <a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.QueenSpec@whenProposalAccepted(msg:feh.tec.agents.lite.Message.ProposalResponse)(implicitag:feh.tec.agents.lite.impl.agent.create.PPI.Ag):Unit" title="Permalink" target="_top">
+        <img src="../../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="feh.tec.agents.lite.spec.RequiresDistinctPriority">
+              <h3>Inherited from <a href="spec/RequiresDistinctPriority.html" class="extype" name="feh.tec.agents.lite.spec.RequiresDistinctPriority">RequiresDistinctPriority</a></h3>
+            </div><div class="parent" name="feh.tec.agents.lite.impl.agent.create.PPI.AllVarsSpec">
+              <h3>Inherited from <a href="impl/agent/create$$PPI$$AllVarsSpec.html" class="extype" name="feh.tec.agents.lite.impl.agent.create.PPI.AllVarsSpec">AllVarsSpec</a></h3>
+            </div><div class="parent" name="feh.tec.agents.lite.impl.agent.create.SpecExt">
+              <h3>Inherited from <a href="impl/agent/create$$SpecExt.html" class="extype" name="feh.tec.agents.lite.impl.agent.create.SpecExt">SpecExt</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.impl.spec.IteratingSpec.AllVars">
+              <h3>Inherited from <a href="impl/spec/IteratingSpec$$AllVars.html" class="extype" name="feh.tec.agents.lite.impl.spec.IteratingSpec.AllVars">AllVars</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>, <a href="impl/agent/create$$PPI$.html#Lang=feh.tec.agents.lite.NegotiationLanguagewithfeh.tec.agents.lite.Language.ProposalBasedwithfeh.tec.agents.lite.Language.HasPriority" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Lang">Lang</a>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.AgentSpecification.Iterating">
+              <h3>Inherited from <a href="spec/AgentSpecification$$Iterating.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.Iterating">Iterating</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>, <a href="impl/agent/create$$PPI$.html#Lang=feh.tec.agents.lite.NegotiationLanguagewithfeh.tec.agents.lite.Language.ProposalBasedwithfeh.tec.agents.lite.Language.HasPriority" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Lang">Lang</a>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">
+              <h3>Inherited from <a href="impl/spec/PriorityAndProposalBasedAgentSpec.html" class="extype" name="feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>, <a href="impl/agent/create$$PPI$.html#Lang=feh.tec.agents.lite.NegotiationLanguagewithfeh.tec.agents.lite.Language.ProposalBasedwithfeh.tec.agents.lite.Language.HasPriority" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Lang">Lang</a>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">
+              <h3>Inherited from <a href="spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>, <a href="impl/agent/create$$PPI$.html#Lang=feh.tec.agents.lite.NegotiationLanguagewithfeh.tec.agents.lite.Language.ProposalBasedwithfeh.tec.agents.lite.Language.HasPriority" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Lang">Lang</a>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.AgentSpecificationExt">
+              <h3>Inherited from <a href="spec/AgentSpecificationExt.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecificationExt">AgentSpecificationExt</a>[<a href="impl/agent/create$$PPI$.html#Ag=feh.tec.agents.lite.impl.spec.IteratingSpec.Agent[feh.tec.agents.lite.impl.agent.create.PPI.Lang]" class="extmbr" name="feh.tec.agents.lite.impl.agent.create.PPI.Ag">Ag</a>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.AgentSpecification">
+              <h3>Inherited from <a href="spec/AgentSpecification.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification">AgentSpecification</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <a href="../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
