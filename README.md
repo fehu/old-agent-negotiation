@@ -11,7 +11,7 @@ A Thesis Project at *Monterrey Institute of Technology and Higher Education* ([I
 ### Queens' negotiation
 
 The negotiation is implemented upon [akka](http://akka.io) actors. Agents, the Controller and their dependencies are 
-generated my [macros](comm-lite/src/main/scala/feh/tec/agents/lite/spec/macros).
+generated my [macros](comm-lite/src/main/scala/feh/tec/agents/lite/spec/macros) ([API](http://fehu.github.io/agent-negotiation/unidoc/index.html#feh.tec.agents.lite.spec.macros.package)).
 
 It is described by
 
