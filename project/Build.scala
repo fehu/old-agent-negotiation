@@ -125,9 +125,9 @@ object  Build extends sbt.Build {
     )
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
    .aggregate(GitDependencies: _*)
-   .aggregate(commLight, misc, webFrontend, webBackend)
+   .aggregate(commLite, misc, webFrontend, webBackend)
 
-  lazy val commLight = Project("comm-light", file("comm-light"),
+  lazy val commLite = Project("comm-lite", file("comm-lite"),
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(akka, scala.reflectApi)
     )
@@ -140,7 +140,7 @@ object  Build extends sbt.Build {
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(akkaSlf4j, slf4j)
     )
-  ) dependsOn (webBackend, commLight)
+  ) dependsOn (webBackend, commLite)
 
   lazy val webCommon = Project("web-common", file("web/common"),
     settings = buildSettings ++ Seq(

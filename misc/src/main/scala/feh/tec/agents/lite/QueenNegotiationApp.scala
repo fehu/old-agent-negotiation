@@ -1,11 +1,11 @@
-package feh.tec.agents.light
+package feh.tec.agents.lite
 
 import feh.tec.agents.NQueenWebSocketPushServerBuilder
 import feh.tec.web.WebSocketPushServer.OnConnection
 import feh.tec.web.common.{NQueenMessages, WebsocketConf}
 import feh.util._
 import akka.actor.{ActorRef, ActorSystem}
-import feh.tec.agents.light.spec.dsl._
+import feh.tec.agents.lite.spec.dsl._
 import impl.agent._
 import spray.can.websocket.frame.TextFrame
 import scala.concurrent.duration._
@@ -20,7 +20,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
 
       def `queen's position` = negotiation over(x, y)
 
-      def Queen = agent withRole "chess queen" definedBy QueenSpec(150 millis) that (
+      def Queen = agent withRole "chess queen" definedBy QueenSpec(100 millis) that (
         negotiates the `queen's position` `with` the.others reportingTo reporter.forwarding(WebPushServer) and
           hasConstraints(
             "direct-line sight" | {
@@ -40,15 +40,18 @@ object QueenNegotiationApp extends App with WebsocketConf{
       configure(
         timeout.initialize <= 100.millis,
         timeout.start <= 100.millis,
-        timeout.`response delay` <= 50.millis
+        timeout.`response delay` <= 0.millis
       )
 
       when finished {
         controller =>
           (neg, values) => {
-            controller.log.info(s"negotiation $neg successfully finished: ${values.flatMap(_.values)}")
-            asys.shutdown()
-            sys.exit(0)
+            controller.log.info(s"negotiation $neg successfully finished: $values")
+            asys.scheduler.scheduleOnce(2 seconds, () => {
+              sys.error("finished")
+              asys.shutdown()
+              sys.exit(0)
+            })(asys.dispatcher)
           }
       }
 
@@ -64,7 +67,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
     }
   }
 
-  def N = 4
+  def N = 6
 
   implicit val asys = ActorSystem()
 

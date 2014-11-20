@@ -1,4 +1,4 @@
-package feh.tec.agents.light
+package feh.tec.agents.lite
 
 /*
 

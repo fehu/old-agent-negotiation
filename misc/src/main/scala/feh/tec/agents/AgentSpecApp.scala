@@ -1,8 +1,8 @@
 package feh.tec.agents
 
-import feh.tec.agents.light.NegotiationState._
-import feh.tec.agents.light.spec.NegotiationSpecification._
-import feh.tec.agents.light.spec.dsl._
+import feh.tec.agents.lite.NegotiationState._
+import feh.tec.agents.lite.spec.NegotiationSpecification._
+import feh.tec.agents.lite.spec.dsl._
 
 import scala.concurrent.duration._
 

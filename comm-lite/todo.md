@@ -1,0 +1,6 @@
+[x] constraints must be refactored to support separate condition tests
+[x] agent reporting for lite
+[x] connect web backend
+[x] provide constraints checking helper
+[ ] change DomainIterator > DomainValuesStream 
+[ ] check with JProfiler

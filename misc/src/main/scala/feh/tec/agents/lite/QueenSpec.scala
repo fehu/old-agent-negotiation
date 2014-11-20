@@ -1,11 +1,11 @@
-package feh.tec.agents.light
+package feh.tec.agents.lite
 
 import java.util.UUID
 
-import feh.tec.agents.light.Message.ProposalId
-import feh.tec.agents.light.impl.agent.create
+import feh.tec.agents.lite.Message.ProposalId
+import feh.tec.agents.lite.impl.agent.create
 import feh.util._
-import feh.tec.agents.light.spec.RequiresDistinctPriority
+import feh.tec.agents.lite.spec.RequiresDistinctPriority
 
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
@@ -35,7 +35,9 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
     (priorities(neg) + (ag.ref -> ag.get(neg).currentPriority.raw))
       .mapValues(_.get).maxBy(_._2.get)
 
-  private val proposalAcceptance = mutable.HashMap.empty[NegotiationId, (ProposalId, mutable.HashMap[AgentRef, Option[Boolean]])]
+  private val proposalAcceptance = synchronized{
+    mutable.HashMap.empty[NegotiationId, (ProposalId, mutable.HashMap[AgentRef, Option[Boolean]])]
+  }
 
   def setProposalAcceptance(msg: Message.ProposalResponse, v: Boolean)(implicit ag: create.PPI.Ag) = {
     val (pid, map) = proposalAcceptance
@@ -53,7 +55,7 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
   
   def allAccepted(neg: NegotiationId, pid: ProposalId) =
     proposalAcceptance.get(neg).exists{
-      case (id, map) => id == pid  && map.forall(_._2.getOrElse(false))
+      case (id, map) => id == pid  && map.nonEmpty && map.forall(_._2.getOrElse(false))
     } //.exists(_._2.forall(_._2.exists(identity)))
 
   def whenProposalAccepted(msg: Message.ProposalResponse)(implicit ag: create.PPI.Ag): Unit = whenProposalAccepted(msg.negotiation, msg.respondingTo)
@@ -166,7 +168,7 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
     implicit ag =>
       import ag._
       {
-        case msg if(myPriority isLowerThenOf  msg ) && hasState(msg, NegotiationState.Waiting) =>
+        case msg if(myPriority isLowerThenOf  msg) && !hasState(msg, FallbackState) =>
           if(!msg.satisfiesConstraints) {
             get(msg.negotiation).currentState update NegotiationState.Negotiating
             sendToAll(ag.setNextProposal(msg.negotiation))
@@ -187,7 +189,7 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
         ag.log.debug("rejected: myPriority isHigherThenOf " + msg)
       case msg if ag.myPriority isLowerThenOf  msg =>
         setProposalAcceptance(msg, v = false)
-        whenProposalAccepted(msg)
+//        whenProposalAccepted(msg)
         ag.log.debug("!!!!!!!!!!!!!! rejected")
         val prop = ag.setNextProposal(msg.negotiation)
         ag.log.debug("rejected: spam new proposal " + prop)

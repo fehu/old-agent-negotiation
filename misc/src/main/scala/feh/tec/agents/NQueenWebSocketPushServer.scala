@@ -1,8 +1,8 @@
 package feh.tec.agents
 
 import akka.actor.{Props, ActorSystem}
-import feh.tec.agents.light.Message.ProposalId
-import feh.tec.agents.light._
+import feh.tec.agents.lite.Message.ProposalId
+import feh.tec.agents.lite._
 import scala.concurrent.duration._
 import feh.tec.web.{WebSocketPushServerCreation, WebSocketPushServer}
 import feh.tec.web.WebSocketPushServer.Push

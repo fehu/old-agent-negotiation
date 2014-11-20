@@ -16,21 +16,21 @@ that is~~ implemented upon [akka](http://akka.io) actors.
 
 It is described by
 
-#### Agent Specification (light)
+#### Agent Specification (lite)
 Defines agent behaviour.
 
-The `feh.tec.agents.light.impl.agent.create` object provides some specifications bases with very simple or stubbed behaviour.
-The specification defines the aspects of agent's behavior as [ExtendableDefinition](comm-light/src/main/scala/feh/tec/agents/light/spec/ExtendableDefinition.scala),
-    which can be extended/overridden using implicit methods from [create.Extendable***DefinitionWrapper](comm-light/src/main/scala/feh/tec/agents/light/impl/agent/create.scala).
+The `feh.tec.agents.lite.impl.agent.create` object provides some specifications bases with very simple or stubbed behaviour.
+The specification defines the aspects of agent's behavior as [ExtendableDefinition](comm-lite/src/main/scala/feh/tec/agents/lite/spec/ExtendableDefinition.scala),
+    which can be extended/overridden using implicit methods from [create.Extendable***DefinitionWrapper](comm-lite/src/main/scala/feh/tec/agents/lite/impl/agent/create.scala).
 
 Most of definitions are instances of *MonoDefinition* class and support following extension methods: **<:=**, **:=**, **andThen**.
       
 Some of the definitions extend also *ExtendableDefinition.BeforeAndAfter* trait, that provides two extra extension points.
   They can be overridden with methods **before** and **after**.
 
-([source](misc/src/main/scala/feh/tec/agents/light/QueenSpec.scala)):
+([source](misc/src/main/scala/feh/tec/agents/lite/QueenSpec.scala)):
 ```scala
-import feh.tec.agents.light.impl.agent.create
+import feh.tec.agents.lite.impl.agent.create
 
 object QueenSpec extends create.PPI.AllVarsSpec{
   initialize after {
@@ -79,13 +79,13 @@ object QueenSpec extends create.PPI.AllVarsSpec{
 }
 ```
 
-#### Negotiation Specification  (light)
+#### Negotiation Specification  (lite)
 Defines variables and negotiations, references *Agent Specification*, defines the number of agents to create.  
 
-([source](misc/src/main/scala/feh/tec/agents/light/QueenNegotiationApp.scala)):
+([source](misc/src/main/scala/feh/tec/agents/lite/QueenNegotiationApp.scala)):
 ```scala
 
-import feh.tec.agents.light.spec.dsl._
+import feh.tec.agents.lite.spec.dsl._
 import impl.agent._
 import scala.concurrent.duration._
 
