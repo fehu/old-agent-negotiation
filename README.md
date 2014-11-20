@@ -199,7 +199,7 @@ The front-end consists of
 * the associated [css](web/frontend/styles/n-queen)
 
 The project now generates two versions of the web interface:
-* Heavy 'n-queen.html'.
+* 'n-queen.html'.
 * Lite  'n-queen-lite.html' that shows no messages and works better for long negotiations.
 
 Both [generation and packing](web/frontend/src/main/scala/feh/tec/web/util/PackTemplates.scala) are done by `pack-templates` sbt task in `project web-frontend`, the output directory is defined by `Web.packDir` setting key 
