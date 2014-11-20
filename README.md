@@ -5,14 +5,13 @@ A Thesis Project at *Monterrey Institute of Technology and Higher Education* ([I
 -[Project API](http://fehu.github.io/agent-negotiation/unidoc/package.html)
 
 ##### todo:
-  * [comm](comm/todo.md)
+  * [comm-lite](comm-lite/todo.md)
   * [web-frontend](web/frontend/todo.md)
 
-### ~~Queens' negotiation~~
-**(information here is obsolete - needs update)**
+### Queens' negotiation
 
-The negotiation is ~~run by [GenericNegotiatingAgents](misc/src/main/scala/feh/tec/agents/GenericNegotiatingAgent.scala),
-that is~~ implemented upon [akka](http://akka.io) actors.
+The negotiation is implemented upon [akka](http://akka.io) actors. Agents, the Controller and their dependencies are 
+generated my [macros](comm-lite/src/main/scala/feh/tec/agents/lite/spec/macros).
 
 It is described by
 
@@ -30,53 +29,47 @@ Some of the definitions extend also *ExtendableDefinition.BeforeAndAfter* trait,
 
 ([source](misc/src/main/scala/feh/tec/agents/lite/QueenSpec.scala)):
 ```scala
-import feh.tec.agents.lite.impl.agent.create
-
-object QueenSpec extends create.PPI.AllVarsSpec{
-  initialize after {
-    ag => _ =>
-      ag.negotiations.foreach(_.currentPriority update new Priority(1))
-      ag.log.info("initialized")
-  }
+  import feh.tec.agents.lite.impl.agent.create
+  import feh.tec.agents.lite.spec.RequiresDistinctPriority
+  import scala.collection.mutable
+  import scala.concurrent.duration.FiniteDuration
   
-  start andThen {
-    ag =>
-      import ag._
-      negotiations.foreach {
-        neg =>
-          if(neg.currentIterator.raw.isEmpty) neg.currentIterator update ag.newIterator(neg.id)
-          log.info("Iterating the domain with " + neg.currentIterator())
-          ag.setNextProposal(neg.id)
-          //            ag.nextValues()
-          //            val proposal = neg.currentProposal.getOrElse {
-          //              Message.Proposal(Message.ProposalId.rand, neg.id, neg.currentPriority(), neg.currentValues())
-          //            }
-          neg.currentState update NegotiationState.Negotiating
-          log.info(s"negotiation ${neg.id} started, scope = ${neg.scope()}")
-          sendToAll(neg.currentProposal())
+  class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
+  
+    initialize after {
+      ag => _ => ag.log.info("initialized")
+    }
+    
+    start andThen {
+      ag =>
+        overridden =>
+          import ag._
+          overridden(ag)
+          negotiations.foreach {
+            neg =>
+              if(neg.currentIterator.raw.isEmpty) neg.currentIterator update ag.newIterator(neg.id)
+              val prop = ag.setNextProposal(neg.id)
+              neg.currentState update NegotiationState.Negotiating
+              sendToAll(prop)
+          }
+    }
+    
+      onProposal <:= {
+        implicit ag =>
+          import ag._
+          {
+            case msg if(myPriority isLowerThenOf  msg) && !hasState(msg, FallbackState) =>
+              if(!msg.satisfiesConstraints) {
+                get(msg.negotiation).currentState update NegotiationState.Negotiating
+                sendToAll(ag.setNextProposal(msg.negotiation))
+              }
+              respondToProposal(msg)
+            case msg if myPriority isLowerThenOf  msg => respondToProposal(msg)
+            case msg if myPriority isHigherThenOf msg => respondToProposal(msg)
+          }
       }
   }
 
-  def respondToProposal(msg: Message.Proposal)(implicit ag: create.PPI.Ag) = {
-    import ag._
-    msg match{
-      case Message.Proposal(propId, negId, _, values) =>
-        val response =
-          if(msg.satisfiesConstraints) Message.Accepted(negId, propId, get(negId).currentPriority(), get(negId).currentValues())
-          else Message.Rejected(negId, propId, get(negId).currentPriority(), get(negId).currentValues())
-        priorities += msg.sender -> msg.priority
-        respond(response)
-    }
-  }
-
-  onProposal <:= {
-    implicit ag =>{
-      case msg if ag.myPriority isHigherThenOf msg => respondToProposal(msg)
-      case msg if ag.myPriority isLowerThenOf  msg => respondToProposal(msg)
-      case samePriority => ag.requestPriorityRaise(samePriority.negotiation)
-    }
-  }  
-}
 ```
 
 #### Negotiation Specification  (lite)
@@ -97,7 +90,7 @@ def negController(boardSize: Int) = controller {
 
     def `queen's position` = negotiation over(x, y)
 
-    def Queen = agent withRole "chess queen" definedBy QueenSpec that (
+    def Queen = agent withRole "chess queen" definedBy QueenSpec(100 millis) that (
       negotiates the `queen's position` `with` the.others reportingTo reporter.default and
         hasConstraints(
           "direct-line sight" | {
@@ -115,9 +108,31 @@ def negController(boardSize: Int) = controller {
       )
 
     configure(
-      timeout.creation <= 100.millis,
-      timeout.`resolve conflict` <= 100.millis
+      timeout.initialize <= 100.millis,
+        timeout.start <= 100.millis,
+        timeout.`response delay` <= 0.millis
     )
+    
+    when finished {
+      controller =>
+        (neg, values) => {
+          controller.log.info(s"negotiation $neg successfully finished: $values")
+          asys.scheduler.scheduleOnce(2 seconds, () => {
+            sys.error("finished")
+            asys.shutdown()
+            sys.exit(0)
+          })(asys.dispatcher)
+        }
+      }
+
+      when failed {
+        controller =>
+          (neg, reason) => {
+            controller.log.info(s"negotiation $neg failed: $reason")
+            asys.shutdown()
+            sys.exit(1)
+          }
+      }
   }
 }
 ```
@@ -180,8 +195,12 @@ To verify the accordance of the reports received by the front-end, run the follo
 The front-end consists of
 * javascript, [generated](web/frontend/src/main/scala/feh/tec/web/NQueen.scala) by scala-js
 * it's dependencies
-* [generated](web/frontend/src/main/scala/feh/tec/web/gen/NQueenTemplate.scala) template
+* [generated](web/frontend/src/main/scala/feh/tec/web/gen/NQueenTemplate.scala) templates
 * the associated [css](web/frontend/styles/n-queen)
+
+The project now generates two versions of the web interface:
+* Heavy 'n-queen.html'.
+* Lite  'n-queen-lite.html' that shows no messages and works better for long negotiations.
 
 Both [generation and packing](web/frontend/src/main/scala/feh/tec/web/util/PackTemplates.scala) are done by `pack-templates` sbt task in `project web-frontend`, the output directory is defined by `Web.packDir` setting key 
 (`web/packed` by default). To package fully optimized js, execute `pack-templates-opt`. There is also `clean-templates` task defined.
