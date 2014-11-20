@@ -8,7 +8,9 @@ import scala.collection.mutable
 import scala.scalajs.js
 import scala.scalajs.js.{Dynamic, JSApp}
 
-object NQueen extends JSApp with NQueenSocketListener{
+object NQueen extends NQueen
+
+trait NQueen extends JSApp with NQueenSocketListener{
   lazy val wsUrl = jQuery("head meta[ws]").attr("ws")
   def main() = {}
 
@@ -19,17 +21,25 @@ object NQueen extends JSApp with NQueenSocketListener{
 
   protected var chessBoard: ChessBoard = null
   protected var queensInfo: Map[Int, QueenInfo] = null
-  protected var reportArchive: ReportArchive = null
+  protected var reportArchive: ReportArchiveInterface = null
   protected var communications: QueensCommunications = null
   protected var selection: QueenInfo.Selection = null
 
-  def initNegotiationInfo(queens: Map[Int, String]): Any = {
-    reportArchive = new ReportArchive(queens.keySet)
-    chessBoard = new ChessBoard(queens.size)
+  def queensInfoCommunicationsInit(queens: Map[Int, String]) = {
     communications = new QueensCommunications(reportArchive)
     selection = new QueenInfo.Selection(
       s => (communications.update _).tupled apply s.queens(queens(s.left.get), queens(s.right.get))
     )
+  }
+
+  def queensInfoCommunicationsLateInit(): Any = {
+    jQuery(sel.containerForInfo) append communications.create.toString()
+  }
+
+  def initNegotiationInfo(queens: Map[Int, String]): Any = {
+    reportArchive = new ReportArchive(queens.keySet)
+    chessBoard = new ChessBoard(queens.size)
+    queensInfoCommunicationsInit(queens)
     queensInfo = queens.map{ case (i, name) => i -> new QueenInfo(name, i, selection) }.toMap
 
     sel.containerForInfo append s"""<div class="queen-info">${queensInfo.map(_._2.infoList).mkString("\n")}</div>"""
@@ -38,7 +48,7 @@ object NQueen extends JSApp with NQueenSocketListener{
 
     jQuery("head") append QueenFlagStyles.generate(queens.size)
     jQuery(sel.containerForBoard) append chessBoard.create
-    jQuery(sel.containerForInfo) append communications.create.toString()
+    queensInfoCommunicationsLateInit()
 
     def maxBySecure[A <: CanBulk, B](reps: Map[Int, List[A]])(f: A => Option[B]) = reps.mapValues{
       rep =>
@@ -67,7 +77,19 @@ object NQueen extends JSApp with NQueenSocketListener{
   def bulkReport(report: BulkReport): Any = reportArchive.report(report)
 }
 
-class ReportArchive(queens: Set[Int]){
+trait ReportArchiveInterface{
+  def report(msg: BulkReport)
+
+  def onStateChange(byQueen: js.Function1[Map[Int, List[ChangeReport]], Any])
+  def onNewMessages(byQueen: js.Function1[Map[Int, List[MessageReport]], Any])
+  def rmOnNewMessagesCallback(func: js.Function1[Map[Int, List[MessageReport]], Any])
+
+  def messages: Map[Int, List[MessageReport]]
+  def messages(i: Int): List[MessageReport]
+  def messages(i: Set[Int]): List[MessageReport]
+}
+
+class ReportArchive(queens: Set[Int]) extends ReportArchiveInterface{
 
   def report(msg: BulkReport): Unit = {
     val grouped_c =
@@ -95,4 +117,28 @@ class ReportArchive(queens: Set[Int]){
 
   protected val _onStateChange = mutable.Buffer.empty[js.Function1[Map[Int, List[ChangeReport]], Any]]
   protected val _onNewMessages = mutable.Buffer.empty[js.Function1[Map[Int, List[MessageReport]], Any]]
+}
+
+class ReportArchiveLite extends ReportArchiveInterface{
+  def report(msg: BulkReport): Unit = {
+    val grouped_c =
+      msg.messages.toList.withFilter(_.isInstanceOf[ChangeReport]).map(_.asInstanceOf[ChangeReport]).groupBy(_.by.n)
+
+    val grouped_m =
+      msg.messages.toList.withFilter(_.isInstanceOf[MessageReport]).map(_.asInstanceOf[MessageReport]).groupBy(_.by.n)
+
+    _onNewMessages foreach (_(grouped_m))
+    _onStateChange foreach (_(grouped_c))
+  }
+
+  def onStateChange(byQueen: js.Function1[Map[Int, List[ChangeReport]], Any]): Unit     = { _onStateChange += byQueen }
+  def onNewMessages(byQueen: js.Function1[Map[Int, List[MessageReport]], Any]): Unit = { _onNewMessages += byQueen }
+  def rmOnNewMessagesCallback(func: js.Function1[Map[Int, List[MessageReport]], Any]): Unit = { _onNewMessages -= func }
+
+  protected val _onStateChange = mutable.Buffer.empty[js.Function1[Map[Int, List[ChangeReport]], Any]]
+  protected val _onNewMessages = mutable.Buffer.empty[js.Function1[Map[Int, List[MessageReport]], Any]]
+
+  def messages: Map[Int, List[MessageReport]] = ???
+  def messages(i: Int): List[MessageReport] = ???
+  def messages(i: Set[Int]): List[MessageReport] = ???
 }

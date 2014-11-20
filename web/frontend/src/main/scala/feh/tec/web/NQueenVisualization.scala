@@ -1,5 +1,6 @@
 package feh.tec.web
 
+import feh.tec.web.QueenInfo.SelectionDisabled
 import feh.tec.web.common.NQueenMessages.{MessageReport, ChangeReport, Queen}
 import feh.tec.web.common.{NQueenMessages, WebSocketMessages}
 import scala.scalajs.js.Dynamic
@@ -114,6 +115,8 @@ object QueenInfo{
       if(isDefined) (Queen(left.get), nameL) -> (Queen(right.get), nameR)
       else sys.error("!isDefined")
   }
+
+  case object SelectionDisabled extends Selection(null)
 }
 
 class QueenInfo(name: String, val n: Int, selection: QueenInfo.Selection){
@@ -134,15 +137,16 @@ class QueenInfo(name: String, val n: Int, selection: QueenInfo.Selection){
       }
   }
 
-  def updateSelection() = for(i <- 1 to n ){
-    selection.left.filter(i ==)
-      .map{ _ => jQuery(selLeft(i)).addClass("selected") }
-      .getOrElse{ jQuery(selLeft(i)).removeClass("selected") }
-    selection.right.filter(i ==)
-      .map{ _ => jQuery(selRight(i)).addClass("selected") }
-      .getOrElse{ jQuery(selRight(i)).removeClass("selected") }
-    if(selection.isDefined) selection.updFunc(selection)
-  }
+  def updateSelection() = if(selection != SelectionDisabled)
+    for(i <- 1 to n ){
+      selection.left.filter(i ==)
+        .map{ _ => jQuery(selLeft(i)).addClass("selected") }
+        .getOrElse{ jQuery(selLeft(i)).removeClass("selected") }
+      selection.right.filter(i ==)
+        .map{ _ => jQuery(selRight(i)).addClass("selected") }
+        .getOrElse{ jQuery(selRight(i)).removeClass("selected") }
+      if(selection.isDefined) selection.updFunc(selection)
+    }
 
   def infoList =
     s"""<div class="queen-$n">
@@ -156,7 +160,7 @@ class QueenInfo(name: String, val n: Int, selection: QueenInfo.Selection){
        """.stripMargin
 
 
-  def setCallbacks() = {
+  def setCallbacks() = if(selection != SelectionDisabled)  {
     for(i <- 1 to n ) {
       jQuery(selLeft(i)).click{ (ev: JQueryEventObject) =>
         selection.left = Some(i)

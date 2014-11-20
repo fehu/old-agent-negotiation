@@ -20,7 +20,7 @@ trait QueensCommunicationsApi{
   def create: Text.TypedTag[_]
 }
 
-class QueensCommunications(archive: ReportArchive) extends QueensCommunicationsApi with QueensCommunicationsTemplates{
+class QueensCommunications(archive: ReportArchiveInterface) extends QueensCommunicationsApi with QueensCommunicationsTemplates{
   cacheNewMessages(archive.messages.mapValues(_.toList))
   archive.onNewMessages{(msg: Map[Int, scala.List[MessageReport]]) => cacheNewMessages(msg); showNewMessages(msg)}
 
@@ -115,7 +115,7 @@ class QueensCommunications(archive: ReportArchive) extends QueensCommunicationsA
 @JSExport
 object QueensCommunications{
 
-  var archive: ReportArchive = null
+  var archive: ReportArchiveInterface = null
   var comm: QueensCommunications = null
 
   case class ProposalId(id: String, to: Queen, at: Int)
