@@ -34,7 +34,7 @@ Some of the definitions extend also *ExtendableDefinition.BeforeAndAfter* trait,
   import scala.collection.mutable
   import scala.concurrent.duration.FiniteDuration
   
-  class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
+  class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
   
     initialize after {
       ag => _ => ag.log.info("initialized")
@@ -90,7 +90,7 @@ def negController(boardSize: Int) = controller {
 
     def `queen's position` = negotiation over(x, y)
 
-    def Queen = agent withRole "chess queen" definedBy QueenSpec(100 millis) that (
+    def Queen = agent withRole "chess queen" definedBy new QueenSpec that (
       negotiates the `queen's position` `with` the.others reportingTo reporter.default and
         hasConstraints(
           "direct-line sight" | {
