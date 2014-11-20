@@ -1,5 +1,7 @@
 package feh.tec.agents.light.spec.dsl
 
+import feh.tec.agents.light.impl.NegotiationEnvironmentController
+
 import scala.concurrent.duration.FiniteDuration
 
 trait CreationSpecification{
@@ -14,12 +16,22 @@ trait CreationSpecification{
   protected trait ConfDef
   protected trait TimeoutDef extends ConfDef
 
+  type NegotiationName = String
+  type Reason = String
+  type Controller = NegotiationEnvironmentController // todo
+  type Values = Seq[Map[String, Any]]
+
   type ChooseTimeout = {
     def initialize: TimeoutIdent
     def start: TimeoutIdent
     def stop: TimeoutIdent
     def reset: TimeoutIdent
     def `response delay`: TimeoutIdent
+  }
+
+  type ChooseWhen = {
+    def finished(action: Controller => (NegotiationName, Values) => Any)
+    def failed(action: Controller => (NegotiationName, Reason) => Any)
   }
 
   def spawn:{
@@ -31,7 +43,6 @@ trait CreationSpecification{
   def configure(c: ConfDef*) = stub
   def timeout: ChooseTimeout = stub
 
-//  implicit class TimingDefWrapper(f: ChooseTimeout => TimeoutIdent){
-//    def >>(time: FiniteDuration): TimeoutDef = stub
-//  }
+  def when: ChooseWhen = ???
+
 }

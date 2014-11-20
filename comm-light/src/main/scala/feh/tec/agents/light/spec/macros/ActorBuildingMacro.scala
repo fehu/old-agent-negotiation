@@ -60,10 +60,11 @@ trait ActorBuildingMacroImpl[C <: whitebox.Context] extends ActorBuildingMacro[C
           (h.typeSymbol.asType, h.typeArgs, Nil, pTraitsTrees.tail)
       }
 
+    val undef = trees.parents.flatMap(_.members.filter(sym => sym.isAbstract && sym.isTerm && !sym.asTerm.isAccessor && !sym.isParameter))
 
-    val paramStatements = trees.constructorArgs.map {
-      case (name, tpe) =>
-        ValDef(Modifiers(Flag.PARAM | Flag.PRIVATE | Flag.LOCAL), TermName(name), TypeTree(tpe.asInstanceOf[c.Type]), EmptyTree)
+    def paramStatements = trees.constructorArgs.map {
+      case (name, tpe) if undef.exists(sym => sym.name == TermName(name) && sym.typeSignature.resultType =:= tpe) => q"val ${TermName(name)}: $tpe"
+      case (name, tpe) => q"private[this] val ${TermName(name)}: $tpe"
     }
 
     val classDef = q"""

@@ -1,11 +1,10 @@
 package feh.tec.agents.light
 
-import feh.tec.agents.{NQueenWebSocketPushServerBuilder, NQueenWebSocketPushServer}
-import feh.tec.web.WebSocketPushServer
+import feh.tec.agents.NQueenWebSocketPushServerBuilder
 import feh.tec.web.WebSocketPushServer.OnConnection
 import feh.tec.web.common.{NQueenMessages, WebsocketConf}
 import feh.util._
-import akka.actor.{ActorRef, Props, ActorSystem}
+import akka.actor.{ActorRef, ActorSystem}
 import feh.tec.agents.light.spec.dsl._
 import impl.agent._
 import spray.can.websocket.frame.TextFrame
@@ -41,8 +40,27 @@ object QueenNegotiationApp extends App with WebsocketConf{
       configure(
         timeout.initialize <= 100.millis,
         timeout.start <= 100.millis,
-        timeout.`response delay` <= 100.millis
+        timeout.`response delay` <= 50.millis
       )
+
+      when finished {
+        controller =>
+          (neg, values) => {
+            controller.log.info(s"negotiation $neg successfully finished: ${values.flatMap(_.values)}")
+            asys.shutdown()
+            sys.exit(0)
+          }
+      }
+
+      when failed {
+        controller =>
+          (neg, reason) => {
+            controller.log.info(s"negotiation $neg failed: $reason")
+            asys.shutdown()
+            sys.exit(1)
+          }
+
+      }
     }
   }
 

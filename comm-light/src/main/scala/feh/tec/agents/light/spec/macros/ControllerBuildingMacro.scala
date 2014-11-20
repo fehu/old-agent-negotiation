@@ -10,6 +10,7 @@ import feh.tec.agents.light.spec.{NegotiationSpecification, AgentSpecification}
 import feh.util._
 import scala.collection.immutable.HashSet
 import scala.collection.{IterableLike, mutable}
+import scala.concurrent.duration.FiniteDuration
 import scala.reflect.macros.whitebox
 
 trait ControllerBuildingMacro[C <: whitebox.Context] extends ActorBuildingMacro[C] {
@@ -45,6 +46,7 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
     EmbedAgentsProps(negRaw, cBuilder) ::
     ExtraArgsValues ::
     EmbedSpawnsAndTimeouts(negRaw) ::
+    EmbedControllerDefs(negRaw) ::
     SupportBundle :: Nil
   )
 
@@ -159,18 +161,20 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
           case Raw.SingleSpawnDef(name, count) => q"$name -> $count"
         }
       }
-      val timeouts = raw.time.flatMap(_.mp.mapValues(dur => q"akka.util.Timeout($dur)")).toMap
+      val dur = raw.time.flatMap(_.mp).toMap
+      def timeout(tr: c.Expr[FiniteDuration]) = q"akka.util.Timeout($tr)"
 
       trees.copy(controller = controller.append.body(
         q"protected val spawns: Map[String, Int] = Map(..$spawns)",
         q"""
             import feh.tec.agents.light.impl.NegotiationEnvironmentController._
-            protected val timeouts: Timeouts = new Timeouts {
-              lazy val initialize = ${timeouts.getOrElse("initialize", q"DefaultTimeouts.initialize")}
-              lazy val start = ${timeouts.getOrElse("start", q"DefaultTimeouts.start")}
-              lazy val stop = ${timeouts.getOrElse("stop", q"DefaultTimeouts.stop")}
-              lazy val reset = ${timeouts.getOrElse("reset", q"DefaultTimeouts.reset")}
-              lazy val `response delay` = ${timeouts.get("response delay").map(t => q"$t.duration").getOrElse(q"DefaultTimeouts.`response delay`")}
+            protected lazy val timeouts: Timeouts = new Timeouts {
+              lazy val initialize = ${dur.get("initialize").map(timeout) getOrElse q"DefaultTimeouts.initialize"}
+              lazy val start = ${dur.get("start").map(timeout) getOrElse q"DefaultTimeouts.start"}
+              lazy val stop = ${dur.get("stop").map(timeout) getOrElse q"DefaultTimeouts.stop"}
+              lazy val reset = ${dur.get("reset").map(timeout) getOrElse q"DefaultTimeouts.reset"}
+              lazy val `response delay` = ${dur.getOrElse("response delay", c.Expr(q"DefaultTimeouts.`response delay`"))}
+              lazy val `confirm finished` = ${dur.getOrElse("confirm finished", c.Expr(q"DefaultTimeouts.`confirm finished`"))}
          }"""
       ))
   }
@@ -182,6 +186,31 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
           q"def configInfo = feh.tec.agents.light.impl.service.SupportBundle.Config(${Configs.controller[c.type](c)})"
         )
       else controller
+
+      trees.copy(controller = newController)
+  }
+
+  def EmbedControllerDefs(raw: NegotiationRaw) = MacroSegment{
+    case trees@Trees(controller, _) =>
+      val newController = controller.append.body(
+        q"""def negotiationFinished(neg: NegotiationId, values: Seq[Map[Var, Any]]): Unit = {
+         ..${
+          raw.controller.finished
+            .map(t => {
+                val vTree = q"values.map(_.map{case (k,v) => k.name -> v})"
+                q"$t(implicitly[feh.tec.agents.light.impl.NegotiationEnvironmentController])(neg.name, $vTree)"
+              })
+            .getOrElse(q"???")
+          }
+        }""",
+        q"""def negotiationFailed(neg: NegotiationId, reason: String): Unit = {
+        ..${
+          raw.controller.failed
+            .map(t => q"$t(implicitly[feh.tec.agents.light.impl.NegotiationEnvironmentController])(neg.name, reason)")
+            .getOrElse(q"???")
+          }
+        }"""
+      )
 
       trees.copy(controller = newController)
   }

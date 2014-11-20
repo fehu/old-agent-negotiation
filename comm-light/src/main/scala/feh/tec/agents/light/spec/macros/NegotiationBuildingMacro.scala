@@ -1,5 +1,6 @@
 package feh.tec.agents.light.spec.macros
 
+import feh.tec.agents.light.impl.NegotiationEnvironmentController
 import feh.tec.agents.light.spec
 import feh.tec.agents.light.spec.{NegotiationSpecification, AgentSpecification}
 import feh.tec.agents.light.spec.NegotiationSpecification.{InterlocutorsByRoles, NegotiationDef, Interlocutors}
@@ -13,7 +14,8 @@ trait NegotiationBuildingMacro[C <: whitebox.Context] extends MacroContext[C]{
                             negotiations: List[Raw.NegotiationDef],
                             agents: List[Raw.AgentDef],
                             spawns: List[Raw.SpawnDefs],
-                            time: List[Raw.TimeDefs]
+                            time: List[Raw.TimeDefs],
+                            controller: Raw.ControllerDefs
                              )
 
 
@@ -39,6 +41,9 @@ trait NegotiationBuildingMacro[C <: whitebox.Context] extends MacroContext[C]{
     case class AgentConstraintsDef(constraints: Seq[c.Tree])
 
     case class TimeDefs(mp: Map[String, c.Expr[FiniteDuration]])
+
+    case class ControllerDefs(finished: Option[c.Expr[NegotiationEnvironmentController => (String, Seq[Map[String, Any]]) => Any]],
+                              failed: Option[c.Expr[NegotiationEnvironmentController => (String, String) => Any]])
   }
 
   def build(dsl: c.Expr[spec.dsl.Negotiation]): NegotiationRaw
@@ -220,6 +225,11 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
         }
     }.flatten
 
+  /** Seq( definition-name, Tree[function] ) */
+  def extractControllerDefs(applications: Seq[(c.Tree, List[c.Tree])]) = applications collect {
+    case (Select(Select(This(TypeName("$anon")), TermName("when")), TermName(defName)), tree) => defName -> tree
+  }
+
   protected def extractDomainType(t: c.Tree) = t match {
     case Apply(
           Select(
@@ -280,13 +290,64 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
       Raw.AgentDef(name.decodedName.toString, role, nr, c.Expr(spec)/*, specTpe*/)
     }
 
+    def removeThisAndReplace(t: c.Tree, replacements: PartialFunction[c.Tree, c.Tree]) = h.transform(t,
+      replacements orElse {
+        case Select(This(_), name) => Ident(name)
+      }
+    )
+
+    val controllerName = TermName("$arg_controller")
+    val nameName = TermName("$arg_name")
+    val valuesName = TermName("$arg_values")
+    val reasonName = TermName("$arg_reason")
+
     val spawnsRaw = Raw.SpawnDefs(b.extractSpawns(applications) map (Raw.SingleSpawnDef.apply _).tupled)
-    val spawns = q"""SimpleSpawnDef(Map(..${b.extractSpawns(applications)}))"""
+//    val spawns = q"""SimpleSpawnDef(Map(..${b.extractSpawns(applications)}))"""
+    val controllerEntries = extractControllerDefs(applications).groupBy(_._1).mapValues(_.unzip._2).map{
+      case ("finished", funcs) =>
+        val newFuncs = funcs.flatten.map{
+          case q"($a) => ($b, $c) => $d" =>
+            val CName = a.name
+            val NName = b.name
+            val VName = c.name
+            removeThisAndReplace(d, {
+              case Ident(CName) => Ident(controllerName)
+              case Ident(NName) => Ident(nameName)
+              case Ident(VName) => Ident(valuesName)
+             })
+        }
+        "finished" -> q"""
+          ($controllerName: feh.tec.agents.light.impl.NegotiationEnvironmentController) =>
+            ($nameName: String, $valuesName: Seq[Map[String, Any]]) =>
+              { ..$newFuncs }
+        """
+      case ("failed", funcs) =>
+        val newFuncs = funcs.flatten.map{
+          case q"($a) => ($b, $c) => $d" =>
+            val CName = a.name
+            val NName = b.name
+            val RName = c.name
+            removeThisAndReplace(d, {
+              case Ident(CName) => Ident(controllerName)
+              case Ident(NName) => Ident(nameName)
+              case Ident(RName) => Ident(reasonName)
+            })
+        }
+        "failed" -> q"""
+          ($controllerName: feh.tec.agents.light.impl.NegotiationEnvironmentController) =>
+            ($nameName: String, $reasonName: String) =>
+              { ..$newFuncs }
+        """
+    }
+    val controller = Raw.ControllerDefs(
+      finished = controllerEntries.get("finished").map(c.Expr[(NegotiationEnvironmentController) => (String, scala.Seq[Map[String, Any]]) => Any]),
+      failed = controllerEntries.get("failed").map(c.Expr[(NegotiationEnvironmentController) => (String, String) => Any])
+    )
 
     val timeoutDefs = b.extractTimeouts(applications)
-    val timeouts = Raw.TimeDefs(timeoutDefs.toMap.mapValues(c.Expr(_)))
+    val timeouts = Raw.TimeDefs(timeoutDefs.toMap.mapValues(c.Expr[FiniteDuration]))
 
-    NegotiationRaw(vars.toList, negotiations.toList, agents.toList, spawnsRaw :: Nil, timeouts :: Nil)
+    NegotiationRaw(vars.toList, negotiations.toList, agents.toList, spawnsRaw :: Nil, timeouts :: Nil, controller)
   }
 
 }

@@ -13,6 +13,9 @@ trait EnvironmentController extends SystemAgent{
   def stop()
   /** reset negotiations (after stop) */
   def reset()
+
+  def negotiationFinished(neg: NegotiationId, values: Seq[Map[Var, Any]])
+  def negotiationFailed(neg: NegotiationId, reason: String)
 }
 
 /** scope updates */

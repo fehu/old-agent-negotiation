@@ -32,7 +32,8 @@ object SystemMessage{
   }
 
 
-  case class NegotiationFinished(neg: NegotiationId) extends SystemMessage
+  case class NegotiationFinished(neg: NegotiationId, values: Seq[Map[Var, Any]]) extends SystemMessage
+  case class NegotiationFailed(neg: NegotiationId, reason: String) extends SystemMessage
 
   case class UnexpectedCommand(cmd: SystemMessage, controllerState: NegotiationState)
 }

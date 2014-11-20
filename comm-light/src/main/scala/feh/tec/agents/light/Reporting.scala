@@ -3,11 +3,10 @@ package feh.tec.agents.light
 import java.io.{FileWriter, BufferedWriter, File}
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import akka.actor.Actor.Receive
 import feh.tec.agents.light.impl.NegotiationEnvironmentController
 import org.apache.commons.io.IOUtils
-
 import scala.collection.mutable
+import scala.concurrent.duration.FiniteDuration
 
 trait AgentReport extends Message { def at: Long }
 
@@ -108,6 +107,46 @@ trait ReportListener extends SystemAgent{
 
   def receive: Actor.Receive = {
     case r: AgentReport => reportReceived(r)
+  }
+}
+
+trait NegotiationFinishedListener extends ReportListener with ActorLogging{
+  log.info("NegotiationFinishedListener started")
+
+  def controller: ActorRef
+  def confirmAllWaitingDelay: FiniteDuration
+
+  private lazy val _states = mutable.HashMap.empty[NegotiationId, mutable.Map[AgentRef, NegotiationState]]
+  private lazy val _values = mutable.HashMap.empty[NegotiationId, mutable.Map[AgentRef, Map[Var, Any]]]
+
+  def states = _states.toMap.mapValues(_.toMap)
+  def values = _values.toMap.mapValues(_.toMap)
+
+  def allWaiting(neg: NegotiationId) = states.get(neg).exists(_.forall(_._2 == NegotiationState.Waiting))
+
+  def guardState(msg: StateReport) = {
+    msg.state.get("state").map(
+      state => _states.getOrElseUpdate(msg.negotiation, mutable.Map.empty) += msg.sender -> state.asInstanceOf[(NegotiationState, NegotiationState)]._2
+    )
+    msg.state.get("values").map{
+      case values => _values.getOrElseUpdate(msg.negotiation, mutable.Map.empty) += msg.sender -> values.asInstanceOf[(Map[Var, Any], Map[Var, Any])]._2
+    }
+  }
+
+  protected def allWaitingCheck(neg: NegotiationId) = if(allWaiting(neg)) context.system.scheduler
+    .scheduleOnce(confirmAllWaitingDelay, self, "confirm all waiting" -> neg)(context.dispatcher)
+
+  override def receive = ({
+    case r: StateReport =>
+      guardState(r)
+      super.receive(r)
+      allWaitingCheck(r.negotiation)
+    case ("confirm all waiting", neg: NegotiationId) => if(allWaiting(neg)) negotiationFinished(neg)
+  }: Actor.Receive) orElse super.receive
+
+  def negotiationFinished(neg: NegotiationId) = {
+    val vals = values(neg).map(_._2).toSeq
+    controller ! SystemMessage.NegotiationFinished(neg, vals)
   }
 }
 

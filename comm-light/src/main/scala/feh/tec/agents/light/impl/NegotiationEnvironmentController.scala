@@ -37,6 +37,8 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
     def receive: Actor.Receive = Map()
   }))
 
+  implicit def controller: NegotiationEnvironmentController = this
+
   def info =
     s""" NegotiationEnvironmentController:
        |   spawns = $spawns
@@ -154,10 +156,12 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
 
   def receive: Receive = {
     case SystemMessage.Initialize => initialize()
-    case SystemMessage.Start            => start()
-    case SystemMessage.Stop             => stop()
-    case SystemMessage.Reset            => reset()
-    case req: AgentReport.StateRequest  => currentAgents.foreach(_.ref forward req)
+    case SystemMessage.Start                            => start()
+    case SystemMessage.Stop                             => stop()
+    case SystemMessage.Reset                            => reset()
+    case req: AgentReport.StateRequest                  => currentAgents.foreach(_.ref forward req)
+    case SystemMessage.NegotiationFinished(neg, values) => log.info(s"$neg FINISHED"); negotiationFinished(neg, values)
+    case SystemMessage.NegotiationFailed(n, m)          => log.info(s"$n FAILED: $m"); negotiationFailed(n, m)
   }
 
   val name = NegotiationEnvironmentController.Name
@@ -171,6 +175,7 @@ object NegotiationEnvironmentController{
     def stop: Timeout
     def reset: Timeout
     def `response delay`: FiniteDuration
+    def `confirm finished`: FiniteDuration
   }
 
   lazy val Name = "NegotiationEnvironmentController"
@@ -184,5 +189,6 @@ object NegotiationEnvironmentController{
     def stop = Timeout(50 millis)
     def reset = Timeout(50 millis)
     def `response delay` = 0.millis
+    def `confirm finished` = 100.millis
   }
 }

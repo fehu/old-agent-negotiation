@@ -1,5 +1,6 @@
 package feh.tec.agents.light.spec.macros
 
+import akka.actor.ActorRef
 import feh.tec.agents.light.AgentCreationInterface.NegotiationInit
 import feh.tec.agents.light._
 import feh.tec.agents.light.impl.agent
@@ -56,7 +57,7 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
   }
 
   def PriorityAndProposalBasedAgentSegment(raw: NegotiationRaw) = raw match {
-    case NegotiationRaw(vars, negs, agents, _, _) =>
+    case NegotiationRaw(vars, negs, agents, _, _, _) =>
       val priorityAndProposalBased = agents.filter(_.spec.actualType <:< c.typeOf[PriorityAndProposalBasedAgentSpec[_, _]])
       MacroSegment {
         case Trees(controller, ags) =>
@@ -84,7 +85,7 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
   }
 
   def IteratingAllVarsAgentSegment(raw: NegotiationRaw) = raw match {
-    case NegotiationRaw(_, _, agents, _, _) =>
+    case NegotiationRaw(_, _, agents, _, _, _) =>
       val iteratingAllVars = agents.filter(_.spec.actualType <:< c.typeOf[IteratingSpec.AllVars[_, _]])
       MacroSegment {
         case Trees(controller, ags) =>
@@ -169,14 +170,22 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
       }
     ).toList
 
+    def agentConstructorArgs = Map(
+      "writeTo" -> typeOf[java.io.File],
+      "controller" -> typeOf[ActorRef],
+      "confirmAllWaitingDelay" -> typeOf[FiniteDuration]
+    )
+
     def reportSysAgent = "report-listener" -> ActorTrees("$ReportListener",
-      parents = typeOf[impl.service.DefaultReportWriter] :: Nil, // todo: use ReportListenerRef
+      parents = typeOf[impl.service.DefaultReportWriter] :: typeOf[NegotiationFinishedListener] :: Nil, // todo: use ReportListenerRef
       body = reportSysAgentBody,
-      constructorArgs = Map("writeTo" -> typeOf[java.io.File])
+      constructorArgs = agentConstructorArgs
     )
     def addReportSysAgent() = {
       addAgentArgs("report-listener", "writeTo", typeOf[java.io.File], Ident(TermName("reportFile")) )
       addAgentArgs("report-listener", "role", typeOf[Role], reportListenerRoleTree)
+      addAgentArgs("report-listener", "controller", typeOf[ActorRef], q"self")
+      addAgentArgs("report-listener", "confirmAllWaitingDelay", typeOf[FiniteDuration], q"timeouts.`confirm finished`")
     }
 
     MacroSegment{
@@ -275,8 +284,6 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
         .ensuring(_.size <= 1).headOption
 
       val negotiationCreation = ag.parents.exists(_ <:< typeOf[impl.agent.NegotiationCreation])
-
-      c.info(NoPosition, "!!!!!!!!!!!negotiationCreation = " + negotiationCreation, true)
 
       implTpesOpt map {
         impl =>
