@@ -7,3 +7,4 @@
 - [ ] partial solution search
 - [ ] connect `when failed` controller behaviour definition
 - [x] remove most of debug logs
+- [ ] remove restrictions on valid code in `when finished` and `when failed`

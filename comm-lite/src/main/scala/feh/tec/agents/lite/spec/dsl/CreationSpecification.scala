@@ -1,5 +1,6 @@
 package feh.tec.agents.lite.spec.dsl
 
+import feh.tec.agents.lite.{Var, NegotiationId}
 import feh.tec.agents.lite.impl.NegotiationEnvironmentController
 
 import scala.concurrent.duration.FiniteDuration
@@ -16,10 +17,9 @@ trait CreationSpecification{
   protected trait ConfDef
   protected trait TimeoutDef extends ConfDef
 
-  type NegotiationName = String
   type Reason = String
   type Controller = NegotiationEnvironmentController // todo
-  type Values = Seq[Map[String, Any]]
+  type Values = Seq[Map[Var, Any]]
 
   type ChooseTimeout = {
     def initialize: TimeoutIdent
@@ -30,8 +30,8 @@ trait CreationSpecification{
   }
 
   type ChooseWhen = {
-    def finished(action: Controller => (NegotiationName, Values) => Any)
-    def failed(action: Controller => (NegotiationName, Reason) => Any)
+    def finished(action: Controller => (NegotiationId, Values) => Any)
+    def failed(action: Controller => (NegotiationId, Reason) => Any)
   }
 
   def spawn:{

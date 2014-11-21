@@ -47,8 +47,15 @@ object QueenNegotiationApp extends App with WebsocketConf{
         controller =>
           (neg, values) => {
             controller.log.info(s"negotiation $neg successfully finished: $values")
-            asys.scheduler.scheduleOnce(2 seconds, () => {
-//              sys.error("finished")
+            controller.agents.foreach{
+              ag =>
+                ag.ref.tell(
+                  AgentReport.StateRequest(neg),
+                  WebPushServer
+                )
+            }
+            asys.scheduler.scheduleOnce(200 millis, () => {
+              WebPushServer.tell(SystemMessage.NegotiationFinished(neg, values), controller.self)
               asys.shutdown()
               sys.exit(0)
             })(asys.dispatcher)
@@ -78,7 +85,6 @@ object QueenNegotiationApp extends App with WebsocketConf{
     import feh.tec.web.NQueenProtocol._
 
     new NQueenWebSocketPushServerBuilder(
-
       wsConf.back.host("n-queen"),
       wsConf.back.port("n-queen"),
       negotiationId = NegotiationId("queen's position"),

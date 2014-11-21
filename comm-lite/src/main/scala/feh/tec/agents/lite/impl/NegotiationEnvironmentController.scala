@@ -17,6 +17,7 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
 
   type CreateInterface = Map[String, Any]
   implicit def asys: ActorSystem = context.system
+  implicit def dispatcher = asys.dispatcher
 
 //  protected val initialAgents: List[(AgentDef, () => AgentRef)]
   protected val spawns: Map[String, Int]
@@ -33,11 +34,9 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
 
   protected lazy val initialAgentsByName = initialAgents.map(x => x._1.name -> x).toMap
 
-  implicitly[ActorSystem].actorOf(Props.apply(new Actor{
-    def receive: Actor.Receive = Map()
-  }))
-
   implicit def controller: NegotiationEnvironmentController = this
+
+  def agents = currentAgents
 
   def info =
     s""" NegotiationEnvironmentController:
@@ -51,9 +50,8 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
        |   systemAgents = $systemAgents
      """.stripMargin
 
-  println(info)
-
-  var sysAgentByRole: Map[SystemRole, AgentRef] = null
+  protected var sysAgentByRole: Map[SystemRole, AgentRef] = null
+  def sysAgent(role: SystemRole) = sysAgentByRole(role)
 
 
   def createAgent(c: Int, d: AgentDef, f: CreateInterface => AgentRef) = d match {

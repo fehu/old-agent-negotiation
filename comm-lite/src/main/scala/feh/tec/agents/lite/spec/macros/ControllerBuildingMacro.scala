@@ -194,8 +194,7 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
          ..${
           raw.controller.finished
             .map(t => {
-                val vTree = q"values.map(_.map{case (k,v) => k.name -> v})"
-                q"$t(implicitly[feh.tec.agents.lite.impl.NegotiationEnvironmentController])(neg.name, $vTree)"
+                q"$t(implicitly[feh.tec.agents.lite.impl.NegotiationEnvironmentController])(neg, values)"
               })
             .getOrElse(q"???")
           }
@@ -203,7 +202,7 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
         q"""def negotiationFailed(neg: NegotiationId, reason: String): Unit = {
         ..${
           raw.controller.failed
-            .map(t => q"$t(implicitly[feh.tec.agents.lite.impl.NegotiationEnvironmentController])(neg.name, reason)")
+            .map(t => q"$t(implicitly[feh.tec.agents.lite.impl.NegotiationEnvironmentController])(neg, reason)")
             .getOrElse(q"???")
           }
         }"""

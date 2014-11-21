@@ -18,7 +18,7 @@ object NegotiationRole{ def apply(name: String): NegotiationRole = new Role(name
 trait SystemRole extends Role
 object SystemRole{ def apply(name: String): SystemRole = new Role(name) with SystemRole }
 
-case class AgentRef(id: Agent.Id, protected[lite] val ref: ActorRef){
+case class AgentRef(id: Agent.Id, ref: ActorRef){
   override def toString: String = s"Agent(${id.name})"
 }
 

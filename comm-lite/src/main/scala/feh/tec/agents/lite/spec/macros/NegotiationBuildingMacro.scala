@@ -302,7 +302,6 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
     val reasonName = TermName("$arg_reason")
 
     val spawnsRaw = Raw.SpawnDefs(b.extractSpawns(applications) map (Raw.SingleSpawnDef.apply _).tupled)
-//    val spawns = q"""SimpleSpawnDef(Map(..${b.extractSpawns(applications)}))"""
     val controllerEntries = extractControllerDefs(applications).groupBy(_._1).mapValues(_.unzip._2).map{
       case ("finished", funcs) =>
         val newFuncs = funcs.flatten.map{
@@ -318,7 +317,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
         }
         "finished" -> q"""
           ($controllerName: feh.tec.agents.lite.impl.NegotiationEnvironmentController) =>
-            ($nameName: String, $valuesName: Seq[Map[String, Any]]) =>
+            ($nameName: NegotiationId, $valuesName: Seq[Map[Var, Any]]) =>
               { ..$newFuncs }
         """
       case ("failed", funcs) =>
@@ -335,7 +334,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
         }
         "failed" -> q"""
           ($controllerName: feh.tec.agents.lite.impl.NegotiationEnvironmentController) =>
-            ($nameName: String, $reasonName: String) =>
+            ($nameName: NegotiationId, $reasonName: String) =>
               { ..$newFuncs }
         """
     }
