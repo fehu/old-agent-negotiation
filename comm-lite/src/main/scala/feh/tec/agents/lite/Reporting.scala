@@ -64,11 +64,7 @@ object AgentReporting{
     def stateReport(negId: NegotiationId): StateReport
     
     override def processSys = super.processSys orElse{
-      case AgentReport.StateRequest(negId) =>
-        val s = sender()
-        val rep = stateReport(negId)
-        log.debug(s"StateRequest: s=$s, rep=$rep")
-        s ! rep
+      case AgentReport.StateRequest(negId) => sender() ! stateReport(negId)
     }
   }
 

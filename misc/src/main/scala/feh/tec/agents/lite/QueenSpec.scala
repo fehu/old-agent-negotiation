@@ -6,12 +6,10 @@ import feh.tec.agents.lite.Message.ProposalId
 import feh.tec.agents.lite.impl.agent.create
 import feh.util._
 import feh.tec.agents.lite.spec.RequiresDistinctPriority
-
 import scala.collection.mutable
-import scala.concurrent.duration.FiniteDuration
 
 object QueenSpec{
-  def apply(acceptanceCheckDelay: FiniteDuration) = new QueenSpec(acceptanceCheckDelay)
+  def apply() = new QueenSpec
 
   case class FallbackRequest(negotiation: NegotiationId, priority: Priority, id: UUID)(implicit val sender: AgentRef) extends Message.HasPriority{
     def asString: String = s"I have no more values to propose in $negotiation ($priority)"
@@ -25,7 +23,7 @@ object QueenSpec{
   case object FallbackState extends NegotiationState 
 }
 
-class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
+class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
   import QueenSpec._
 
   val priorities = mutable.HashMap.empty[NegotiationId, mutable.HashMap[AgentRef, Option[Priority]]]
@@ -35,9 +33,7 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
     (priorities(neg) + (ag.ref -> ag.get(neg).currentPriority.raw))
       .mapValues(_.get).maxBy(_._2.get)
 
-  private val proposalAcceptance = synchronized{
-    mutable.HashMap.empty[NegotiationId, (ProposalId, mutable.HashMap[AgentRef, Option[Boolean]])]
-  }
+  private val proposalAcceptance = mutable.HashMap.empty[NegotiationId, (ProposalId, mutable.HashMap[AgentRef, Option[Boolean]])]
 
   def setProposalAcceptance(msg: Message.ProposalResponse, v: Boolean)(implicit ag: create.PPI.Ag) = {
     val (pid, map) = proposalAcceptance
@@ -45,14 +41,8 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
     assert(pid == msg.respondingTo)
     map(msg.sender) = Option(v)
   }
-  def clearProposalAcceptance(neg: NegotiationId)(implicit ag: create.PPI.Ag) = {
-    ag.log.debug("clearProposalAcceptance + " + proposalAcceptance)
-    proposalAcceptance -= neg
-  }
-  
-//  def scheduleAcceptanceCheck(msg: Message.ProposalResponse)(implicit ag: create.PPI.Ag) = ag.context.system.scheduler
-//    .scheduleOnce(acceptanceCheckDelay, ag.self, CheckAcceptance(msg.negotiation, msg.respondingTo))(ag.context.dispatcher)
-  
+  def clearProposalAcceptance(neg: NegotiationId)(implicit ag: create.PPI.Ag) = proposalAcceptance -= neg
+
   def allAccepted(neg: NegotiationId, pid: ProposalId) =
     proposalAcceptance.get(neg).exists{
       case (id, map) => id == pid  && map.nonEmpty && map.forall(_._2.getOrElse(false))
@@ -81,12 +71,6 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
     }
   }
   
-//  processUserMessage <:= {
-//    implicit ag => {
-//      case CheckAcceptance(neg, pid) => whenProposalAccepted(neg, pid)
-//    }
-//  }
-
   def onFallbackRequest(req: FallbackRequest)(implicit ag: create.PPI.Ag): Unit = req match {
     case req@FallbackRequest(negId, pr, id) =>
       import ag._
@@ -128,9 +112,7 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
   }
   
   initialize after {
-    ag => _ =>
-//      ag.negotiations.foreach(_.currentPriority update new Priority(1))
-      ag.log.info("initialized")
+    ag => _ => ag.log.info("initialized")
   }
   start andThen {
     ag =>
@@ -140,15 +122,9 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
         negotiations.foreach {
           neg =>
             if(neg.currentIterator.raw.isEmpty) neg.currentIterator update ag.newIterator(neg.id)
-            log.info("Iterating the domain with " + neg.currentIterator())
-            ag.setNextProposal(neg.id)
-            //            ag.nextValues()
-            //            val proposal = neg.currentProposal.getOrElse {
-            //              Message.Proposal(Message.ProposalId.rand, neg.id, neg.currentPriority(), neg.currentValues())
-            //            }
+            val prop = ag.setNextProposal(neg.id)
             neg.currentState update NegotiationState.Negotiating
-            log.info(s"negotiation ${neg.id} started, scope = ${neg.scope()}")
-            sendToAll(neg.currentProposal())
+            sendToAll(prop)
         }
   }
 
@@ -186,18 +162,13 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
         //mark as accepted
         setProposalAcceptance(msg, v = true)
         whenProposalAccepted(msg)
-        ag.log.debug("rejected: myPriority isHigherThenOf " + msg)
       case msg if ag.myPriority isLowerThenOf  msg =>
         setProposalAcceptance(msg, v = false)
-//        whenProposalAccepted(msg)
-        ag.log.debug("!!!!!!!!!!!!!! rejected")
-        val prop = ag.setNextProposal(msg.negotiation)
-        ag.log.debug("rejected: spam new proposal " + prop)
-        ag.sendToAll(prop)
+        ag.sendToAll(ag.setNextProposal(msg.negotiation))
     }
   }
 
-  updateCurrentProposal /*setNextProposal*/ andThen {
+  updateCurrentProposal andThen {
     ag =>
       overridden =>
         negId =>
@@ -209,7 +180,6 @@ class QueenSpec(val acceptanceCheckDelay: FiniteDuration) extends create.PPI.All
     implicit ag => {
       case msg if msg.respondingTo != ag.get(msg.negotiation).currentProposal().id => //ignore
       case msg =>
-        ag.log.debug("accepted: " + msg)
         setProposalAcceptance(msg, v = true)
         whenProposalAccepted(msg)
     }

@@ -11,12 +11,7 @@ trait ConstraintsSatisfactionChecks {
   val constraintsByNegotiation: Map[NegotiationId, AgentConstraintsDef]
 
   def satisfiesConstraints(of: NegotiationId, values: Map[Var, Any]): Boolean = constraintsByNegotiation(of).constraints forall {
-    case AgentConstraintDef(cName, parts) =>
-      val neg = get(of)
-      val myValues = neg.currentValues()
-      log.debug(s"satisfiesConstraints values=$values, myValues=$myValues, neg=$neg")
-      satisfiesParts(parts, values, myValues) $$
-        { r => log.debug(s"constrain $cName ${if(r) "" else "NOT "}satisfied") }
+    case AgentConstraintDef(cName, parts) => satisfiesParts(parts, values, get(of).currentValues())
   }
 
   protected def ifConstraintLeafForOtherVars = true
@@ -36,7 +31,6 @@ trait ConstraintsSatisfactionChecks {
           case ConstraintParamDescription("valueOf", varName, _) =>
             myValues.find(_._1.name == varName).getOrThrow(s"no var $varName found among my values $myValues")._2
         }
-        log.debug(s"testArgs = $testArgs")
         test(seqToTuple(testArgs))
       case _: ConstraintPartLeaf[_] => ifConstraintLeafForOtherVars
     }

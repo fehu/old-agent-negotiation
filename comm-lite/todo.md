@@ -3,4 +3,7 @@
 - [x] connect web backend
 - [x] provide constraints checking helper
 - [ ] change DomainIterator > DomainValuesStream 
-- [ ] check with JProfiler
+- [x] check with JProfiler
+- [ ] partial solution search
+- [ ] connect `when failed` controller behaviour definition
+- [x] remove most of debug logs

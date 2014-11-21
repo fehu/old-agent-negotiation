@@ -29,14 +29,12 @@ object IteratingSpec{
           }
           val domains = dItByVar.map(_._1.domain)
           val dit = it.apply(domains).map(i2i)
-          owner.log.debug(s"created domain iterator $dit")
           dit
       })
 
     lazy val nextValues = new DefBADS[NegotiationId => Option[Map[Var, Any]]](
       owner =>
         negId => {
-          owner.log.debug(s"getting next values for $negId: ${owner.get(negId).currentIterator.raw}")
           owner.get(negId).currentIterator.raw.collectFirst({
             case it if it.hasNext => it.next()
           })

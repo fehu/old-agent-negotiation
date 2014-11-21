@@ -37,24 +37,15 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
 
   /** (this, that) => Boolean */
   def comparePriority(msg: Lang#Msg, f: (Priority, Priority) => Boolean): Boolean = {
-    log.debug(s"comparePriority: msg=$msg")
-    val negId = msg.negotiation
-//    log.debug(s"comparePriority: negId=$negId")
-    val neg = get(negId)
-    val priority = neg.currentPriority()
-    log.debug(s"comparePriority: neg=$neg")
-    f(priority, msg.priority)
+    val myPriority = get(msg.negotiation).currentPriority()
+    f(myPriority, msg.priority)
   }
 
 
   def hasState(msg: NegotiationMessage, s: NegotiationState*) = s.contains(get(msg.negotiation).currentState())
   private val delayedMessages = mutable.HashSet.empty[Lang#Msg]
-  def guardDelayedMessage(msg: Lang#Msg) = {
-    log.debug("added delayed message " + msg)
-    delayedMessages += msg
-  }
+  def guardDelayedMessage(msg: Lang#Msg) = delayedMessages += msg
   def resendDelayedMessages() = {
-    log.debug("resendDelayedMessages " + delayedMessages)
     delayedMessages.foreach(msg => self.tell(msg, msg.sender.ref))
     delayedMessages.clear()
   }
@@ -91,7 +82,6 @@ object PriorityAndProposalBasedAgent{
     }
 
     def requestPriorityRaise(neg: NegotiationId): Lang#PriorityRaiseRequest = {
-      log.debug(s"requestPriorityRaise $neg")
       val req = priorityNegotiationHandler.start(neg)
       sendToAll(req)
       req

@@ -138,16 +138,13 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
       val liftedArgsByNameAndAg = ags map { case (agName, _) => agName -> q"${agentArgsRequired(agName).mapValues(p => q"() => ${p._2}")}" }
 
       val extraArgs = q"""
-        log.debug("initialAgents = " + initialAgents)
         private lazy val liftedArgsByNameAndAg: Map[String, Map[String, () => Any]] =
           Map(..${
             liftedArgsByNameAndAg.map{ case (name, tree) => q"$name -> $tree" }
           })
         protected def extraArgs(agent: String): Map[String, Any] = liftedArgsByNameAndAg(agent).map{
           case (n, f) =>
-            val v = f()
-            log.debug("arg(" + n + ")=" + v)
-            n -> v
+            n -> f()
         }
       """
 

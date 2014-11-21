@@ -20,7 +20,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
 
       def `queen's position` = negotiation over(x, y)
 
-      def Queen = agent withRole "chess queen" definedBy QueenSpec(100 millis) that (
+      def Queen = agent withRole "chess queen" definedBy QueenSpec() that (
         negotiates the `queen's position` `with` the.others reportingTo reporter.forwarding(WebPushServer) and
           hasConstraints(
             "direct-line sight" | {
@@ -48,7 +48,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
           (neg, values) => {
             controller.log.info(s"negotiation $neg successfully finished: $values")
             asys.scheduler.scheduleOnce(2 seconds, () => {
-              sys.error("finished")
+//              sys.error("finished")
               asys.shutdown()
               sys.exit(0)
             })(asys.dispatcher)

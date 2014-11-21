@@ -9,3 +9,4 @@
 - [ ] conflict reports
 - [x] acceptance in StateReport
 - [ ] table rows should be paginated (and filtered) in code, not DOM; it cases major freezes if there is a lot of messages
+- [ ] chess-board shows incorrect positions when the n-queen negotiation is run without response delay 

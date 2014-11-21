@@ -112,7 +112,6 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
         def next(neg: NegotiationId) = synchronized{
           val pr = p.getOrElse(neg, new Priority(0)).raise()
           p += neg -> pr
-          log.debug("InitialPriority.next called for negotiation " + neg + " priority given = " + pr)
           pr
         }
       }
@@ -295,7 +294,6 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
                 def scopeUpdated(): Unit = $negotiationScopeUpdatedTree
               }
               ${if(negotiationCreation) q"negotiationCreated(neg)" else q"" }
-              log.debug("neg created(macro): " + neg)
               neg
             }
           """

@@ -20,9 +20,6 @@ abstract class PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with
   type Negotiation <: Negotiation.DynamicScope with Negotiation.HasPriority with Negotiation.HasProposal[Lang]
   type Agent <: PriorityAndProposalBasedAgent[Lang]
 
-  log.debug("negotiationsInit = " + negotiationsInit)
-  log.debug("args = " + args)
-
   val spec: AgentSpecification.PriorityAndProposalBased[Agent, Lang]
 
   implicit def owner: Agent = this.asInstanceOf[Agent]
@@ -78,11 +75,8 @@ trait RequiresDistinctPriority extends NegotiationCreation{
 
   def initialPriority: Map[NegotiationId, Priority]
 
-  log.debug(s"initialPriority = $initialPriority, negotiations = $negotiations")
-
   override def negotiationCreated(neg: Negotiation) = {
     super.negotiationCreated(neg)
     neg.currentPriority update initialPriority(neg.id)
-    log.debug(s"neg.currentPriority = ${neg.currentPriority.raw}, neg.currentProposal = ${neg.currentProposal.raw}")
   }
 }

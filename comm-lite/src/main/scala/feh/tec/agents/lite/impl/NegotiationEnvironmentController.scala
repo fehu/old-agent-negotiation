@@ -64,16 +64,12 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
           case AgentNegDef(negName, scope, extra) =>
             NegotiationInit(NegotiationId(negName), issuesByNegotiation(negName).map(issues).toSet)
         }: (AgentNegDef => NegotiationInit)}
-      log.debug("extraArgs in createAgent")
-      val args = extraArgs(nme)
-      log.debug("extraArgs in createAgent = " + args)
 
-      log.debug("negInits = " + negInits)
       f(Map(
         "uniqueName" -> uniqueName,
         "role" -> NegotiationRole(rle),
         "negotiationsInit" -> negInits,
-        "args" -> args
+        "args" -> extraArgs(nme)
       )) -> d
     }
 
@@ -84,24 +80,20 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
       systemAgents = systemAgentsInit.map(_())
       sysAgentByRole = systemAgents.map(ag => ag.id.role.asInstanceOf[SystemRole] -> ag).toMap
 
-      log.debug("initializing")
       val refsAndDefs = spawns flatMap {
         case (agName, count) =>
           val (agDef, f) = initialAgentsByName(agName)
-          log.debug(s"agName = $agName, count = $count, agDef = $agDef, f = $f")
           for (c <- 1 to count)
             yield createAgent(c, agDef, f)
       }
       currentAgents = refsAndDefs.keySet
 
-      log.debug("currentAgents = " + currentAgents)
       initialAgentsCreated(refsAndDefs.mapValues{
         adef => adef.negotiations.map{
           case AgentNegDef(neg, scope, _) => NegotiationId(neg) -> scope
         }.toMap
       })
       currentAgents foreach sendAndProcessAnswer(SystemMessage.Initialize, timeouts.initialize, _.mapTo[SystemMessage.Initialized.type])
-      log.debug("sendAndProcessAnswer")
       state = NegotiationState.Initialized
     }
     else wrongMessageForCurrentState(SystemMessage.Initialize)
@@ -129,11 +121,8 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
     else wrongMessageForCurrentState(SystemMessage.Reset)
 
   protected def sendAndProcessAnswer[R](msg: AbstractMessage, timeout: Timeout, f: Future[Any] => Future[R])(ag: AgentRef): R = {
-    log.debug(s"sendAndProcessAnswer(msg = $msg, timeout = $timeout)")
     implicit def t = timeout
-    val res = Await.result(f(ag.ref ? msg), t.duration)
-    log.debug(s"sendAndProcessAnswer(res = $res)")
-    res
+    Await.result(f(ag.ref ? msg), t.duration)
   }
 
   protected def newScope(ag: AgentRef, scope: Set[AgentRef], neg: NegotiationId) =

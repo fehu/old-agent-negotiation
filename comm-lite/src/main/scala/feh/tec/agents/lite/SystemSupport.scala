@@ -102,7 +102,6 @@ trait ResponseDelay[Lang <: NegotiationLanguage] extends AgentHelpers[Lang] with
 
   private def responseDelayHook: (AgentRef, Lang#Msg) => Boolean = {
     case (to, msg) if responseDelay.toMillis != 0 =>
-//      log.debug(s"delaying message $msg for $to")
       context.system.scheduler.scheduleOnce(responseDelay, to.ref, msg)(context.dispatcher)
       false
     case _ => true
