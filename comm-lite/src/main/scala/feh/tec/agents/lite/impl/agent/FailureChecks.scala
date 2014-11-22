@@ -1,10 +1,22 @@
 package feh.tec.agents.lite.impl.agent
 
+import akka.actor.Actor
 import feh.tec.agents.lite.Message.ProposalId
 import feh.tec.agents.lite._
 import feh.util._
 import feh.tec.agents.lite.impl.FailedConfigurationsChecks
 import scala.collection.mutable
+
+object FailureChecks{
+  case class GuardFailedConfiguration(conf: PartialValuesConfiguration, priority: Priority)
+                                     (implicit val sender: AgentRef)
+    extends Message.HasPriority /*with Message*/
+  {
+    val negotiation = conf.negotiation
+
+    def asString = s"GuardFailedConfiguration($conf) by $sender"
+  }
+}
 
 trait FailureChecks[Lang <: Language.ProposalBased with Language.HasPriority]
   extends FailedConfigurationsChecks[Lang] with AgentHelpers[Lang]
@@ -30,7 +42,7 @@ trait FailureChecks[Lang <: Language.ProposalBased with Language.HasPriority]
 
   /** yes / no / None = maybe */
   def repeatingAFailure(acceptance: Lang#Acceptance): Option[Boolean] = {
-    log.debug("repeatingAFailure?")
+//    log.debug("repeatingAFailure?")
     val evidenceOpt = failureCheckEvidences.get(acceptance.negotiation).filter(_._1 == acceptance.respondingTo)
     val evidence = evidenceOpt map{
       case (id, vals) =>
@@ -44,25 +56,35 @@ trait FailureChecks[Lang <: Language.ProposalBased with Language.HasPriority]
     }
 
     val failOpt = failureFuncsFor(acceptance.negotiation, get(acceptance.negotiation).currentValues()).map(_(evidence))
-    log.debug("repeatingAFailure? " + failOpt)
+//    log.debug("repeatingAFailure? " + failOpt)
     if(failOpt.exists(_.contains(true))) Some(true)
     else if (failOpt.exists(_.isEmpty)) None
     else Some(false)
   }
 
+
+  override def process: PartialFunction[Lang#Msg, Any] = ({
+    case FailureChecks.GuardFailedConfiguration(conf, _) =>
+      guardFailedConfiguration(conf)
+    //      log.debug("Failed Configuration Guarded " + conf)
+  }: Actor.Receive) orElse super.process
+
   /** Guards functions for checking the configuration given */
   def guardFailedConfiguration(failed: PartialValuesConfiguration): Unit = {
 
     def failure(evidence: Map[Priority, Map[Var, Any]], myValues: Map[Var, Any], myPriority: Priority): Option[Boolean] = {
-      val (mentionsMe, withoutMe) = failed.configurations.partition{ case (_, `myValues`) => true }
-      assert(mentionsMe.size == 1)
-      if(withoutMe.forall(_._1 > myPriority)){
+      val (mentionsMe, withoutMe) = failed.configurations.partition{ PartialFunction.cond(_){ case (`myPriority`, `myValues`) => true } }
+      if(mentionsMe.isEmpty) Some(false)
+      else if(withoutMe.forall(_._1 > myPriority)){
         val satisfies = withoutMe.map{
           case (p, vals) =>  evidence.get(p).map(_ == vals)
         }
         if(satisfies.exists(_.isEmpty)) None
         else if(satisfies.exists(_.contains(false))) Some(false)
-        else Some(true)
+        else {
+//          log.debug(s"failure confirmed: evidence=$evidence,\nmyValues=$myValues, myPriority=$myPriority,\nfailed.configurations=$failed.configurations")
+          Some(true)
+        }
       }
       else Some(false)
     }

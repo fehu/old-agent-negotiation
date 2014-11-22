@@ -11,7 +11,7 @@ import feh.tec.agents.lite.impl.NegotiationEnvironmentController
 trait DefaultReportPrinter extends ReportPrinter{
   protected lazy val DateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
-  def print(r: AgentReport): String = s"[${DateFormat.format(new Date(r.at))}] $r"
+  def print(r: AgentReport): String = s"[${DateFormat.format(new Date(r.at))}] $r" //todo: 15% CPU on printing Message.Accepted
 }
 
 class DefaultReportWriter(val writeTo: File) extends ReportWriter with DefaultReportPrinter with ReportForwarder with ActorLogging{

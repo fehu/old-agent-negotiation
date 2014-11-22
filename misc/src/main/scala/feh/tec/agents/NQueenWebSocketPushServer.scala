@@ -3,7 +3,7 @@ package feh.tec.agents
 import akka.actor.{Props, ActorSystem}
 import feh.tec.agents.lite.Message.ProposalId
 import feh.tec.agents.lite._
-import scala.concurrent.duration._
+import feh.util._
 import feh.tec.web.{WebSocketPushServerCreation, WebSocketPushServer}
 import feh.tec.web.WebSocketPushServer.Push
 import feh.tec.web.common.{WebSocketMessages, NQueenMessages}
@@ -13,7 +13,8 @@ import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
 
 class NQueenWebSocketPushServer(neg: NegotiationId,
-                                flushFrequency: FiniteDuration)
+                                flushFrequency: FiniteDuration,
+                                liteReporting: Boolean)
   extends WebSocketPushServer
 {
   import feh.tec.web.NQueenProtocol._
@@ -98,7 +99,14 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
 //      super.receive(push(bulk))
     // bulk send buff contents and clear
     case FlushReports =>
-      val bulk = NQueenMessages.BulkReport(reportsBuff.toList flatMap reportToBulkable)
+      val preBulk = NQueenMessages.BulkReport(reportsBuff.toList flatMap reportToBulkable)
+
+      val bulk =
+        if(liteReporting) preBulk.copy(
+          preBulk.messages.filter(_.reportsState).groupBy(_.by).mapValues(_.maxBy(_.at)).values.toSeq
+        )
+        else preBulk
+
       reportsBuff.clear()
       super.receive(push(bulk))
     case _: SystemMessage.NegotiationFinished =>
@@ -123,5 +131,5 @@ class NQueenWebSocketPushServerBuilder(host: String, port: Int,
                                       (implicit asys: ActorSystem)
   extends WebSocketPushServerCreation(host, port, "NQueenWebServer", onConnection)
 {
-  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, flushFrequency))
+  override def serverProps = Props(new NQueenWebSocketPushServer(negotiationId, flushFrequency, liteReporting = true))
 }

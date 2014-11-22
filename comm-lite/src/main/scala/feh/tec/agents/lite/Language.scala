@@ -56,6 +56,7 @@ object Message{
   }
 
   trait ProposalResponse extends Message.HasPriority{
+    def accepted: Boolean
     def respondingTo: ProposalId
     def myValues: Map[Var, Any]
   }
@@ -63,10 +64,12 @@ object Message{
   case class Accepted(negotiation: NegotiationId, respondingTo: ProposalId, priority: Priority, myValues: Map[Var, Any], waiting: Boolean)
                      (implicit val sender: AgentRef) extends ProposalResponse {
     def asString = s"I accept your offer ($priority)${if (waiting) " [Waiting]" else ""}"
+    final def accepted = true
   }
   case class Rejected(negotiation: NegotiationId, respondingTo: ProposalId, priority: Priority, myValues: Map[Var, Any])
                      (implicit val sender: AgentRef) extends ProposalResponse {
     def asString = s"I reject your offer ($priority)"
+    final def accepted = false
   }
 
   class PriorityRaiseRequestId{

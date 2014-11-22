@@ -395,6 +395,7 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
     def addConstraintsByNegotiationArg(agName: String) =
       addAgentArgs(agName, constraintsByNegotiationArg, constraintsByNegotiationType, getConstraintsByNegotiation(agName))
 
+    // todo: up to 14% op CPU (?)
     def seqToTuple = q"""
       (s: Seq[Any]) => ${
       Match(q"s", (for(i <- 2 to 22) yield
