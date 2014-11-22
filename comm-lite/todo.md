@@ -9,4 +9,6 @@
 - [ ] connect `when failed` controller behaviour definition
 - [x] remove most of debug logs
 - [ ] remove restrictions on valid code in `when finished` and `when failed`
-- [ ] add reporting configuration to agent
+- [x] add reporting configuration to agent
+- [ ] reduce usage of mutable maps 
+- [ ] change report timing from millis to nanos

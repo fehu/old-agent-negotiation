@@ -134,7 +134,13 @@ class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.AllVa
         }
     }
   }
-  
+
+  initialize before {
+    ag =>
+      ag.Reporting.Messages = false
+      ag.Reporting.States = false
+  }
+
   initialize after {
     ag => _ => ag.log.info("initialized")
   }

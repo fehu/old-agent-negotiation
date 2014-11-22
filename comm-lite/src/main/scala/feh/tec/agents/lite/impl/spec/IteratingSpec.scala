@@ -7,9 +7,11 @@ import feh.tec.agents.lite.spec.AgentSpecification
 import feh.util._
 
 object IteratingSpec{
-  type Agent[Lang <: Language.ProposalBased with Language.HasPriority] = PriorityAndProposalBasedAgent[Lang] with DomainIterating[Lang] with AgentHelpers[Lang]{
-    type Negotiation <: Negotiation.HasProposal[Lang] with Negotiation.HasPriority with Negotiation.HasIterator
-  }
+  type Agent[Lang <: Language.ProposalBased with Language.HasPriority] =
+    PriorityAndProposalBasedAgent[Lang] with DomainIterating[Lang] with AgentHelpers[Lang] with ReportControlInterface
+    {
+      type Negotiation <: Negotiation.HasProposal[Lang] with Negotiation.HasPriority with Negotiation.HasIterator
+    }
 
   trait AllVars[Ag <: IteratingSpec.Agent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
     extends AgentSpecification.Iterating[Ag, Lang]

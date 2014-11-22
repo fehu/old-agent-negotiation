@@ -39,13 +39,18 @@ object AgentReport{
 trait AgentReporting[Lang <: NegotiationLanguage] extends NegotiatingAgent[Lang] with SpeakingSystemSupport[Lang]{
   val reportingTo: Map[NegotiationId, AgentRef]
 
-  protected def report(r: AgentReport) = reportingTo.get(r.negotiation) foreach (_.ref ! r)
+  protected def report(enabled: Boolean, r: AgentReport) = reportingTo.get(r.negotiation) foreach (_.ref ! r -> enabled)
 }
 
 object AgentReporting{
 
   trait AutoMessage[Lang <: NegotiationLanguage] extends AgentReporting[Lang] with AgentHelpers[Lang] with SystemSupport {
-    protected def messageReportHook(to: AgentRef, msg: Lang#Msg) = { report(MessageReport(msg, to, extraMessage)); true }
+    protected def messageReportHook(to: AgentRef, msg: Lang#Msg) = {
+      report(autoMessage, MessageReport(msg, to, extraMessage))
+      true
+    }
+
+    protected def autoMessage: Boolean
 
     abstract override def process: PartialFunction[Lang#Msg, Any] = {
       case msg if super.process.isDefinedAt(msg) => hooks.OnSend.withHooks(messageReportHook)(super.process(msg))
@@ -70,15 +75,28 @@ object AgentReporting{
 
   trait AutoState[Lang <: NegotiationLanguage] extends AgentReporting[Lang] {
     type Negotiation <: Negotiation.ChangeHooks
-    
+
+    protected def autoState: Boolean
+
     for(neg <- negotiations){
-      neg.ChangeHooks.add("state auto report", changes => report(StateReport(neg.id, changes, "changes")))
+      neg.ChangeHooks.add("state auto report", changes => report(autoState, StateReport(neg.id, changes, "changes")))
     }
   }
 }
 
+trait ReportControlInterface{
+  object Reporting{
+    var States = true
+    var Messages = true
+  }
+}
+
 trait AutoReporting[Lang <: NegotiationLanguage] extends AgentReporting.AutoMessage[Lang]
-  with AgentReporting.AutoState[Lang] with AgentReporting.StateByDemand[Lang]
+  with AgentReporting.AutoState[Lang] with AgentReporting.StateByDemand[Lang] with ReportControlInterface
+{
+  protected def autoState = Reporting.States
+  protected def autoMessage = Reporting.Messages
+}
 
 case class ReportListenerRef[T <: ReportListener](clazz: Class[T], forward: List[ActorRef])
 
@@ -99,10 +117,10 @@ trait ReportListenerControllerSupport {
 }
 
 trait ReportListener extends SystemAgent{
-  def reportReceived(r: AgentReport)
+  def reportReceived(r: AgentReport, printEnabled: Boolean)
 
   def receive: Actor.Receive = {
-    case r: AgentReport => reportReceived(r)
+    case (r: AgentReport, printEnabled: Boolean) => reportReceived(r, printEnabled)
   }
 }
 
@@ -162,7 +180,7 @@ trait ReportPrinter extends ReportListener{
 trait ReportWriter extends ReportPrinter{
   val writeTo: File
 
-  def reportReceived(r: AgentReport): Unit = {
+  def reportReceived(r: AgentReport, printEnabled: Boolean): Unit = if(printEnabled){
     IOUtils.write(print(r), writer)
     writer.newLine()
     writer.flush()
@@ -179,8 +197,8 @@ trait ReportForwarder extends ReportListener{
     case AgentReport.StopForward(to)  => forwardTo -= to
   }
 
-  abstract override def reportReceived(r: AgentReport): Unit = {
-    super.reportReceived(r)
+  abstract override def reportReceived(r: AgentReport, printEnabled: Boolean): Unit = {
+    super.reportReceived(r, printEnabled)
     forwardTo foreach (_ ! r)
   }
 }

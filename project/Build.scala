@@ -18,6 +18,7 @@ object  Build extends sbt.Build {
     organization  := "feh.agents",
     version       := Version,
     scalaVersion  := ScalaVersion,
+//    javaOptions   += "-Xmx4000M -XX:MaxPermSize=1024 -Xss1M",
 //    scalacOptions ++= Seq("-explaintypes"),
 //    scalacOptions ++= Seq("-deprecation"),
 //    scalacOptions ++= Seq("-Ydebug"),

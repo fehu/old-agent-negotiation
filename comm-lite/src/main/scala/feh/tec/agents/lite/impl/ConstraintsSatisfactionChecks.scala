@@ -19,6 +19,7 @@ trait ConstraintsSatisfactionChecks {
   /** should be generated in macro */
   protected def seqToTuple(seq: Seq[Any]): Product
 
+  // todo: up to 14% of CPU and 17% of MEM
   protected def satisfiesParts(part: ConstraintPart[AgentVarConstraintDef], proposed: Map[Var, Any], myValues: Map[Var, Any]): Boolean = {
     def recCall(p: ConstraintPart[AgentVarConstraintDef]): Boolean = satisfiesParts(p, proposed, myValues)
     part match {

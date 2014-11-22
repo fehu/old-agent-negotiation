@@ -34,7 +34,7 @@ trait AgentHelpers[Lang <: NegotiationLanguage] extends ActorLogging{
   }
 
   implicit def agentRefWrapper(ref: AgentRef): AgentRefWrapper = new AgentRefWrapper(ref) {
-    def !(msg: Lang#Msg) = { // todo: up to 24% of MEM allocation, Message Reports - 1st place in memory allocated for classes
+    def !(msg: Lang#Msg) = {
       if(hooks.OnSend.get forall (_(ref, msg)))
         ref.ref ! msg
     }
