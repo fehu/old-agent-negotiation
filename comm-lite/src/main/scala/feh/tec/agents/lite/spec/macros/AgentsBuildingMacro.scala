@@ -3,9 +3,10 @@ package feh.tec.agents.lite.spec.macros
 import akka.actor.ActorRef
 import feh.tec.agents.lite.AgentCreationInterface.NegotiationInit
 import feh.tec.agents.lite._
-import feh.tec.agents.lite.impl.agent
+import feh.tec.agents.lite.impl.agent.FailureChecks
+import feh.tec.agents.lite.impl.{FailedConfigurationsChecks, agent}
 import feh.tec.agents.lite.impl.spec.{IteratingSpec, PriorityAndProposalBasedAgentSpec}
-import feh.tec.agents.lite.spec.NegotiationSpecification
+import feh.tec.agents.lite.spec.{AgentSpecification, NegotiationSpecification}
 import feh.util._
 
 import scala.collection.mutable
@@ -27,16 +28,17 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
 
   def AgentBuildSegments(raw: NegotiationRaw) =
     EmptyAgentTrees(raw) ::
-      PriorityAndProposalBasedAgentSegment(raw) ::
-      IteratingAllVarsAgentSegment(raw) ::
-      RequiresDistinctPriorityAgentSegment(raw) ::
-      ReportingAgentSegment(raw) ::
-      TypesDefinitionsAgentSegment ::
-      CreateNegotiationAgentSegment ::
-      DomainIteratorsAgentSegment ::
-      ConstraintsByNegotiationAgentSegment ::
-      SpecAgentSegment(raw) ::
-      ResponseDelayAgentSegment :: Nil
+    PriorityAndProposalBasedAgentSegment(raw) ::
+    IteratingAllVarsAgentSegment(raw) ::
+    RequiresDistinctPriorityAgentSegment(raw) ::
+    FailedConfigurationsChecksMacroSegment(raw) ::
+    ReportingAgentSegment(raw) ::
+    TypesDefinitionsAgentSegment ::
+    CreateNegotiationAgentSegment ::
+    DomainIteratorsAgentSegment ::
+    ConstraintsByNegotiationAgentSegment ::
+    SpecAgentSegment(raw) ::
+    ResponseDelayAgentSegment :: Nil
 
 
   protected def transform(in: List[Raw.AgentDef])(f: (ActorTrees, Raw.AgentDef) => ActorTrees): I[(AgentName, ActorTrees)] =
@@ -140,6 +142,32 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
             }(ag)
         }
         Trees(if (requireDistinctPriority.nonEmpty) controller.append.body(controllerExtra) else controller, newAgs)
+    }
+  }
+
+  def FailedConfigurationsChecksMacroSegment(raw: NegotiationRaw) = {
+    val failedConfigurationsChecks = raw.agents.filter(
+      _.spec.actualType.member(TermName("agentTag"))
+        .typeSignature.resultType.typeArgs.filter(_ <:< typeOf[AbstractAgent]).ensuring(_.size == 1)
+        .head <:< typeOf[FailedConfigurationsChecks[_]]
+    )
+    val failedConfigurationsChecksTpe = typeOf[FailureChecks[Language.ProposalBased with Language.HasPriority]]
+
+    //    val agTag = raw.agents.map(_.spec.actualType.member(TermName("agentTag"))).ensuring(_.size == 1).head
+//    val agTpe = agTag.typeSignature.resultType.typeArgs.filter(_ <:< typeOf[AbstractAgent]).ensuring(_.size == 1).head
+
+//    c.abort(NoPosition, showRaw(failedConfigurationsChecks))
+    MacroSegment{
+      case trees@Trees(_, ags) =>
+//        c.abort(NoPosition, showRaw(ags))
+        val newAgs = ags.map{
+          transform(failedConfigurationsChecks){
+            (tr, raw) =>
+              val parent = replaceLanguageTypeArg(failedConfigurationsChecksTpe, tr)
+              tr.append.parents(parent)
+          }
+        }
+        trees.copy(agents = newAgs)
     }
   }
 
@@ -260,6 +288,7 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
             .mapValues(_.map(replaceLanguageTypeArg(_, tr)))
             .toList.map{ case (tName, ext :: mix) => q"type $tName = $ext with ..$mix" }
 
+          c.info(NoPosition, typeDefs.map(showCode(_)).mkString("\n"), true)
           name -> tr.prepend.body(typeDefs: _*)
         case system => system
       }

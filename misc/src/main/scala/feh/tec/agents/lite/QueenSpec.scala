@@ -3,10 +3,12 @@ package feh.tec.agents.lite
 import java.util.UUID
 
 import feh.tec.agents.lite.Message.ProposalId
+import feh.tec.agents.lite.impl.FailedConfigurationsChecks
 import feh.tec.agents.lite.impl.agent.create
 import feh.util._
 import feh.tec.agents.lite.spec.RequiresDistinctPriority
 import scala.collection.mutable
+import scala.reflect.ClassTag
 
 object QueenSpec{
   def apply() = new QueenSpec
@@ -20,11 +22,16 @@ object QueenSpec{
 
 //  case class CheckAcceptance(neg: NegotiationId, pid: ProposalId) extends UserMessage
   
-  case object FallbackState extends NegotiationState 
+  case object FallbackState extends NegotiationState
+
+  type Agent = create.PPI.Ag with FailedConfigurationsChecks[create.PPI.Lang]
 }
 
-class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
-  import QueenSpec._
+import QueenSpec._
+
+class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.AllVarsSpec[Agent]
+  with RequiresDistinctPriority
+{
 
   val priorities = mutable.HashMap.empty[NegotiationId, mutable.HashMap[AgentRef, Option[Priority]]]
 
@@ -50,7 +57,7 @@ class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
 
   def whenProposalAccepted(msg: Message.ProposalResponse)(implicit ag: create.PPI.Ag): Unit = whenProposalAccepted(msg.negotiation, msg.respondingTo)
   def whenProposalAccepted(neg: NegotiationId, pid: ProposalId)(implicit ag: create.PPI.Ag): Unit = if(allAccepted(neg, pid)){
-    ag.log.info("all accepted, setting state to **Waiting** " + proposalAcceptance(neg))
+//    ag.log.info("all accepted, setting state to **Waiting** " + proposalAcceptance(neg))
     ag.get(neg).currentState update NegotiationState.Waiting
   }
 
@@ -156,6 +163,10 @@ class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
       }
   }
 
+  def rejected(neg: NegotiationId)(implicit ag: Agent) = {
+    ag.sendToAll(ag.setNextProposal(neg))
+  }
+
   onRejection <:= {
     implicit ag => {
       case msg if msg.respondingTo != ag.get(msg.negotiation).currentProposal().id => //ignore
@@ -164,8 +175,7 @@ class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
         setProposalAcceptance(msg, v = true)
         whenProposalAccepted(msg)
       case msg if ag.myPriority isLowerThenOf  msg =>
-        setProposalAcceptance(msg, v = false)
-        ag.sendToAll(ag.setNextProposal(msg.negotiation))
+        rejected(msg.negotiation)
     }
   }
 
@@ -181,8 +191,15 @@ class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
     implicit ag => {
       case msg if msg.respondingTo != ag.get(msg.negotiation).currentProposal().id => //ignore
       case msg =>
-        setProposalAcceptance(msg, v = true)
-        whenProposalAccepted(msg)
+        ag.repeatingAFailure(msg) match {
+          case Some(true) =>
+            ag.log.info("rejecting repeating error")
+            rejected(msg.negotiation)
+          case Some(false) =>
+            setProposalAcceptance(msg, v = true)
+            whenProposalAccepted(msg)
+          case None => // wait for more
+        }
     }
   }
 

@@ -30,6 +30,7 @@ trait FailureChecks[Lang <: Language.ProposalBased with Language.HasPriority]
 
   /** yes / no / None = maybe */
   def repeatingAFailure(acceptance: Lang#Acceptance): Option[Boolean] = {
+    log.debug("repeatingAFailure?")
     val evidenceOpt = failureCheckEvidences.get(acceptance.negotiation).filter(_._1 == acceptance.respondingTo)
     val evidence = evidenceOpt map{
       case (id, vals) =>
@@ -43,7 +44,7 @@ trait FailureChecks[Lang <: Language.ProposalBased with Language.HasPriority]
     }
 
     val failOpt = failureFuncsFor(acceptance.negotiation, get(acceptance.negotiation).currentValues()).map(_(evidence))
-
+    log.debug("repeatingAFailure? " + failOpt)
     if(failOpt.exists(_.contains(true))) Some(true)
     else if (failOpt.exists(_.isEmpty)) None
     else Some(false)

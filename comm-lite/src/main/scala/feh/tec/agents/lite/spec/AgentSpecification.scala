@@ -6,6 +6,8 @@ import feh.tec.agents.lite._
 import feh.tec.agents.lite
 import feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent
 
+import scala.reflect.ClassTag
+
 trait AgentSpecification {
 //  type Agent <: AbstractAgent
 //  type BuildArgs
@@ -39,6 +41,8 @@ object AgentSpecification{
     extends AgentSpecification with AgentSpecificationExt[Ag]
   {
 //    type Agent = Ag
+
+    def agentTag: ClassTag[Ag]
 
     def initialize: DefBADS[Unit]
     def start: DefBADS[Unit]
@@ -99,12 +103,5 @@ object AgentSpecification{
 @deprecated("is related to a negotiation, not the entire agent")
 trait RequiresDistinctPriority{
   self: AgentSpecification =>
-
-}
-
-// a marker for macros
-trait FailureChecks{
-  self: AgentSpecification =>
-
 
 }

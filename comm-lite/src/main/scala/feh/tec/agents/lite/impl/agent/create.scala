@@ -35,7 +35,7 @@ object create {
     type Lang = NegotiationLanguage with Language.ProposalBased with Language.HasPriority
     type Ag = impl.spec.IteratingSpec.Agent[Lang]
 
-    trait AllVarsSpec extends PriorityAndProposalBasedAgentSpec[Ag, Lang] with IteratingSpec.AllVars[Ag, Lang] with SpecExt[Ag]
+    trait AllVarsSpec[A <: Ag] extends PriorityAndProposalBasedAgentSpec[A, Lang] with IteratingSpec.AllVars[A, Lang] with SpecExt[A]
   }
 
 /*
