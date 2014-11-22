@@ -2,9 +2,11 @@
 - [x] agent reporting for lite
 - [x] connect web backend
 - [x] provide constraints checking helper
+- [ ] constraints checking function must be build entirely by macro
 - [ ] change DomainIterator > DomainValuesStream 
 - [x] check with JProfiler
 - [ ] partial solution search
 - [ ] connect `when failed` controller behaviour definition
 - [x] remove most of debug logs
 - [ ] remove restrictions on valid code in `when finished` and `when failed`
+- [ ] add reporting configuration to agent

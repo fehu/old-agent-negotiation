@@ -95,9 +95,16 @@ object AgentSpecification{
   }
 }
 
-// is a marker
+// a marker for macros
 @deprecated("is related to a negotiation, not the entire agent")
 trait RequiresDistinctPriority{
   self: AgentSpecification =>
+
+}
+
+// a marker for macros
+trait FailureChecks{
+  self: AgentSpecification =>
+
 
 }

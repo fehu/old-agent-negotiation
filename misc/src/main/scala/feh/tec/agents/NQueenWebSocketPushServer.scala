@@ -66,7 +66,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
         val message = PartialFunction.condOpt(msg){
           case prop@Message.Proposal(ProposalId(id), `neg`, _, vals) =>
             buildMessage(_.Proposal(id.toString, getPosXY(vals)))
-          case acc@Message.Accepted(`neg`, offer, _, vals) =>
+          case acc@Message.Accepted(`neg`, offer, _, vals, _) =>
             buildMessage(_.Response(offer.id, getPosXY(vals), _.Acceptance))
           case rej@Message.Rejected(`neg`, offer, _, vals)  =>
             buildMessage(_.Response(offer.id, getPosXY(vals), _.Rejection))

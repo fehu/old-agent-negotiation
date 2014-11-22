@@ -132,10 +132,11 @@ class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
     import ag._
     msg match{
       case Message.Proposal(propId, negId, _, values) =>
+        val neg = get(negId)
         val response =
-          if(msg.satisfiesConstraints) Message.Accepted(negId, propId, get(negId).currentPriority(), get(negId).currentValues())
-          else Message.Rejected(negId, propId, get(negId).currentPriority(), get(negId).currentValues())
-//        priorities += msg.sender -> msg.priority
+          if(msg.satisfiesConstraints)
+            Message.Accepted(negId, propId, neg.currentPriority(), neg.currentValues(), neg.currentState() == NegotiationState.Waiting)
+          else Message.Rejected(negId, propId, neg.currentPriority(), get(negId).currentValues())
         respond(response)
     }
   }

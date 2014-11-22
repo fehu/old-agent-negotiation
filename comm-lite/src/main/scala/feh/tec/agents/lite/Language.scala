@@ -60,9 +60,9 @@ object Message{
     def myValues: Map[Var, Any]
   }
 
-  case class Accepted(negotiation: NegotiationId, respondingTo: ProposalId, priority: Priority, myValues: Map[Var, Any])
+  case class Accepted(negotiation: NegotiationId, respondingTo: ProposalId, priority: Priority, myValues: Map[Var, Any], waiting: Boolean)
                      (implicit val sender: AgentRef) extends ProposalResponse {
-    def asString = s"I accept your offer ($priority)"
+    def asString = s"I accept your offer ($priority)${if (waiting) " [Waiting]" else ""}"
   }
   case class Rejected(negotiation: NegotiationId, respondingTo: ProposalId, priority: Priority, myValues: Map[Var, Any])
                      (implicit val sender: AgentRef) extends ProposalResponse {
