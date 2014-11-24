@@ -28,6 +28,11 @@ object Language{
     type PriorityKeeping        = Message.Keep
     type PriorityRaising        = Message.Raise
   }
+
+  trait NegotiatesIssues extends NegotiationLanguage{
+    type IssueRequest   = Message.IssuesRequest
+    type IssueResponse  = Message.IssuesDemand
+  }
 }
 
 trait Message extends NegotiationMessage{
@@ -97,5 +102,21 @@ object Message{
   case class Raise(negotiation: NegotiationId, respondingTo: PriorityRaiseRequestId, priority: Priority)
                   (implicit val sender: AgentRef) extends PriorityRaiseResponse{
     def asString = s"I will raise my $priority"
+  }
+  
+  case class IssuesRequest(negotiation: NegotiationId, req: IssueChange.Change, priority: Priority)
+                         (implicit val sender: AgentRef) extends Message with HasPriority{
+    def asString = s"I request to $req for $negotiation ($priority)"
+  }
+  
+  object IssueChange{
+    trait Change
+    case class Add(preferences: Var*) extends Change { override def toString = "Add Issues " + preferences }
+    case class Remove(preferences: Var*) extends Change{ override def toString = "Remove Issues " + preferences }
+  }
+  
+  case class IssuesDemand(negotiation: NegotiationId, req: IssueChange.Change, priority: Priority)
+                         (implicit val sender: AgentRef) extends Message with HasPriority{
+    def asString = s"I demand you $req in $negotiation ($priority)"
   }
 }

@@ -18,7 +18,7 @@ trait AgentSpecification {
 //  protected val agent: Agent
 }
 
-trait AgentSpecificationExt[Ag <: PriorityAndProposalBasedAgent[_]]{
+trait AgentSpecificationExt[Ag <: AbstractAgent]{
 
   trait DefExt[T] extends ExtendableDefinition[Ag, T]
   /** Directly Settable */

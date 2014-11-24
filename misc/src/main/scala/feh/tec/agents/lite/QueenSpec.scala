@@ -3,8 +3,9 @@ package feh.tec.agents.lite
 import java.util.UUID
 
 import feh.tec.agents.lite.Message.ProposalId
-import feh.tec.agents.lite.impl.FailedConfigurationsChecks
+import feh.tec.agents.lite.impl.{ChangingIssues, FailedConfigurationsChecks}
 import feh.tec.agents.lite.impl.agent.{FailureChecks, create}
+import feh.tec.agents.lite.impl.spec.ChangingIssuesSpec
 import feh.util._
 import feh.tec.agents.lite.spec.RequiresDistinctPriority
 import scala.collection.mutable
@@ -24,13 +25,16 @@ object QueenSpec{
   
   case object FallbackState extends NegotiationState
 
-  type Agent = create.PPI.Ag with FailedConfigurationsChecks[create.PPI.Lang]
+  type Lang = create.PPI.Lang with Language.NegotiatesIssues
+  type Agent = create.PPI.Ag with FailedConfigurationsChecks[Lang] with ChangingIssues[Lang]{
+    type Negotiation <: Negotiation.HasProposal[Lang] with Negotiation.HasPriority with Negotiation.HasIterator with Negotiation.ChangingIssues
+  }
 }
 
 import QueenSpec._
 
 class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.AllVarsSpec[Agent]
-  with RequiresDistinctPriority
+  with ChangingIssuesSpec[Agent, Lang] with RequiresDistinctPriority
 {
 
   val priorities = mutable.HashMap.empty[NegotiationId, mutable.HashMap[AgentRef, Option[Priority]]]
@@ -89,7 +93,7 @@ class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.AllVa
   }
   
   def onFallbackRequest(req: FallbackRequest)(implicit ag: Agent): Unit = req match {
-    case req@FallbackRequest(negId, pr, id) =>
+    case req@FallbackRequest(negId, pr, reqId) =>
       import ag._
       val neg = get(negId)
       val myPr = neg.currentPriority()
@@ -102,7 +106,7 @@ class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.AllVa
           sendToAll(FailureChecks.GuardFailedConfiguration(failed, myPr))
         }
         ag.setNextProposal(negId)
-        val resp = IWillMove(negId, myPr, id)
+        val resp = IWillMove(negId, myPr, reqId)
         req.sender ! resp
         sendToAll(neg.currentProposal())
       }

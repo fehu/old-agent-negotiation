@@ -134,6 +134,10 @@ object Priority{
 
 object Negotiation{
 
+  trait ChangingIssues extends AbstractNegotiation{
+    lazy val currentIssues = new IdentStateVar[Seq[Var]]("current-issues", Nil)
+  }
+
   trait HasProposal[Lang <: Language.ProposalBased] extends AbstractNegotiation{
     lazy val currentProposal = new OptionStateVar[Lang#Proposal]("proposal")
 
@@ -150,14 +154,16 @@ object Negotiation{
     val scope = new IdentStateVar[Set[AgentRef]]("scope", Set())
 
     def scopeUpdated()
-
-    //override def statesAsString: List[String] = super.statesAsString ::: List(scope).map(_.toString)
   }
 
   trait HasIterator extends AbstractNegotiation{
     lazy val currentIterator = new OptionStateVar[ProposalEngine.DomainIterator]("domain-iterator")
+  }
 
-    //override def statesAsString: List[String] = super.statesAsString ::: List(currentIterator).map(_.toString)
+  trait HasIterators  extends HasIterator{
+    self: ChangingIssues =>
+
+    lazy val currentIterators = new IdentStateVar[Map[Set[Var], ProposalEngine.DomainIterator]]("domain-iterator", Map())
   }
 
   trait ChangeHooks extends AbstractNegotiation{

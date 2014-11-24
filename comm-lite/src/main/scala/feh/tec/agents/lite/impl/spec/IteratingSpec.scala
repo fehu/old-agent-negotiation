@@ -9,9 +9,9 @@ import feh.util._
 object IteratingSpec{
   type Agent[Lang <: Language.ProposalBased with Language.HasPriority] =
     PriorityAndProposalBasedAgent[Lang] with DomainIterating[Lang] with AgentHelpers[Lang] with ReportControlInterface
-    {
-      type Negotiation <: Negotiation.HasProposal[Lang] with Negotiation.HasPriority with Negotiation.HasIterator
-    }
+//    {
+//      type Negotiation <: Negotiation.HasProposal[Lang] with Negotiation.HasPriority with Negotiation.HasIterator
+//    }
 
   trait AllVars[Ag <: IteratingSpec.Agent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
     extends AgentSpecification.Iterating[Ag, Lang]
@@ -42,5 +42,15 @@ object IteratingSpec{
           })
         }
     )
+  }
+
+  trait ChangingIssues[Ag <: IteratingSpec.Agent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
+    extends AgentSpecification.Iterating[Ag, Lang]
+  {
+    self: AgentSpecification.PriorityAndProposalBased[Ag, Lang] =>
+
+    def newIterator = ???
+
+    def nextValues = ???
   }
 }
