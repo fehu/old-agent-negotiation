@@ -28,7 +28,14 @@ trait ControllerBuildingMacro[C <: whitebox.Context] extends ActorBuildingMacro[
   }
 }
 
+trait StandardControllerBuildingMacroInterface[C <: whitebox.Context]{
+  self: ControllerBuildingMacro[C] with HasConstraintsBuilder[C] =>
+
+  def controllerPropsExpr(dsl: c.Expr[spec.dsl.Negotiation], trees: Trees, cBuilder: ConstraintsBuilder): c.Expr[Props]
+}
+
 trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuildingMacro[C]
+  with StandardControllerBuildingMacroInterface[C]
   with AgentsBuildingMacro[C]
   with HasConstraintsBuilder[C]
 {

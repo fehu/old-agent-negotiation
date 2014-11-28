@@ -163,7 +163,7 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
         val newAgs = ags.map{
           transform(failedConfigurationsChecks){
             (tr, raw) =>
-              val parent = replaceLanguageTypeArg(failedConfigurationsChecksTpe, tr)
+              val parent = ??? //replaceLanguageTypeArg(failedConfigurationsChecksTpe, tr)
               tr.append.parents(parent)
           }
         }
@@ -171,16 +171,16 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
     }
   }
 
-  protected def agentLang(trees: ActorTrees): c.Type = trees.parents
-    .flatMap(_.typeArgs.filter(_ <:< typeOf[NegotiationLanguage]))
-    .sortWith(_ <:< _).lastOption getOrThrow s"no language type parameter found in $trees"
+//  protected def agentLang(trees: ActorTrees): c.Type = trees.parents
+//    .flatMap(_.typeArgs.filter(_ <:< typeOf[NegotiationLanguage]))
+//    .sortWith(_ <:< _).lastOption getOrThrow s"no language type parameter found in $trees"
 
 
   def ReportingAgentSegment(raw: NegotiationRaw) = {
     val reportingAgents = raw.agents.filter(_.negotiations.exists(_.reportingToOpt.isDefined))
 
     def agentParent(agTrees: ActorTrees): c.Type = typeOf[AutoReporting[NegotiationLanguage]] match {
-      case TypeRef(pre, sym, args) => internal.typeRef(pre, sym, agentLang(agTrees) :: Nil)
+      case TypeRef(pre, sym, args) => ??? //internal.typeRef(pre, sym, agentLang(agTrees) :: Nil)
     }
 
     def reportListenerRoleTree = q"feh.tec.agents.lite.impl.service.DefaultReportWriter.Role"
@@ -257,10 +257,10 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
     case other => other
   }
 
-  def replaceLanguageTypeArg(in: c.Type, forAgent: ActorTrees) = {
-    val langTpe = agentLang(forAgent)
-    replaceTypeArg(in, typeOf[Language], langTpe)
-  }
+//  def replaceLanguageTypeArg(in: c.Type, forAgent: ActorTrees) = {
+//    val langTpe = agentLang(forAgent)
+//    replaceTypeArg(in, typeOf[Language], langTpe)
+//  }
 
   def TypesDefinitionsAgentSegment = MacroSegment{
     case trees@Trees(_, ags) =>
@@ -285,7 +285,7 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
             .filter(_._2.nonEmpty)
 
           val typeDefs = abstractTypeMembers
-            .mapValues(_.map(replaceLanguageTypeArg(_, tr)))
+//            .mapValues(_.map(replaceLanguageTypeArg(_, tr)))
             .toList.map{ case (tName, ext :: mix) => q"type $tName = $ext with ..$mix" }
 
           c.info(NoPosition, typeDefs.map(showCode(_)).mkString("\n"), true)
@@ -438,7 +438,7 @@ trait AgentsBuildingMacroImpl[C <: whitebox.Context] extends AgentsBuildingMacro
               .flatMap(_.members.find(isAbstract(TermName("spec"))))
               .map(_.typeSignature.resultType).sortWith(_ <:< _)
               .last
-              .pipe(replaceLanguageTypeArg(_, tr))
+//              .pipe(replaceLanguageTypeArg(_, tr))
               .pipe(replaceTypeArg(_, typeOf[AbstractAgent], agentType))
 
 
