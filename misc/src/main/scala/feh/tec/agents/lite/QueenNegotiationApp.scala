@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 
 object QueenNegotiationApp extends App with WebsocketConf{
 
-  def negController(boardSize: Int) = controller {
+  def negController(boardSize: Int) = controllerExperimental {
     new Negotiation {
 
       var x = variable `with` domain(1 to boardSize)

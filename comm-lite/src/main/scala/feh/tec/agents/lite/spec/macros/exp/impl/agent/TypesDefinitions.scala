@@ -10,7 +10,7 @@ import scala.reflect.macros.whitebox
  * Contains `MacroSegmentsTransform`s for `TypesDefinitions` stage
  */
 trait TypesDefinitions[C <: whitebox.Context]{
-  self: AgentsBuildingMacroExperimentalBase[C] with ControllerBuildingMacroExperimental[C] =>
+  self: AgentsBuildingMacroExperimentalBase[C] =>
 
   import c.universe._
 
@@ -22,9 +22,11 @@ trait TypesDefinitions[C <: whitebox.Context]{
 //  protected[TypesDefinitions] def setAgentLang(in: MacroSegments)(agentName: String, lang: c.Type) =
 //    in.changeExtra[Map[String, c.Type]]("agent-lang", _.map{ _ + (agentName -> lang) })
 
-  protected def extractBounds(from: c.Type) = from match {
+  protected def discomposeTypesAndBounds(from: c.Type) = from match {
     case TypeBounds(_, RefinedType(tpes, _)) => tpes
     case TypeBounds(_, ref: TypeRef) => ref :: Nil
+    case RefinedType(tpes, _) => tpes
+    case ref: TypeRef => ref :: Nil
   }
 
   protected def unitedType(of: List[c.Type]) = internal.refinedType(of, internal.newScopeWith())
@@ -37,7 +39,7 @@ trait TypesDefinitions[C <: whitebox.Context]{
         case trees@Trees(_, agents) =>
           val newAgents = agents.map{
             case (name, tr@ActorTrees(cName, parents, _, _)) =>
-              val langCompTypes: List[Type] = parents.flatMap(_.typeArgs.filter(_.resultType <:< typeOf[Language])) flatMap extractBounds
+              val langCompTypes = parents.flatMap(_.typeArgs.filter(_.resultType <:< typeOf[Language])) flatMap discomposeTypesAndBounds
               val langType = unitedType(langCompTypes)
 
               name -> tr.prepend.body(q"type ${langTypeName(cName)} = $langType")

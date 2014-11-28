@@ -6,11 +6,9 @@ import scala.reflect.macros.whitebox
 
 trait AgentsBuildingMacroExperimentalImpl[C <: whitebox.Context] extends AgentsBuildingMacroExperimentalBase[C]
   with CreateAgentTrees[C]
-  with AggregatingParents[C]
+  with AggregateParents[C]
   with TypesDefinitions[C]
 {
-  self: ControllerBuildingMacroExperimental[C] =>
-
   def AgentSegmentsTransformation(raw: NegotiationRaw) =
     allCreateAgentTrees(raw) ::: allAggregatingParents(raw) ::: allTypesDefinitions
 }

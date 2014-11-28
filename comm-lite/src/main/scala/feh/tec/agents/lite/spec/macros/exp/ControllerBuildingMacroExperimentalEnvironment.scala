@@ -35,7 +35,10 @@ trait ControllerBuildingMacroExperimentalEnvironment[C <: whitebox.Context] exte
   }
 
   trait StagesOrderingComparisonImmutable extends StagesOrdering{
-    def compare(x: MacroSegments.Stage, y: MacroSegments.Stage) = ??? // todo
+    def compare(x: MacroSegments.Stage, y: MacroSegments.Stage) = precedence.stages.collectFirst{
+      case `x` => /* x < y */ -1
+      case `y` => /* x > y */ 1
+    }.get
   }
 
   object StagesOrdering{
@@ -84,20 +87,29 @@ trait ControllerBuildingMacroExperimentalEnvironment[C <: whitebox.Context] exte
     extends MacroSegments
   {
     def append(stage: MacroSegments.Stage, f: MacroSegment*) = copy(
-      stageApplication + (stage -> (stageApplication(stage) ::: f.toList))
+      stageApplication + (stage -> (stageApplication.getOrElse(stage, Nil) ::: f.toList))
     )
     def prepend(stage: MacroSegments.Stage, f: MacroSegment*) = copy(
-      stageApplication + (stage -> (f.toList ::: stageApplication(stage)))
+      stageApplication + (stage -> (f.toList ::: stageApplication.getOrElse(stage, Nil)))
     )
 
-    def changeExtra[T: ClassTag](name: String, f: Option[T] => Option[T]): MacroSegments = copy(
-      _extra = _extra + (name -> getExtra[T](name).map(t => _extra + (name -> t)).getOrElse(_extra))
-    )
+    def changeExtra[T: ClassTag](name: String, f: Option[T] => Option[T]): MacroSegments =
+      f(getExtra[T](name))
+        .map(t => copy(_extra = _extra + (name -> t)) )
+        .getOrElse(this)
 
     def getExtra[T: ClassTag](name: String) = _extra.get(name).flatMap{
       case t: T => Some(t)
       case _ => None
     }
+
+    override def toString() =
+      s"""
+         |#MacroSegments:
+         |    *stageApplication: $stageApplication
+         |    *stagesOrdering: $stagesOrdering
+         |    *extra: ${_extra}
+       """.stripMargin
   }
 
 }

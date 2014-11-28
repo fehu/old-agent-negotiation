@@ -8,4 +8,5 @@ package object dsl {
 
   def `def`(dsl: Agent): AgentSpecification = macro AgentSpecificationBuilder.build
   def controller(dsl: Negotiation): Props = ??? //macro NegotiationMacros.controller
+  def controllerExperimental(dsl: Negotiation): Props = macro NegotiationMacros.controllerExperimental
 }

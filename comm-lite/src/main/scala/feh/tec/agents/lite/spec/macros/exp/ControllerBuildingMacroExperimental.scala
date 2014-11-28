@@ -10,10 +10,10 @@ trait ControllerBuildingMacroExperimental[C <: whitebox.Context]
 
   def ControllerSegmentsTransformation(negRaw: NegotiationRaw): List[MacroSegments => MacroSegments]
 
-  def ControllerStagesOrder: Ordering[MacroSegments.Stage]
+  def ControllerStagesOrdering: StagesOrdering //Ordering[MacroSegments.Stage]
 
-  def ControllerBuildSegments(negRaw: NegotiationRaw): List[MacroSegment] =
-    Function.chain(ControllerSegmentsTransformation(negRaw))(MacroSegments.empty(ControllerStagesOrder)).segments
+//  def ControllerBuildSegments(negRaw: NegotiationRaw): List[MacroSegment] =
+//    Function.chain(ControllerSegmentsTransformation(negRaw))(MacroSegments.empty(ControllerStagesOrdering)).segments
 
 }
 
@@ -26,13 +26,15 @@ trait ControllerBuildingMacroExperimentalBase[C <: whitebox.Context] extends Con
     case object EmbedExtraArgsValues extends MacroSegments.Stage
     case object EmbedSpawnsAndTimeouts extends MacroSegments.Stage
     case object EmbedControllerDefinitions extends MacroSegments.Stage
+    case object Extra extends MacroSegments.Stage
   }
 
-  def ControllerStagesOrder = {
+  lazy val ControllerStagesOrdering = {
     import ControllerBuildingStages._
     import StagesOrdering._
     StagesOrdering(
-      AggregateParents >>: EmbedIssues >>: EmbedAgentProps >>: EmbedExtraArgsValues >>: EmbedSpawnsAndTimeouts >>: EmbedControllerDefinitions
+      AggregateParents >>: EmbedIssues >>: EmbedAgentProps >>: EmbedExtraArgsValues >>: EmbedSpawnsAndTimeouts
+        >>: EmbedControllerDefinitions >>: Extra
     )
   }
 }

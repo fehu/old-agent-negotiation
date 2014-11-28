@@ -14,8 +14,8 @@ import scala.reflect.macros.whitebox
 
 /** Contains `MacroSegmentsTransform`s for **Aggregating Parents**
   */
-trait AggregatingParents[C <: whitebox.Context]{
-  self: AgentsBuildingMacroExperimentalBase[C] with ControllerBuildingMacroExperimental[C] =>
+trait AggregateParents[C <: whitebox.Context]{
+  self: AgentsBuildingMacroExperimentalBase[C] =>
 
   def allAggregatingParents(raw: NegotiationRaw) =
     AgentSegmentParentPriorityAndProposalBased(raw) ::
@@ -30,7 +30,7 @@ trait AggregatingParents[C <: whitebox.Context]{
     val priorityAndProposalBased = raw.agents.filter(_.spec.actualType <:< c.typeOf[PriorityAndProposalBasedAgentSpec[_, _]])
 
     MacroSegmentsTransform{
-      _.append(AgentBuildingStages.AggregatingParents,
+      _.append(AgentBuildingStages.AggregateParents,
         MacroSegment {
           case Trees(controller, ags) =>
             val newAg = ags.map {
@@ -63,7 +63,7 @@ trait AggregatingParents[C <: whitebox.Context]{
     val iteratingAllVars = raw.agents.filter(_.spec.actualType <:< c.typeOf[IteratingSpec.AllVars[_, _]])
 
     MacroSegmentsTransform{
-      _.append(AgentBuildingStages.AggregatingParents,
+      _.append(AgentBuildingStages.AggregateParents,
         MacroSegment {
           case Trees(controller, ags) =>
             val newAgs = ags.map(
@@ -108,7 +108,7 @@ trait AggregatingParents[C <: whitebox.Context]{
     }
 
     MacroSegmentsTransform{
-      _.append(AgentBuildingStages.AggregatingParents,
+      _.append(AgentBuildingStages.AggregateParents,
         MacroSegment {
           case Trees(controller, ags) =>
             val newAgs = ags.map{
@@ -144,7 +144,7 @@ trait AggregatingParents[C <: whitebox.Context]{
     val failedConfigurationsChecksTpe = typeOf[FailureChecks[Language.ProposalBased with Language.HasPriority]]
 
     MacroSegmentsTransform {
-      _.append(AgentBuildingStages.AggregatingParents,
+      _.append(AgentBuildingStages.AggregateParents,
         MacroSegment{
           case trees@Trees(_, ags) =>
             val newAgs = ags.map{
@@ -195,7 +195,7 @@ trait AggregatingParents[C <: whitebox.Context]{
     )
 
     MacroSegmentsTransform{
-      _.append(AgentBuildingStages.AggregatingParents,
+      _.append(AgentBuildingStages.AggregateParents,
         MacroSegment{
           case Trees(controller, ags) =>
             val newAgs = ags map {
