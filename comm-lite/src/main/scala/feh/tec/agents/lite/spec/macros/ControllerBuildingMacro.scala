@@ -142,7 +142,8 @@ trait ControllerBuildingMacroImpl[C <: whitebox.Context] extends ControllerBuild
 
   def ExtraArgsValues = MacroSegment{
     case trees@Trees(controller, ags) =>
-      val liftedArgsByNameAndAg = ags map { case (agName, _) => agName -> q"${agentArgsRequired(agName).mapValues(p => q"() => ${p._2}")}" }
+      val liftedArgsByNameAndAg = ags map { case (agName, _) => agName -> q"${
+        agentArgsRequired(agName).mapValues(p => q"() => ${p._2}")}" }
 
       val extraArgs = q"""
         private lazy val liftedArgsByNameAndAg: Map[String, Map[String, () => Any]] =

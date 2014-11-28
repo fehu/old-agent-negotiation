@@ -17,6 +17,7 @@ trait AgentsBuildingMacro[C <: whitebox.Context] extends NegotiationBuildingMacr
   self: ControllerBuildingMacro[C] =>
 
   def AgentBuildSegments(negRaw: NegotiationRaw): List[MacroSegment]
+  @deprecated
   protected def agentArgsRequired(agent: String): Map[String, (c.Type, c.Tree)]
 }
 

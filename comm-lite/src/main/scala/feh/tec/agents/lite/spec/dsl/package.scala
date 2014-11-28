@@ -7,5 +7,5 @@ package object dsl {
   import scala.language.experimental.macros
 
   def `def`(dsl: Agent): AgentSpecification = macro AgentSpecificationBuilder.build
-  def controller(dsl: Negotiation): Props = macro NegotiationMacros.controller
+  def controller(dsl: Negotiation): Props = ??? //macro NegotiationMacros.controller
 }
