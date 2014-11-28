@@ -9,8 +9,19 @@ import scala.reflect.macros.whitebox
 trait ControllerBuildingMacroExperimentalEnvironment[C <: whitebox.Context] extends ActorBuildingMacro[C] {
 
   type AgentName = String
-  case class Trees(controller: ActorTrees, agents: Map[AgentName, ActorTrees])
-  object Trees{ def empty(name: String) = Trees(ActorTrees(name, Nil, Nil, Map()), Map()) }
+  case class Trees(controller: ActorTrees, agents: Map[AgentName, ActorTrees], _extra: Map[String, Any]){
+    def changeExtra[T: ClassTag](name: String, f: Option[T] => Option[T]): Trees =
+      f(getExtra[T](name))
+        .map(t => copy(_extra = _extra + (name -> t)) )
+        .getOrElse(this)
+
+    def getExtra[T: ClassTag](name: String) = _extra.get(name).flatMap{
+      case t: T => Some(t)
+      case _ => None
+    }
+    def extra[T : ClassTag](name: String) = getExtra[T](name).get
+  }
+  object Trees{ def empty(name: String) = Trees(ActorTrees(name, Nil, Nil, Map()), Map(), Map()) }
   type MacroSegment = Trees => Trees
 
   def MacroSegment(transform: PartialFunction[Trees, Trees]): MacroSegment = {
@@ -24,10 +35,10 @@ trait ControllerBuildingMacroExperimentalEnvironment[C <: whitebox.Context] exte
   object MacroSegments{
     trait Stage
 
-    def apply(stageApplication: Map[Stage, List[MacroSegment]], extra: Map[String, Any])
-             (implicit stagesOrdering: Ordering[Stage]): MacroSegments = MacroSegmentsImpl(stageApplication, extra)
+    def apply(stageApplication: Map[Stage, List[MacroSegment]])
+             (implicit stagesOrdering: Ordering[Stage]): MacroSegments = MacroSegmentsImpl(stageApplication)
 
-    def empty(implicit stagesOrdering: Ordering[Stage]) = apply(Map(), Map())
+    def empty(implicit stagesOrdering: Ordering[Stage]) = apply(Map())
   }
 
   trait StagesOrdering extends Ordering[MacroSegments.Stage]{
@@ -74,15 +85,10 @@ trait ControllerBuildingMacroExperimentalEnvironment[C <: whitebox.Context] exte
 
     def segments = stageApplication.toList.sortBy(_._1).flatMap(_._2)
 
-    def changeExtra[T : ClassTag](name: String, f: Option[T] => Option[T]): MacroSegments
-
-    def getExtra[T : ClassTag](name: String): Option[T]
-    def extra[T : ClassTag](name: String) = getExtra[T](name).get
-
     def apply(v1: Trees) = Function.chain(segments)(v1)
   }
 
-  case class MacroSegmentsImpl(stageApplication: Map[MacroSegments.Stage, List[MacroSegment]], _extra: Map[String, Any])
+  case class MacroSegmentsImpl(stageApplication: Map[MacroSegments.Stage, List[MacroSegment]])
                               (implicit val stagesOrdering: Ordering[MacroSegments.Stage])
     extends MacroSegments
   {
@@ -93,22 +99,11 @@ trait ControllerBuildingMacroExperimentalEnvironment[C <: whitebox.Context] exte
       stageApplication + (stage -> (f.toList ::: stageApplication.getOrElse(stage, Nil)))
     )
 
-    def changeExtra[T: ClassTag](name: String, f: Option[T] => Option[T]): MacroSegments =
-      f(getExtra[T](name))
-        .map(t => copy(_extra = _extra + (name -> t)) )
-        .getOrElse(this)
-
-    def getExtra[T: ClassTag](name: String) = _extra.get(name).flatMap{
-      case t: T => Some(t)
-      case _ => None
-    }
-
     override def toString() =
       s"""
          |#MacroSegments:
          |    *stageApplication: $stageApplication
          |    *stagesOrdering: $stagesOrdering
-         |    *extra: ${_extra}
        """.stripMargin
   }
 

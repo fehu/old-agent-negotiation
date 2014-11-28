@@ -7,7 +7,7 @@ import scala.reflect.macros.whitebox
 /** Contains `MacroSegmentsTransform`s for `CreateAgentTrees` stage
   */
 trait CreateAgentTrees[C <: whitebox.Context]{
-  self: AgentsBuildingMacroExperimentalBase[C] =>
+  self: AgentsBuildingMacroExperimentalBase[C] with ControllerBuildingMacroExperimental[C] =>
 
   def allCreateAgentTrees(raw: NegotiationRaw, anonAgentClassName: String = "$AgentAnonClass") =
     AgentSegmentEmptyAgentTrees(raw, anonAgentClassName) :: Nil
@@ -16,7 +16,7 @@ trait CreateAgentTrees[C <: whitebox.Context]{
     */
   def AgentSegmentEmptyAgentTrees(raw: NegotiationRaw, anonAgentClassName: String = "$AgentAnonClass") = MacroSegmentsTransform{
     _.append(AgentBuildingStages.CreateAgentTrees, {
-      case tr@Trees(_, ags) if ags.isEmpty =>
+      case tr if tr.agents.isEmpty =>
         val agents = raw.agents.map(_.name -> ActorTrees(anonAgentClassName, Nil, Nil, Map())).toMap
         tr.copy(agents = agents)
     })

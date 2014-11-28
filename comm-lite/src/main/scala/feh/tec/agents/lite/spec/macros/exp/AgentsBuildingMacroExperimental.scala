@@ -41,20 +41,20 @@ trait AgentsBuildingMacroExperimentalBase[C <: whitebox.Context] extends AgentsB
   protected def transform(in: List[Raw.AgentDef])(f: (ActorTrees, Raw.AgentDef) => ActorTrees): I[(AgentName, ActorTrees)] =
     original => in.find(_.name == original._1).map(raw => original._1 -> f(original._2, raw)) getOrElse original
 
-  protected def agentArgsRequired(in: MacroSegments): RequiredAgentArgs =
+  protected def agentArgsRequired(in: Trees): RequiredAgentArgs =
     in.getExtra[RequiredAgentArgs]("args-required") getOrElse Map()
 
   protected case class AddAgentArgs(agentName: String, argName: String, argType: c.Type, argTree: c.Tree)
 
-  protected implicit class MacroSegmentsWrapper(ms: MacroSegments) {
-    def addAgentArgs(addArgs: Seq[AddAgentArgs]*): MacroSegments = {
+  protected implicit class TreesWrapper(trees: Trees) {
+    def addAgentArgs(addArgs: Seq[AddAgentArgs]*): Trees = {
 
       def argsToAdd(args: RequiredAgentArgs) = addArgs.flatMap(_.map{
         case AddAgentArgs(agentName, argName, argType, argTree) =>
           agentName -> (args.getOrElse(agentName, Map()) + (argName ->(argType, argTree)))
       })
 
-      ms.changeExtra[RequiredAgentArgs]("args-required", opt =>
+      trees.changeExtra[RequiredAgentArgs]("args-required", opt =>
         Some{
           opt
             .map {args => args ++ argsToAdd(args)}

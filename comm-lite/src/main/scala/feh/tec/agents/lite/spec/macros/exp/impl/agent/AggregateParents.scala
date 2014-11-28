@@ -32,7 +32,7 @@ trait AggregateParents[C <: whitebox.Context]{
     MacroSegmentsTransform{
       _.append(AgentBuildingStages.AggregateParents,
         MacroSegment {
-          case Trees(controller, ags) =>
+          case Trees(controller, ags, extra) =>
             val newAg = ags.map {
               original =>
                 priorityAndProposalBased.find(_.name == original._1)
@@ -52,7 +52,7 @@ trait AggregateParents[C <: whitebox.Context]{
                   .getOrElse(original)
             }.toMap
 
-            Trees(controller, newAg)
+            Trees(controller, newAg, extra)
         }
       )}
   }
@@ -65,7 +65,7 @@ trait AggregateParents[C <: whitebox.Context]{
     MacroSegmentsTransform{
       _.append(AgentBuildingStages.AggregateParents,
         MacroSegment {
-          case Trees(controller, ags) =>
+          case Trees(controller, ags, extra) =>
             val newAgs = ags.map(
               transform(iteratingAllVars) {
                 (trees, raw) =>
@@ -75,7 +75,7 @@ trait AggregateParents[C <: whitebox.Context]{
                     )
               }
             )
-            Trees(controller, newAgs)
+            Trees(controller, newAgs, extra)
         }
       )
     }
@@ -110,7 +110,7 @@ trait AggregateParents[C <: whitebox.Context]{
     MacroSegmentsTransform{
       _.append(AgentBuildingStages.AggregateParents,
         MacroSegment {
-          case Trees(controller, ags) =>
+          case trees@Trees(controller, ags, extra) =>
             val newAgs = ags.map{
               transform(requireDistinctPriority) {
                 (trees, raw) =>
@@ -121,13 +121,13 @@ trait AggregateParents[C <: whitebox.Context]{
                     )
               }
             }
-            Trees(if (requireDistinctPriority.nonEmpty) controller.append.body(controllerExtra) else controller, newAgs)
+            Trees(if (requireDistinctPriority.nonEmpty) controller.append.body(controllerExtra) else controller, newAgs, extra)
+              .addAgentArgs(requireDistinctPriority.map{
+                case Raw.AgentDef(name, _, _, _) =>
+                  AddAgentArgs(name, "initial-priority", c.typeOf[Map[NegotiationId, Priority]], argTree(name))
+              })
         }
       )
-      .addAgentArgs(requireDistinctPriority.map{
-        case Raw.AgentDef(name, _, _, _) =>
-          AddAgentArgs(name, "initial-priority", c.typeOf[Map[NegotiationId, Priority]], argTree(name))
-      })
     }
   }
 
@@ -146,8 +146,8 @@ trait AggregateParents[C <: whitebox.Context]{
     MacroSegmentsTransform {
       _.append(AgentBuildingStages.AggregateParents,
         MacroSegment{
-          case trees@Trees(_, ags) =>
-            val newAgs = ags.map{
+          case trees =>
+            val newAgs = trees.agents.map{
               transform(failedConfigurationsChecks){
                 (tr, raw) =>
                   tr.append.parents(failedConfigurationsChecksTpe)
@@ -197,7 +197,7 @@ trait AggregateParents[C <: whitebox.Context]{
     MacroSegmentsTransform{
       _.append(AgentBuildingStages.AggregateParents,
         MacroSegment{
-          case Trees(controller, ags) =>
+          case Trees(controller, ags, extra) =>
             val newAgs = ags map {
               case (name, trees) if reportingAgents.exists(_.name == name) =>
                 val reportingTo = reportingAgents.find(_.name == name).get.negotiations.map{
@@ -219,18 +219,18 @@ trait AggregateParents[C <: whitebox.Context]{
             val sys = if(reportingAgents.nonEmpty) reportSysAgent :: Nil else Nil
             val newController = controller.append.parents(typeOf[lite.impl.service.ReportPrinterSupportBundle])
 
-            Trees(newController, newAgs ++ sys)
+            Trees(newController, newAgs ++ sys, extra)
+              .addAgentArgs(
+                reportingAgents.map(aDef => AddAgentArgs(aDef.name, "report-to", typeOf[AgentRef], reportToTree)),
+                Seq(
+                  AddAgentArgs("report-listener", "writeTo", typeOf[java.io.File], Ident(TermName("reportFile")) ),
+                  AddAgentArgs("report-listener", "role", typeOf[Role], reportListenerRoleTree),
+                  AddAgentArgs("report-listener", "controller", typeOf[ActorRef], q"self"),
+                  AddAgentArgs("report-listener", "confirmAllWaitingDelay", typeOf[FiniteDuration], q"timeouts.`confirm finished`")
+                )
+              )
         }
       )
-      .addAgentArgs(
-          reportingAgents.map(aDef => AddAgentArgs(aDef.name, "report-to", typeOf[AgentRef], reportToTree)),
-          Seq(
-            AddAgentArgs("report-listener", "writeTo", typeOf[java.io.File], Ident(TermName("reportFile")) ),
-            AddAgentArgs("report-listener", "role", typeOf[Role], reportListenerRoleTree),
-            AddAgentArgs("report-listener", "controller", typeOf[ActorRef], q"self"),
-            AddAgentArgs("report-listener", "confirmAllWaitingDelay", typeOf[FiniteDuration], q"timeouts.`confirm finished`")
-        )
-        )
     }
   }
 }

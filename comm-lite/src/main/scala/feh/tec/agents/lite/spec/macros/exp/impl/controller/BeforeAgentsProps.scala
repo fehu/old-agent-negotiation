@@ -17,10 +17,10 @@ trait BeforeAgentsProps[C <: whitebox.Context]{
   def ControllerSegmentParent = MacroSegmentsTransform(
     _.prepend(ControllerBuildingStages.AggregateParents,
       MacroSegment{
-        case Trees(controller, ags) =>
-          val newController = controller
+        case trees =>
+          val newController = trees.controller
             .prepend.parents(c.typeOf[NegotiationEnvironmentController])
-          Trees(newController, ags)
+          trees.copy(newController)
       }
     )
   )
@@ -28,7 +28,7 @@ trait BeforeAgentsProps[C <: whitebox.Context]{
   def ControllerSegmentEmbedIssuesAndDomainIteratorsCreators(raw: NegotiationRaw) = MacroSegmentsTransform(
     _.append(ControllerBuildingStages.EmbedIssues,
       MacroSegment{
-        case trees@Trees(controller, _) =>
+        case trees =>
           import c.universe._
 
           val (issues, domainIteratorsCreators) = raw.vars.map{
@@ -44,7 +44,7 @@ trait BeforeAgentsProps[C <: whitebox.Context]{
           }.unzip
           val issuesByNeg = raw.negotiations.map{ case NegotiationDef(name, i) => q"$name -> Seq(..$i)" }
 
-          trees.copy(controller = controller.append.body(q"""
+          trees.copy(controller = trees.controller.append.body(q"""
             protected val issues: Map[String, Var] = Map(..$issues)
             protected val issuesByNegotiation: Map[String, Seq[String]] = Map(..$issuesByNeg)
             protected val domainIteratorsCreators: Map[String, DomainIteratorBuilder[Var#Domain, Var#Tpe]] = Map(..$domainIteratorsCreators)

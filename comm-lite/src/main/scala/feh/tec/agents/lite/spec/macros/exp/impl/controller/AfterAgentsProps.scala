@@ -19,13 +19,15 @@ trait AfterAgentsProps[C <: whitebox.Context]{
     ControllerSegmentSupportBundle :: Nil
 
   def ControllerSegmentExtraArgsValues = MacroSegmentsTransform(
-    seg => seg.append(ControllerBuildingStages.EmbedExtraArgsValues,
+    _.append(ControllerBuildingStages.EmbedExtraArgsValues,
       MacroSegment{
-        case trees@Trees(controller, ags) =>
+        case trees =>
           import c.universe._
 
-          val liftedArgsByNameAndAg = ags map { case (agName, _) => agName -> q"${
-            agentArgsRequired(seg)(agName).mapValues(p => q"() => ${p._2}")}" }
+          val liftedArgsByNameAndAg = trees.agents map { case (agName, _) => agName -> q"${
+            agentArgsRequired(trees)(agName).mapValues(p => q"() => ${p._2}")}" }
+
+          c.abort(NoPosition, showRaw(agentArgsRequired))
 
           val extraArgs = q"""
             private lazy val liftedArgsByNameAndAg: Map[String, Map[String, () => Any]] =
@@ -38,7 +40,7 @@ trait AfterAgentsProps[C <: whitebox.Context]{
             }
           """
 
-          trees.copy(controller = controller.append.body(extraArgs))
+          trees.copy(controller = trees.controller.append.body(extraArgs))
       }
 
     )
@@ -47,7 +49,7 @@ trait AfterAgentsProps[C <: whitebox.Context]{
   def ControllerSegmentEmbedSpawnsAndTimeouts(raw: NegotiationRaw) = MacroSegmentsTransform(
     _.append(ControllerBuildingStages.EmbedSpawnsAndTimeouts,
       MacroSegment{
-        case trees@Trees(controller, _) =>
+        case trees =>
           import c.universe._
           
           val spawns = raw.spawns.flatMap{
@@ -58,7 +60,7 @@ trait AfterAgentsProps[C <: whitebox.Context]{
           val dur = raw.time.flatMap(_.mp).toMap
           def timeout(tr: c.Expr[FiniteDuration]) = q"akka.util.Timeout($tr)"
 
-          trees.copy(controller = controller.append.body(
+          trees.copy(controller = trees.controller.append.body(
             q"protected val spawns: Map[String, Int] = Map(..$spawns)",
             q"""
               import feh.tec.agents.lite.impl.NegotiationEnvironmentController._
@@ -79,10 +81,10 @@ trait AfterAgentsProps[C <: whitebox.Context]{
   def ControllerSegmentEmbedControllerDefs(raw: NegotiationRaw) = MacroSegmentsTransform(
     _.append(ControllerBuildingStages.EmbedControllerDefinitions,
       MacroSegment{
-        case trees@Trees(controller, _) =>
+        case trees =>
           import c.universe._
 
-          val newController = controller.append.body(
+          val newController = trees.controller.append.body(
             q"""def negotiationFinished(neg: NegotiationId, values: Seq[Map[Var, Any]]): Unit = {
              ..${
                   raw.controller.finished
@@ -109,14 +111,14 @@ trait AfterAgentsProps[C <: whitebox.Context]{
   def ControllerSegmentSupportBundle = MacroSegmentsTransform(
     _.append(ControllerBuildingStages.Extra,
       MacroSegment{
-        case trees@Trees(controller, _) =>
+        case trees =>
           import c.universe._
 
-          val newController = if(controller.parents.exists(_ <:< typeOf[impl.service.SupportBundle]))
-            controller.prepend.body(
+          val newController = if(trees.controller.parents.exists(_ <:< typeOf[impl.service.SupportBundle]))
+            trees.controller.prepend.body(
               q"def configInfo = feh.tec.agents.lite.impl.service.SupportBundle.Config(${Configs.controller[c.type](c)})"
             )
-          else controller
+          else trees.controller
 
           trees.copy(controller = newController)
       }

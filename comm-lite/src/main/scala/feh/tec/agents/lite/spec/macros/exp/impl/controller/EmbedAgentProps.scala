@@ -17,11 +17,11 @@ trait EmbedAgentProps[C <: whitebox.Context]{
   def ControllerSegmentEmbedAgentsProps(raw: NegotiationRaw, cBuilder: ConstraintsBuilder) = MacroSegmentsTransform(
     seg => seg.append(ControllerBuildingStages.EmbedAgentProps,
       MacroSegment{
-        case Trees(controller, ags) =>
+        case trees =>
           import c.universe._
 
           val rawNames = raw.agents.map(_.name)
-          val (agents, sysAgents) = ags.partition(rawNames contains _._1)
+          val (agents, sysAgents) = trees.agents.partition(rawNames contains _._1)
 
           val initialAgents: List[c.Expr[(NegotiationSpecification.AgentDef, NegotiationEnvironmentController#CreateInterface => AgentRef)]] = raw.agents map{
             case Raw.AgentDef(name, role, negs, spec) =>
@@ -38,23 +38,20 @@ trait EmbedAgentProps[C <: whitebox.Context]{
               val agentTrees = agents(name)
               val actorProps = actorCreatePropsExpr(agentTrees)
 
-              /*
-              val name = propsArgs("uniqueName").asInstanceOf[String]
-              val props = $actorProps(propsArgs)
-              val actorRef = implicitly[ActorSystem].actorOf(props, name)
-              AgentRef(Agent.Id(name, propsArgs("role").asInstanceOf[Role]), actorRef)
-               */
               val buildTree = q"""
                 (propsArgs: Map[String, Any]) => {
-                  ???
+                  val name = propsArgs("uniqueName").asInstanceOf[String]
+                  val props = $actorProps(propsArgs)
+                  val actorRef = implicitly[ActorSystem].actorOf(props, name)
+                  AgentRef(Agent.Id(name, propsArgs("role").asInstanceOf[Role]), actorRef)
                 }
               """
               c.Expr(q"$agentDef -> $buildTree")
           }
 
           val systemAgentsInit: List[c.Expr[() => AgentRef]] = sysAgents.toList.map{
-            case (name, trees) =>
-              val ci = actorCreatePropsExpr(trees)
+            case (name, tr) =>
+              val ci = actorCreatePropsExpr(tr)
               c.Expr[() => AgentRef](q"""
                 val args = extraArgs($name)
                 def props = $ci(args)
@@ -64,14 +61,14 @@ trait EmbedAgentProps[C <: whitebox.Context]{
               """)
           }
 
-          val newController = controller
+          val newController = trees.controller
             .append.body(q"""
                import feh.tec.agents.lite.spec.NegotiationSpecification._
                protected val initialAgents: List[(AgentDef, CreateInterface => AgentRef)] = List(..$initialAgents)
                protected val systemAgentsInit: Set[() => AgentRef] = Set(..$systemAgentsInit)
             """)
 
-          Trees(newController, ags)
+          trees.copy(newController)
       }
 
     )

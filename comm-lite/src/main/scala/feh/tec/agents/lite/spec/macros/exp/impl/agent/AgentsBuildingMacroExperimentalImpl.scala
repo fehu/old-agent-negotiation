@@ -8,7 +8,10 @@ trait AgentsBuildingMacroExperimentalImpl[C <: whitebox.Context] extends AgentsB
   with CreateAgentTrees[C]
   with AggregateParents[C]
   with TypesDefinitions[C]
+  with ValAndDefDefinitions[C]
 {
+  self: ControllerBuildingMacroExperimental[C] =>
+
   def AgentSegmentsTransformation(raw: NegotiationRaw) =
-    allCreateAgentTrees(raw) ::: allAggregatingParents(raw) ::: allTypesDefinitions
+    allCreateAgentTrees(raw) ::: allAggregatingParents(raw) ::: allTypesDefinitions ::: allValAndDefDefinitions(raw)
 }
