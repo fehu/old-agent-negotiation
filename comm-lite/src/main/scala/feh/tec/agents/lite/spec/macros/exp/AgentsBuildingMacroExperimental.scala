@@ -1,20 +1,19 @@
 package feh.tec.agents.lite.spec.macros.exp
 
-import feh.tec.agents.lite.spec.macros.AgentsBuildingMacro
+import feh.tec.agents.lite.spec.macros.{NegotiationBuildingMacro, AgentsBuildingMacro}
 import feh.util._
 
-import scala.collection.mutable
 import scala.reflect.macros.whitebox
 
-trait AgentsBuildingMacroExperimental[C <: whitebox.Context] extends AgentsBuildingMacro[C]{
-  self: ControllerBuildingMacroExperimental[C] =>
+trait AgentsBuildingMacroExperimental[C <: whitebox.Context]
+  extends ControllerBuildingMacroExperimentalEnvironment[C] with NegotiationBuildingMacro[C]
+{
+  def AgentSegmentsTransformation(negRaw: NegotiationRaw): List[MacroSegments => MacroSegments]
 
-  def SegmentsTransformation(negRaw: NegotiationRaw): List[MacroSegments => MacroSegments]
-
-  def stagesOrder: Ordering[MacroSegments.Stage]
+  def agentStagesOrder: Ordering[MacroSegments.Stage]
 
   def AgentBuildSegments(negRaw: NegotiationRaw): List[MacroSegment] =
-    Function.chain(SegmentsTransformation(negRaw))(MacroSegments.empty(stagesOrder)).segments
+    Function.chain(AgentSegmentsTransformation(negRaw))(MacroSegments.empty(agentStagesOrder)).segments
 }
 
 
@@ -29,7 +28,7 @@ trait AgentsBuildingMacroExperimentalBase[C <: whitebox.Context] extends AgentsB
     case object ConstructorDefinition extends MacroSegments.Stage
   }
 
-  lazy val stagesOrder: Ordering[MacroSegments.Stage] = {
+  lazy val agentStagesOrder: Ordering[MacroSegments.Stage] = {
     import AgentBuildingStages._
     import StagesOrdering._
     StagesOrdering(

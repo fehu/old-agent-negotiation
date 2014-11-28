@@ -1,9 +1,10 @@
-package feh.tec.agents.lite.spec.macros.exp.impl
+package feh.tec.agents.lite.spec.macros.exp.impl.agent
 
-import feh.tec.agents.lite.SystemAgent
-import feh.tec.agents.lite.spec.macros.exp.{ControllerBuildingMacroExperimental, AgentsBuildingMacroExperimentalBase}
-import scala.reflect.macros.whitebox
+import feh.tec.agents.lite.spec.macros.exp.{AgentsBuildingMacroExperimentalBase, ControllerBuildingMacroExperimental}
+import feh.tec.agents.lite.{Language, SystemAgent}
 import feh.util._
+
+import scala.reflect.macros.whitebox
 
 /**
  * Contains `MacroSegmentsTransform`s for `TypesDefinitions` stage
@@ -11,9 +12,41 @@ import feh.util._
 trait TypesDefinitions[C <: whitebox.Context]{
   self: AgentsBuildingMacroExperimentalBase[C] with ControllerBuildingMacroExperimental[C] =>
 
-  def allTypesDefinitions = AgentSegmentTypesDefinitions :: Nil
+  import c.universe._
 
-  def ExtractLangs = ???
+  def allTypesDefinitions = AgentSegmentLangDefinition :: AgentSegmentTypesDefinitions :: Nil
+
+//  protected def agentLang(in: MacroSegments, agentName: String): Option[c.Type] =
+//    in.getExtra[Map[String, c.Type]]("agent-lang").flatMap(_.get(agentName))
+//
+//  protected[TypesDefinitions] def setAgentLang(in: MacroSegments)(agentName: String, lang: c.Type) =
+//    in.changeExtra[Map[String, c.Type]]("agent-lang", _.map{ _ + (agentName -> lang) })
+
+  protected def extractBounds(from: c.Type) = from match {
+    case TypeBounds(_, RefinedType(tpes, _)) => tpes
+    case TypeBounds(_, ref: TypeRef) => ref :: Nil
+  }
+
+  protected def unitedType(of: List[c.Type]) = internal.refinedType(of, internal.newScopeWith())
+
+  def langTypeName(anonAgentClassName: String) = TypeName(anonAgentClassName + "Lang")
+
+  def AgentSegmentLangDefinition = MacroSegmentsTransform{
+    _.append(AgentBuildingStages.TypesDefinitions,
+      MacroSegment{
+        case trees@Trees(_, agents) =>
+          val newAgents = agents.map{
+            case (name, tr@ActorTrees(cName, parents, _, _)) =>
+              val langCompTypes: List[Type] = parents.flatMap(_.typeArgs.filter(_.resultType <:< typeOf[Language])) flatMap extractBounds
+              val langType = unitedType(langCompTypes)
+
+              name -> tr.prepend.body(q"type ${langTypeName(cName)} = $langType")
+          }
+
+          trees.copy(agents = newAgents)
+      }
+    )
+  }
 
   def AgentSegmentTypesDefinitions = MacroSegmentsTransform(
     _.append(AgentBuildingStages.TypesDefinitions,

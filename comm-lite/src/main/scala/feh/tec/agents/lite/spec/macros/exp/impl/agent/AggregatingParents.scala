@@ -1,12 +1,12 @@
-package feh.tec.agents.lite.spec.macros.exp.impl
+package feh.tec.agents.lite.spec.macros.exp.impl.agent
 
 import akka.actor.ActorRef
+import feh.tec.agents.lite
 import feh.tec.agents.lite.AgentCreationInterface.NegotiationInit
 import feh.tec.agents.lite._
-import feh.tec.agents.lite
 import feh.tec.agents.lite.impl.agent.FailureChecks
-import feh.tec.agents.lite.impl.{FailedConfigurationsChecks, agent}
 import feh.tec.agents.lite.impl.spec.{IteratingSpec, PriorityAndProposalBasedAgentSpec}
+import feh.tec.agents.lite.impl.{FailedConfigurationsChecks, agent}
 import feh.tec.agents.lite.spec.macros.exp.{AgentsBuildingMacroExperimentalBase, ControllerBuildingMacroExperimental}
 
 import scala.concurrent.duration.FiniteDuration

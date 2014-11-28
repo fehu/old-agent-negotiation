@@ -1,4 +1,4 @@
-package feh.tec.agents.lite.spec.macros.exp.impl
+package feh.tec.agents.lite.spec.macros.exp.impl.agent
 
 import feh.tec.agents.lite.spec.macros.exp.{AgentsBuildingMacroExperimentalBase, ControllerBuildingMacroExperimental}
 
