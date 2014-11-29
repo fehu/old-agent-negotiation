@@ -1,16 +1,16 @@
-package feh.tec.agents.lite.spec.macros.exp.impl.agent
+package feh.tec.agents.lite.spec.macros.impl.agent
 
 import feh.tec.agents.lite.spec.NegotiationSpecification
 import feh.tec.agents.lite._
+import feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase
 import feh.util._
-import feh.tec.agents.lite.spec.macros.exp.AgentsBuildingMacroExperimentalBase
 import scala.concurrent.duration.FiniteDuration
 import scala.reflect.macros.whitebox
 
 /** Contains `MacroSegmentsTransform`s for `ValAndDefDefinitions` stage
  */
 trait ValAndDefDefinitions [C <: whitebox.Context]{
-  self: AgentsBuildingMacroExperimentalBase[C] with TypesDefinitionsHelpers[C] =>
+  self: AgentsBuildingMacroBase[C] with TypesDefinitionsHelpers[C] =>
 
   def allValAndDefDefinitions(raw: NegotiationRaw) =
     AgentSegmentCreateNegotiation ::

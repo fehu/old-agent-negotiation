@@ -1,12 +1,11 @@
-package feh.tec.agents.lite.spec.macros.exp
+package feh.tec.agents.lite.spec.macros
 
-import feh.tec.agents.lite.spec.macros.ActorBuildingMacro
 import scala.reflect.ClassTag
 import scala.reflect.macros.whitebox
 
 /**
  */
-trait ControllerBuildingMacroExperimentalEnvironment[C <: whitebox.Context] extends ActorBuildingMacro[C] {
+trait ControllerBuildingMacroEnvironment[C <: whitebox.Context] extends ActorBuildingMacro[C] {
 
   type AgentName = String
   case class Trees(controller: ActorTrees, agents: Map[AgentName, ActorTrees], _extra: Map[String, Any]){
@@ -27,7 +26,6 @@ trait ControllerBuildingMacroExperimentalEnvironment[C <: whitebox.Context] exte
   def MacroSegment(transform: PartialFunction[Trees, Trees]): MacroSegment = {
     trees => transform.lift(trees).getOrElse(trees)
   }
-
 
   final type MacroSegmentsTransform = MacroSegments => MacroSegments
   final def MacroSegmentsTransform(f: MacroSegments => MacroSegments) = f

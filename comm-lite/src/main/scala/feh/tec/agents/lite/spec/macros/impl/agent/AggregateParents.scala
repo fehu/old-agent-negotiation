@@ -1,4 +1,4 @@
-package feh.tec.agents.lite.spec.macros.exp.impl.agent
+package feh.tec.agents.lite.spec.macros.impl.agent
 
 import akka.actor.ActorRef
 import feh.tec.agents.lite
@@ -7,15 +7,14 @@ import feh.tec.agents.lite._
 import feh.tec.agents.lite.impl.agent.FailureChecks
 import feh.tec.agents.lite.impl.spec.{IteratingSpec, PriorityAndProposalBasedAgentSpec}
 import feh.tec.agents.lite.impl.{FailedConfigurationsChecks, agent}
-import feh.tec.agents.lite.spec.macros.exp.{AgentsBuildingMacroExperimentalBase, ControllerBuildingMacroExperimental}
-
+import feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase
 import scala.concurrent.duration.FiniteDuration
 import scala.reflect.macros.whitebox
 
 /** Contains `MacroSegmentsTransform`s for **Aggregating Parents**
   */
 trait AggregateParents[C <: whitebox.Context]{
-  self: AgentsBuildingMacroExperimentalBase[C] =>
+  self: AgentsBuildingMacroBase[C] =>
 
   def allAggregatingParents(raw: NegotiationRaw) =
     AgentSegmentParentPriorityAndProposalBased(raw) ::

@@ -1,16 +1,15 @@
-package feh.tec.agents.lite.spec.macros.exp.impl.controller
+package feh.tec.agents.lite.spec.macros.impl.controller
 
 import feh.tec.agents.lite.AgentRef
 import feh.tec.agents.lite.impl.NegotiationEnvironmentController
 import feh.tec.agents.lite.spec.NegotiationSpecification
-import feh.tec.agents.lite.spec.macros.HasConstraintsBuilder
-import feh.tec.agents.lite.spec.macros.exp.ControllerBuildingMacroExperimentalBase
+import feh.tec.agents.lite.spec.macros.{ControllerBuildingMacroBase, HasConstraintsBuilder}
 import scala.reflect.macros.whitebox
 
 /** Contains `MacroSegmentsTransform`s for **EmbedAgentProps**
   */
 trait EmbedAgentProps[C <: whitebox.Context]{
-  self: ControllerBuildingMacroExperimentalBase[C] with HasConstraintsBuilder[C] =>
+  self: ControllerBuildingMacroBase[C] with HasConstraintsBuilder[C] =>
 
   def allEmbedAgentsProps(raw: NegotiationRaw, cBuilder: ConstraintsBuilder) = ControllerSegmentEmbedAgentsProps(raw, cBuilder) :: Nil
 

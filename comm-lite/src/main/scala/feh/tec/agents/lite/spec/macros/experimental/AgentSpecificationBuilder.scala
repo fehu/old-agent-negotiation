@@ -1,6 +1,7 @@
-package feh.tec.agents.lite.spec.macros
+package feh.tec.agents.lite.spec.macros.experimental
 
 import feh.tec.agents.lite.spec.NegotiationSpecification.NegotiationDef
+import feh.tec.agents.lite.spec.macros.Helper
 import feh.tec.agents.lite.{NegotiationId, spec}
 
 import scala.reflect.macros.whitebox

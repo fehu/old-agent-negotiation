@@ -1,12 +1,12 @@
-package feh.tec.agents.lite.spec.macros.exp.impl.agent
+package feh.tec.agents.lite.spec.macros.impl.agent
 
-import feh.tec.agents.lite.spec.macros.exp.{AgentsBuildingMacroExperimentalBase, ControllerBuildingMacroExperimental}
+import feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase
 import feh.tec.agents.lite.{Language, SystemAgent}
 import feh.util._
 import scala.reflect.macros.whitebox
 
 trait TypesDefinitionsHelpers[C <: whitebox.Context]{
-  self: AgentsBuildingMacroExperimentalBase[C] =>
+  self: AgentsBuildingMacroBase[C] =>
 
   import c.universe._
   
@@ -45,7 +45,7 @@ trait TypesDefinitionsHelpers[C <: whitebox.Context]{
  * Contains `MacroSegmentsTransform`s for `TypesDefinitions` stage
  */
 trait TypesDefinitions[C <: whitebox.Context] extends TypesDefinitionsHelpers[C]{
-  self: AgentsBuildingMacroExperimentalBase[C] =>
+  self: AgentsBuildingMacroBase[C] =>
 
   import c.universe._
 

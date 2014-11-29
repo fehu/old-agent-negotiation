@@ -1,14 +1,14 @@
-package feh.tec.agents.lite.spec.macros.exp.impl.controller
+package feh.tec.agents.lite.spec.macros.impl.controller
 
 import feh.tec.agents.lite.impl.NegotiationEnvironmentController
 import feh.tec.agents.lite.spec.NegotiationSpecification.NegotiationDef
-import feh.tec.agents.lite.spec.macros.exp.ControllerBuildingMacroExperimentalBase
+import feh.tec.agents.lite.spec.macros.ControllerBuildingMacroBase
 import scala.reflect.macros.whitebox
 
 /** Contains `MacroSegmentsTransform`s for stages before **EmbedAgentProps**
   */
 trait BeforeAgentsProps[C <: whitebox.Context]{
-  self: ControllerBuildingMacroExperimentalBase[C] =>
+  self: ControllerBuildingMacroBase[C] =>
 
   def allBeforeAgentsProps(raw: NegotiationRaw) =
     ControllerSegmentParent ::

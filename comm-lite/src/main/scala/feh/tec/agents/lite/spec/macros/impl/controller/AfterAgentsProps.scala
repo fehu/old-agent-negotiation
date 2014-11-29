@@ -1,16 +1,14 @@
-package feh.tec.agents.lite.spec.macros.exp.impl.controller
+package feh.tec.agents.lite.spec.macros.impl.controller
 
 import feh.tec.agents.lite.impl
-import feh.tec.agents.lite.spec.macros.Configs
-import feh.tec.agents.lite.spec.macros.exp.{AgentsBuildingMacroExperimentalBase, ControllerBuildingMacroExperimentalBase}
-
+import feh.tec.agents.lite.spec.macros.{ControllerBuildingMacroBase, AgentsBuildingMacroBase, Configs}
 import scala.concurrent.duration.FiniteDuration
 import scala.reflect.macros.whitebox
 
 /** Contains `MacroSegmentsTransform`s for stages after **EmbedAgentProps**
   */
 trait AfterAgentsProps[C <: whitebox.Context]{
-  self: ControllerBuildingMacroExperimentalBase[C] with AgentsBuildingMacroExperimentalBase[C] =>
+  self: ControllerBuildingMacroBase[C] with AgentsBuildingMacroBase[C] =>
 
   def allAfterAgentsProps(raw: NegotiationRaw) =
     ControllerSegmentExtraArgsValues ::
@@ -26,9 +24,6 @@ trait AfterAgentsProps[C <: whitebox.Context]{
 
           val liftedArgsByNameAndAg = trees.agents map { case (agName, _) => agName -> q"${
             agentArgsRequired(trees)(agName).mapValues(p => q"() => ${p._2}")}" }
-
-//          c.abort(NoPosition, showRaw(liftedArgsByNameAndAg))
-//          c.abort(NoPosition, showRaw(agentArgsRequired(trees)))
 
           val extraArgs = q"""
             private lazy val liftedArgsByNameAndAg: Map[String, Map[String, () => Any]] =

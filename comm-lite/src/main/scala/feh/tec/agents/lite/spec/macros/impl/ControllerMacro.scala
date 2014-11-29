@@ -1,15 +1,15 @@
-package feh.tec.agents.lite.spec.macros.exp.impl
+package feh.tec.agents.lite.spec.macros.impl
 
 import akka.actor.Props
 import feh.tec.agents.lite.spec
-import feh.tec.agents.lite.spec.macros.exp.impl.agent.AgentsBuildingMacroExperimentalImpl
-import feh.tec.agents.lite.spec.macros.exp.impl.controller.ControllerBuildingMacroExperimentalImpl
-import feh.tec.agents.lite.spec.macros.{HasVarsSeparatingConstraintsBuilder, ActorBuildingMacroImpl, NegotiationBuildingMacroImpl}
+import feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl
+import feh.tec.agents.lite.spec.macros.impl.controller.ControllerBuildingMacroImpl
+import feh.tec.agents.lite.spec.macros.ActorBuildingMacroImpl
 import scala.reflect.macros.whitebox
 
-class ControllerMacroExperimental[C <: whitebox.Context](val c: C)
+class ControllerMacro[C <: whitebox.Context](val c: C)
   extends NegotiationBuildingMacroImpl[C] with ActorBuildingMacroImpl[C]
-  with ControllerBuildingMacroExperimentalImpl[C] with AgentsBuildingMacroExperimentalImpl[C]
+  with ControllerBuildingMacroImpl[C] with AgentsBuildingMacroImpl[C]
   with HasVarsSeparatingConstraintsBuilder[C]
 {
   def cBuilder = new VarsSeparatingConstraintsBuilder
@@ -28,5 +28,12 @@ class ControllerMacroExperimental[C <: whitebox.Context](val c: C)
     val trees = Function.chain(segments)(Trees.empty(anonControllerName))
     val buildPropsExpr = actorCreatePropsExpr(trees.controller)
     c.universe.reify(buildPropsExpr.splice(Map()))
+  }
+}
+
+object ControllerMacro {
+  def controller(c: whitebox.Context)(dsl: c.Expr[spec.dsl.Negotiation]): c.Expr[Props] = {
+    val m = new ControllerMacro[c.type](c)
+    m.controllerPropsExpr(dsl)
   }
 }

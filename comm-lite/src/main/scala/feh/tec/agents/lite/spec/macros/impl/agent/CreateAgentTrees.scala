@@ -1,13 +1,12 @@
-package feh.tec.agents.lite.spec.macros.exp.impl.agent
+package feh.tec.agents.lite.spec.macros.impl.agent
 
-import feh.tec.agents.lite.spec.macros.exp.{AgentsBuildingMacroExperimentalBase, ControllerBuildingMacroExperimental}
-
+import feh.tec.agents.lite.spec.macros.{ControllerBuildingMacro, AgentsBuildingMacroBase}
 import scala.reflect.macros.whitebox
 
 /** Contains `MacroSegmentsTransform`s for `CreateAgentTrees` stage
   */
 trait CreateAgentTrees[C <: whitebox.Context]{
-  self: AgentsBuildingMacroExperimentalBase[C] with ControllerBuildingMacroExperimental[C] =>
+  self: AgentsBuildingMacroBase[C] with ControllerBuildingMacro[C] =>
 
   def allCreateAgentTrees(raw: NegotiationRaw, anonAgentClassName: String = "$AgentAnonClass") =
     AgentSegmentEmptyAgentTrees(raw, anonAgentClassName) :: Nil
