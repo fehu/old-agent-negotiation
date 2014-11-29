@@ -45,7 +45,7 @@ trait ValAndDefDefinitions [C <: whitebox.Context]{
             protected def createNegotiation(nId: NegotiationId): Negotiation = {
               val neg = new ${impl.head} with ..${impl.tail} {
                 val id = nId
-                val issues: Set[Var] = negotiationsInit.find(_.id == id).get.issues
+                val issues: Set[Var] = negotiationsInit.find(_.id == id).getOrElse(sys.error("createNegotiation: no id found")).issues
                 def scopeUpdated(): Unit = $negotiationScopeUpdatedTree
               }
               ${if(negotiationCreation) q"negotiationCreated(neg)" else q"" }
@@ -89,8 +89,8 @@ trait ValAndDefDefinitions [C <: whitebox.Context]{
               isAbstract(TermName("domainIterators")), { case (name, tr) => tr.append.body(domainIteratorsTree) }
             )
             trees
-              .copy(agents = newAgs)
-              .addAgentArgs(newAgs.keySet.toList.map(addDomainIteratorsArg))
+              .copy(agents = newAgs.mapValues(_._2))
+              .addAgentArgs(newAgs.filter(_._2._1).keySet.toList.map(addDomainIteratorsArg))
         }
 
       )
@@ -104,12 +104,13 @@ trait ValAndDefDefinitions [C <: whitebox.Context]{
     def getConstraintsByNegotiation(agName: String) = q"""
       import feh.tec.agents.lite.spec.NegotiationSpecification
 
-      initialAgents.find(_._1.name == $agName).get._1.negotiations.map{
-        case NegotiationSpecification.AgentNegDef(negName, _, extra) =>
-          val constraints = extra.collect{
-            case c: NegotiationSpecification.AgentConstraintsDef => c
-          }
-          NegotiationId(negName) -> constraints.ensuring(_.size == 1, constraints.size + " AgentConstraintsDef defined").head
+      initialAgents.find(_._1.name == $agName).getOrElse(sys.error("getConstraintsByNegotiation: no initialAgent " + $agName + " found"))
+        ._1.negotiations.map{
+          case NegotiationSpecification.AgentNegDef(negName, _, extra) =>
+            val constraints = extra.collect{
+              case c: NegotiationSpecification.AgentConstraintsDef => c
+            }
+            NegotiationId(negName) -> constraints.ensuring(_.size == 1, constraints.size + " AgentConstraintsDef defined").head
       }.toMap
     """
 
@@ -136,8 +137,8 @@ trait ValAndDefDefinitions [C <: whitebox.Context]{
             isAbstract(TermName("constraintsByNegotiation")), { case (name, tr) => tr.append.body(constraintsByNegotiationTree) }
             )
             trees
-              .copy(agents = newAgs)
-              .addAgentArgs(newAgs.keySet.toList.map(addConstraintsByNegotiationArg))
+              .copy(agents = newAgs.mapValues(_._2))
+              .addAgentArgs(newAgs.filter(_._2._1).keySet.toList.map(addConstraintsByNegotiationArg))
         }
 
       )
@@ -190,13 +191,13 @@ trait ValAndDefDefinitions [C <: whitebox.Context]{
           case trees =>
             val newAgs = trees.agents.map{
               case (name, tr@ActorTrees(_, parents, _, _)) if parents.exists(_ <:< typeOf[ResponseDelay[Language]].erasure) =>
-                name -> tr.append.body(responseDelayAgBody)
-              case other => other
+                name -> (true, tr.append.body(responseDelayAgBody))
+              case (name, other) => name -> (false, other)
             }
 
             trees
-              .copy(agents = newAgs)
-              .addAgentArgs(newAgs.keySet.toList.map(addResponseDelayArg))
+              .copy(agents = newAgs.mapValues(_._2))
+              .addAgentArgs(newAgs.filter(_._2._1).keySet.toList.map(addResponseDelayArg))
         }
       )
     )
@@ -206,7 +207,7 @@ trait ValAndDefDefinitions [C <: whitebox.Context]{
   protected def transformIfHasMember(ags: Map[String, ActorTrees])(cond: Symbol => Boolean, f: ((String, ActorTrees)) => ActorTrees) =
     ags.map{
       case (name, ag) =>
-        name -> ( if(ag.parents.exists(_.members.exists(cond))) f(name -> ag) else ag )
+        name -> ( if(ag.parents.exists(_.members.exists(cond))) true -> f(name -> ag) else false -> ag )
     }
 
   protected def isAbstract(name: Name): Symbol => Boolean = sym => sym.isAbstract && sym.name == name

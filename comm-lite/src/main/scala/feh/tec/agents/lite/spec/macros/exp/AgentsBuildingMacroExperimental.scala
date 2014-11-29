@@ -47,7 +47,28 @@ trait AgentsBuildingMacroExperimentalBase[C <: whitebox.Context] extends AgentsB
   protected case class AddAgentArgs(agentName: String, argName: String, argType: c.Type, argTree: c.Tree)
 
   protected implicit class TreesWrapper(trees: Trees) {
+
+
     def addAgentArgs(addArgs: Seq[AddAgentArgs]*): Trees = {
+      val byAgName = addArgs.flatten.groupBy(_.agentName)
+
+      def argsToAdd(args: RequiredAgentArgs): RequiredAgentArgs = byAgName map  {
+        case (name, add) =>
+          val agMap = args.getOrElse(name, Map())
+          val toAdd = add.map{ case AddAgentArgs(agentName, argName, argType, argTree) => argName ->(argType, argTree) }
+         name -> (agMap ++ toAdd)
+      }
+
+      trees.changeExtra[RequiredAgentArgs]("args-required", opt =>
+        Some{
+          opt
+            .map {args => args ++ argsToAdd(args)}
+            .getOrElse(argsToAdd(Map()).toMap)
+        }
+      )
+    }
+/*
+    def addAgentArgs2(addArgs: Seq[AddAgentArgs]*): Trees = {
 
       def argsToAdd(args: RequiredAgentArgs) = addArgs.flatMap(_.map{
         case AddAgentArgs(agentName, argName, argType, argTree) =>
@@ -62,6 +83,7 @@ trait AgentsBuildingMacroExperimentalBase[C <: whitebox.Context] extends AgentsB
         }
       )
     }
+*/
   }
 
   /*

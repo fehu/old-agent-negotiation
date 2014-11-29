@@ -27,7 +27,8 @@ trait AfterAgentsProps[C <: whitebox.Context]{
           val liftedArgsByNameAndAg = trees.agents map { case (agName, _) => agName -> q"${
             agentArgsRequired(trees)(agName).mapValues(p => q"() => ${p._2}")}" }
 
-          c.abort(NoPosition, showRaw(agentArgsRequired))
+//          c.abort(NoPosition, showRaw(liftedArgsByNameAndAg))
+//          c.abort(NoPosition, showRaw(agentArgsRequired(trees)))
 
           val extraArgs = q"""
             private lazy val liftedArgsByNameAndAg: Map[String, Map[String, () => Any]] =

@@ -155,6 +155,7 @@ trait NegotiationFinishedListener extends ReportListener with ActorLogging{
 
   protected def allWaitingCheck(neg: NegotiationId) = if(allWaiting(neg)) {
     hadChanges = false
+    log.info("schedule allWaitingCheck")
     context.system.scheduler
       .scheduleOnce(confirmAllWaitingDelay, self, "confirm all waiting" -> neg)(context.dispatcher)
   }
@@ -164,7 +165,9 @@ trait NegotiationFinishedListener extends ReportListener with ActorLogging{
       guardState(r)
       super.receive(r)
       allWaitingCheck(r.negotiation)
-    case ("confirm all waiting", neg: NegotiationId) => if(allWaiting(neg) && !hadChanges) negotiationFinished(neg)
+    case ("confirm all waiting", neg: NegotiationId) =>
+      log.info(s"NegotiationFinishedListener: confirm all waiting. allWaiting(neg)=${allWaiting(neg)}, hadChanges=$hadChanges")
+      if(allWaiting(neg) && !hadChanges) negotiationFinished(neg)
   }: Actor.Receive) orElse super.receive
 
   def negotiationFinished(neg: NegotiationId) = {
