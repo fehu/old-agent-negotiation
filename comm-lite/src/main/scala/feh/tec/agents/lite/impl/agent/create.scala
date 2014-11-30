@@ -33,9 +33,9 @@ object create {
 
   object PPI{
     type Lang = NegotiationLanguage with Language.ProposalBased with Language.HasPriority
-    type Ag = impl.spec.IteratingSpec.Agent[Lang]
+    type Ag[L <: Lang] = impl.spec.IteratingSpec.Agent[L]
 
-    trait AllVarsSpec[A <: Ag] extends PriorityAndProposalBasedAgentSpec[A, Lang] with IteratingSpec.AllVars[A, Lang] with SpecExt[A]
+    trait AllVarsSpec[A <: Ag[L], L <: Lang] extends PriorityAndProposalBasedAgentSpec[A, L] with IteratingSpec.AllVars[A, L] with SpecExt[A]
   }
 
 /*

@@ -1,0 +1,107 @@
+package feh.tec.agents.lite
+
+import java.util.UUID
+import feh.tec.agents.lite.Message.ProposalId
+import feh.tec.agents.lite.impl.{FailedConfigurationsChecks, PriorityAndProposalBasedAgent}
+import feh.tec.agents.lite.impl.agent.FailureChecks
+import feh.tec.agents.lite.impl.agent.create.SpecExt
+import feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec
+import feh.tec.agents.lite.spec.RequiresDistinctPriority
+
+object Fallback {
+  type Agent[Lang <: Language.ProposalBased with Language.HasPriority] =
+    PriorityAndProposalBasedAgent[Lang] with ProposalEngine.Iterating[Lang] with FailedConfigurationsChecks[Lang]
+      {
+        type Negotiation <: Negotiation.HasProposal[Lang] with Negotiation.HasPriority with Negotiation.HasIterator with Negotiation.ChangingIssues
+      }
+
+  case class FallbackRequest(negotiation: NegotiationId, priority: Priority, id: UUID)(implicit val sender: AgentRef) extends Message.HasPriority{
+    def asString: String = s"I have no more values to propose in $negotiation ($priority)"
+  }
+  case class IWillMove(negotiation: NegotiationId, priority: Priority, respondingTo: UUID)(implicit val sender: AgentRef) extends Message.HasPriority{
+    def asString: String = s"I will move in $negotiation as you asked ($priority)"
+  }
+
+  case object FallbackState extends NegotiationState
+}
+
+trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
+  extends PrioritiesRegister[Ag, Lang] with ProposalAcceptanceRegister[Ag, Lang]
+{
+  self: PriorityAndProposalBasedAgentSpec[Ag, Lang] with RequiresDistinctPriority with SpecExt[Ag] =>
+
+  import Fallback._
+  
+  def knownConfiguration(neg: NegotiationId, prop: ProposalId)(implicit ag: Ag): PartialValuesConfiguration = {
+    val responses = proposalAcceptance.get(neg).filter(_._1 == prop).map(_._2.values.flatten.toList).getOrElse(Nil)
+    val n = ag.get(neg)
+    val myConf = n.currentPriority() -> n.currentValues()
+    val confs = responses.map{case (resp, _) => resp.priority -> resp.myValues}.toMap + myConf
+    new PartialValuesConfiguration(confs, neg)
+  }
+
+
+  def onFallbackRequest(req: FallbackRequest)(implicit ag: Ag): Unit = req match {
+    case req@FallbackRequest(negId, pr, reqId) =>
+      import ag._
+      val neg = get(negId)
+      val myPr = neg.currentPriority()
+      if(myPr.get == pr.get + 1) {
+        if(neg.currentState() == NegotiationState.Waiting) neg.currentState update NegotiationState.Negotiating
+        val failed = knownConfiguration(negId, neg.currentProposal().id).filter((p, _) => p >= myPr)
+        val requiredSize = neg.scope().size - myPr + 1
+        if(failed.size == requiredSize) {
+          ag.guardFailedConfiguration(failed)
+          sendToAll(FailureChecks.GuardFailedConfiguration(failed, myPr))
+        }
+        ag.setNextProposal(negId)
+        val resp = IWillMove(negId, myPr, reqId)
+        req.sender ! resp
+        sendToAll(neg.currentProposal())
+      }
+  }
+
+  def whenProposalAccepted(msg: Message.ProposalResponse)(implicit ag: Ag): Unit = whenProposalAccepted(msg.negotiation, msg.respondingTo)
+  def whenProposalAccepted(neg: NegotiationId, pid: ProposalId)(implicit ag: Ag): Unit = if(allAccepted(neg, pid)){
+    //    ag.log.info("all accepted, setting state to **Waiting** " + proposalAcceptance(neg))
+    ag.get(neg).currentState update NegotiationState.Waiting
+  }
+
+  def nothingToProposeIfHasMaxPriority(negId: NegotiationId)(implicit ag: Ag): Option[Unit] =
+    if(maxPriority(negId)._1 == ag.ref) Some{
+      sys.error("Failed to resolve negotiation")
+    } else None
+
+
+  moreProcess <:= {
+    implicit ag => {
+      case msg: FallbackRequest if ag.hasState(msg, NegotiationState.Negotiating, NegotiationState.Waiting) => onFallbackRequest(msg)
+      /* Fallback State */
+      case msg: IWillMove if ag.hasState(msg, FallbackState) =>
+        val neg = ag.get(msg.negotiation)
+        neg.currentIterator update ag.newIterator(neg.id)
+        ag.setNextProposal(neg.id)
+        neg.currentState update NegotiationState.Negotiating
+        ag.resendDelayedMessages()
+        ag.sendToAll(neg.currentProposal())
+      case msg: FallbackRequest if ag.hasState(msg, FallbackState) => ag.guardDelayedMessage(msg)
+      case msg: Message.Proposal if ag.hasState(msg, FallbackState) => ag.guardDelayedMessage(msg)
+      case msg if ag.hasState(msg, FallbackState) => // do nothing
+    }
+  }
+
+  nothingToPropose <:= {
+    implicit ag => {
+      negId =>
+        clearProposalAcceptance(negId)(ag)
+        nothingToProposeIfHasMaxPriority(negId).getOrElse{
+          val neg = ag.get(negId)
+          neg.currentState update FallbackState
+          val req = FallbackRequest(negId, neg.currentPriority(), UUID.randomUUID())(ag.ref)
+          ag.sendToAll(req)
+        }
+    }
+  }
+
+
+}

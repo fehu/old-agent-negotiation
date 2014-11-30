@@ -118,8 +118,8 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
 //      reportsBuff.clear()
 //      super.receive(push(NQueenMessages.NegotiationFinishedAutoRestart(delay.toMillis.toInt)))
     case NQueenMessages.Restart => super.receive(push(NQueenMessages.Restart))
-    case _: QueenSpec.FallbackRequest => // do nothing
-    case _: QueenSpec.IWillMove       => // do nothing
+    case _: Fallback.FallbackRequest => // do nothing
+    case _: Fallback.IWillMove       => // do nothing
   }
 
   scheduleFlush()
