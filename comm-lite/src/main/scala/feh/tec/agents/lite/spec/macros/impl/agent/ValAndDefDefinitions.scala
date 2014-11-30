@@ -158,10 +158,11 @@ trait ValAndDefDefinitions [C <: whitebox.Context]{
                   case TypeDef(_, TypeName("Agent"), Nil, CompoundTypeTree(Template(parents, _, _))) =>
                     internal.refinedType(parents.map(_.tpe), internal.newScopeWith())
                 }.head
+
                 val specTpe = tr.parents
                   .flatMap(_.members.find(isAbstract(TermName("spec"))))
-                  .map(_.typeSignature.resultType).sortWith(_ <:< _)
-                  .last
+                  .flatMap(_.typeSignature.resultType |> decomposeTypesAndBounds) //.sortWith(_ <:< _)
+                  .pipe(unitedType)
                   .pipe(replaceLang(tr))
                   .pipe(replaceTypeArg(_, typeOf[AbstractAgent], agentType))
 

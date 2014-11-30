@@ -4,9 +4,9 @@ import akka.actor.ActorRef
 import feh.tec.agents.lite
 import feh.tec.agents.lite.AgentCreationInterface.NegotiationInit
 import feh.tec.agents.lite._
-import feh.tec.agents.lite.impl.agent.FailureChecks
+import feh.tec.agents.lite.impl.agent.{ChangingIssuesImpl, FailureChecks}
 import feh.tec.agents.lite.impl.spec.{IteratingSpec, PriorityAndProposalBasedAgentSpec}
-import feh.tec.agents.lite.impl.{FailedConfigurationsChecks, agent}
+import feh.tec.agents.lite.impl.{ChangingIssues, FailedConfigurationsChecks, agent}
 import feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase
 import scala.concurrent.duration.FiniteDuration
 import scala.reflect.macros.whitebox
@@ -21,6 +21,7 @@ trait AggregateParents[C <: whitebox.Context]{
     AgentSegmentParentIteratingAllVars(raw) ::
     AgentSegmentParentRequiresDistinctPriority(raw) ::
     AgentSegmentParentFailedConfigurationsChecks(raw) ::
+    AgentSegmentParentChangingIssues(raw) ::
     AgentSegmentParentReportingAgent(raw) :: Nil
 
   /** Adds corresponding parent and definitions if `raw`.spec is a [[PriorityAndProposalBasedAgentSpec]]
@@ -130,16 +131,25 @@ trait AggregateParents[C <: whitebox.Context]{
     }
   }
 
+  protected def agentType(raw: Raw.AgentDef) = {
+    import c.universe._
+    raw.spec.actualType.members.find(_.name == TermName("agentTag")).flatMap(
+      _.typeSignature.resultType.typeArgs.filter(_ <:< typeOf[AbstractAgent]).ensuring(_.size <= 1).headOption
+    )
+  }
+
   /** Adds corresponding parent and definitions if `raw` indicates agent's type is [[FailedConfigurationsChecks]]
     */
   def AgentSegmentParentFailedConfigurationsChecks(raw: NegotiationRaw) = {
     import c.universe._
 
-    val failedConfigurationsChecks = raw.agents.filter(
-      _.spec.actualType.member(TermName("agentTag"))
-        .typeSignature.resultType.typeArgs.filter(_ <:< typeOf[AbstractAgent]).ensuring(_.size == 1)
-        .head <:< typeOf[FailedConfigurationsChecks[_]]
-    )
+    val failedConfigurationsChecks = raw.agents.filter(r => agentType(r).exists(_ <:< typeOf[FailedConfigurationsChecks[_]]))
+
+//      raw.agents.filter(
+//      _.spec.actualType.member(TermName("agentTag"))
+//        .typeSignature.resultType.typeArgs.filter(_ <:< typeOf[AbstractAgent]).ensuring(_.size == 1)
+//        .head <:< typeOf[FailedConfigurationsChecks[_]]
+//    )
     val failedConfigurationsChecksTpe = typeOf[FailureChecks[Language.ProposalBased with Language.HasPriority]]
 
     MacroSegmentsTransform {
@@ -156,6 +166,29 @@ trait AggregateParents[C <: whitebox.Context]{
         }
       )
     }
+  }
+
+  def AgentSegmentParentChangingIssues(raw: NegotiationRaw) = {
+    import c.universe._
+
+    val changingIssues = raw.agents.filter(r => agentType(r).exists(_ <:< typeOf[ChangingIssues[_]]))
+    val changingIssuesTpe = typeOf[ChangingIssuesImpl[Language.ProposalBased with Language.HasPriority with Language.NegotiatesIssues]]
+
+    MacroSegmentsTransform {
+      _.append(AgentBuildingStages.AggregateParents,
+        MacroSegment{
+          case trees =>
+            val newAgs = trees.agents.map{
+              transform(changingIssues){
+                (tr, raw) =>
+                  tr.append.parents(changingIssuesTpe)
+              }
+            }
+            trees.copy(agents = newAgs)
+        }
+      )
+    }
+
   }
 
   /** Adds corresponding parent and definitions if any of `raw.negotiations` have `reportingToOpt` defined

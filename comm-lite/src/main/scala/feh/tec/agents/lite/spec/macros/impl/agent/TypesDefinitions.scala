@@ -86,14 +86,14 @@ trait TypesDefinitions[C <: whitebox.Context] extends TypesDefinitionsHelpers[C]
               val abstractTypeMembers = parents
                 .flatMap(
                   _.members
-                    .withFilter(d => d.name.isTypeName && d.isAbstract)
+                    .withFilter(d => d.name.isTypeName && d.isAbstract && !d.isClass)
                     .map(
                       sym =>
                         sym.asType.name ->
                           (sym.typeSignature match {
                             case TypeBounds(_, RefinedType(tpes, _)) => tpes
                             case TypeBounds(_, ref: TypeRef) => ref :: Nil
-                            case _ => Nil
+                            case other => c.abort(NoPosition, other.toString)
                           })
                     )
                 ).groupBy(_._1)
