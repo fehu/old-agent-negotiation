@@ -10,6 +10,14 @@ The macros work by applying transformations, called `MacroSegment`, to AST trees
 and [ActorBuildingMacro#ActorTrees](comm-lite/src/main/scala/feh/tec/agents/lite/spec/macros/ActorBuildingMacro.scala)
 containers. ([API](http://fehu.github.io/agent-negotiation/unidoc/index.html#feh.tec.agents.lite.spec.macros.package))
 
-![Macro Stages](https://docs.google.com/uc?id=0B9XpukXOfywNWEE0YnpDNVNTQmM)
+Many of the segments use 
+[NegotiationBuildingMacro#NegotiationRaw](comm-lite/src/main/scala/feh/tec/agents/lite/spec/macros/NegotiationBuildingMacro.scala)(*Negotiation Raw Definition*),
+that contains the definitions from the processed [Negotiation](comm-lite/src/main/scala/feh/tec/agents/lite/spec/dsl/Negotiation.scala). 
 
-![Negotiation Steps Decomposition](https://docs.google.com/uc?id=0B9XpukXOfywNb0RrUkt6QTNob2s)
+![Negotiation Steps Decomposition](https://docs.google.com/uc?authuser=0&id=0B9XpukXOfywNSDdSekVrVzhIUHc)
+
+A [ControllerBuildingMacroEnvironment#MacroSegments](comm-lite/src/main/scala/feh/tec/agents/lite/spec/macros/ControllerBuildingMacroEnvironment.scala)
+groups `MacroSegment`s by stages and defines `stagesOrdering: Ordering[Stage]` used to determine stages order when forming single macro fragment.
+
+![Macro Stages](https://docs.google.com/uc?authuser=0&id=0B9XpukXOfywNNjhjYlNmNWRadFk)
+
