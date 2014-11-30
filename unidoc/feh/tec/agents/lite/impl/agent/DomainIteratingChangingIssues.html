@@ -1,0 +1,1745 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>DomainIteratingChangingIssues - feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues</title>
+          <meta name="description" content="DomainIteratingChangingIssues - feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues" />
+          <meta name="keywords" content="DomainIteratingChangingIssues feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../../../lib/tools.tooltip.js"></script>
+      <script type="text/javascript" src="../../../../../../lib/modernizr.custom.js"></script><script type="text/javascript" src="../../../../../../lib/diagrams.js" id="diagrams-js"></script>
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../../../index.html';
+            var hash = 'feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img src="../../../../../../lib/trait_big.png" />
+        <p id="owner"><a href="../../../../../package.html" class="extype" name="feh">feh</a>.<a href="../../../../package.html" class="extype" name="feh.tec">tec</a>.<a href="../../../package.html" class="extype" name="feh.tec.agents">agents</a>.<a href="../../package.html" class="extype" name="feh.tec.agents.lite">lite</a>.<a href="../package.html" class="extype" name="feh.tec.agents.lite.impl">impl</a>.<a href="package.html" class="extype" name="feh.tec.agents.lite.impl.agent">agent</a></p>
+        <h1>DomainIteratingChangingIssues</h1> <span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <span class="name">DomainIteratingChangingIssues</span><span class="tparams">[<span name="Lang">Lang &lt;: <a href="../../Language$$ProposalBased.html" class="extype" name="feh.tec.agents.lite.Language.ProposalBased">ProposalBased</a> with <a href="../../Language$$HasPriority.html" class="extype" name="feh.tec.agents.lite.Language.HasPriority">HasPriority</a> with <a href="../../Language$$NegotiatesIssues.html" class="extype" name="feh.tec.agents.lite.Language.NegotiatesIssues">NegotiatesIssues</a></span>]</span><span class="result"> extends <a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>] with <a href="../DomainIterating.html" class="extype" name="feh.tec.agents.lite.impl.DomainIterating">DomainIterating</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Self Type</dt><dd><a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>] with <a href="../ChangingIssues.html" class="extype" name="feh.tec.agents.lite.impl.ChangingIssues">ChangingIssues</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="../DomainIterating.html" class="extype" name="feh.tec.agents.lite.impl.DomainIterating">DomainIterating</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../../ProposalEngine$$Iterating.html" class="extype" name="feh.tec.agents.lite.ProposalEngine.Iterating">Iterating</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../../ResponseDelay.html" class="extype" name="feh.tec.agents.lite.ResponseDelay">ResponseDelay</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../../AgentCreationInterface.html" class="extype" name="feh.tec.agents.lite.AgentCreationInterface">AgentCreationInterface</a>, <a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">impl.PriorityAndProposalBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../ConstraintsSatisfactionChecks.html" class="extype" name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks">ConstraintsSatisfactionChecks</a>, <a href="../../SpeakingSystemSupport.html" class="extype" name="feh.tec.agents.lite.SpeakingSystemSupport">SpeakingSystemSupport</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../../DynamicScopeSupport.html" class="extype" name="feh.tec.agents.lite.DynamicScopeSupport">DynamicScopeSupport</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../../AgentHelpers.html" class="extype" name="feh.tec.agents.lite.AgentHelpers">AgentHelpers</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <span class="extype" name="akka.actor.ActorLogging">ActorLogging</span>, <a href="../../SystemSupport.html" class="extype" name="feh.tec.agents.lite.SystemSupport">SystemSupport</a>, <a href="../../PriorityProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.PriorityProposalBasedAgent">PriorityProposalBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../../ProposalEngine.html" class="extype" name="feh.tec.agents.lite.ProposalEngine">ProposalEngine</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../../ProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.ProposalBasedAgent">ProposalBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../../PriorityBasedAgent.html" class="extype" name="feh.tec.agents.lite.PriorityBasedAgent">PriorityBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../../NegotiatingAgent.html" class="extype" name="feh.tec.agents.lite.NegotiatingAgent">NegotiatingAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../../SpeakingAgent.html" class="extype" name="feh.tec.agents.lite.SpeakingAgent">SpeakingAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>], <a href="../../AbstractAgent.html" class="extype" name="feh.tec.agents.lite.AbstractAgent">AbstractAgent</a>, <span class="extype" name="akka.actor.Actor">Actor</span>, <a href="../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block diagram-container" id="inheritance-diagram-container">
+                <span class="toggle diagram-link">Type Hierarchy</span>
+                <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#diagrams" target="_blank" class="diagram-help">Learn more about scaladoc diagrams</a>
+                <div class="diagram" id="inheritance-diagram"><svg class="class-diagram" id="graph173" viewBox="0.00 0.00 378.00 120.00" height="120pt" width="378pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 116)" class="graph" id="graph1"><polygon points="-4,5 -4,-116 375,-116 375,5 -4,5" stroke="white" fill="white"></polygon><g class="cluster" id="graph2"></g><g class="cluster" id="graph3"></g><!-- node0 --><g class="node this trait" id="graph173_0"><a xlink:title="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues (this trait)" xlink:href="#inheritance-diagram"><polygon points="307.25,-50 98.75,-50 98.75,-24 307.25,-24 307.25,-50" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../../../lib/trait_diagram.png" y="-45" x="109" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-35" x="131" text-anchor="start">DomainIteratingChangingIssues[Lang]</text></a></g><!-- node1 --><g class="node class" id="graph173_1"><a xlink:title="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent" xlink:href="PriorityAndProposalBasedAgent.html#inheritance-diagram"><polygon points="211.5,-112 0.5,-112 0.5,-86 211.5,-86 211.5,-112" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../../../lib/class_diagram.png" y="-107" x="10" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-97" x="32" text-anchor="start">PriorityAndProposalBasedAgent[Lang]</text></a></g><!-- node1&#45;&gt;node0 --><g class="edge inheritance" id="graph173_1_0"><a xlink:title="DomainIteratingChangingIssues[Lang] is a subtype of PriorityAndProposalBasedAgent[Lang]"><path d="M130.12,-83.0801C146.55,-72.9173 168.025,-59.6342 183.4,-50.1238" stroke="#d4d4d4" fill="none"></path><polygon points="128.961,-81.7395 125.629,-85.8581 130.802,-84.7161 128.961,-81.7395" stroke="#d4d4d4" fill="none"></polygon></a></g><!-- node2 --><g class="node trait" id="graph173_2"><a xlink:title="feh.tec.agents.lite.impl.DomainIterating" xlink:href="../DomainIterating.html#inheritance-diagram"><polygon points="370,-112 230,-112 230,-86 370,-86 370,-112" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../../../lib/trait_diagram.png" y="-107" x="240" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-97" x="262" text-anchor="start">DomainIterating[Lang]</text></a></g><!-- node2&#45;&gt;node0 --><g class="edge inheritance" id="graph173_2_0"><a xlink:title="DomainIteratingChangingIssues[Lang] is a subtype of DomainIterating[Lang]"><path d="M275.88,-83.0801C259.45,-72.9173 237.975,-59.6342 222.6,-50.1238" stroke="#d4d4d4" fill="none"></path><polygon points="275.198,-84.7161 280.371,-85.8581 277.039,-81.7395 275.198,-84.7161" stroke="#d4d4d4" fill="none"></polygon></a></g></g></svg></div>
+              </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues"><span>DomainIteratingChangingIssues</span></li><li class="in" name="feh.tec.agents.lite.impl.DomainIterating"><span>DomainIterating</span></li><li class="in" name="feh.tec.agents.lite.ProposalEngine.Iterating"><span>Iterating</span></li><li class="in" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent"><span>PriorityAndProposalBasedAgent</span></li><li class="in" name="feh.tec.agents.lite.ResponseDelay"><span>ResponseDelay</span></li><li class="in" name="feh.tec.agents.lite.AgentCreationInterface"><span>AgentCreationInterface</span></li><li class="in" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent"><span>PriorityAndProposalBasedAgent</span></li><li class="in" name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks"><span>ConstraintsSatisfactionChecks</span></li><li class="in" name="feh.tec.agents.lite.SpeakingSystemSupport"><span>SpeakingSystemSupport</span></li><li class="in" name="feh.tec.agents.lite.DynamicScopeSupport"><span>DynamicScopeSupport</span></li><li class="in" name="feh.tec.agents.lite.AgentHelpers"><span>AgentHelpers</span></li><li class="in" name="akka.actor.ActorLogging"><span>ActorLogging</span></li><li class="in" name="feh.tec.agents.lite.SystemSupport"><span>SystemSupport</span></li><li class="in" name="feh.tec.agents.lite.PriorityProposalBasedAgent"><span>PriorityProposalBasedAgent</span></li><li class="in" name="feh.tec.agents.lite.ProposalEngine"><span>ProposalEngine</span></li><li class="in" name="feh.tec.agents.lite.ProposalBasedAgent"><span>ProposalBasedAgent</span></li><li class="in" name="feh.tec.agents.lite.PriorityBasedAgent"><span>PriorityBasedAgent</span></li><li class="in" name="feh.tec.agents.lite.NegotiatingAgent"><span>NegotiatingAgent</span></li><li class="in" name="feh.tec.agents.lite.SpeakingAgent"><span>SpeakingAgent</span></li><li class="in" name="feh.tec.agents.lite.AbstractAgent"><span>AbstractAgent</span></li><li class="in" name="akka.actor.Actor"><span>Actor</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Agent" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="Agent&lt;:feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent[Lang]withfeh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues[Lang]"></a>
+      <a id="Agent:(DomainIteratingChangingIssues.this)#Agent"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Agent</span><span class="result"> &lt;: <a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>] with <a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@Agent&lt;:feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent[Lang]withfeh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues[Lang]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a> → <a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.AgentHelpers.AgentRefWrapper" visbl="prt" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="AgentRefWrapperextendsAnyRef"></a>
+      <a id="AgentRefWrapper:(AgentHelpers.this)#AgentRefWrapper"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="../../AgentHelpers$AgentRefWrapper.html"><span class="name">AgentRefWrapper</span></a><span class="result"> extends <a href="../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.AgentHelpers@AgentRefWrapperextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../../AgentHelpers.html" class="extype" name="feh.tec.agents.lite.AgentHelpers">AgentHelpers</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.AgentCreationInterface.Args" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Args=Map[String,Any]"></a>
+      <a id="Args:(DomainIteratingChangingIssues.this)#Args"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Args</span><span class="result"> = <span class="extype" name="scala.collection.immutable.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Any">Any</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@Args=Map[String,Any]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../AgentCreationInterface.html" class="extype" name="feh.tec.agents.lite.AgentCreationInterface">AgentCreationInterface</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Negotiation" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="Negotiation&lt;:feh.tec.agents.lite.Negotiation.DynamicScopewithfeh.tec.agents.lite.Negotiation.HasPrioritywithfeh.tec.agents.lite.Negotiation.HasProposal[Lang]withfeh.tec.agents.lite.Negotiation.ChangingIssueswithfeh.tec.agents.lite.Negotiation.HasIterators"></a>
+      <a id="Negotiation:(DomainIteratingChangingIssues.this)#Negotiation"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Negotiation</span><span class="result"> &lt;: <a href="../../Negotiation$$DynamicScope.html" class="extype" name="feh.tec.agents.lite.Negotiation.DynamicScope">DynamicScope</a> with <a href="../../Negotiation$$HasPriority.html" class="extype" name="feh.tec.agents.lite.Negotiation.HasPriority">HasPriority</a> with <a href="../../Negotiation$$HasProposal.html" class="extype" name="feh.tec.agents.lite.Negotiation.HasProposal">HasProposal</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>] with <a href="../../Negotiation$$ChangingIssues.html" class="extype" name="feh.tec.agents.lite.Negotiation.ChangingIssues">Negotiation.ChangingIssues</a> with <a href="../../Negotiation$$HasIterators.html" class="extype" name="feh.tec.agents.lite.Negotiation.HasIterators">HasIterators</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@Negotiation&lt;:feh.tec.agents.lite.Negotiation.DynamicScopewithfeh.tec.agents.lite.Negotiation.HasPrioritywithfeh.tec.agents.lite.Negotiation.HasProposal[Lang]withfeh.tec.agents.lite.Negotiation.ChangingIssueswithfeh.tec.agents.lite.Negotiation.HasIterators" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a> → <a href="../../ProposalEngine$$Iterating.html" class="extype" name="feh.tec.agents.lite.ProposalEngine.Iterating">Iterating</a> → <a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../DynamicScopeSupport.html" class="extype" name="feh.tec.agents.lite.DynamicScopeSupport">DynamicScopeSupport</a> → <a href="../../PriorityProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.PriorityProposalBasedAgent">PriorityProposalBasedAgent</a> → <a href="../../ProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.ProposalBasedAgent">ProposalBasedAgent</a> → <a href="../../PriorityBasedAgent.html" class="extype" name="feh.tec.agents.lite.PriorityBasedAgent">PriorityBasedAgent</a> → <a href="../../NegotiatingAgent.html" class="extype" name="feh.tec.agents.lite.NegotiatingAgent">NegotiatingAgent</a></dd></dl></div>
+    </li><li name="akka.actor.Actor.Receive" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Receive=akka.actor.Actor.Receive"></a>
+      <a id="Receive:(DomainIteratingChangingIssues.this)#Receive"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Receive</span><span class="result"> = <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="scala.Any">Any</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@Receive=akka.actor.Actor.Receive" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent.SatisfiesConstraintsWrapper" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SatisfiesConstraintsWrapperextendsAnyRef"></a>
+      <a id="SatisfiesConstraintsWrapper:SatisfiesConstraintsWrapper"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="../PriorityAndProposalBasedAgent$SatisfiesConstraintsWrapper.html"><span class="name">SatisfiesConstraintsWrapper</span></a><span class="result"> extends <a href="../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent@SatisfiesConstraintsWrapperextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div id="values" class="values members">
+              <h3>Abstract Value Members</h3>
+              <ol><li name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks#constraintsByNegotiation" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="constraintsByNegotiation:Map[feh.tec.agents.lite.NegotiationId,feh.tec.agents.lite.spec.NegotiationSpecification.AgentConstraintsDef]"></a>
+      <a id="constraintsByNegotiation:Map[NegotiationId,AgentConstraintsDef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">constraintsByNegotiation</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a>, <a href="../../spec/NegotiationSpecification$$AgentConstraintsDef.html" class="extype" name="feh.tec.agents.lite.spec.NegotiationSpecification.AgentConstraintsDef">AgentConstraintsDef</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@constraintsByNegotiation:Map[feh.tec.agents.lite.NegotiationId,feh.tec.agents.lite.spec.NegotiationSpecification.AgentConstraintsDef]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../ConstraintsSatisfactionChecks.html" class="extype" name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks">ConstraintsSatisfactionChecks</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent#createNegotiation" visbl="prt" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="createNegotiation(id:feh.tec.agents.lite.NegotiationId):PriorityAndProposalBasedAgent.this.Negotiation"></a>
+      <a id="createNegotiation(NegotiationId):(DomainIteratingChangingIssues.this)#Negotiation"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">createNegotiation</span><span class="params">(<span name="id">id: <a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="result">: (<a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a>.this)#<span class="extype" name="feh.tec.agents.lite.impl.ChangingIssues.Negotiation">Negotiation</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@createNegotiation(id:feh.tec.agents.lite.NegotiationId):PriorityAndProposalBasedAgent.this.Negotiation" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.DomainIterating#domainIterators" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="domainIterators:Map[feh.tec.agents.lite.Var,feh.tec.agents.lite.DomainIteratorBuilder[feh.tec.agents.lite.Var#Domain,feh.tec.agents.lite.Var#Tpe]]"></a>
+      <a id="domainIterators:Map[Var,DomainIteratorBuilder[Var.Domain,Tpe]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">domainIterators</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../../Var.html" class="extype" name="feh.tec.agents.lite.Var">Var</a>, <a href="../../DomainIteratorBuilder.html" class="extype" name="feh.tec.agents.lite.DomainIteratorBuilder">DomainIteratorBuilder</a>[<a href="../../Var.html#Domain" class="extmbr" name="feh.tec.agents.lite.Var.Domain">Var.Domain</a>, <a href="../../Var.html#Tpe" class="extmbr" name="feh.tec.agents.lite.Var.Tpe">Tpe</a>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@domainIterators:Map[feh.tec.agents.lite.Var,feh.tec.agents.lite.DomainIteratorBuilder[feh.tec.agents.lite.Var#Domain,feh.tec.agents.lite.Var#Tpe]]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../DomainIterating.html" class="extype" name="feh.tec.agents.lite.impl.DomainIterating">DomainIterating</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.ResponseDelay#responseDelay" visbl="prt" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="responseDelay:scala.concurrent.duration.FiniteDuration"></a>
+      <a id="responseDelay:FiniteDuration"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">responseDelay</span><span class="result">: <span class="extype" name="scala.concurrent.duration.FiniteDuration">FiniteDuration</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@responseDelay:scala.concurrent.duration.FiniteDuration" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../../ResponseDelay.html" class="extype" name="feh.tec.agents.lite.ResponseDelay">ResponseDelay</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks#seqToTuple" visbl="prt" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="seqToTuple(seq:Seq[Any]):Product"></a>
+      <a id="seqToTuple(Seq[Any]):Product"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">seqToTuple</span><span class="params">(<span name="seq">seq: <a href="../../../../../../scala/package.html#Seq[+A]=Seq[A]" class="extmbr" name="scala.Seq">Seq</a>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Product">Product</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@seqToTuple(seq:Seq[Any]):Product" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">should be generated in macro</p><div class="fullcomment"><div class="comment cmt"><p>should be generated in macro</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../ConstraintsSatisfactionChecks.html" class="extype" name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks">ConstraintsSatisfactionChecks</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues#spec" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="spec:feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased[DomainIteratingChangingIssues.this.Agent,Lang]withfeh.tec.agents.lite.spec.AgentSpecification.Iterating[DomainIteratingChangingIssues.this.Agent,Lang]"></a>
+      <a id="spec:PriorityAndProposalBased[(DomainIteratingChangingIssues.this)#Agent,Lang]withIterating[(DomainIteratingChangingIssues.this)#Agent,Lang]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">spec</span><span class="result">: <a href="../../spec/AgentSpecification$$PriorityAndProposalBased.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased">PriorityAndProposalBased</a>[(<a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a>.this)#<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Agent">Agent</span>, <span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>] with <a href="../../spec/AgentSpecification$$Iterating.html" class="extype" name="feh.tec.agents.lite.spec.AgentSpecification.Iterating">Iterating</a>[(<a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a>.this)#<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Agent">Agent</span>, <span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@spec:feh.tec.agents.lite.spec.AgentSpecification.PriorityAndProposalBased[DomainIteratingChangingIssues.this.Agent,Lang]withfeh.tec.agents.lite.spec.AgentSpecification.Iterating[DomainIteratingChangingIssues.this.Agent,Lang]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a> → <a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div id="values" class="values members">
+              <h3>Concrete Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@##():Int" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.AgentHelpers#agentRefWrapper" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="agentRefWrapper(ref:feh.tec.agents.lite.AgentRef):AgentHelpers.this.AgentRefWrapper"></a>
+      <a id="agentRefWrapper(AgentRef):(DomainIteratingChangingIssues.this)#AgentRefWrapper"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">agentRefWrapper</span><span class="params">(<span name="ref">ref: <a href="../../AgentRef.html" class="extype" name="feh.tec.agents.lite.AgentRef">AgentRef</a></span>)</span><span class="result">: (<a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a>.this)#<span class="extype" name="feh.tec.agents.lite.AgentHelpers.AgentRefWrapper">AgentRefWrapper</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@agentRefWrapper(ref:feh.tec.agents.lite.AgentRef):AgentHelpers.this.AgentRefWrapper" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../AgentHelpers.html" class="extype" name="feh.tec.agents.lite.AgentHelpers">AgentHelpers</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#args" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="args:scala.collection.immutable.Map[String,Any]"></a>
+      <a id="args:Map[String,Any]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">args</span><span class="result">: <span class="extype" name="scala.collection.immutable.Map">Map</span>[<span class="extype" name="java.lang.String">String</span>, <span class="extype" name="scala.Any">Any</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@args:scala.collection.immutable.Map[String,Any]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../AgentCreationInterface.html" class="extype" name="feh.tec.agents.lite.AgentCreationInterface">AgentCreationInterface</a></dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPostRestart" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPostRestart(reason:Throwable):Unit"></a>
+      <a id="aroundPostRestart(Throwable):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPostRestart</span><span class="params">(<span name="reason">reason: <a href="../../../../../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@aroundPostRestart(reason:Throwable):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../akka/package.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPostStop" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPostStop():Unit"></a>
+      <a id="aroundPostStop():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPostStop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@aroundPostStop():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../akka/package.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPreRestart" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPreRestart(reason:Throwable,message:Option[Any]):Unit"></a>
+      <a id="aroundPreRestart(Throwable,Option[Any]):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPreRestart</span><span class="params">(<span name="reason">reason: <a href="../../../../../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a></span>, <span name="message">message: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@aroundPreRestart(reason:Throwable,message:Option[Any]):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../akka/package.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPreStart" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPreStart():Unit"></a>
+      <a id="aroundPreStart():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPreStart</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@aroundPreStart():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../akka/package.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundReceive" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundReceive(receive:akka.actor.Actor.Receive,msg:Any):Unit"></a>
+      <a id="aroundReceive(akka.actor.Actor.Receive,Any):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundReceive</span><span class="params">(<span name="receive">receive: <span class="extype" name="akka.actor.Actor.Receive">akka.actor.Actor.Receive</span></span>, <span name="msg">msg: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@aroundReceive(receive:akka.actor.Actor.Receive,msg:Any):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../akka/package.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#beforeEachMessage" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="beforeEachMessage(msg:feh.tec.agents.lite.Message.HasPriority):Unit"></a>
+      <a id="beforeEachMessage(HasPriority):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">beforeEachMessage</span><span class="params">(<span name="msg">msg: <a href="../../Message$$HasPriority.html" class="extype" name="feh.tec.agents.lite.Message.HasPriority">HasPriority</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@beforeEachMessage(msg:feh.tec.agents.lite.Message.HasPriority):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../SpeakingSystemSupport.html" class="extype" name="feh.tec.agents.lite.SpeakingSystemSupport">SpeakingSystemSupport</a></dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <a href="../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@clone():Object" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent#comparePriority" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="comparePriority(msg:feh.tec.agents.lite.Message.HasPriority,f:(feh.tec.agents.lite.Priority,feh.tec.agents.lite.Priority)=&gt;Boolean):Boolean"></a>
+      <a id="comparePriority(HasPriority,(Priority,Priority)⇒Boolean):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">comparePriority</span><span class="params">(<span name="msg">msg: <a href="../../Message$$HasPriority.html" class="extype" name="feh.tec.agents.lite.Message.HasPriority">HasPriority</a></span>, <span name="f">f: (<a href="../../Priority.html" class="extype" name="feh.tec.agents.lite.Priority">Priority</a>, <a href="../../Priority.html" class="extype" name="feh.tec.agents.lite.Priority">Priority</a>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@comparePriority(msg:feh.tec.agents.lite.Message.HasPriority,f:(feh.tec.agents.lite.Priority,feh.tec.agents.lite.Priority)=&gt;Boolean):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">(this, that) =&gt; Boolean</p><div class="fullcomment"><div class="comment cmt"><p>(this, that) =&gt; Boolean</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../PriorityBasedAgent.html" class="extype" name="feh.tec.agents.lite.PriorityBasedAgent">PriorityBasedAgent</a></dd></dl></div>
+    </li><li name="akka.actor.Actor#context" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="context:akka.actor.ActorContext"></a>
+      <a id="context:ActorContext"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">context</span><span class="result">: <span class="extype" name="akka.actor.ActorContext">ActorContext</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@context:akka.actor.ActorContext" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.SpeakingSystemSupport#currentMessage" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="currentMessage:Lang#Msg"></a>
+      <a id="currentMessage:Lang.Msg"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">currentMessage</span><span class="result">: <span class="extype" name="feh.tec.agents.lite.Language.HasPriority.Msg">Lang.Msg</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@currentMessage:Lang#Msg" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../SpeakingSystemSupport.html" class="extype" name="feh.tec.agents.lite.SpeakingSystemSupport">SpeakingSystemSupport</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="feh.tec.agents.lite.AgentHelpers#get" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="get(neg:feh.tec.agents.lite.NegotiationId):AgentHelpers.this.Negotiation"></a>
+      <a id="get(NegotiationId):(DomainIteratingChangingIssues.this)#Negotiation"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">get</span><span class="params">(<span name="neg">neg: <a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="result">: (<a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a>.this)#<span class="extype" name="feh.tec.agents.lite.impl.ChangingIssues.Negotiation">Negotiation</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@get(neg:feh.tec.agents.lite.NegotiationId):AgentHelpers.this.Negotiation" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../AgentHelpers.html" class="extype" name="feh.tec.agents.lite.AgentHelpers">AgentHelpers</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.AgentHelpers#getOpt" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getOpt(neg:feh.tec.agents.lite.NegotiationId):Option[AgentHelpers.this.Negotiation]"></a>
+      <a id="getOpt(NegotiationId):Option[(DomainIteratingChangingIssues.this)#Negotiation]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getOpt</span><span class="params">(<span name="neg">neg: <a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[(<a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a>.this)#<span class="extype" name="feh.tec.agents.lite.impl.ChangingIssues.Negotiation">Negotiation</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@getOpt(neg:feh.tec.agents.lite.NegotiationId):Option[AgentHelpers.this.Negotiation]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../AgentHelpers.html" class="extype" name="feh.tec.agents.lite.AgentHelpers">AgentHelpers</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent#guardDelayedMessage" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="guardDelayedMessage(msg:feh.tec.agents.lite.Message.HasPriority):scala.collection.mutable.HashSet[feh.tec.agents.lite.Message.HasPriority]"></a>
+      <a id="guardDelayedMessage(HasPriority):HashSet[HasPriority]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">guardDelayedMessage</span><span class="params">(<span name="msg">msg: <a href="../../Message$$HasPriority.html" class="extype" name="feh.tec.agents.lite.Message.HasPriority">HasPriority</a></span>)</span><span class="result">: <span class="extype" name="scala.collection.mutable.HashSet">HashSet</span>[<a href="../../Message$$HasPriority.html" class="extype" name="feh.tec.agents.lite.Message.HasPriority">HasPriority</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@guardDelayedMessage(msg:feh.tec.agents.lite.Message.HasPriority):scala.collection.mutable.HashSet[feh.tec.agents.lite.Message.HasPriority]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent#hasState" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hasState(msg:feh.tec.agents.lite.NegotiationMessage,s:feh.tec.agents.lite.NegotiationState*):Boolean"></a>
+      <a id="hasState(NegotiationMessage,NegotiationState*):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hasState</span><span class="params">(<span name="msg">msg: <a href="../../NegotiationMessage.html" class="extype" name="feh.tec.agents.lite.NegotiationMessage">NegotiationMessage</a></span>, <span name="s">s: <a href="../../NegotiationState.html" class="extype" name="feh.tec.agents.lite.NegotiationState">NegotiationState</a>*</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@hasState(msg:feh.tec.agents.lite.NegotiationMessage,s:feh.tec.agents.lite.NegotiationState*):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.AgentHelpers.hooks" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hooks"></a>
+      <a id="hooks:hooks"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="../../AgentHelpers$hooks$.html"><span class="name">hooks</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../index.html#feh.tec.agents.lite.AgentHelpers@hooks" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../../AgentHelpers.html" class="extype" name="feh.tec.agents.lite.AgentHelpers">AgentHelpers</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks#ifConstraintLeafForOtherVars" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ifConstraintLeafForOtherVars:Boolean"></a>
+      <a id="ifConstraintLeafForOtherVars:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ifConstraintLeafForOtherVars</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@ifConstraintLeafForOtherVars:Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../ConstraintsSatisfactionChecks.html" class="extype" name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks">ConstraintsSatisfactionChecks</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#initialize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="initialize():Unit"></a>
+      <a id="initialize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">initialize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@initialize():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../SystemSupport.html" class="extype" name="feh.tec.agents.lite.SystemSupport">SystemSupport</a></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="akka.actor.ActorLogging#log" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="log:akka.event.LoggingAdapter"></a>
+      <a id="log:LoggingAdapter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">log</span><span class="result">: <span class="extype" name="akka.event.LoggingAdapter">LoggingAdapter</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@log:akka.event.LoggingAdapter" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ActorLogging</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#moreProcess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="moreProcess:PartialFunction[feh.tec.agents.lite.Message.HasPriority,Any]"></a>
+      <a id="moreProcess:PartialFunction[HasPriority,Any]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">moreProcess</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="../../Message$$HasPriority.html" class="extype" name="feh.tec.agents.lite.Message.HasPriority">HasPriority</a>, <span class="extype" name="scala.Any">Any</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@moreProcess:PartialFunction[feh.tec.agents.lite.Message.HasPriority,Any]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent.myPriority" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="myPriority"></a>
+      <a id="myPriority:myPriority"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="../PriorityAndProposalBasedAgent$myPriority$.html"><span class="name">myPriority</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent@myPriority" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.AgentCreationInterface#name" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="name:String"></a>
+      <a id="name:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">name</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@name:String" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../AgentCreationInterface.html" class="extype" name="feh.tec.agents.lite.AgentCreationInterface">AgentCreationInterface</a></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#negotiationIds" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="negotiationIds:Set[feh.tec.agents.lite.NegotiationId]"></a>
+      <a id="negotiationIds:Set[NegotiationId]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">negotiationIds</span><span class="result">: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@negotiationIds:Set[feh.tec.agents.lite.NegotiationId]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent#negotiations" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="negotiations:scala.collection.immutable.Set[PriorityAndProposalBasedAgent.this.Negotiation]"></a>
+      <a id="negotiations:Set[(DomainIteratingChangingIssues.this)#Negotiation]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">negotiations</span><span class="result">: <span class="extype" name="scala.collection.immutable.Set">Set</span>[(<a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a>.this)#<span class="extype" name="feh.tec.agents.lite.impl.ChangingIssues.Negotiation">Negotiation</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@negotiations:scala.collection.immutable.Set[PriorityAndProposalBasedAgent.this.Negotiation]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../NegotiatingAgent.html" class="extype" name="feh.tec.agents.lite.NegotiatingAgent">NegotiatingAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#negotiationsInit" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="negotiationsInit:Set[feh.tec.agents.lite.AgentCreationInterface.NegotiationInit]"></a>
+      <a id="negotiationsInit:Set[NegotiationInit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">negotiationsInit</span><span class="result">: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="../../AgentCreationInterface$$NegotiationInit.html" class="extype" name="feh.tec.agents.lite.AgentCreationInterface.NegotiationInit">NegotiationInit</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@negotiationsInit:Set[feh.tec.agents.lite.AgentCreationInterface.NegotiationInit]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../AgentCreationInterface.html" class="extype" name="feh.tec.agents.lite.AgentCreationInterface">AgentCreationInterface</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues#newIterator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="newIterator(neg:feh.tec.agents.lite.NegotiationId):feh.tec.agents.lite.ProposalEngine.DomainIterator"></a>
+      <a id="newIterator(NegotiationId):DomainIterator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">newIterator</span><span class="params">(<span name="neg">neg: <a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="result">: <a href="../../ProposalEngine$.html#DomainIterator=Iterator[Map[feh.tec.agents.lite.Var,Any]]" class="extmbr" name="feh.tec.agents.lite.ProposalEngine.DomainIterator">DomainIterator</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@newIterator(neg:feh.tec.agents.lite.NegotiationId):feh.tec.agents.lite.ProposalEngine.DomainIterator" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a> → <a href="../../ProposalEngine$$Iterating.html" class="extype" name="feh.tec.agents.lite.ProposalEngine.Iterating">Iterating</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#nextValues" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="nextValues(neg:feh.tec.agents.lite.NegotiationId):Option[Map[feh.tec.agents.lite.Var,Any]]"></a>
+      <a id="nextValues(NegotiationId):Option[Map[Var,Any]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nextValues</span><span class="params">(<span name="neg">neg: <a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<a href="../../Var.html" class="extype" name="feh.tec.agents.lite.Var">Var</a>, <span class="extype" name="scala.Any">Any</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@nextValues(neg:feh.tec.agents.lite.NegotiationId):Option[Map[feh.tec.agents.lite.Var,Any]]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../ProposalEngine.html" class="extype" name="feh.tec.agents.lite.ProposalEngine">ProposalEngine</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#nothingToPropose" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="nothingToPropose(neg:feh.tec.agents.lite.NegotiationId):Unit"></a>
+      <a id="nothingToPropose(NegotiationId):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nothingToPropose</span><span class="params">(<span name="neg">neg: <a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@nothingToPropose(neg:feh.tec.agents.lite.NegotiationId):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../PriorityProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.PriorityProposalBasedAgent">PriorityProposalBasedAgent</a></dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#onAcceptance" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="onAcceptance:PartialFunction[feh.tec.agents.lite.Message.Accepted,Any]"></a>
+      <a id="onAcceptance:PartialFunction[Accepted,Any]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">onAcceptance</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="../../Message$$Accepted.html" class="extype" name="feh.tec.agents.lite.Message.Accepted">Accepted</a>, <span class="extype" name="scala.Any">Any</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@onAcceptance:PartialFunction[feh.tec.agents.lite.Message.Accepted,Any]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../ProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.ProposalBasedAgent">ProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#onProposal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="onProposal:PartialFunction[feh.tec.agents.lite.Message.Proposal,Any]"></a>
+      <a id="onProposal:PartialFunction[Proposal,Any]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">onProposal</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="../../Message$$Proposal.html" class="extype" name="feh.tec.agents.lite.Message.Proposal">Proposal</a>, <span class="extype" name="scala.Any">Any</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@onProposal:PartialFunction[feh.tec.agents.lite.Message.Proposal,Any]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../ProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.ProposalBasedAgent">ProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#onRejection" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="onRejection:PartialFunction[feh.tec.agents.lite.Message.Rejected,Any]"></a>
+      <a id="onRejection:PartialFunction[Rejected,Any]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">onRejection</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="../../Message$$Rejected.html" class="extype" name="feh.tec.agents.lite.Message.Rejected">Rejected</a>, <span class="extype" name="scala.Any">Any</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@onRejection:PartialFunction[feh.tec.agents.lite.Message.Rejected,Any]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../ProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.ProposalBasedAgent">ProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#owner" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="owner:PriorityAndProposalBasedAgent.this.Agent"></a>
+      <a id="owner:(DomainIteratingChangingIssues.this)#Agent"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">owner</span><span class="result">: (<a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a>.this)#<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Agent">Agent</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@owner:PriorityAndProposalBasedAgent.this.Agent" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li><li name="akka.actor.Actor#postRestart" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="postRestart(reason:Throwable):Unit"></a>
+      <a id="postRestart(Throwable):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">postRestart</span><span class="params">(<span name="reason">reason: <a href="../../../../../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@postRestart(reason:Throwable):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Exception]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#postStop" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="postStop():Unit"></a>
+      <a id="postStop():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">postStop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@postStop():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Exception]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#preRestart" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="preRestart(reason:Throwable,message:Option[Any]):Unit"></a>
+      <a id="preRestart(Throwable,Option[Any]):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">preRestart</span><span class="params">(<span name="reason">reason: <a href="../../../../../../scala/package.html#Throwable=Throwable" class="extmbr" name="scala.Throwable">Throwable</a></span>, <span name="message">message: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@preRestart(reason:Throwable,message:Option[Any]):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Exception]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#preStart" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="preStart():Unit"></a>
+      <a id="preStart():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">preStart</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@preStart():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Exception]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="feh.tec.agents.lite.ResponseDelay#process" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="process:PartialFunction[Lang#Msg,Any]"></a>
+      <a id="process:PartialFunction[Lang.Msg,Any]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">process</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="feh.tec.agents.lite.Language.HasPriority.Msg">Lang.Msg</span>, <span class="extype" name="scala.Any">Any</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@process:PartialFunction[Lang#Msg,Any]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ResponseDelay.html" class="extype" name="feh.tec.agents.lite.ResponseDelay">ResponseDelay</a> → <a href="../../SpeakingAgent.html" class="extype" name="feh.tec.agents.lite.SpeakingAgent">SpeakingAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.DynamicScopeSupport#processSys" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="processSys:PartialFunction[feh.tec.agents.lite.SystemMessage,Any]"></a>
+      <a id="processSys:PartialFunction[SystemMessage,Any]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">processSys</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="../../SystemMessage.html" class="extype" name="feh.tec.agents.lite.SystemMessage">SystemMessage</a>, <span class="extype" name="scala.Any">Any</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@processSys:PartialFunction[feh.tec.agents.lite.SystemMessage,Any]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../DynamicScopeSupport.html" class="extype" name="feh.tec.agents.lite.DynamicScopeSupport">DynamicScopeSupport</a> → <a href="../../SystemSupport.html" class="extype" name="feh.tec.agents.lite.SystemSupport">SystemSupport</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#processUserMessage" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="processUserMessage:PartialFunction[feh.tec.agents.lite.UserMessage,Any]"></a>
+      <a id="processUserMessage:PartialFunction[UserMessage,Any]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">processUserMessage</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="../../UserMessage.html" class="extype" name="feh.tec.agents.lite.UserMessage">UserMessage</a>, <span class="extype" name="scala.Any">Any</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@processUserMessage:PartialFunction[feh.tec.agents.lite.UserMessage,Any]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../SpeakingSystemSupport.html" class="extype" name="feh.tec.agents.lite.SpeakingSystemSupport">SpeakingSystemSupport</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.SpeakingSystemSupport#receive" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="receive:PartialFunction[Any,Unit]"></a>
+      <a id="receive:PartialFunction[Any,Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">receive</span><span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="scala.Any">Any</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@receive:PartialFunction[Any,Unit]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../SpeakingSystemSupport.html" class="extype" name="feh.tec.agents.lite.SpeakingSystemSupport">SpeakingSystemSupport</a> → Actor</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent#ref" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ref:feh.tec.agents.lite.AgentRef"></a>
+      <a id="ref:AgentRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ref</span><span class="result">: <a href="../../AgentRef.html" class="extype" name="feh.tec.agents.lite.AgentRef">AgentRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@ref:feh.tec.agents.lite.AgentRef" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../SpeakingAgent.html" class="extype" name="feh.tec.agents.lite.SpeakingAgent">SpeakingAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent#resendDelayedMessages" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="resendDelayedMessages():Unit"></a>
+      <a id="resendDelayedMessages():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">resendDelayedMessages</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@resendDelayedMessages():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#reset" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="reset():Unit"></a>
+      <a id="reset():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">reset</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@reset():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../SystemSupport.html" class="extype" name="feh.tec.agents.lite.SystemSupport">SystemSupport</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent#respond" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="respond(msg:feh.tec.agents.lite.Message.HasPriority):Unit"></a>
+      <a id="respond(HasPriority):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">respond</span><span class="params">(<span name="msg">msg: <a href="../../Message$$HasPriority.html" class="extype" name="feh.tec.agents.lite.Message.HasPriority">HasPriority</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@respond(msg:feh.tec.agents.lite.Message.HasPriority):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#role" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="role:feh.tec.agents.lite.NegotiationRole"></a>
+      <a id="role:NegotiationRole"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">role</span><span class="result">: <a href="../../NegotiationRole.html" class="extype" name="feh.tec.agents.lite.NegotiationRole">NegotiationRole</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@role:feh.tec.agents.lite.NegotiationRole" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../AgentCreationInterface.html" class="extype" name="feh.tec.agents.lite.AgentCreationInterface">AgentCreationInterface</a> → <a href="../../NegotiatingAgent.html" class="extype" name="feh.tec.agents.lite.NegotiatingAgent">NegotiatingAgent</a> → <a href="../../AbstractAgent.html" class="extype" name="feh.tec.agents.lite.AbstractAgent">AbstractAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks#satisfiesConstraints" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="satisfiesConstraints(of:feh.tec.agents.lite.NegotiationId,values:Map[feh.tec.agents.lite.Var,Any]):Boolean"></a>
+      <a id="satisfiesConstraints(NegotiationId,Map[Var,Any]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">satisfiesConstraints</span><span class="params">(<span name="of">of: <a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>, <span name="values">values: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../../Var.html" class="extype" name="feh.tec.agents.lite.Var">Var</a>, <span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@satisfiesConstraints(of:feh.tec.agents.lite.NegotiationId,values:Map[feh.tec.agents.lite.Var,Any]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../ConstraintsSatisfactionChecks.html" class="extype" name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks">ConstraintsSatisfactionChecks</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks#satisfiesParts" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="satisfiesParts(part:feh.tec.agents.lite.spec.NegotiationSpecification.ConstraintPart[feh.tec.agents.lite.spec.NegotiationSpecification.AgentVarConstraintDef],proposed:Map[feh.tec.agents.lite.Var,Any],myValues:Map[feh.tec.agents.lite.Var,Any]):Boolean"></a>
+      <a id="satisfiesParts(ConstraintPart[AgentVarConstraintDef],Map[Var,Any],Map[Var,Any]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">satisfiesParts</span><span class="params">(<span name="part">part: <a href="../../spec/NegotiationSpecification$$ConstraintPart.html" class="extype" name="feh.tec.agents.lite.spec.NegotiationSpecification.ConstraintPart">ConstraintPart</a>[<a href="../../spec/NegotiationSpecification$$AgentVarConstraintDef.html" class="extype" name="feh.tec.agents.lite.spec.NegotiationSpecification.AgentVarConstraintDef">AgentVarConstraintDef</a>]</span>, <span name="proposed">proposed: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../../Var.html" class="extype" name="feh.tec.agents.lite.Var">Var</a>, <span class="extype" name="scala.Any">Any</span>]</span>, <span name="myValues">myValues: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../../Var.html" class="extype" name="feh.tec.agents.lite.Var">Var</a>, <span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@satisfiesParts(part:feh.tec.agents.lite.spec.NegotiationSpecification.ConstraintPart[feh.tec.agents.lite.spec.NegotiationSpecification.AgentVarConstraintDef],proposed:Map[feh.tec.agents.lite.Var,Any],myValues:Map[feh.tec.agents.lite.Var,Any]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../ConstraintsSatisfactionChecks.html" class="extype" name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks">ConstraintsSatisfactionChecks</a></dd></dl></div>
+    </li><li name="akka.actor.Actor#self" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="self:akka.actor.ActorRef"></a>
+      <a id="self:ActorRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit final </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">self</span><span class="result">: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@self:akka.actor.ActorRef" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.AgentHelpers#sendToAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sendToAll(msg:Lang#Msg):Unit"></a>
+      <a id="sendToAll(Lang.Msg):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sendToAll</span><span class="params">(<span name="msg">msg: <span class="extype" name="feh.tec.agents.lite.Language.HasPriority.Msg">Lang.Msg</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@sendToAll(msg:Lang#Msg):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../AgentHelpers.html" class="extype" name="feh.tec.agents.lite.AgentHelpers">AgentHelpers</a></dd></dl></div>
+    </li><li name="akka.actor.Actor#sender" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sender():akka.actor.ActorRef"></a>
+      <a id="sender():ActorRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sender</span><span class="params">()</span><span class="result">: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@sender():akka.actor.ActorRef" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#setNextProposal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setNextProposal(neg:feh.tec.agents.lite.NegotiationId):feh.tec.agents.lite.Message.Proposal"></a>
+      <a id="setNextProposal(NegotiationId):Proposal"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setNextProposal</span><span class="params">(<span name="neg">neg: <a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="result">: <a href="../../Message$$Proposal.html" class="extype" name="feh.tec.agents.lite.Message.Proposal">Proposal</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@setNextProposal(neg:feh.tec.agents.lite.NegotiationId):feh.tec.agents.lite.Message.Proposal" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../ProposalEngine.html" class="extype" name="feh.tec.agents.lite.ProposalEngine">ProposalEngine</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#start" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="start():Unit"></a>
+      <a id="start():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">start</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@start():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../SystemSupport.html" class="extype" name="feh.tec.agents.lite.SystemSupport">SystemSupport</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#stop" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="stop():Unit"></a>
+      <a id="stop():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@stop():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../SystemSupport.html" class="extype" name="feh.tec.agents.lite.SystemSupport">SystemSupport</a></dd></dl></div>
+    </li><li name="akka.actor.Actor#supervisorStrategy" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="supervisorStrategy:akka.actor.SupervisorStrategy"></a>
+      <a id="supervisorStrategy:SupervisorStrategy"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">supervisorStrategy</span><span class="result">: <span class="extype" name="akka.actor.SupervisorStrategy">SupervisorStrategy</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@supervisorStrategy:akka.actor.SupervisorStrategy" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@toString():String" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="akka.actor.Actor#unhandled" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unhandled(message:Any):Unit"></a>
+      <a id="unhandled(Any):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">unhandled</span><span class="params">(<span name="message">message: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@unhandled(message:Any):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#uniqueName" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="uniqueName:String"></a>
+      <a id="uniqueName:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">uniqueName</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@uniqueName:String" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../AgentCreationInterface.html" class="extype" name="feh.tec.agents.lite.AgentCreationInterface">AgentCreationInterface</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent#updateCurrentProposal" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateCurrentProposal(neg:feh.tec.agents.lite.NegotiationId):Unit"></a>
+      <a id="updateCurrentProposal(NegotiationId):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateCurrentProposal</span><span class="params">(<span name="neg">neg: <a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@updateCurrentProposal(neg:feh.tec.agents.lite.NegotiationId):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a> → <a href="../../ProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.ProposalBasedAgent">ProposalBasedAgent</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues#varsByNeg" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="varsByNeg:Map[feh.tec.agents.lite.NegotiationId,Set[feh.tec.agents.lite.Var]]"></a>
+      <a id="varsByNeg:Map[NegotiationId,Set[Var]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">varsByNeg</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../../NegotiationId.html" class="extype" name="feh.tec.agents.lite.NegotiationId">NegotiationId</a>, <span class="extype" name="scala.Predef.Set">Set</span>[<a href="../../Var.html" class="extype" name="feh.tec.agents.lite.Var">Var</a>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@varsByNeg:Map[feh.tec.agents.lite.NegotiationId,Set[feh.tec.agents.lite.Var]]" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues">DomainIteratingChangingIssues</a> → <a href="../DomainIterating.html" class="extype" name="feh.tec.agents.lite.impl.DomainIterating">DomainIterating</a></dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="feh.tec.agents.lite.impl.DomainIterating">
+              <h3>Inherited from <a href="../DomainIterating.html" class="extype" name="feh.tec.agents.lite.impl.DomainIterating">DomainIterating</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.ProposalEngine.Iterating">
+              <h3>Inherited from <a href="../../ProposalEngine$$Iterating.html" class="extype" name="feh.tec.agents.lite.ProposalEngine.Iterating">Iterating</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">
+              <h3>Inherited from <a href="PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.agent.PriorityAndProposalBasedAgent">PriorityAndProposalBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.ResponseDelay">
+              <h3>Inherited from <a href="../../ResponseDelay.html" class="extype" name="feh.tec.agents.lite.ResponseDelay">ResponseDelay</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.AgentCreationInterface">
+              <h3>Inherited from <a href="../../AgentCreationInterface.html" class="extype" name="feh.tec.agents.lite.AgentCreationInterface">AgentCreationInterface</a></h3>
+            </div><div class="parent" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">
+              <h3>Inherited from <a href="../PriorityAndProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent">impl.PriorityAndProposalBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks">
+              <h3>Inherited from <a href="../ConstraintsSatisfactionChecks.html" class="extype" name="feh.tec.agents.lite.impl.ConstraintsSatisfactionChecks">ConstraintsSatisfactionChecks</a></h3>
+            </div><div class="parent" name="feh.tec.agents.lite.SpeakingSystemSupport">
+              <h3>Inherited from <a href="../../SpeakingSystemSupport.html" class="extype" name="feh.tec.agents.lite.SpeakingSystemSupport">SpeakingSystemSupport</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.DynamicScopeSupport">
+              <h3>Inherited from <a href="../../DynamicScopeSupport.html" class="extype" name="feh.tec.agents.lite.DynamicScopeSupport">DynamicScopeSupport</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.AgentHelpers">
+              <h3>Inherited from <a href="../../AgentHelpers.html" class="extype" name="feh.tec.agents.lite.AgentHelpers">AgentHelpers</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="akka.actor.ActorLogging">
+              <h3>Inherited from <span class="extype" name="akka.actor.ActorLogging">ActorLogging</span></h3>
+            </div><div class="parent" name="feh.tec.agents.lite.SystemSupport">
+              <h3>Inherited from <a href="../../SystemSupport.html" class="extype" name="feh.tec.agents.lite.SystemSupport">SystemSupport</a></h3>
+            </div><div class="parent" name="feh.tec.agents.lite.PriorityProposalBasedAgent">
+              <h3>Inherited from <a href="../../PriorityProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.PriorityProposalBasedAgent">PriorityProposalBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.ProposalEngine">
+              <h3>Inherited from <a href="../../ProposalEngine.html" class="extype" name="feh.tec.agents.lite.ProposalEngine">ProposalEngine</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.ProposalBasedAgent">
+              <h3>Inherited from <a href="../../ProposalBasedAgent.html" class="extype" name="feh.tec.agents.lite.ProposalBasedAgent">ProposalBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.PriorityBasedAgent">
+              <h3>Inherited from <a href="../../PriorityBasedAgent.html" class="extype" name="feh.tec.agents.lite.PriorityBasedAgent">PriorityBasedAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.NegotiatingAgent">
+              <h3>Inherited from <a href="../../NegotiatingAgent.html" class="extype" name="feh.tec.agents.lite.NegotiatingAgent">NegotiatingAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.SpeakingAgent">
+              <h3>Inherited from <a href="../../SpeakingAgent.html" class="extype" name="feh.tec.agents.lite.SpeakingAgent">SpeakingAgent</a>[<span class="extype" name="feh.tec.agents.lite.impl.agent.DomainIteratingChangingIssues.Lang">Lang</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.AbstractAgent">
+              <h3>Inherited from <a href="../../AbstractAgent.html" class="extype" name="feh.tec.agents.lite.AbstractAgent">AbstractAgent</a></h3>
+            </div><div class="parent" name="akka.actor.Actor">
+              <h3>Inherited from <span class="extype" name="akka.actor.Actor">Actor</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <a href="../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

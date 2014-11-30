@@ -114,7 +114,7 @@
     </span>
       
     </li><li name="feh.tec.agents.lite.spec.dsl.CreationSpecification.ChooseWhen" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="ChooseWhen=AnyRef{deffinished(action:CreationSpecification.this.Controller=&gt;((CreationSpecification.this.NegotiationName,CreationSpecification.this.Values)=&gt;Any)):Unit;deffailed(action:CreationSpecification.this.Controller=&gt;((CreationSpecification.this.NegotiationName,CreationSpecification.this.Reason)=&gt;Any)):Unit}"></a>
+      <a id="ChooseWhen=AnyRef{deffinished(action:CreationSpecification.this.Controller=&gt;((feh.tec.agents.lite.NegotiationId,CreationSpecification.this.Values)=&gt;Any)):Unit;deffailed(action:CreationSpecification.this.Controller=&gt;((feh.tec.agents.lite.NegotiationId,CreationSpecification.this.Reason)=&gt;Any)):Unit}"></a>
       <a id="ChooseWhen:Negotiation.ChooseWhen"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -125,7 +125,7 @@
         <span class="name">ChooseWhen</span><span class="result"> = <a href="../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a> { ... /* 2 definitions in type refinement */ }</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.dsl.CreationSpecification@ChooseWhen=AnyRef{deffinished(action:CreationSpecification.this.Controller=&gt;((CreationSpecification.this.NegotiationName,CreationSpecification.this.Values)=&gt;Any)):Unit;deffailed(action:CreationSpecification.this.Controller=&gt;((CreationSpecification.this.NegotiationName,CreationSpecification.this.Reason)=&gt;Any)):Unit}" title="Permalink" target="_top">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.dsl.CreationSpecification@ChooseWhen=AnyRef{deffinished(action:CreationSpecification.this.Controller=&gt;((feh.tec.agents.lite.NegotiationId,CreationSpecification.this.Values)=&gt;Any)):Unit;deffailed(action:CreationSpecification.this.Controller=&gt;((feh.tec.agents.lite.NegotiationId,CreationSpecification.this.Reason)=&gt;Any)):Unit}" title="Permalink" target="_top">
         <img src="../../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -160,23 +160,6 @@
       </span>
       </h4><span class="permalink">
       <a href="../../../../../../index.html#feh.tec.agents.lite.spec.dsl.CreationSpecification@Controller=feh.tec.agents.lite.impl.NegotiationEnvironmentController" title="Permalink" target="_top">
-        <img src="../../../../../../lib/permalink.png" />
-      </a>
-    </span>
-      
-    </li><li name="feh.tec.agents.lite.spec.dsl.CreationSpecification.NegotiationName" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="NegotiationName=String"></a>
-      <a id="NegotiationName:Negotiation.NegotiationName"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">type</span>
-      </span>
-      <span class="symbol">
-        <span class="name">NegotiationName</span><span class="result"> = <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.dsl.CreationSpecification@NegotiationName=String" title="Permalink" target="_top">
         <img src="../../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -233,7 +216,7 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="feh.tec.agents.lite.spec.dsl.CreationSpecification.Values" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Values=Seq[Map[String,Any]]"></a>
+      <a id="Values=Seq[Map[feh.tec.agents.lite.Var,Any]]"></a>
       <a id="Values:Negotiation.Values"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -241,10 +224,10 @@
         <span class="kind">type</span>
       </span>
       <span class="symbol">
-        <span class="name">Values</span><span class="result"> = <span class="extype" name="scala.collection.Seq">Seq</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Any">Any</span>]]</span>
+        <span class="name">Values</span><span class="result"> = <span class="extype" name="scala.collection.Seq">Seq</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<a href="../../Var.html" class="extype" name="feh.tec.agents.lite.Var">Var</a>, <span class="extype" name="scala.Any">Any</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.dsl.CreationSpecification@Values=Seq[Map[String,Any]]" title="Permalink" target="_top">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.dsl.CreationSpecification@Values=Seq[Map[feh.tec.agents.lite.Var,Any]]" title="Permalink" target="_top">
         <img src="../../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -669,7 +652,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">when</span><span class="result">: <a href="Negotiation.html#ChooseWhen=AnyRef{deffinished(action:CreationSpecification.this.Controller=&gt;((CreationSpecification.this.NegotiationName,CreationSpecification.this.Values)=&gt;Any)):Unit;deffailed(action:CreationSpecification.this.Controller=&gt;((CreationSpecification.this.NegotiationName,CreationSpecification.this.Reason)=&gt;Any)):Unit}" class="extmbr" name="feh.tec.agents.lite.spec.dsl.Negotiation.ChooseWhen">Negotiation.ChooseWhen</a></span>
+        <span class="name">when</span><span class="result">: <a href="Negotiation.html#ChooseWhen=AnyRef{deffinished(action:CreationSpecification.this.Controller=&gt;((feh.tec.agents.lite.NegotiationId,CreationSpecification.this.Values)=&gt;Any)):Unit;deffailed(action:CreationSpecification.this.Controller=&gt;((feh.tec.agents.lite.NegotiationId,CreationSpecification.this.Reason)=&gt;Any)):Unit}" class="extmbr" name="feh.tec.agents.lite.spec.dsl.Negotiation.ChooseWhen">Negotiation.ChooseWhen</a></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../../../../index.html#feh.tec.agents.lite.spec.dsl.CreationSpecification@when:CreationSpecification.this.ChooseWhen" title="Permalink" target="_top">

@@ -1,0 +1,1508 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>AgentsBuildingMacroImpl - feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl</title>
+          <meta name="description" content="AgentsBuildingMacroImpl - feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl" />
+          <meta name="keywords" content="AgentsBuildingMacroImpl feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../../../../../lib/tools.tooltip.js"></script>
+      <script type="text/javascript" src="../../../../../../../../lib/modernizr.custom.js"></script><script type="text/javascript" src="../../../../../../../../lib/diagrams.js" id="diagrams-js"></script>
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../../../../../index.html';
+            var hash = 'feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img src="../../../../../../../../lib/trait_big.png" />
+        <p id="owner"><a href="../../../../../../../package.html" class="extype" name="feh">feh</a>.<a href="../../../../../../package.html" class="extype" name="feh.tec">tec</a>.<a href="../../../../../package.html" class="extype" name="feh.tec.agents">agents</a>.<a href="../../../../package.html" class="extype" name="feh.tec.agents.lite">lite</a>.<a href="../../../package.html" class="extype" name="feh.tec.agents.lite.spec">spec</a>.<a href="../../package.html" class="extype" name="feh.tec.agents.lite.spec.macros">macros</a>.<a href="../package.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl">impl</a>.<a href="package.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent">agent</a></p>
+        <h1>AgentsBuildingMacroImpl</h1> <span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentsBuildingMacroImpl</span><span class="tparams">[<span name="C">C &lt;: <span class="extype" name="scala.reflect.macros.whitebox.Context">Context</span></span>]</span><span class="result"> extends <a href="../../AgentsBuildingMacroBase.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase">AgentsBuildingMacroBase</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>] with <a href="CreateAgentTrees.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.CreateAgentTrees">CreateAgentTrees</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>] with <a href="AggregateParents.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">AggregateParents</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>] with <a href="TypesDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions">TypesDefinitions</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>] with <a href="ValAndDefDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">ValAndDefDefinitions</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Self Type</dt><dd><a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>] with <a href="../../ControllerBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacro">ControllerBuildingMacro</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="ValAndDefDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">ValAndDefDefinitions</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>], <a href="TypesDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions">TypesDefinitions</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>], <a href="TypesDefinitionsHelpers.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers">TypesDefinitionsHelpers</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>], <a href="AggregateParents.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">AggregateParents</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>], <a href="CreateAgentTrees.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.CreateAgentTrees">CreateAgentTrees</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>], <a href="../../AgentsBuildingMacroBase.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase">AgentsBuildingMacroBase</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>], <a href="../../AgentsBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacro">AgentsBuildingMacro</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>], <a href="../../NegotiationBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro">NegotiationBuildingMacro</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>], <a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>], <a href="../../ActorBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro">ActorBuildingMacro</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>], <a href="../../MacroContext.html" class="extype" name="feh.tec.agents.lite.spec.macros.MacroContext">MacroContext</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>], <a href="../../../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block">
+            <span class="toggle">Known Subclasses</span>
+            <div class="subClasses hiddenContent"><a href="../ControllerMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.ControllerMacro">ControllerMacro</a></div>
+          </div><div class="toggleContainer block diagram-container" id="inheritance-diagram-container">
+                <span class="toggle diagram-link">Type Hierarchy</span>
+                <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#diagrams" target="_blank" class="diagram-help">Learn more about scaladoc diagrams</a>
+                <div class="diagram" id="inheritance-diagram"><svg class="class-diagram" id="graph91" viewBox="0.00 0.00 803.00 158.00" height="158pt" width="803pt" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g transform="scale(1 1) rotate(0) translate(4 154)" class="graph" id="graph1"><polygon points="-4,5 -4,-154 800,-154 800,5 -4,5" stroke="white" fill="white"></polygon><g class="cluster" id="graph2"></g><g class="cluster" id="graph3"></g><!-- node0 --><g class="node this trait" id="graph91_0"><a xlink:title="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl (this trait)" xlink:href="#inheritance-diagram"><polygon points="497.25,-88 328.75,-88 328.75,-62 497.25,-62 497.25,-88" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../../../../../lib/trait_diagram.png" y="-83" x="339" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-73" x="361" text-anchor="start">AgentsBuildingMacroImpl[C]</text></a></g><!-- node1 --><g class="node class" id="graph91_1"><a xlink:title="feh.tec.agents.lite.spec.macros.impl.ControllerMacro" xlink:href="../ControllerMacro.html#inheritance-diagram"><polygon points="476.25,-26 349.75,-26 349.75,-0 476.25,-0 476.25,-26" stroke="#115f3b" fill="#0a955b"></polygon><image xlink:href="../../../../../../../../lib/class_diagram.png" y="-21" x="360" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-11" x="382" text-anchor="start">ControllerMacro[C]</text></a></g><!-- node0&#45;&gt;node1 --><g class="edge inheritance" id="graph91_0_1"><a xlink:title="ControllerMacro[C] is a subtype of AgentsBuildingMacroImpl[C]"><path d="M413,-56.6826C413,-46.8961 413,-34.9026 413,-26.1238" stroke="#d4d4d4" fill="none"></path><polygon points="411.25,-56.8581 413,-61.8581 414.75,-56.8581 411.25,-56.8581" stroke="#d4d4d4" fill="none"></polygon></a></g><!-- node2 --><g class="node trait" id="graph91_2"><a xlink:title="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase" xlink:href="../../AgentsBuildingMacroBase.html#inheritance-diagram"><polygon points="172.25,-150 -0.25,-150 -0.25,-124 172.25,-124 172.25,-150" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../../../../../lib/trait_diagram.png" y="-145" x="10" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-135" x="32" text-anchor="start">AgentsBuildingMacroBase[C]</text></a></g><!-- node2&#45;&gt;node0 --><g class="edge inheritance" id="graph91_2_0"><a xlink:title="AgentsBuildingMacroImpl[C] is a subtype of AgentsBuildingMacroBase[C]"><path d="M156.842,-123.001C213.435,-112.617 292.138,-98.1765 347.325,-88.0504" stroke="#d4d4d4" fill="none"></path><polygon points="156.382,-121.307 151.78,-123.93 157.014,-124.749 156.382,-121.307" stroke="#d4d4d4" fill="none"></polygon></a></g><!-- node3 --><g class="node trait" id="graph91_3"><a xlink:title="feh.tec.agents.lite.spec.macros.impl.agent.CreateAgentTrees" xlink:href="CreateAgentTrees.html#inheritance-diagram"><polygon points="327,-150 191,-150 191,-124 327,-124 327,-150" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../../../../../lib/trait_diagram.png" y="-145" x="201" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-135" x="223" text-anchor="start">CreateAgentTrees[C]</text></a></g><!-- node3&#45;&gt;node0 --><g class="edge inheritance" id="graph91_3_0"><a xlink:title="AgentsBuildingMacroImpl[C] is a subtype of CreateAgentTrees[C]"><path d="M294.992,-121.977C321.437,-111.674 356.995,-97.8202 382.145,-88.0213" stroke="#d4d4d4" fill="none"></path><polygon points="294.188,-120.412 290.164,-123.858 295.458,-123.674 294.188,-120.412" stroke="#d4d4d4" fill="none"></polygon></a></g><!-- node4 --><g class="node trait" id="graph91_4"><a xlink:title="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents" xlink:href="AggregateParents.html#inheritance-diagram"><polygon points="481,-150 345,-150 345,-124 481,-124 481,-150" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../../../../../lib/trait_diagram.png" y="-145" x="355" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-135" x="377" text-anchor="start">AggregateParents[C]</text></a></g><!-- node4&#45;&gt;node0 --><g class="edge inheritance" id="graph91_4_0"><a xlink:title="AgentsBuildingMacroImpl[C] is a subtype of AggregateParents[C]"><path d="M413,-118.683C413,-108.896 413,-96.9026 413,-88.1238" stroke="#d4d4d4" fill="none"></path><polygon points="411.25,-118.858 413,-123.858 414.75,-118.858 411.25,-118.858" stroke="#d4d4d4" fill="none"></polygon></a></g><!-- node5 --><g class="node trait" id="graph91_5"><a xlink:title="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions" xlink:href="TypesDefinitions.html#inheritance-diagram"><polygon points="628.25,-150 499.75,-150 499.75,-124 628.25,-124 628.25,-150" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../../../../../lib/trait_diagram.png" y="-145" x="510" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-135" x="532" text-anchor="start">TypesDefinitions[C]</text></a></g><!-- node5&#45;&gt;node0 --><g class="edge inheritance" id="graph91_5_0"><a xlink:title="AgentsBuildingMacroImpl[C] is a subtype of TypesDefinitions[C]"><path d="M528.71,-121.977C502.779,-111.674 467.914,-97.8202 443.254,-88.0213" stroke="#d4d4d4" fill="none"></path><polygon points="528.15,-123.638 533.443,-123.858 529.443,-120.385 528.15,-123.638" stroke="#d4d4d4" fill="none"></polygon></a></g><!-- node6 --><g class="node trait" id="graph91_6"><a xlink:title="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions" xlink:href="ValAndDefDefinitions.html#inheritance-diagram"><polygon points="795,-150 647,-150 647,-124 795,-124 795,-150" stroke="#37657d" fill="#498aad"></polygon><image xlink:href="../../../../../../../../lib/trait_diagram.png" y="-145" x="657" preserveAspectRatio="xMinYMin meet" height="16px" width="16px"></image><text fill="#ffffff" font-size="10.00" font-family="Arial" y="-135" x="679" text-anchor="start">ValAndDefDefinitions[C]</text></a></g><!-- node6&#45;&gt;node0 --><g class="edge inheritance" id="graph91_6_0"><a xlink:title="AgentsBuildingMacroImpl[C] is a subtype of ValAndDefDefinitions[C]"><path d="M653.952,-122.939C600.671,-112.559 526.735,-98.1561 474.859,-88.0504" stroke="#d4d4d4" fill="none"></path><polygon points="653.8,-124.692 659.042,-123.93 654.469,-121.256 653.8,-124.692" stroke="#d4d4d4" fill="none"></polygon></a></g></g></svg></div>
+              </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl"><span>AgentsBuildingMacroImpl</span></li><li class="in" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions"><span>ValAndDefDefinitions</span></li><li class="in" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions"><span>TypesDefinitions</span></li><li class="in" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers"><span>TypesDefinitionsHelpers</span></li><li class="in" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents"><span>AggregateParents</span></li><li class="in" name="feh.tec.agents.lite.spec.macros.impl.agent.CreateAgentTrees"><span>CreateAgentTrees</span></li><li class="in" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase"><span>AgentsBuildingMacroBase</span></li><li class="in" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacro"><span>AgentsBuildingMacro</span></li><li class="in" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro"><span>NegotiationBuildingMacro</span></li><li class="in" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment"><span>ControllerBuildingMacroEnvironment</span></li><li class="in" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro"><span>ActorBuildingMacro</span></li><li class="in" name="feh.tec.agents.lite.spec.macros.MacroContext"><span>MacroContext</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ActorTreesextendsProductwithSerializable"></a>
+      <a id="ActorTrees:ActorTrees"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="../../ActorBuildingMacro$ActorTrees.html"><span class="name">ActorTrees</span></a><span class="params">(<span name="className">className: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="parents">parents: <a href="../../../../../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span>]</span>, <span name="body">body: <a href="../../../../../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<span class="extype" name="scala.reflect.macros.Aliases.Tree">C.Tree</span>]</span>, <span name="constructorArgs">constructorArgs: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.ActorBuildingMacro@ActorTreesextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Trees container for building actors</p><div class="fullcomment"><div class="comment cmt"><p>Trees container for building actors</p></div><dl class="paramcmts block"><dt class="param">parents</dt><dd class="cmt"><p>actor parent types</p></dd><dt class="param">body</dt><dd class="cmt"><p>actor body definitions</p></dd><dt class="param">constructorArgs</dt><dd class="cmt"><p>named arguments for actor's constructor
+</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ActorBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro">ActorBuildingMacro</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase.AddAgentArgs" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AddAgentArgsextendsProductwithSerializable"></a>
+      <a id="AddAgentArgs:AddAgentArgs"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="../../AgentsBuildingMacroBase$AddAgentArgs.html"><span class="name">AddAgentArgs</span></a><span class="params">(<span name="agentName">agentName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="argName">argName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="argType">argType: <span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span></span>, <span name="argTree">argTree: <span class="extype" name="scala.reflect.macros.Aliases.Tree">C.Tree</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase@AddAgentArgsextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../../AgentsBuildingMacroBase.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase">AgentsBuildingMacroBase</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.AgentName" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentName=String"></a>
+      <a id="AgentName:(AgentsBuildingMacroImpl.this)#AgentName"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentName</span><span class="result"> = <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentName=String" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.CreatePropsArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CreatePropsArgs=Map[String,Any]"></a>
+      <a id="CreatePropsArgs:(AgentsBuildingMacroImpl.this)#CreatePropsArgs"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">CreatePropsArgs</span><span class="result"> = <span class="extype" name="scala.collection.immutable.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Any">Any</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@CreatePropsArgs=Map[String,Any]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ActorBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro">ActorBuildingMacro</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegment" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MacroSegment=ControllerBuildingMacroEnvironment.this.Trees=&gt;ControllerBuildingMacroEnvironment.this.Trees"></a>
+      <a id="MacroSegment:(AgentsBuildingMacroImpl.this)#MacroSegment"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MacroSegment</span><span class="result"> = ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.Trees">Trees</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.Trees">Trees</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@MacroSegment=ControllerBuildingMacroEnvironment.this.Trees=&gt;ControllerBuildingMacroEnvironment.this.Trees" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MacroSegmentsextendsControllerBuildingMacroEnvironment.this.MacroSegment"></a>
+      <a id="MacroSegments:MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="../../ControllerBuildingMacroEnvironment$MacroSegments.html"><span class="name">MacroSegments</span></a><span class="result"> extends <a href="../../ControllerBuildingMacroEnvironment.html#MacroSegment=ControllerBuildingMacroEnvironment.this.Trees=&gt;ControllerBuildingMacroEnvironment.this.Trees" class="extmbr" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegment">MacroSegment</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment@MacroSegmentsextendsControllerBuildingMacroEnvironment.this.MacroSegment" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegmentsImpl" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MacroSegmentsImplextendsControllerBuildingMacroEnvironment.this.MacroSegmentswithProductwithSerializable"></a>
+      <a id="MacroSegmentsImpl:MacroSegmentsImpl"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="../../ControllerBuildingMacroEnvironment$MacroSegmentsImpl.html"><span class="name">MacroSegmentsImpl</span></a><span class="params">(<span name="stageApplication">stageApplication: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../../ControllerBuildingMacroEnvironment$MacroSegments$$Stage.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments.Stage">Stage</a>, <a href="../../../../../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="../../ControllerBuildingMacroEnvironment.html#MacroSegment=ControllerBuildingMacroEnvironment.this.Trees=&gt;ControllerBuildingMacroEnvironment.this.Trees" class="extmbr" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegment">MacroSegment</a>]]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="stagesOrdering">stagesOrdering: <a href="../../../../../../../../scala/package.html#Ordering[T]=scala.math.Ordering[T]" class="extmbr" name="scala.Ordering">Ordering</a>[<a href="../../ControllerBuildingMacroEnvironment$MacroSegments$$Stage.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments.Stage">Stage</a>]</span>)</span><span class="result"> extends <a href="../../ControllerBuildingMacroEnvironment$MacroSegments.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment@MacroSegmentsImplextendsControllerBuildingMacroEnvironment.this.MacroSegmentswithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegmentsTransform" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MacroSegmentsTransform=ControllerBuildingMacroEnvironment.this.MacroSegments=&gt;ControllerBuildingMacroEnvironment.this.MacroSegments"></a>
+      <a id="MacroSegmentsTransform:(AgentsBuildingMacroImpl.this)#MacroSegmentsTransform"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MacroSegmentsTransform</span><span class="result"> = ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@MacroSegmentsTransform=ControllerBuildingMacroEnvironment.this.MacroSegments=&gt;ControllerBuildingMacroEnvironment.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NegotiationRawextendsProductwithSerializable"></a>
+      <a id="NegotiationRaw:NegotiationRaw"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="../../NegotiationBuildingMacro$NegotiationRaw.html"><span class="name">NegotiationRaw</span></a><span class="params">(<span name="vars">vars: <a href="../../../../../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="../../NegotiationBuildingMacro$Raw$$VarDef.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.Raw.VarDef">VarDef</a>]</span>, <span name="negotiations">negotiations: <a href="../../../../../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="../../NegotiationBuildingMacro$Raw$.html#NegotiationDef=feh.tec.agents.lite.spec.NegotiationSpecification.NegotiationDef" class="extmbr" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.Raw.NegotiationDef">NegotiationDef</a>]</span>, <span name="agents">agents: <a href="../../../../../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="../../NegotiationBuildingMacro$Raw$$AgentDef.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.Raw.AgentDef">AgentDef</a>]</span>, <span name="spawns">spawns: <a href="../../../../../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="../../NegotiationBuildingMacro$Raw$$SpawnDefs.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.Raw.SpawnDefs">SpawnDefs</a>]</span>, <span name="time">time: <a href="../../../../../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="../../NegotiationBuildingMacro$Raw$$TimeDefs.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.Raw.TimeDefs">TimeDefs</a>]</span>, <span name="controller">controller: <a href="../../NegotiationBuildingMacro$Raw$$ControllerDefs.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.Raw.ControllerDefs">ControllerDefs</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro@NegotiationRawextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../NegotiationBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro">NegotiationBuildingMacro</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase.RequiredAgentArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="RequiredAgentArgs=Map[String,Map[String,(AgentsBuildingMacroBase.this.c.Type,AgentsBuildingMacroBase.this.c.Tree)]]"></a>
+      <a id="RequiredAgentArgs:(AgentsBuildingMacroImpl.this)#RequiredAgentArgs"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">RequiredAgentArgs</span><span class="result"> = <span class="extype" name="scala.collection.immutable.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, (<span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span>, <span class="extype" name="scala.reflect.macros.Aliases.Tree">C.Tree</span>)]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@RequiredAgentArgs=Map[String,Map[String,(AgentsBuildingMacroBase.this.c.Type,AgentsBuildingMacroBase.this.c.Tree)]]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../AgentsBuildingMacroBase.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase">AgentsBuildingMacroBase</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.StagesOrdering" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="StagesOrderingextendsOrdering[ControllerBuildingMacroEnvironment.this.MacroSegments.Stage]"></a>
+      <a id="StagesOrdering:StagesOrdering"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="../../ControllerBuildingMacroEnvironment$StagesOrdering.html"><span class="name">StagesOrdering</span></a><span class="result"> extends <a href="../../../../../../../../scala/package.html#Ordering[T]=scala.math.Ordering[T]" class="extmbr" name="scala.Ordering">Ordering</a>[<a href="../../ControllerBuildingMacroEnvironment$MacroSegments$$Stage.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments.Stage">Stage</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment@StagesOrderingextendsOrdering[ControllerBuildingMacroEnvironment.this.MacroSegments.Stage]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.StagesOrderingComparisonImmutable" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="StagesOrderingComparisonImmutableextendsControllerBuildingMacroEnvironment.this.StagesOrdering"></a>
+      <a id="StagesOrderingComparisonImmutable:StagesOrderingComparisonImmutable"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="../../ControllerBuildingMacroEnvironment$StagesOrderingComparisonImmutable.html"><span class="name">StagesOrderingComparisonImmutable</span></a><span class="result"> extends <a href="../../ControllerBuildingMacroEnvironment$StagesOrdering.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.StagesOrdering">StagesOrdering</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment@StagesOrderingComparisonImmutableextendsControllerBuildingMacroEnvironment.this.StagesOrdering" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.Trees" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TreesextendsProductwithSerializable"></a>
+      <a id="Trees:Trees"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="../../ControllerBuildingMacroEnvironment$Trees.html"><span class="name">Trees</span></a><span class="params">(<span name="controller">controller: <a href="../../ControllerBuildingMacroEnvironment.html#ActorTreesextendsProductwithSerializable" class="extmbr" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ControllerBuildingMacroEnvironment.ActorTrees</a></span>, <span name="agents">agents: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="../../ControllerBuildingMacroEnvironment.html#AgentName=String" class="extmbr" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.AgentName">AgentName</a>, <a href="../../ControllerBuildingMacroEnvironment.html#ActorTreesextendsProductwithSerializable" class="extmbr" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ControllerBuildingMacroEnvironment.ActorTrees</a>]</span>, <span name="_extra">_extra: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment@TreesextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase.TreesWrapper" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TreesWrapperextendsAnyRef"></a>
+      <a id="TreesWrapper:TreesWrapper"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="../../AgentsBuildingMacroBase$TreesWrapper.html"><span class="name">TreesWrapper</span></a><span class="result"> extends <a href="../../../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase@TreesWrapperextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../../AgentsBuildingMacroBase.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase">AgentsBuildingMacroBase</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div id="values" class="values members">
+              <h3>Abstract Value Members</h3>
+              <ol><li name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro#actorCreatePropsExpr" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="actorCreatePropsExpr(trees:ActorBuildingMacro.this.ActorTrees):ActorBuildingMacro.this.c.Expr[ActorBuildingMacro.this.CreatePropsArgs=&gt;akka.actor.Props]"></a>
+      <a id="actorCreatePropsExpr((AgentsBuildingMacroImpl.this)#ActorTrees):C.Expr[((AgentsBuildingMacroImpl.this)#CreatePropsArgs)⇒Props]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">actorCreatePropsExpr</span><span class="params">(<span name="trees">trees: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ActorTrees</span></span>)</span><span class="result">: <span class="extype" name="scala.reflect.macros.Aliases.Expr">C.Expr</span>[((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.CreatePropsArgs">CreatePropsArgs</span>) ⇒ <span class="extype" name="akka.actor.Props">Props</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@actorCreatePropsExpr(trees:ActorBuildingMacro.this.ActorTrees):ActorBuildingMacro.this.c.Expr[ActorBuildingMacro.this.CreatePropsArgs=&gt;akka.actor.Props]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ActorBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro">ActorBuildingMacro</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro#build" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="build(dsl:NegotiationBuildingMacro.this.c.Expr[feh.tec.agents.lite.spec.dsl.Negotiation]):NegotiationBuildingMacro.this.NegotiationRaw"></a>
+      <a id="build(C.Expr[dsl.Negotiation]):(AgentsBuildingMacroImpl.this)#NegotiationRaw"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">build</span><span class="params">(<span name="dsl">dsl: <span class="extype" name="scala.reflect.macros.Aliases.Expr">C.Expr</span>[<a href="../../../dsl/Negotiation.html" class="extype" name="feh.tec.agents.lite.spec.dsl.Negotiation">dsl.Negotiation</a>]</span>)</span><span class="result">: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@build(dsl:NegotiationBuildingMacro.this.c.Expr[feh.tec.agents.lite.spec.dsl.Negotiation]):NegotiationBuildingMacro.this.NegotiationRaw" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../NegotiationBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro">NegotiationBuildingMacro</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.MacroContext#c" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="c:C"></a>
+      <a id="c:C"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">c</span><span class="result">: <span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@c:C" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../MacroContext.html" class="extype" name="feh.tec.agents.lite.spec.macros.MacroContext">MacroContext</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div id="values" class="values members">
+              <h3>Concrete Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@##():Int" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase.AgentBuildingStages" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentBuildingStages"></a>
+      <a id="AgentBuildingStages:AgentBuildingStages"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="../../AgentsBuildingMacroBase$AgentBuildingStages$.html"><span class="name">AgentBuildingStages</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase@AgentBuildingStages" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../AgentsBuildingMacroBase.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase">AgentsBuildingMacroBase</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions#AgentSegmentConstraintsByNegotiation" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentConstraintsByNegotiation:ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments"></a>
+      <a id="AgentSegmentConstraintsByNegotiation:((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentConstraintsByNegotiation</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentConstraintsByNegotiation:ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ValAndDefDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">ValAndDefDefinitions</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions#AgentSegmentCreateNegotiation" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentCreateNegotiation:ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments"></a>
+      <a id="AgentSegmentCreateNegotiation:((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentCreateNegotiation</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentCreateNegotiation:ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">creates <code>createNegotiation</code> method
+</p><div class="fullcomment"><div class="comment cmt"><p>creates <code>createNegotiation</code> method
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ValAndDefDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">ValAndDefDefinitions</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions#AgentSegmentDomainIterators" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentDomainIterators:ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments"></a>
+      <a id="AgentSegmentDomainIterators:((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentDomainIterators</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentDomainIterators:ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">creates <code>domainIterators</code> method
+</p><div class="fullcomment"><div class="comment cmt"><p>creates <code>domainIterators</code> method
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ValAndDefDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">ValAndDefDefinitions</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.CreateAgentTrees#AgentSegmentEmptyAgentTrees" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentEmptyAgentTrees(raw:CreateAgentTrees.this.NegotiationRaw,anonAgentClassName:String):CreateAgentTrees.this.MacroSegments=&gt;CreateAgentTrees.this.MacroSegments"></a>
+      <a id="AgentSegmentEmptyAgentTrees((AgentsBuildingMacroImpl.this)#NegotiationRaw,String):((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentEmptyAgentTrees</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>, <span name="anonAgentClassName">anonAgentClassName: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;$AgentAnonClass&quot;</span></span>)</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentEmptyAgentTrees(raw:CreateAgentTrees.this.NegotiationRaw,anonAgentClassName:String):CreateAgentTrees.this.MacroSegments=&gt;CreateAgentTrees.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Creates empty <span class="extype" name="ActorTrees">ActorTrees</span> for every actor, defined in <code>raw</code>, assigning them <code>anonAgentClassName</code>
+</p><div class="fullcomment"><div class="comment cmt"><p>Creates empty <span class="extype" name="ActorTrees">ActorTrees</span> for every actor, defined in <code>raw</code>, assigning them <code>anonAgentClassName</code>
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="CreateAgentTrees.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.CreateAgentTrees">CreateAgentTrees</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions#AgentSegmentLangDefinition" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentLangDefinition:TypesDefinitions.this.MacroSegments=&gt;TypesDefinitions.this.MacroSegments"></a>
+      <a id="AgentSegmentLangDefinition:((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentLangDefinition</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentLangDefinition:TypesDefinitions.this.MacroSegments=&gt;TypesDefinitions.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">extract agent's <code>Lang</code> type and defines it in the body as <a href="TypesDefinitions.html#langTypeName(anonAgentClassName:String):TypesDefinitionsHelpers.this.c.universe.TypeName" class="extmbr" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions#langTypeName">langTypeName</a>
+</p><div class="fullcomment"><div class="comment cmt"><p>extract agent's <code>Lang</code> type and defines it in the body as <a href="TypesDefinitions.html#langTypeName(anonAgentClassName:String):TypesDefinitionsHelpers.this.c.universe.TypeName" class="extmbr" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions#langTypeName">langTypeName</a>
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="TypesDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions">TypesDefinitions</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents#AgentSegmentParentChangingIssues" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentParentChangingIssues(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments"></a>
+      <a id="AgentSegmentParentChangingIssues((AgentsBuildingMacroImpl.this)#NegotiationRaw):((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentParentChangingIssues</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>)</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentParentChangingIssues(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="AggregateParents.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">AggregateParents</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents#AgentSegmentParentFailedConfigurationsChecks" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentParentFailedConfigurationsChecks(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments"></a>
+      <a id="AgentSegmentParentFailedConfigurationsChecks((AgentsBuildingMacroImpl.this)#NegotiationRaw):((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentParentFailedConfigurationsChecks</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>)</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentParentFailedConfigurationsChecks(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Adds corresponding parent and definitions if <code>raw</code> indicates agent's type is <span class="extype" name="FailedConfigurationsChecks">FailedConfigurationsChecks</span>
+</p><div class="fullcomment"><div class="comment cmt"><p>Adds corresponding parent and definitions if <code>raw</code> indicates agent's type is <span class="extype" name="FailedConfigurationsChecks">FailedConfigurationsChecks</span>
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="AggregateParents.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">AggregateParents</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents#AgentSegmentParentIteratingAllVars" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentParentIteratingAllVars(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments"></a>
+      <a id="AgentSegmentParentIteratingAllVars((AgentsBuildingMacroImpl.this)#NegotiationRaw):((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentParentIteratingAllVars</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>)</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentParentIteratingAllVars(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Adds corresponding parent and definitions if <code>raw</code>.spec is a <span class="extype" name="IteratingSpec.AllVars">IteratingSpec.AllVars</span>
+</p><div class="fullcomment"><div class="comment cmt"><p>Adds corresponding parent and definitions if <code>raw</code>.spec is a <span class="extype" name="IteratingSpec.AllVars">IteratingSpec.AllVars</span>
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="AggregateParents.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">AggregateParents</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents#AgentSegmentParentPriorityAndProposalBased" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentParentPriorityAndProposalBased(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments"></a>
+      <a id="AgentSegmentParentPriorityAndProposalBased((AgentsBuildingMacroImpl.this)#NegotiationRaw):((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentParentPriorityAndProposalBased</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>)</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentParentPriorityAndProposalBased(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Adds corresponding parent and definitions if <code>raw</code>.spec is a <span class="extype" name="PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</span>
+</p><div class="fullcomment"><div class="comment cmt"><p>Adds corresponding parent and definitions if <code>raw</code>.spec is a <span class="extype" name="PriorityAndProposalBasedAgentSpec">PriorityAndProposalBasedAgentSpec</span>
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="AggregateParents.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">AggregateParents</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents#AgentSegmentParentReportingAgent" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentParentReportingAgent(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments"></a>
+      <a id="AgentSegmentParentReportingAgent((AgentsBuildingMacroImpl.this)#NegotiationRaw):((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentParentReportingAgent</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>)</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentParentReportingAgent(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Adds corresponding parent and definitions if any of <code>raw.negotiations</code> have <code>reportingToOpt</code> defined
+</p><div class="fullcomment"><div class="comment cmt"><p>Adds corresponding parent and definitions if any of <code>raw.negotiations</code> have <code>reportingToOpt</code> defined
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="AggregateParents.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">AggregateParents</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents#AgentSegmentParentRequiresDistinctPriority" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentParentRequiresDistinctPriority(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments"></a>
+      <a id="AgentSegmentParentRequiresDistinctPriority((AgentsBuildingMacroImpl.this)#NegotiationRaw):((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentParentRequiresDistinctPriority</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>)</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentParentRequiresDistinctPriority(raw:AggregateParents.this.NegotiationRaw):AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Adds corresponding parent and definitions if <code>raw.spec</code> is a <a href="../../../RequiresDistinctPriority.html" class="extype" name="feh.tec.agents.lite.spec.RequiresDistinctPriority">spec.RequiresDistinctPriority</a>
+</p><div class="fullcomment"><div class="comment cmt"><p>Adds corresponding parent and definitions if <code>raw.spec</code> is a <a href="../../../RequiresDistinctPriority.html" class="extype" name="feh.tec.agents.lite.spec.RequiresDistinctPriority">spec.RequiresDistinctPriority</a>
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="AggregateParents.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">AggregateParents</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions#AgentSegmentReplaceLang" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentReplaceLang:TypesDefinitions.this.MacroSegments=&gt;TypesDefinitions.this.MacroSegments"></a>
+      <a id="AgentSegmentReplaceLang:((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentReplaceLang</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentReplaceLang:TypesDefinitions.this.MacroSegments=&gt;TypesDefinitions.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">replaces <code>Lang</code> type parameter in agents' parents
+</p><div class="fullcomment"><div class="comment cmt"><p>replaces <code>Lang</code> type parameter in agents' parents
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="TypesDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions">TypesDefinitions</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions#AgentSegmentResponseDelay" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentResponseDelay:ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments"></a>
+      <a id="AgentSegmentResponseDelay:((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentResponseDelay</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentResponseDelay:ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ValAndDefDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">ValAndDefDefinitions</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions#AgentSegmentSpec" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentSpec(raw:ValAndDefDefinitions.this.NegotiationRaw):ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments"></a>
+      <a id="AgentSegmentSpec((AgentsBuildingMacroImpl.this)#NegotiationRaw):((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentSpec</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>)</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentSpec(raw:ValAndDefDefinitions.this.NegotiationRaw):ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ValAndDefDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">ValAndDefDefinitions</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions#AgentSegmentTypesDefinitions" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentTypesDefinitions:TypesDefinitions.this.MacroSegments=&gt;TypesDefinitions.this.MacroSegments"></a>
+      <a id="AgentSegmentTypesDefinitions:((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentTypesDefinitions</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentTypesDefinitions:TypesDefinitions.this.MacroSegments=&gt;TypesDefinitions.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">defines abstract types
+</p><div class="fullcomment"><div class="comment cmt"><p>defines abstract types
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="TypesDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions">TypesDefinitions</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl#AgentSegmentsTransformation" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentSegmentsTransformation(raw:AgentsBuildingMacroImpl.this.NegotiationRaw):List[AgentsBuildingMacroImpl.this.MacroSegments=&gt;AgentsBuildingMacroImpl.this.MacroSegments]"></a>
+      <a id="AgentSegmentsTransformation((AgentsBuildingMacroImpl.this)#NegotiationRaw):List[((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentSegmentsTransformation</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>)</span><span class="result">: <span class="extype" name="scala.collection.immutable.List">List</span>[((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentSegmentsTransformation(raw:AgentsBuildingMacroImpl.this.NegotiationRaw):List[AgentsBuildingMacroImpl.this.MacroSegments=&gt;AgentsBuildingMacroImpl.this.MacroSegments]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a> → <a href="../../AgentsBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacro">AgentsBuildingMacro</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase#AgentStagesOrdering" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AgentStagesOrdering:AgentsBuildingMacroBase.this.StagesOrdering"></a>
+      <a id="AgentStagesOrdering:(AgentsBuildingMacroImpl.this)#StagesOrdering"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">AgentStagesOrdering</span><span class="result">: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.StagesOrdering">StagesOrdering</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@AgentStagesOrdering:AgentsBuildingMacroBase.this.StagesOrdering" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../AgentsBuildingMacroBase.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase">AgentsBuildingMacroBase</a> → <a href="../../AgentsBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacro">AgentsBuildingMacro</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment#MacroSegment" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MacroSegment(transform:PartialFunction[ControllerBuildingMacroEnvironment.this.Trees,ControllerBuildingMacroEnvironment.this.Trees]):ControllerBuildingMacroEnvironment.this.MacroSegment"></a>
+      <a id="MacroSegment(PartialFunction[(AgentsBuildingMacroImpl.this)#Trees,(AgentsBuildingMacroImpl.this)#Trees]):(AgentsBuildingMacroImpl.this)#MacroSegment"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MacroSegment</span><span class="params">(<span name="transform">transform: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[(<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.Trees">Trees</span>, (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.Trees">Trees</span>]</span>)</span><span class="result">: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegment">MacroSegment</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@MacroSegment(transform:PartialFunction[ControllerBuildingMacroEnvironment.this.Trees,ControllerBuildingMacroEnvironment.this.Trees]):ControllerBuildingMacroEnvironment.this.MacroSegment" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MacroSegments"></a>
+      <a id="MacroSegments:MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="../../ControllerBuildingMacroEnvironment$MacroSegments$.html"><span class="name">MacroSegments</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment@MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment#MacroSegmentsTransform" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MacroSegmentsTransform(f:ControllerBuildingMacroEnvironment.this.MacroSegments=&gt;ControllerBuildingMacroEnvironment.this.MacroSegments):ControllerBuildingMacroEnvironment.this.MacroSegments=&gt;ControllerBuildingMacroEnvironment.this.MacroSegments"></a>
+      <a id="MacroSegmentsTransform(((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments):((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MacroSegmentsTransform</span><span class="params">(<span name="f">f: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>)</span><span class="result">: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@MacroSegmentsTransform(f:ControllerBuildingMacroEnvironment.this.MacroSegments=&gt;ControllerBuildingMacroEnvironment.this.MacroSegments):ControllerBuildingMacroEnvironment.this.MacroSegments=&gt;ControllerBuildingMacroEnvironment.this.MacroSegments" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.Raw" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Raw"></a>
+      <a id="Raw:Raw"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="../../NegotiationBuildingMacro$Raw$.html"><span class="name">Raw</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro@Raw" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../NegotiationBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro">NegotiationBuildingMacro</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.StagesOrdering" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="StagesOrdering"></a>
+      <a id="StagesOrdering:StagesOrdering"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="../../ControllerBuildingMacroEnvironment$StagesOrdering$.html"><span class="name">StagesOrdering</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment@StagesOrdering" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.Trees" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Trees"></a>
+      <a id="Trees:Trees"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="../../ControllerBuildingMacroEnvironment$Trees$.html"><span class="name">Trees</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../index.html#feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment@Trees" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase#agentArgsRequired" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="agentArgsRequired(in:AgentsBuildingMacroBase.this.Trees):AgentsBuildingMacroBase.this.RequiredAgentArgs"></a>
+      <a id="agentArgsRequired((AgentsBuildingMacroImpl.this)#Trees):(AgentsBuildingMacroImpl.this)#RequiredAgentArgs"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">agentArgsRequired</span><span class="params">(<span name="in">in: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.Trees">Trees</span></span>)</span><span class="result">: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase.RequiredAgentArgs">RequiredAgentArgs</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@agentArgsRequired(in:AgentsBuildingMacroBase.this.Trees):AgentsBuildingMacroBase.this.RequiredAgentArgs" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../../AgentsBuildingMacroBase.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase">AgentsBuildingMacroBase</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents#agentType" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="agentType(raw:AggregateParents.this.Raw.AgentDef):Option[AggregateParents.this.c.universe.Type]"></a>
+      <a id="agentType(AgentDef):Option[scala.reflect.macros.Universe.Type]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">agentType</span><span class="params">(<span name="raw">raw: <a href="../../NegotiationBuildingMacro$Raw$$AgentDef.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.Raw.AgentDef">AgentDef</a></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.macros.Universe.Type</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@agentType(raw:AggregateParents.this.Raw.AgentDef):Option[AggregateParents.this.c.universe.Type]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="AggregateParents.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">AggregateParents</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents#allAggregatingParents" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="allAggregatingParents(raw:AggregateParents.this.NegotiationRaw):List[AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments]"></a>
+      <a id="allAggregatingParents((AgentsBuildingMacroImpl.this)#NegotiationRaw):List[((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">allAggregatingParents</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>)</span><span class="result">: <span class="extype" name="scala.collection.immutable.List">List</span>[((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@allAggregatingParents(raw:AggregateParents.this.NegotiationRaw):List[AggregateParents.this.MacroSegments=&gt;AggregateParents.this.MacroSegments]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="AggregateParents.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">AggregateParents</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.CreateAgentTrees#allCreateAgentTrees" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="allCreateAgentTrees(raw:CreateAgentTrees.this.NegotiationRaw,anonAgentClassName:String):List[CreateAgentTrees.this.MacroSegments=&gt;CreateAgentTrees.this.MacroSegments]"></a>
+      <a id="allCreateAgentTrees((AgentsBuildingMacroImpl.this)#NegotiationRaw,String):List[((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">allCreateAgentTrees</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>, <span name="anonAgentClassName">anonAgentClassName: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;$AgentAnonClass&quot;</span></span>)</span><span class="result">: <span class="extype" name="scala.collection.immutable.List">List</span>[((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@allCreateAgentTrees(raw:CreateAgentTrees.this.NegotiationRaw,anonAgentClassName:String):List[CreateAgentTrees.this.MacroSegments=&gt;CreateAgentTrees.this.MacroSegments]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="CreateAgentTrees.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.CreateAgentTrees">CreateAgentTrees</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions#allTypesDefinitions" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="allTypesDefinitions:List[TypesDefinitions.this.MacroSegments=&gt;TypesDefinitions.this.MacroSegments]"></a>
+      <a id="allTypesDefinitions:List[((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">allTypesDefinitions</span><span class="result">: <span class="extype" name="scala.collection.immutable.List">List</span>[((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@allTypesDefinitions:List[TypesDefinitions.this.MacroSegments=&gt;TypesDefinitions.this.MacroSegments]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="TypesDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions">TypesDefinitions</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions#allValAndDefDefinitions" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="allValAndDefDefinitions(raw:ValAndDefDefinitions.this.NegotiationRaw):List[ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments]"></a>
+      <a id="allValAndDefDefinitions((AgentsBuildingMacroImpl.this)#NegotiationRaw):List[((AgentsBuildingMacroImpl.this)#MacroSegments)⇒(AgentsBuildingMacroImpl.this)#MacroSegments]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">allValAndDefDefinitions</span><span class="params">(<span name="raw">raw: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.NegotiationRaw">NegotiationRaw</span></span>)</span><span class="result">: <span class="extype" name="scala.collection.immutable.List">List</span>[((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.MacroSegments">MacroSegments</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@allValAndDefDefinitions(raw:ValAndDefDefinitions.this.NegotiationRaw):List[ValAndDefDefinitions.this.MacroSegments=&gt;ValAndDefDefinitions.this.MacroSegments]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ValAndDefDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">ValAndDefDefinitions</a></dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <a href="../../../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@clone():Object" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers#decomposeTypesAndBounds" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="decomposeTypesAndBounds(from:TypesDefinitionsHelpers.this.c.Type):List[TypesDefinitionsHelpers.this.c.universe.Type]"></a>
+      <a id="decomposeTypesAndBounds(C.Type):List[scala.reflect.macros.Universe.Type]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">decomposeTypesAndBounds</span><span class="params">(<span name="from">from: <span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span></span>)</span><span class="result">: <a href="../../../../../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.macros.Universe.Type</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@decomposeTypesAndBounds(from:TypesDefinitionsHelpers.this.c.Type):List[TypesDefinitionsHelpers.this.c.universe.Type]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="TypesDefinitionsHelpers.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers">TypesDefinitionsHelpers</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <a href="../../../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions#isAbstract" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isAbstract(name:ValAndDefDefinitions.this.c.universe.Name):ValAndDefDefinitions.this.c.universe.Symbol=&gt;Boolean"></a>
+      <a id="isAbstract(scala.reflect.macros.Universe.Name):(scala.reflect.macros.Universe.Symbol)⇒Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isAbstract</span><span class="params">(<span name="name">name: <span class="extype" name="scala.reflect.api.Names.Name">scala.reflect.macros.Universe.Name</span></span>)</span><span class="result">: (<span class="extype" name="scala.reflect.api.Symbols.Symbol">scala.reflect.macros.Universe.Symbol</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@isAbstract(name:ValAndDefDefinitions.this.c.universe.Name):ValAndDefDefinitions.this.c.universe.Symbol=&gt;Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="ValAndDefDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">ValAndDefDefinitions</a></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers#langType" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="langType(of:TypesDefinitionsHelpers.this.ActorTrees):Option[TypesDefinitionsHelpers.this.c.Type]"></a>
+      <a id="langType((AgentsBuildingMacroImpl.this)#ActorTrees):Option[C.Type]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">langType</span><span class="params">(<span name="of">of: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ActorTrees</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@langType(of:TypesDefinitionsHelpers.this.ActorTrees):Option[TypesDefinitionsHelpers.this.c.Type]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="TypesDefinitionsHelpers.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers">TypesDefinitionsHelpers</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers#langTypeName" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="langTypeName(anonAgentClassName:String):TypesDefinitionsHelpers.this.c.universe.TypeName"></a>
+      <a id="langTypeName(String):scala.reflect.macros.Universe.TypeName"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">langTypeName</span><span class="params">(<span name="anonAgentClassName">anonAgentClassName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.reflect.api.Names.TypeName">scala.reflect.macros.Universe.TypeName</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@langTypeName(anonAgentClassName:String):TypesDefinitionsHelpers.this.c.universe.TypeName" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="TypesDefinitionsHelpers.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers">TypesDefinitionsHelpers</a></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <a href="../../../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers#replaceLang" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="replaceLang(tr:TypesDefinitionsHelpers.this.ActorTrees):TypesDefinitionsHelpers.this.c.Type=&gt;TypesDefinitionsHelpers.this.c.universe.Type"></a>
+      <a id="replaceLang((AgentsBuildingMacroImpl.this)#ActorTrees):(C.Type)⇒scala.reflect.macros.Universe.Type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">replaceLang</span><span class="params">(<span name="tr">tr: (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ActorTrees</span></span>)</span><span class="result">: (<span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span>) ⇒ <span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.macros.Universe.Type</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@replaceLang(tr:TypesDefinitionsHelpers.this.ActorTrees):TypesDefinitionsHelpers.this.c.Type=&gt;TypesDefinitionsHelpers.this.c.universe.Type" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="TypesDefinitionsHelpers.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers">TypesDefinitionsHelpers</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers#replaceLanguageTypeArg" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="replaceLanguageTypeArg(in:TypesDefinitionsHelpers.this.c.Type,lang:TypesDefinitionsHelpers.this.c.Type):TypesDefinitionsHelpers.this.c.universe.Type"></a>
+      <a id="replaceLanguageTypeArg(C.Type,C.Type):scala.reflect.macros.Universe.Type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">replaceLanguageTypeArg</span><span class="params">(<span name="in">in: <span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span></span>, <span name="lang">lang: <span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span></span>)</span><span class="result">: <span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.macros.Universe.Type</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@replaceLanguageTypeArg(in:TypesDefinitionsHelpers.this.c.Type,lang:TypesDefinitionsHelpers.this.c.Type):TypesDefinitionsHelpers.this.c.universe.Type" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="TypesDefinitionsHelpers.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers">TypesDefinitionsHelpers</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers#replaceTypeArg" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="replaceTypeArg(in:TypesDefinitionsHelpers.this.c.Type,ofType:TypesDefinitionsHelpers.this.c.Type,replacement:TypesDefinitionsHelpers.this.c.Type):TypesDefinitionsHelpers.this.c.universe.Type"></a>
+      <a id="replaceTypeArg(C.Type,C.Type,C.Type):scala.reflect.macros.Universe.Type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">replaceTypeArg</span><span class="params">(<span name="in">in: <span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span></span>, <span name="ofType">ofType: <span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span></span>, <span name="replacement">replacement: <span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span></span>)</span><span class="result">: <span class="extype" name="scala.reflect.api.Types.Type">scala.reflect.macros.Universe.Type</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@replaceTypeArg(in:TypesDefinitionsHelpers.this.c.Type,ofType:TypesDefinitionsHelpers.this.c.Type,replacement:TypesDefinitionsHelpers.this.c.Type):TypesDefinitionsHelpers.this.c.universe.Type" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="TypesDefinitionsHelpers.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers">TypesDefinitionsHelpers</a></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@toString():String" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase#transform" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="transform(in:List[AgentsBuildingMacroBase.this.Raw.AgentDef])(f:(AgentsBuildingMacroBase.this.ActorTrees,AgentsBuildingMacroBase.this.Raw.AgentDef)=&gt;AgentsBuildingMacroBase.this.ActorTrees):feh.util.I[(AgentsBuildingMacroBase.this.AgentName,AgentsBuildingMacroBase.this.ActorTrees)]"></a>
+      <a id="transform(List[AgentDef])(((AgentsBuildingMacroImpl.this)#ActorTrees,AgentDef)⇒(AgentsBuildingMacroImpl.this)#ActorTrees):util.I[((AgentsBuildingMacroImpl.this)#AgentName,(AgentsBuildingMacroImpl.this)#ActorTrees)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">transform</span><span class="params">(<span name="in">in: <a href="../../../../../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<a href="../../NegotiationBuildingMacro$Raw$$AgentDef.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.Raw.AgentDef">AgentDef</a>]</span>)</span><span class="params">(<span name="f">f: ((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ActorTrees</span>, <a href="../../NegotiationBuildingMacro$Raw$$AgentDef.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro.Raw.AgentDef">AgentDef</a>) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ActorTrees</span></span>)</span><span class="result">: <a href="../../../../../../../util/package.html#I[T]=T=&gt;T" class="extmbr" name="feh.util.I">util.I</a>[((<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment.AgentName">AgentName</span>, (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ActorTrees</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@transform(in:List[AgentsBuildingMacroBase.this.Raw.AgentDef])(f:(AgentsBuildingMacroBase.this.ActorTrees,AgentsBuildingMacroBase.this.Raw.AgentDef)=&gt;AgentsBuildingMacroBase.this.ActorTrees):feh.util.I[(AgentsBuildingMacroBase.this.AgentName,AgentsBuildingMacroBase.this.ActorTrees)]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../../AgentsBuildingMacroBase.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase">AgentsBuildingMacroBase</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions#transformIfHasMember" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="transformIfHasMember(ags:Map[String,ValAndDefDefinitions.this.ActorTrees])(cond:ValAndDefDefinitions.this.c.universe.Symbol=&gt;Boolean,f:((String,ValAndDefDefinitions.this.ActorTrees))=&gt;ValAndDefDefinitions.this.ActorTrees):scala.collection.immutable.Map[String,(Boolean,ValAndDefDefinitions.this.ActorTrees)]"></a>
+      <a id="transformIfHasMember(Map[String,(AgentsBuildingMacroImpl.this)#ActorTrees])((scala.reflect.macros.Universe.Symbol)⇒Boolean,((String,(AgentsBuildingMacroImpl.this)#ActorTrees))⇒(AgentsBuildingMacroImpl.this)#ActorTrees):Map[String,(Boolean,(AgentsBuildingMacroImpl.this)#ActorTrees)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">transformIfHasMember</span><span class="params">(<span name="ags">ags: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ActorTrees</span>]</span>)</span><span class="params">(<span name="cond">cond: (<span class="extype" name="scala.reflect.api.Symbols.Symbol">scala.reflect.macros.Universe.Symbol</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>, <span name="f">f: ((<span class="extype" name="scala.Predef.String">String</span>, (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ActorTrees</span>)) ⇒ (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ActorTrees</span></span>)</span><span class="result">: <span class="extype" name="scala.collection.immutable.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, (<span class="extype" name="scala.Boolean">Boolean</span>, (<a href="" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl">AgentsBuildingMacroImpl</a>.this)#<span class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro.ActorTrees">ActorTrees</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@transformIfHasMember(ags:Map[String,ValAndDefDefinitions.this.ActorTrees])(cond:ValAndDefDefinitions.this.c.universe.Symbol=&gt;Boolean,f:((String,ValAndDefDefinitions.this.ActorTrees))=&gt;ValAndDefDefinitions.this.ActorTrees):scala.collection.immutable.Map[String,(Boolean,ValAndDefDefinitions.this.ActorTrees)]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="ValAndDefDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">ValAndDefDefinitions</a></dd></dl></div>
+    </li><li name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers#unitedType" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unitedType(of:List[TypesDefinitionsHelpers.this.c.Type]):TypesDefinitionsHelpers.this.c.universe.RefinedType"></a>
+      <a id="unitedType(List[C.Type]):scala.reflect.macros.Universe.RefinedType"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">unitedType</span><span class="params">(<span name="of">of: <a href="../../../../../../../../scala/package.html#List[+A]=List[A]" class="extmbr" name="scala.List">List</a>[<span class="extype" name="scala.reflect.macros.Aliases.Type">C.Type</span>]</span>)</span><span class="result">: <span class="extype" name="scala.reflect.api.Types.RefinedType">scala.reflect.macros.Universe.RefinedType</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@unitedType(of:List[TypesDefinitionsHelpers.this.c.Type]):TypesDefinitionsHelpers.this.c.universe.RefinedType" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="TypesDefinitionsHelpers.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers">TypesDefinitionsHelpers</a></dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">
+              <h3>Inherited from <a href="ValAndDefDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.ValAndDefDefinitions">ValAndDefDefinitions</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions">
+              <h3>Inherited from <a href="TypesDefinitions.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitions">TypesDefinitions</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers">
+              <h3>Inherited from <a href="TypesDefinitionsHelpers.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.TypesDefinitionsHelpers">TypesDefinitionsHelpers</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">
+              <h3>Inherited from <a href="AggregateParents.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AggregateParents">AggregateParents</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.macros.impl.agent.CreateAgentTrees">
+              <h3>Inherited from <a href="CreateAgentTrees.html" class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.CreateAgentTrees">CreateAgentTrees</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase">
+              <h3>Inherited from <a href="../../AgentsBuildingMacroBase.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase">AgentsBuildingMacroBase</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacro">
+              <h3>Inherited from <a href="../../AgentsBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.AgentsBuildingMacro">AgentsBuildingMacro</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro">
+              <h3>Inherited from <a href="../../NegotiationBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.NegotiationBuildingMacro">NegotiationBuildingMacro</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">
+              <h3>Inherited from <a href="../../ControllerBuildingMacroEnvironment.html" class="extype" name="feh.tec.agents.lite.spec.macros.ControllerBuildingMacroEnvironment">ControllerBuildingMacroEnvironment</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro">
+              <h3>Inherited from <a href="../../ActorBuildingMacro.html" class="extype" name="feh.tec.agents.lite.spec.macros.ActorBuildingMacro">ActorBuildingMacro</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</h3>
+            </div><div class="parent" name="feh.tec.agents.lite.spec.macros.MacroContext">
+              <h3>Inherited from <a href="../../MacroContext.html" class="extype" name="feh.tec.agents.lite.spec.macros.MacroContext">MacroContext</a>[<span class="extype" name="feh.tec.agents.lite.spec.macros.impl.agent.AgentsBuildingMacroImpl.C">C</span>]</h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <a href="../../../../../../../../scala/package.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
