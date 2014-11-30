@@ -13,14 +13,14 @@ trait AgentReport extends Message { def at: Long }
 case class MessageReport(msg: NegotiationLanguage#Msg,
                          to: AgentRef,
                          extraMessage: Map[String, Any],
-                         at: Long = System.currentTimeMillis()
+                         at: Long = System.nanoTime()
                           ) extends AgentReport{
   val negotiation = msg.negotiation
   val sender = msg.sender
   def asString = s"""MessageReport by $sender to $to: "$msg" """
 }
 
-case class StateReport(negotiation: NegotiationId, state: Map[String, Any], description: String, at: Long = System.currentTimeMillis())
+case class StateReport(negotiation: NegotiationId, state: Map[String, Any], description: String, at: Long = System.nanoTime())
                       (implicit val sender: AgentRef) extends AgentReport{
 
   def asString = s"StateReport by $sender: $negotiation -> $state"
@@ -161,9 +161,9 @@ trait NegotiationFinishedListener extends ReportListener with ActorLogging{
   }
 
   override def receive = ({
-    case r: StateReport =>
+    case (r: StateReport, printEnabled: Boolean) =>
       guardState(r)
-      super.receive(r)
+      super.receive(r -> printEnabled)
       allWaitingCheck(r.negotiation)
     case ("confirm all waiting", neg: NegotiationId) =>
       log.info(s"NegotiationFinishedListener: confirm all waiting. allWaiting(neg)=${allWaiting(neg)}, hadChanges=$hadChanges")

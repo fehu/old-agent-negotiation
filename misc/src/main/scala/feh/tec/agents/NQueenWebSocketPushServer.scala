@@ -29,7 +29,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
       q
   }
 
-  val timeReference = System.currentTimeMillis()
+  val timeReference = System.nanoTime()
   def timeDiff(time: Long) = (time - timeReference).toInt
 
   def push[Msg <: NQueenMessages.Msg : JsonFormat](msg: Msg) =
@@ -103,7 +103,9 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
 
       val bulk =
         if(liteReporting) preBulk.copy(
-          preBulk.messages.filter(_.reportsState).groupBy(_.by).mapValues(_.maxBy(_.at)).values.toSeq
+          preBulk.messages.withFilter(_.reportsState).map(_.asInstanceOf[NQueenMessages.ChangeReport])
+            .groupBy(rep => rep.by -> rep.position.map(_ => "position").orElse(rep.state.map(_ => "state")).getOrElse(""))
+            .mapValues(_.maxBy(_.at)).values.toSeq
         )
         else preBulk
 
