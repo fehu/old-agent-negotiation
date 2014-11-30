@@ -1,7 +1,6 @@
 package feh.tec.agents.lite.spec.macros.impl.controller
 
-import feh.tec.agents.lite.spec.macros.{ControllerBuildingMacroBase, AgentsBuildingMacroBase, HasConstraintsBuilder}
-import feh.tec.agents.lite.spec.macros.ControllerBuildingMacroBase
+import feh.tec.agents.lite.spec.macros.{AgentsBuildingMacroBase, ControllerBuildingMacroBase, HasConstraintsBuilder}
 
 import scala.reflect.macros.whitebox
 

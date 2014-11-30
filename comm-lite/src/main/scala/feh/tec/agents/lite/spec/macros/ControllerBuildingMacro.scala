@@ -10,7 +10,7 @@ trait ControllerBuildingMacro[C <: whitebox.Context]
 
   def ControllerSegmentsTransformation(negRaw: NegotiationRaw): List[MacroSegments => MacroSegments]
 
-  def ControllerStagesOrdering: StagesOrdering //Ordering[MacroSegments.Stage]
+  def ControllerStagesOrdering: StagesOrdering
 
 }
 

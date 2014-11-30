@@ -144,12 +144,6 @@ trait AggregateParents[C <: whitebox.Context]{
     import c.universe._
 
     val failedConfigurationsChecks = raw.agents.filter(r => agentType(r).exists(_ <:< typeOf[FailedConfigurationsChecks[_]]))
-
-//      raw.agents.filter(
-//      _.spec.actualType.member(TermName("agentTag"))
-//        .typeSignature.resultType.typeArgs.filter(_ <:< typeOf[AbstractAgent]).ensuring(_.size == 1)
-//        .head <:< typeOf[FailedConfigurationsChecks[_]]
-//    )
     val failedConfigurationsChecksTpe = typeOf[FailureChecks[Language.ProposalBased with Language.HasPriority]]
 
     MacroSegmentsTransform {
