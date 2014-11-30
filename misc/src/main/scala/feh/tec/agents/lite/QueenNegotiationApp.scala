@@ -74,7 +74,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
     }
   }
 
-  def N = 8
+  def N = 6
 
   implicit val asys = ActorSystem()
 

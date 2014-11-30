@@ -1,17 +1,11 @@
-package feh.tec.agents.lite.spec.macros
+package feh.tec.agents.lite.spec.macros.impl
 
 import feh.tec.agents.lite.spec.NegotiationSpecification
-import feh.tec.agents.lite.spec.NegotiationSpecification.{ConstraintPartLeaf, ConstraintPartComb, ConstraintPart}
+import feh.tec.agents.lite.spec.NegotiationSpecification.{ConstraintPart, ConstraintPartComb, ConstraintPartLeaf}
 import feh.tec.agents.lite.spec.dsl.Negotiation
+import feh.tec.agents.lite.spec.macros.{Helper, ExtendedConstraint, HasConstraintsBuilder}
 import scala.reflect.macros.whitebox
 
-trait HasConstraintsBuilder[C <: whitebox.Context] extends NegotiationBuildingMacro[C] {
-
-  trait ConstraintsBuilder{
-    def build(agDef: Raw.AgentConstraintsDef, raw: NegotiationRaw): c.Expr[NegotiationSpecification.AgentConstraintsDef]
-  }
-
-}
 
 trait HasSimpleConstraintsBuilder[C <: whitebox.Context] extends HasConstraintsBuilder[C] {
 

@@ -12,3 +12,4 @@
 - [x] add reporting configuration to agent
 - [ ] reduce usage of mutable maps 
 - [ ] change report timing from millis to nanos
+- [ ] negotiation finished notification broken at ad6f4654f3831f422d9b56c26f5765c47c846afd
