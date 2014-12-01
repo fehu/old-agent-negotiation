@@ -6,7 +6,7 @@ import feh.tec.agents.lite.AgentCreationInterface.NegotiationInit
 import feh.tec.agents.lite._
 import feh.tec.agents.lite.impl.agent.{ChangingIssuesImpl, FailureChecks}
 import feh.tec.agents.lite.impl.spec.{IteratingSpec, PriorityAndProposalBasedAgentSpec}
-import feh.tec.agents.lite.impl.{ChangingIssues, FailedConfigurationsChecks, agent}
+import feh.tec.agents.lite.impl.agent
 import feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase
 import scala.concurrent.duration.FiniteDuration
 import scala.reflect.macros.whitebox
@@ -19,6 +19,7 @@ trait AggregateParents[C <: whitebox.Context]{
   def allAggregatingParents(raw: NegotiationRaw) =
     AgentSegmentParentPriorityAndProposalBased(raw) ::
     AgentSegmentParentIteratingAllVars(raw) ::
+    AgentSegmentParentIteratingChangingIssues(raw) ::
     AgentSegmentParentRequiresDistinctPriority(raw) ::
     AgentSegmentParentFailedConfigurationsChecks(raw) ::
     AgentSegmentParentChangingIssues(raw) ::
@@ -72,6 +73,30 @@ trait AggregateParents[C <: whitebox.Context]{
                   trees
                     .append.parents(
                       c.typeOf[agent.DomainIteratingAllVars[Language.ProposalBased with Language.HasPriority]]
+                    )
+              }
+            )
+            Trees(controller, newAgs, extra)
+        }
+      )
+    }
+  }
+
+  /** Adds corresponding parent and definitions if `raw`.spec is a [[IteratingSpec.ChangingIssues]]
+    */
+  def AgentSegmentParentIteratingChangingIssues(raw: NegotiationRaw) = {
+    val iteratingChangingIssues = raw.agents.filter(_.spec.actualType <:< c.typeOf[IteratingSpec.ChangingIssues[_, _]])
+
+    MacroSegmentsTransform{
+      _.append(AgentBuildingStages.AggregateParents,
+        MacroSegment {
+          case Trees(controller, ags, extra) =>
+            val newAgs = ags.map(
+              transform(iteratingChangingIssues) {
+                (trees, raw) =>
+                  trees
+                    .append.parents(
+                      c.typeOf[agent.DomainIteratingChangingIssues[Language.ProposalBased with Language.HasPriority with Language.NegotiatesIssues]]
                     )
               }
             )

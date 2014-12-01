@@ -15,6 +15,6 @@ class PartialValuesConfiguration(val configurations: Map[Priority, Map[Var, Any]
 class ValuesConfiguration(configurations: Map[Priority, Map[Var, Any]], negotiation: NegotiationId)
   extends PartialValuesConfiguration(configurations, negotiation)
 
-case class PartialSolution(issues: Set[Var], values: Map[Priority, Map[Var, Any]])
+case class PartialSolution(negotiation: NegotiationId, issues: Set[Var], values: Map[Priority, Map[Var, Any]])
 
 //case class Solution(values: Map[Priority, Map[Var, Any]])

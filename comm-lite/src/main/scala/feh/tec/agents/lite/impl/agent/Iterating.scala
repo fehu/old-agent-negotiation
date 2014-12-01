@@ -2,7 +2,7 @@ package feh.tec.agents.lite.impl.agent
 
 import feh.tec.agents.lite.ProposalEngine.DomainIterator
 import feh.tec.agents.lite._
-import feh.tec.agents.lite.impl.{ChangingIssues, DomainIterating}
+import feh.tec.agents.lite.impl.DomainIterating
 import feh.tec.agents.lite.spec.AgentSpecification
 import feh.util._
 

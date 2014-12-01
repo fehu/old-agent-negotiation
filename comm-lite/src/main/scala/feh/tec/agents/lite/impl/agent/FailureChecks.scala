@@ -4,7 +4,6 @@ import akka.actor.Actor
 import feh.tec.agents.lite.Message.ProposalId
 import feh.tec.agents.lite._
 import feh.util._
-import feh.tec.agents.lite.impl.FailedConfigurationsChecks
 import scala.collection.mutable
 
 object FailureChecks{
@@ -19,7 +18,7 @@ object FailureChecks{
 }
 
 trait FailureChecks[Lang <: Language.ProposalBased with Language.HasPriority]
-  extends FailedConfigurationsChecks[Lang] with AgentHelpers[Lang]
+  extends PriorityAndProposalBasedAgent[Lang] with FailedConfigurationsChecks[Lang] with AgentHelpers[Lang]
 {
   private var failureCheckFuncs =
     Map.empty[(NegotiationId, Map[Var, Any]), mutable.HashMap[PartialValuesConfiguration, Map[Priority, Map[Var, Any]] => Option[Boolean]]]

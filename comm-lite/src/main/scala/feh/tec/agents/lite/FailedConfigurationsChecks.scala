@@ -1,9 +1,7 @@
-package feh.tec.agents.lite.impl
-
-import feh.tec.agents.lite.{PartialValuesConfiguration, Language}
+package feh.tec.agents.lite
 
 trait FailedConfigurationsChecks[Lang <: Language.ProposalBased with Language.HasPriority]
-  extends PriorityAndProposalBasedAgent[Lang]
+  extends PriorityProposalBasedAgent[Lang]
 {
 //  type Agent <: PriorityAndProposalBasedAgent[Lang] with FailedConfigurationsChecks[Lang]
 

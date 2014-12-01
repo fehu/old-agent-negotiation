@@ -2,11 +2,12 @@ package feh.tec.agents.lite
 
 import java.util.UUID
 import feh.tec.agents.lite.Message.ProposalId
-import feh.tec.agents.lite.impl.{FailedConfigurationsChecks, PriorityAndProposalBasedAgent}
+import feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent
 import feh.tec.agents.lite.impl.agent.FailureChecks
 import feh.tec.agents.lite.impl.agent.create.SpecExt
 import feh.tec.agents.lite.impl.spec.PriorityAndProposalBasedAgentSpec
 import feh.tec.agents.lite.spec.RequiresDistinctPriority
+import feh.util._
 
 object Fallback {
   type Agent[Lang <: Language.ProposalBased with Language.HasPriority] =
@@ -67,10 +68,12 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
     ag.get(neg).currentState update NegotiationState.Waiting
   }
 
-  def nothingToProposeIfHasMaxPriority(negId: NegotiationId)(implicit ag: Ag): Option[Unit] =
-    if(maxPriority(negId)._1 == ag.ref) Some{
-      sys.error("Failed to resolve negotiation")
+  final def nothingToProposeIfHasMaxPriority(negId: NegotiationId)(implicit ag: Ag): Option[Unit] =
+    if(maxPriority(negId).getOrThrow("maxPriority unknown")._1 == ag.ref) Some{
+      hasNothingToProposeWhileTopPriority(negId)
     } else None
+
+  def hasNothingToProposeWhileTopPriority(negId: NegotiationId)(implicit ag: Ag): Unit = sys.error("Failed to resolve negotiation")
 
 
   moreProcess <:= {
@@ -90,16 +93,18 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
     }
   }
 
+  def sendFallbackRequest(negId: NegotiationId)(implicit ag: Ag) = {
+    val neg = ag.get(negId)
+    neg.currentState update FallbackState
+    val req = FallbackRequest(negId, neg.currentPriority(), UUID.randomUUID())(ag.ref)
+    ag.sendToAll(req)
+  }
+
   nothingToPropose <:= {
     implicit ag => {
       negId =>
         clearProposalAcceptance(negId)(ag)
-        nothingToProposeIfHasMaxPriority(negId).getOrElse{
-          val neg = ag.get(negId)
-          neg.currentState update FallbackState
-          val req = FallbackRequest(negId, neg.currentPriority(), UUID.randomUUID())(ag.ref)
-          ag.sendToAll(req)
-        }
+        nothingToProposeIfHasMaxPriority(negId) getOrElse sendFallbackRequest(negId)
     }
   }
 

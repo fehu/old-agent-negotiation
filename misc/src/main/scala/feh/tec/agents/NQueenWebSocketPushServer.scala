@@ -35,8 +35,9 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
   def push[Msg <: NQueenMessages.Msg : JsonFormat](msg: Msg) =
     Push(msg, implicitly[JsonFormat[Msg]].asInstanceOf[JsonFormat[WebSocketMessages#Msg]])
 
-  private def getPos(vals: Map[Var, Any], nme: String) = vals.find(_._1.name == nme).get._2.asInstanceOf[Int]
-  private def getPosXY(vals: Map[Var, Any]) = getPos(vals, "x") -> getPos(vals, "y")
+  private def getPosOrElse(vals: Map[Var, Any], nme: String, orElse: Int) =
+    vals.find(_._1.name == nme).map(_._2.asInstanceOf[Int]).getOrElse(orElse)
+  private def getPosXY(vals: Map[Var, Any]) = getPosOrElse(vals, "x", 1) -> getPosOrElse(vals, "y", 1)
 
   protected def reportToBulkable(report: AgentReport): Option[NQueenMessages.CanBulk] = {
     report match {
@@ -54,7 +55,7 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
         val q = indexMap.getOrElse(ref, addNewIndex(ref))
 
         val rep = NQueenMessages.ChangeReport(q, timeDiff(time),
-          Some(getPosXY(vals("values").asInstanceOf[Map[Var, Any]])),
+          if(vals.contains("values")) Some(getPosXY(vals("values").asInstanceOf[Map[Var, Any]])) else None,
           Some(vals("state").asInstanceOf[NegotiationState].toString)
           )
         Some(rep)

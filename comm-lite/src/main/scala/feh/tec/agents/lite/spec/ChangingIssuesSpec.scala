@@ -1,7 +1,6 @@
 package feh.tec.agents.lite.spec
 
-import feh.tec.agents.lite.impl.ChangingIssues
-import feh.tec.agents.lite.{Language, NegotiationId, Var}
+import feh.tec.agents.lite.{ChangingIssues, Language, NegotiationId, Var}
 
 trait ChangingIssuesSpec[Ag <: ChangingIssues[Lang], Lang <: Language.HasPriority with Language.NegotiatesIssues]
   extends AgentSpecificationExt[Ag]

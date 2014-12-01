@@ -36,6 +36,7 @@ object create {
     type Ag[L <: Lang] = impl.spec.IteratingSpec.Agent[L]
 
     trait AllVarsSpec[A <: Ag[L], L <: Lang] extends PriorityAndProposalBasedAgentSpec[A, L] with IteratingSpec.AllVars[A, L] with SpecExt[A]
+    trait DynIssuesSpec[A <: Ag[L], L <: Lang] extends PriorityAndProposalBasedAgentSpec[A, L] with IteratingSpec.ChangingIssues[A, L] with SpecExt[A]
   }
 
 /*

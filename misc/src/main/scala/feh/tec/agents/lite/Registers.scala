@@ -10,17 +10,24 @@ import scala.collection.mutable
 trait PrioritiesRegister[Agent <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]{
   self: PriorityAndProposalBasedAgentSpec[Agent, Lang] with SpecExt[Agent] =>
 
-  val priorities = mutable.HashMap.empty[NegotiationId, mutable.HashMap[AgentRef, Option[Priority]]]
+  private val _priorities = mutable.HashMap.empty[NegotiationId, mutable.HashMap[AgentRef, Option[Priority]]]
+  def priorities = _priorities.mapValues(_.toMap).toMap
 
-  def allPrioritiesKnown(neg: NegotiationId) = priorities(neg).forall(_._2.isDefined)
-  def maxPriority(neg: NegotiationId)(implicit ag: Agent) =
-    (priorities(neg) + (ag.ref -> ag.get(neg).currentPriority.raw))
-      .mapValues(_.get).maxBy(_._2.get)
+  def allPrioritiesKnown(neg: NegotiationId) = _priorities(neg).forall(_._2.isDefined)
+
+  def maxPriority(neg: NegotiationId)(implicit ag: Agent) ={
+    ag.log.debug("_priorities = " + _priorities)
+    val all = _priorities(neg) + (ag.ref -> ag.get(neg).currentPriority.raw)
+    if(all.forall(_._2.isDefined)) Some(all.mapValues(_.get).maxBy(_._2.get))
+    else None
+  }
+
 
   beforeEachMessage andThen {
     ag => overridden => msg =>
       overridden(ag)(msg)
-      priorities
+//      ag.log.debug("registering priority for " + msg)
+      _priorities
         .getOrElseUpdate(
           msg.negotiation, mutable.HashMap(ag.get(msg.negotiation).scope().toSeq.zipMap(_ => Option.empty[Priority]): _*)
         ) += msg.sender -> Some(msg.priority)

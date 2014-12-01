@@ -104,15 +104,18 @@ object Message{
     def asString = s"I will raise my $priority"
   }
   
-  case class IssuesRequest(negotiation: NegotiationId, req: IssueChange.Change, priority: Priority)
+  case class IssuesRequest(negotiation: NegotiationId, req: IssueChange.Change, priority: Priority, myValues: Map[Var, Any])
                          (implicit val sender: AgentRef) extends Message with HasPriority{
     def asString = s"I request to $req for $negotiation ($priority)"
   }
   
   object IssueChange{
-    trait Change
-    case class Add(preferences: Var*) extends Change { override def toString = "Add Issues " + preferences }
-    case class Remove(preferences: Var*) extends Change{ override def toString = "Remove Issues " + preferences }
+    trait Change{
+      def isAggregation: Boolean
+      final def isRemoval = !isAggregation
+    }
+    case class Add(preferences: Var*) extends Change { override def toString = "Add Issues " + preferences; final def isAggregation = true }
+    case class Remove(preferences: Var*) extends Change{ override def toString = "Remove Issues " + preferences; final def isAggregation = false }
   }
   
   case class IssuesDemand(negotiation: NegotiationId, req: IssueChange.Change, priority: Priority)

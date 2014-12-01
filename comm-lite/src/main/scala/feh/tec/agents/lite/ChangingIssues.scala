@@ -1,16 +1,15 @@
-package feh.tec.agents.lite.impl
+package feh.tec.agents.lite
 
 import akka.actor.Actor
-import feh.tec.agents.lite._
 
-trait ChangingIssues[Lang <: /*Language.ProposalBased with*/ Language.HasPriority with Language.NegotiatesIssues]
+trait ChangingIssues[Lang <: Language.HasPriority with Language.NegotiatesIssues]
   extends NegotiatingAgent[Lang] with AgentHelpers[Lang]
 {
   type Negotiation <: Negotiation.HasPriority with Negotiation.ChangingIssues
 
   abstract override def process = ({
-    case msg: Lang#IssueRequest   =>
-    case msg: Lang#IssueResponse  =>
+    case msg: Lang#IssueRequest   => onIssueRequest(msg)
+    case msg: Lang#IssueResponse  => onIssueResponse(msg)
   }: Actor.Receive) orElse super.process
 
   def requestIssueAggregation(neg: NegotiationId, issues: Var*)

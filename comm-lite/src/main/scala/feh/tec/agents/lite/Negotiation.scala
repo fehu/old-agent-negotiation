@@ -47,7 +47,7 @@ trait AbstractNegotiation {
     _states += this
   }
 
-  protected object VarUpdateHooks{
+  protected[lite] object VarUpdateHooks{
     type HookName = String
     type StateVarName = String
     type OldValue = Any

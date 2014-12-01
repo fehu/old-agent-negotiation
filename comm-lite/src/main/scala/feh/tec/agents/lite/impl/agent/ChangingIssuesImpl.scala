@@ -1,9 +1,8 @@
 package feh.tec.agents.lite.impl.agent
 
-import feh.tec.agents.lite.impl.ChangingIssues
 import feh.tec.agents.lite.impl.spec.ChangingIssuesSpec
 import feh.tec.agents.lite.spec.AgentSpecification
-import feh.tec.agents.lite.{Negotiation, Var, NegotiationId, Language}
+import feh.tec.agents.lite._
 
 trait ChangingIssuesImpl[Lang <: Language.ProposalBased with Language.HasPriority with Language.NegotiatesIssues]
   extends PriorityAndProposalBasedAgent[Lang] with ChangingIssues[Lang]
@@ -15,15 +14,7 @@ trait ChangingIssuesImpl[Lang <: Language.ProposalBased with Language.HasPriorit
 
   def requestIssueAggregation(neg: NegotiationId, issues: Var*) = spec.requestIssueAggregation.get
 
-  def onIssueRequest(msg: Lang#IssueRequest) = spec.onIssueRequest.get
-//      if(hasTopPriority) {
-//      issueRequests.filterNot(_.sender == msg.sender) += msg
-//      ???
-//    }
-  def onIssueResponse(msg: Lang#IssueResponse) = spec.onIssueResponse.get
-//  if(msg.priority > get(msg.negotiation).currentPriority()){
-//
-//    }
-//  }
+  def onIssueRequest(msg: Lang#IssueRequest) = spec.onIssueRequest.get apply msg
+  def onIssueResponse(msg: Lang#IssueResponse) = spec.onIssueResponse.get apply msg
 
 }
