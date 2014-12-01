@@ -40,7 +40,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
       configure(
         timeout.initialize <= 100.millis,
         timeout.start <= 200.millis,
-        timeout.`response delay` <= 0.millis
+        timeout.`response delay` <= 200.millis
       )
 
       when finished {

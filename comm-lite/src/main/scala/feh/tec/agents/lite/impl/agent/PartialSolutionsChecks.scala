@@ -15,4 +15,6 @@ trait PartialSolutionsChecks[Lang <: Language.ProposalBased with Language.HasPri
 
   def guardFailedPartialSolution(failed: PartialSolution) = _failedPartialSolutions
     .getOrElseUpdate(failed.negotiation, mutable.ListBuffer.empty[PartialSolution]) += failed
+
+  def failedPartialSolutions(neg: NegotiationId): Seq[PartialSolution] = _failedPartialSolutions.get(neg).map(_.toList).getOrElse(Nil)
 }

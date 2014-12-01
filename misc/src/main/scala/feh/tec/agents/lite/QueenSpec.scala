@@ -5,9 +5,10 @@ import feh.tec.agents.lite.Fallback.FallbackState
 import feh.tec.agents.lite.impl.agent.create
 import feh.tec.agents.lite.impl.agent.create.SpecExt
 import feh.tec.agents.lite.impl.spec.{PriorityAndProposalBasedAgentSpec, ChangingIssuesSpec}
-import feh.tec.agents.lite.spec.RequiresDistinctPriority
+import feh.tec.agents.lite.spec.{AgentSpecification, RequiresDistinctPriority}
 import feh.util._
 import scala.collection.mutable
+import scala.concurrent.duration._
 import scala.reflect.ClassTag
 
 object QueenSpec{
@@ -22,7 +23,9 @@ object QueenSpec{
 import feh.tec.agents.lite.QueenSpec._
 
 trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with FallbackSpec[Agent, Lang] {
-  self: PriorityAndProposalBasedAgentSpec[Agent, Lang] with RequiresDistinctPriority with SpecExt[Agent] =>
+  self: PriorityAndProposalBasedAgentSpec[Agent, Lang] with RequiresDistinctPriority with SpecExt[Agent] with AgentSpecification.Iterating[Agent, Lang] =>
+
+  def confirmAllWaitingDelay: FiniteDuration
 
   private val _partialSolutions = mutable.Map.empty[NegotiationId, mutable.ListBuffer[PartialSolution]]
   /** Last goes first */
@@ -46,16 +49,19 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
 
   def regAggregateReq(req: Message.IssuesRequest)(implicit ag: Agent): Unit = {
     val neg = ag.get(req.negotiation)
-    if(req.myValues.keySet == neg.currentValues()){
+    ag.log.debug(s"req.myValues.keySet = ${req.myValues.keySet}, neg.currentIssues()=${neg.currentIssues()}, neg.currentValues() = ${neg.currentValues()}")
+    if(req.myValues.keySet == neg.currentIssues().toSet){
       val psForNeg = partialSolutionReg.getOrElseUpdate(
         req.negotiation,
         mutable.HashMap(neg.scope().toSeq.zipMap(_ => Option.empty[(Priority, Map[Var, Any])]): _*)
       )
-      assert(psForNeg(req.sender).isEmpty, s"psForNeg(req.sender)=${psForNeg(req.sender)}")
+//      assert(psForNeg(req.sender).isEmpty, s"psForNeg(req.sender)=${psForNeg(req.sender)}")
       psForNeg += req.sender -> Some(req.priority -> req.myValues)
+      ag.log.debug(s"psForNeg=$psForNeg")
     }
   }
-  def clearPartialSolutionReg(neg: NegotiationId): Unit = partialSolutionReg -= neg
+  def unregPartialSolution(neg: NegotiationId, ag: AgentRef): Unit = partialSolutionReg.get(neg).foreach(_ += ag -> None)
+  def clearPartialSolution(neg: NegotiationId): Unit = partialSolutionReg -= neg
 
   def updateIteratorOnIssuesChange(neg: Agent#Negotiation)
                                   (implicit ag: Agent) = {
@@ -87,6 +93,41 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
     varToRemove
   }
 
+  newIterator <:= {
+    implicit ag => {
+      negId =>
+        val neg = ag.get(negId)
+        val issuesOrder = neg.currentIssues().toList
+        val fixedIssuesValues = neg.currentValues()
+        val dItByVar = issuesOrder match {
+          case changing :: statics =>
+            ag.log.debug(s"issuesOrder=$issuesOrder")
+            ag.log.debug(s"changing=$changing, fixedIssuesValues=$fixedIssuesValues")
+            ag.log.debug(s"statics.toSet=${statics.toSet}, fixedIssuesValues.keySet=${fixedIssuesValues.keySet}")
+            assert(statics.toSet subsetOf fixedIssuesValues.keySet)
+            val cIt = statics.map{
+              issue =>
+                ag.log.debug(s"DomainIterator constant(${fixedIssuesValues(issue)}, 1)")
+                DomainIteratorBuilder
+                  .constant[Var#Domain, Var#Tpe](fixedIssuesValues(issue).asInstanceOf[Var#Tpe], 1)
+            }
+            issuesOrder zip (ag.domainIterators(changing) :: cIt)
+        }
+          //ag.varsByNeg(negId).toSeq.zipMap(ag.domainIterators)
+        val it = DomainIteratorBuilder overSeq dItByVar.map(_._2)
+        val vars = dItByVar.map(_._1)
+        val i2i: Seq[Any] => Map[Var, Any] = seq => {
+          assert(vars.length == seq.length)
+          vars.zip(seq).toMap
+        }
+        val domains = dItByVar.map(_._1.domain)
+        val dit = it.apply(domains).map(i2i)
+        val dit2 = it.apply(domains).map(i2i)
+        ag.log.debug("dit2 = " + dit2.toList.mkString("\n"))
+        dit
+    }
+  }
+
   override def hasNothingToProposeWhileTopPriority(negId: NegotiationId)(implicit ag: Agent) = {
     ag.guardFailedPartialSolution(currentPartialSolutionOpt(negId).getOrThrow(s"No partial solution exists for $negId"))
 
@@ -101,14 +142,18 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
     ag.sendToAll(ag.setNextProposal(negId))
   }
 
+  case class ConfirmAllWaiting(neg: NegotiationId) extends UserMessage
+
   onIssueRequest <:= {
     implicit ag => {
       case req if maxPriority(req.negotiation).exists(_._1 == ag.ref) =>
-        ag.log.debug("onIssueRequest: max priority")
         regAggregateReq(req)
 
         val neg = ag.get(req.negotiation)
         val psOpt = currentPartialSolutionOpt(req.negotiation)
+
+        ag.log.debug(s"onIssueRequest: negID = ${neg.id} partialSolution = ${partialSolutionReg.get(neg.id)}; //$partialSolutionReg")
+        ag.log.debug("onIssueRequest: req " + req)
 
         if(req.req.isAggregation){
           psOpt map addPartialSolution
@@ -116,7 +161,10 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
           if(psOpt.nonEmpty || neg.currentIssues().isEmpty){
             val issueToAdd = neg.issues diff neg.currentIssues().toSet
 
-            if(issueToAdd.isEmpty) sys.error("Negotiation finished: " + psOpt + "\nissueToAdd = " + issueToAdd) // todo
+            if(issueToAdd.isEmpty) {
+              ag.context.system.scheduler.scheduleOnce(confirmAllWaitingDelay, ag.self, ConfirmAllWaiting(neg.id))(ag.context.dispatcher)
+//              sys.error("Negotiation finished: " + psOpt + "\nissueToAdd = " + issueToAdd)
+            } // todo
             else {
               val next = issueToAdd.randomChoose
 
@@ -127,6 +175,7 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
 
               updateIteratorOnIssuesChange(neg)
               ag.log.debug("updateIteratorOnIssuesChange")
+              clearPartialSolution(neg.id)
               Thread.sleep(100)
               if(neg.currentState() != NegotiationState.Negotiating) neg.currentState update NegotiationState.Negotiating
               val p = ag.setNextProposal(req.negotiation)
@@ -136,13 +185,28 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
           }
         }
         else {
-          clearPartialSolutionReg(req.negotiation)
+          clearPartialSolution(neg.id)
+//          unregPartialSolution(req.negotiation, req.sender)
         }
 
 //        assert(, s"psOpt=$psOpt, neg.currentIssues()=${neg.currentIssues()}")
       case _ => // do nothing
         ag.log.debug("onIssueRequest: do nothing")
     }
+  }
+
+  processUserMessage andThen{
+    ag =>
+      overridden =>
+        overridden(ag) orElse
+          {
+            case ConfirmAllWaiting(neg) =>
+              def diff = ag.get(neg).issues diff ag.get(neg).currentIssues().toSet
+              val psOpt = currentPartialSolutionOpt(neg)(ag)
+              val f = ag.failedPartialSolutions(neg)
+              if(psOpt.nonEmpty && diff.isEmpty)
+                sys.error(s"Negotiation finished: ${psOpt.get.values.values}\nfails: $f")
+          }
   }
 
   onIssueResponse <:= {
@@ -156,10 +220,14 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
         }
         updateIteratorOnIssuesChange(neg)
         if(neg.currentState() != NegotiationState.Negotiating) neg.currentState update NegotiationState.Negotiating
-        clearPartialSolutionReg(resp.negotiation)
+        //unregPartialSolution(resp.negotiation, resp.sender)
         Thread.sleep(100)
         ag.sendToAll(ag.setNextProposal(neg.id))
-      case _ => // do nothing
+      case resp =>
+        val neg = ag.get(resp.negotiation)
+        if(neg.currentState() == NegotiationState.Waiting)
+          ag.sendToAll(Message.IssuesRequest(resp.negotiation, Message.IssueChange.Add(), neg.currentPriority(), neg.currentValues())(ag.ref))
+      // do nothing
     }
   }
 
@@ -186,6 +254,9 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
 class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.DynIssuesSpec[Agent, Lang]
   with RequiresDistinctPriority with PartialSolutionSearchSpec
 {
+
+  def confirmAllWaitingDelay: FiniteDuration = 400 millis span
+
   initialize before {
     ag =>
 //      ag.Reporting.Messages = false
@@ -197,6 +268,7 @@ class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.DynIs
       ag.negotiations.map(_.id).foreach(addOnStateChangeHookForIssueNeg(_)(ag))
       ag.log.info("initialized")
   }
+
   start andThen {
     ag =>
       overridden =>
@@ -267,6 +339,9 @@ class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.DynIs
     implicit ag => {
       case msg if msg.respondingTo != ag.get(msg.negotiation).currentProposal().id => //ignore
       case msg =>
+        setProposalAcceptance(msg, v = true)
+        whenProposalAccepted(msg)
+/*
         ag.repeatingAFailure(msg) match {
           case Some(true) =>
 //            ag.log.info("rejecting repeating error" + knownConfiguration(msg.negotiation, msg.respondingTo))
@@ -276,6 +351,7 @@ class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.DynIs
             whenProposalAccepted(msg)
 //          case None => // wait for more
         }
+*/
     }
   }
 

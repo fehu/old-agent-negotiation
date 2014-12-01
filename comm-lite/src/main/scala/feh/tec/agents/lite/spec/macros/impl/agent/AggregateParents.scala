@@ -23,6 +23,7 @@ trait AggregateParents[C <: whitebox.Context]{
     AgentSegmentParentRequiresDistinctPriority(raw) ::
     AgentSegmentParentFailedConfigurationsChecks(raw) ::
     AgentSegmentParentChangingIssues(raw) ::
+    AgentSegmentParentFailedPartialSolutionsChecks(raw) ::
     AgentSegmentParentReportingAgent(raw) :: Nil
 
   /** Adds corresponding parent and definitions if `raw`.spec is a [[PriorityAndProposalBasedAgentSpec]]
@@ -187,6 +188,8 @@ trait AggregateParents[C <: whitebox.Context]{
     }
   }
 
+  /** Adds corresponding parent and definitions if `raw` indicates agent's type is [[ChangingIssues]]
+    */
   def AgentSegmentParentChangingIssues(raw: NegotiationRaw) = {
     import c.universe._
 
@@ -209,6 +212,32 @@ trait AggregateParents[C <: whitebox.Context]{
     }
 
   }
+
+  /** Adds corresponding parent and definitions if `raw` indicates agent's type is [[FailedPartialSolutionsChecks]]
+    */
+  def AgentSegmentParentFailedPartialSolutionsChecks(raw: NegotiationRaw) = {
+    import c.universe._
+
+    val failedPartialSolutionsChecks = raw.agents.filter(r => agentType(r).exists(_ <:< typeOf[FailedPartialSolutionsChecks[_]]))
+    val failedPartialSolutionsChecksTpe =
+      typeOf[impl.agent.PartialSolutionsChecks[Language.ProposalBased with Language.HasPriority with Language.NegotiatesIssues]]
+
+    MacroSegmentsTransform {
+      _.append(AgentBuildingStages.AggregateParents,
+        MacroSegment{
+          case trees =>
+            val newAgs = trees.agents.map{
+              transform(failedPartialSolutionsChecks){
+                (tr, raw) =>
+                  tr.append.parents(failedPartialSolutionsChecksTpe)
+              }
+            }
+            trees.copy(agents = newAgs)
+        }
+      )
+    }
+  }
+
 
   /** Adds corresponding parent and definitions if any of `raw.negotiations` have `reportingToOpt` defined
     */
@@ -240,7 +269,7 @@ trait AggregateParents[C <: whitebox.Context]{
     )
 
     def reportSysAgent = "report-listener" -> ActorTrees("$ReportListener",
-      parents = typeOf[lite.impl.service.DefaultReportWriter] :: typeOf[NegotiationFinishedListener] :: Nil, // todo: use ReportListenerRef
+      parents = typeOf[lite.impl.service.DefaultReportWriter] ::  Nil, //typeOf[NegotiationFinishedListener] :: Nil, // todo: use ReportListenerRef
       body = reportSysAgentBody,
       constructorArgs = agentConstructorArgs
     )

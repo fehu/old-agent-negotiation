@@ -8,4 +8,5 @@ trait FailedPartialSolutionsChecks[Lang <: Language.ProposalBased with Language.
   /** yes / no / None = maybe */
   def repeatingAFailure(ps: PartialSolution): Boolean
   def guardFailedPartialSolution(failed: PartialSolution)
+  def failedPartialSolutions(neg: NegotiationId): Seq[PartialSolution]
 }

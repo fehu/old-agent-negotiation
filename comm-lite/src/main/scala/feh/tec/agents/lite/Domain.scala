@@ -80,6 +80,10 @@ object DomainIteratorBuilder{
       }
     }
 
+  def constant[D, T](value: T, size: Int): DomainIteratorBuilder[D, T] = new DomainIteratorBuilder[D, T]{
+    def apply(v1: D): Iterator[T] = Stream.fill(size)(value).iterator
+  }
+
   def overSeq[D, T](di: Seq[DomainIteratorBuilder[D, T]]): StraightForwardDomainIteratorBuilder[Seq[D], Seq[T]] with DomainSeqIteratorBuilder[D, T] =
     new StraightForwardDomainIteratorBuilder[Seq[D], Seq[T]] with DomainSeqIteratorBuilder[D, T]{
       def apply(v1: Seq[D]): WithUnderlying = new Iterator[Seq[T]]{
@@ -101,7 +105,7 @@ object DomainIteratorBuilder{
           }
           else nextValue(0)
 
-          currentValues.values.toSeq
+          currentValues.toList.sortBy(_._1).map(_._2)
         }
 
         protected def nextValue(i: Int): Unit =
