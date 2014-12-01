@@ -9,7 +9,7 @@ import UnidocKeys._
 object  Build extends sbt.Build {
 
   val ScalaVersion = "2.11.4"
-  val Version = "0.1"
+  val Version = "0.3-SNAPSHOT"
 
   import Resolvers._
   import Dependencies._
@@ -23,7 +23,7 @@ object  Build extends sbt.Build {
 //    scalacOptions ++= Seq("-deprecation"),
 //    scalacOptions ++= Seq("-Ydebug"),
 //    scalacOptions ++= Seq("-Xlog-free-terms"),
-//    scalacOptions ++= Seq("-Ymacro-debug-lite"),
+    scalacOptions ++= Seq("-Ymacro-debug-lite"),
     scalacOptions in (Compile, doc) ++= Seq("-diagrams", "-diagrams-max-classes", "50", "-diagrams-max-implicits", "20")
 //     resolvers += Release.spray,
 //     mainClass in Compile := Some("")

@@ -8,7 +8,7 @@ import feh.tec.agents.lite.spec.AgentSpecification
 import feh.util._
 import scala.collection.mutable
 
-trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
+  trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
   extends AgentSpecification.PriorityAndProposalBased[Ag, Lang]   {
   //    type BuildArgs =
 

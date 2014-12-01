@@ -46,7 +46,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
       when finished {
         controller =>
           (neg, values) => {
-            controller.log.info(s"negotiation $neg successfully finished: $values")
+            controller.log.info(s"negotiation $neg successfully finished: $values;\nShutting Down in $shutDownIn")
             controller.agents.foreach{
               ag =>
                 ag.ref.tell(
@@ -54,7 +54,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
                   WebPushServer
                 )
             }
-            asys.scheduler.scheduleOnce(200 millis, () => {
+            asys.scheduler.scheduleOnce(shutDownIn, () => {
               WebPushServer.tell(SystemMessage.NegotiationFinished(neg, values), controller.self)
               asys.shutdown()
               sys.exit(0)
@@ -74,7 +74,9 @@ object QueenNegotiationApp extends App with WebsocketConf{
     }
   }
 
-  def N = 8
+  def N = 6
+
+  val shutDownIn = 1 second span
 
   implicit val asys = ActorSystem()
 
