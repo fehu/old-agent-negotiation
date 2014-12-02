@@ -43,10 +43,12 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
 
 
   def hasState(msg: NegotiationMessage, s: NegotiationState*) = s.contains(get(msg.negotiation).currentState())
-  private val delayedMessages = mutable.HashSet.empty[Lang#Msg]
+  private val delayedMessages = mutable.ListBuffer.empty[Lang#Msg]
   def guardDelayedMessage(msg: Lang#Msg) = delayedMessages += msg
   def resendDelayedMessages() = {
-    delayedMessages.foreach(msg => self.tell(msg, msg.sender.ref))
+    log.debug("resendDelayedMessages " + delayedMessages)
+    delayedMessages.map(msg => self.tell(msg, msg.sender.ref))
+//    this.receive
     delayedMessages.clear()
   }
 

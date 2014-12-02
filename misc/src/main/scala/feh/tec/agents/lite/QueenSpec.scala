@@ -1,7 +1,9 @@
 package feh.tec.agents.lite
 
+import java.util.UUID
+
 import feh.tec.agents.lite.Fallback
-import feh.tec.agents.lite.Fallback.FallbackState
+import feh.tec.agents.lite.Fallback.{FallbackRequest, FallbackState}
 import feh.tec.agents.lite.impl.agent.create
 import feh.tec.agents.lite.impl.agent.create.SpecExt
 import feh.tec.agents.lite.impl.spec.{PriorityAndProposalBasedAgentSpec, ChangingIssuesSpec}
@@ -138,7 +140,7 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
 
 //    neg.currentIterator update neg.currentIterators().getOrElse(theRest.toSet, ag.newIterator(negId))
     updateIteratorOnIssuesChange(neg)
-    Thread.sleep(100)
+//    Thread.sleep(100)
     ag.sendToAll(ag.setNextProposal(negId))
   }
 
@@ -221,7 +223,7 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
         updateIteratorOnIssuesChange(neg)
         if(neg.currentState() != NegotiationState.Negotiating) neg.currentState update NegotiationState.Negotiating
         //unregPartialSolution(resp.negotiation, resp.sender)
-        Thread.sleep(100)
+//        Thread.sleep(100)
         ag.sendToAll(ag.setNextProposal(neg.id))
       case resp =>
         val neg = ag.get(resp.negotiation)
@@ -248,6 +250,25 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
     super.sendFallbackRequest(negId)
     val neg = ag.get(negId)
     ag.sendToAll(Message.IssuesRequest(negId, Message.IssueChange.Remove(), neg.currentPriority(), neg.currentValues())(ag.ref))
+  }
+
+
+  override def onFallbackRequest(req: FallbackRequest)(implicit ag: Agent) = {
+    super.onFallbackRequest(req)
+    if(ag.myPriority isLowerThenOf req){
+      if(pausedByFallbackRequest.nonEmpty) ag.guardDelayedMessage(req)
+      else {
+        val neg = ag.get(req.negotiation)
+        neg.currentState update FallbackState
+        pausedByFallbackRequest = Some(req.id)
+      }
+    }
+  }
+
+  override protected def respondIWillMove(req: FallbackRequest, myPriority: Priority)(implicit ag: Agent) =
+  {
+//    Thread.sleep(50)
+    ag.sendToAll(Fallback.IWillMove(req.negotiation, myPriority, req.id)(ag.ref))
   }
 }
 

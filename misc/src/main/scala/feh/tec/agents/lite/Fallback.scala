@@ -47,6 +47,7 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
       import ag._
       val neg = get(negId)
       val myPr = neg.currentPriority()
+
       if(myPr.get == pr.get + 1) {
         if(neg.currentState() == NegotiationState.Waiting) neg.currentState update NegotiationState.Negotiating
         val failed = knownConfiguration(negId, neg.currentProposal().id).filter((p, _) => p >= myPr)
@@ -56,10 +57,14 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
           sendToAll(FailureChecks.GuardFailedConfiguration(failed, myPr))
         }
         ag.setNextProposal(negId)
-        val resp = IWillMove(negId, myPr, reqId)
-        req.sender ! resp
+        respondIWillMove(req, myPr)
         sendToAll(neg.currentProposal())
       }
+  }
+
+  protected def respondIWillMove(req: FallbackRequest, minePriority: Priority)(implicit ag: Ag) = {
+    import ag._
+    req.sender ! IWillMove(req.negotiation, minePriority, req.id)
   }
 
   def whenProposalAccepted(msg: Message.ProposalResponse)(implicit ag: Ag): Unit = whenProposalAccepted(msg.negotiation, msg.respondingTo)
@@ -75,20 +80,24 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
 
   def hasNothingToProposeWhileTopPriority(negId: NegotiationId)(implicit ag: Ag): Unit = sys.error("Failed to resolve negotiation")
 
+  protected var pausedByFallbackRequest: Option[UUID] = None
 
   moreProcess <:= {
     implicit ag => {
       case msg: FallbackRequest if ag.hasState(msg, NegotiationState.Negotiating, NegotiationState.Waiting) => onFallbackRequest(msg)
       /* Fallback State */
-      case msg: IWillMove if ag.hasState(msg, FallbackState) =>
+      case msg: IWillMove if ag.hasState(msg, FallbackState) && pausedByFallbackRequest.contains(msg.respondingTo) =>
         val neg = ag.get(msg.negotiation)
         neg.currentIterator update ag.newIterator(neg.id)
         ag.setNextProposal(neg.id)
         neg.currentState update NegotiationState.Negotiating
+        pausedByFallbackRequest = None
         ag.resendDelayedMessages()
         ag.sendToAll(neg.currentProposal())
+      case msg: IWillMove if ag.hasState(msg, FallbackState, NegotiationState.Negotiating) => ag.guardDelayedMessage(msg) // for another fallback request
       case msg: FallbackRequest if ag.hasState(msg, FallbackState) => ag.guardDelayedMessage(msg)
       case msg: Message.Proposal if ag.hasState(msg, FallbackState) => ag.guardDelayedMessage(msg)
+      case msg: IWillMove if ag.myPriority isLowerThenOf msg => ???
       case msg if ag.hasState(msg, FallbackState) => // do nothing
     }
   }
@@ -97,6 +106,7 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
     val neg = ag.get(negId)
     neg.currentState update FallbackState
     val req = FallbackRequest(negId, neg.currentPriority(), UUID.randomUUID())(ag.ref)
+    pausedByFallbackRequest = Some(req.id)
     ag.sendToAll(req)
   }
 
