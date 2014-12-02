@@ -179,6 +179,7 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
               ag.log.debug("updateIteratorOnIssuesChange")
               clearPartialSolution(neg.id)
               Thread.sleep(100)
+
               if(neg.currentState() != NegotiationState.Negotiating) neg.currentState update NegotiationState.Negotiating
               val p = ag.setNextProposal(req.negotiation)
               ag.log.debug("onIssueRequest: sending next proposal " + p)
