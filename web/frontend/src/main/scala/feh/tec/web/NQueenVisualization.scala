@@ -108,6 +108,78 @@ class ChessBoard(size: Int) {
   def resetFailedPositions() = jQuery(".chess-board td." + failedPositionClass) removeClass failedPositionClass
 }
 
+@JSExport("feh.tec.web.ChessBoard")
+object ChessBoard{
+
+  trait JSInterface{
+    self: ChessBoard =>
+
+    @JSExport
+    def bindHtml(to: String): Any
+    @JSExport
+    def bindHtml(): Any
+
+    @JSExport
+    def setWaiting(queen: Int): Any
+    @JSExport
+    def setWaiting(queens: js.Array[Int]): Any
+    @JSExport
+    def setFallback(queen: Int): Any
+    @JSExport
+    def setFallback(queens: js.Array[Int]): Any
+    @JSExport
+    def resetState(queen: Int): Any
+    @JSExport
+    def resetState(queens: js.Array[Int]): Any
+
+    @JSExport
+    def updatePositions(queen: Int, x: Int, y: Int): Any
+    @JSExport
+    def setAllPositions(fixed: String, positions: js.Array[Int]): Any
+  }
+
+  @JSExport
+  def offline(size: Int): JSInterface = new ChessBoard(size) with JSInterface{
+
+    def bindHtml(): Any = bindHtml("[containerfor=chess-board]")
+
+    def bindHtml(to: String) = {
+      jQuery("head") append QueenFlagStyles.generate(size)
+      jQuery(to) html this.create
+    }
+
+    def setFallback(queens: js.Array[Int]) = for((queen: Int) <- queens) yield {
+      jQuery("#" + QueenFlagStyles.fallback(queen)).prop("disabled", false)
+      jQuery("#" + QueenFlagStyles.acceptance(queen)).prop("disabled", true)
+    }
+
+    def setWaiting(queens: js.Array[Int]) = for((queen: Int) <- queens) yield{
+      jQuery("#" + QueenFlagStyles.acceptance(queen)).prop("disabled", false)
+      jQuery("#" + QueenFlagStyles.fallback(queen)).prop("disabled", true)
+
+    }
+
+    def resetState(queens: js.Array[Int]) = for((queen: Int) <- queens) yield{
+      jQuery("#" + QueenFlagStyles.acceptance(queen)).prop("disabled", true)
+      jQuery("#" + QueenFlagStyles.fallback(queen)).prop("disabled", true)
+
+    }
+
+    def setWaiting(queen: Int) = setWaiting(js.Array(queen))
+    def setFallback(queen: Int) = setFallback(js.Array(queen))
+    def resetState(queen: Int) = resetState(js.Array(queen))
+
+    def updatePositions(queen: Int, x: Int, y: Int) = this.updatePositions(Map(queen -> (x, y)))
+
+    def setAllPositions(fixed: String, positions: js.Array[Int]): Any = this.updatePositions(
+        (1 to size).map(i => i -> (fixed.trim.toLowerCase match {
+        case "x" => i -> positions(i-1)
+        case "y" => positions(i-1) -> i
+      })).toMap
+    )
+  }
+}
+
 object QueenInfo{
   class Selection(val updFunc: Selection => Any, var left: Option[Int] = None, var right: Option[Int] = None){
     def isDefined = left.isDefined && right.isDefined

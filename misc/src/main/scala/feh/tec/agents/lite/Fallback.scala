@@ -84,7 +84,9 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
 
   moreProcess <:= {
     implicit ag => {
-      case msg: FallbackRequest if ag.hasState(msg, NegotiationState.Negotiating, NegotiationState.Waiting) => onFallbackRequest(msg)
+      case msg: FallbackRequest if ag.hasState(msg, NegotiationState.Negotiating, NegotiationState.Waiting) =>
+        ag.resendDelayedMessages()
+        onFallbackRequest(msg)
       /* Fallback State */
       case msg: IWillMove if ag.hasState(msg, FallbackState) && pausedByFallbackRequest.contains(msg.respondingTo) =>
         val neg = ag.get(msg.negotiation)
