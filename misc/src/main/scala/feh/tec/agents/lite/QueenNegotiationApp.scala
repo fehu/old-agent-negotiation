@@ -74,7 +74,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
     }
   }
 
-  def N = 6
+  def N = 8
 
   val shutDownIn = 1 second span
 

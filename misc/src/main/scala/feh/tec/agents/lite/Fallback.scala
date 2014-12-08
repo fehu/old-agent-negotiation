@@ -49,14 +49,16 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
       val myPr = neg.currentPriority()
 
       if(myPr.get == pr.get + 1) {
-        if(neg.currentState() == NegotiationState.Waiting) neg.currentState update NegotiationState.Negotiating
         val failed = knownConfiguration(negId, neg.currentProposal().id).filter((p, _) => p >= myPr)
         val requiredSize = neg.scope().size - myPr + 1
         if(failed.size == requiredSize) {
           ag.guardFailedConfiguration(failed)
           sendToAll(FailureChecks.GuardFailedConfiguration(failed, myPr))
         }
-        ag.setNextProposal(negId)
+        if(neg.currentState() == NegotiationState.Waiting) {
+          neg.currentState update NegotiationState.Negotiating
+          ag.setNextProposal(negId)
+        }
         respondIWillMove(req, myPr)
         sendToAll(neg.currentProposal())
       }

@@ -4,10 +4,12 @@ import java.util.UUID
 
 import feh.tec.agents.lite.Fallback
 import feh.tec.agents.lite.Fallback.{FallbackRequest, FallbackState}
+import feh.tec.agents.lite.Message.ProposalId
+import feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent
 import feh.tec.agents.lite.impl.agent.create
 import feh.tec.agents.lite.impl.agent.create.SpecExt
 import feh.tec.agents.lite.impl.spec.{PriorityAndProposalBasedAgentSpec, ChangingIssuesSpec}
-import feh.tec.agents.lite.spec.{AgentSpecification, RequiresDistinctPriority}
+import feh.tec.agents.lite.spec.{AgentOverride, AgentSpecification, RequiresDistinctPriority}
 import feh.util._
 import scala.collection.mutable
 import scala.concurrent.duration._
@@ -17,12 +19,27 @@ object QueenSpec{
   def apply() = new QueenSpec
 
   type Lang = create.PPI.Lang with Language.NegotiatesIssues
-  type Agent = create.PPI.Ag[Lang] with FailedConfigurationsChecks[Lang] with FailedPartialSolutionsChecks[Lang]{
+  type Agent = create.PPI.Ag[Lang] with FailedConfigurationsChecks[Lang] with FailedPartialSolutionsChecks[Lang] with ResponseDelay[Lang] with SortResending[Lang]{
     type Negotiation <: Negotiation.HasProposal[Lang] with Negotiation.HasPriority with Negotiation.ChangingIssues with Negotiation.HasIterators
   }
 }
 
 import feh.tec.agents.lite.QueenSpec._
+
+trait SortResending[Lang <: Language.ProposalBased with Language.HasPriority] extends PriorityAndProposalBasedAgent[Lang] with AgentOverride{
+  override def resendDelayedMessages() = {
+    log.debug("resendDelayedMessages (overridden) " + delayedMessages)
+    delayedMessages
+      .sortBy{
+        case m: Fallback.IWillMove => 3
+        case f: Fallback.FallbackRequest => 2
+        case _ => 1
+      }
+      .map(msg => self.tell(msg, msg.sender.ref))
+    //    this.receive
+    delayedMessages.clear()
+  }
+}
 
 trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with FallbackSpec[Agent, Lang] {
   self: PriorityAndProposalBasedAgentSpec[Agent, Lang] with RequiresDistinctPriority with SpecExt[Agent] with AgentSpecification.Iterating[Agent, Lang] =>
@@ -67,13 +84,8 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
 
   def updateIteratorOnIssuesChange(neg: Agent#Negotiation)
                                   (implicit ag: Agent) = {
-    val issues = neg.currentIssues().toSet
-    val itOpt = neg.currentIterators().get(issues)
-    val it = itOpt.getOrElse{
-        val i = ag.newIterator(neg.id)
-        neg.currentIterators update (neg.currentIterators() + (issues -> i))
-        i
-      }
+    val it = ag.newIterator(neg.id)
+//    neg.currentIterators update (neg.currentIterators() + (neg.currentIssues().toSet -> it))
     neg.currentIterator update it
   }
 
@@ -178,7 +190,7 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
               updateIteratorOnIssuesChange(neg)
               ag.log.debug("updateIteratorOnIssuesChange")
               clearPartialSolution(neg.id)
-              Thread.sleep(100)
+              Thread.sleep(ag.responseDelay.toMillis / 2)
 
               if(neg.currentState() != NegotiationState.Negotiating) neg.currentState update NegotiationState.Negotiating
               val p = ag.setNextProposal(req.negotiation)
@@ -317,13 +329,17 @@ class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.DynIs
     msg match{
       case Message.Proposal(propId, negId, _, values) =>
         val neg = get(negId)
-        val response =
-          if(msg.satisfiesConstraints)
-            Message.Accepted(negId, propId, neg.currentPriority(), neg.currentValues(), neg.currentState() == NegotiationState.Waiting)
-          else Message.Rejected(negId, propId, neg.currentPriority(), get(negId).currentValues())
+        def accepted = Message.Accepted(negId, propId, neg.currentPriority(), neg.currentValues(), neg.currentState() == NegotiationState.Waiting)
+        def rejected = Message.Rejected(negId, propId, neg.currentPriority(), get(negId).currentValues())
+
+        val response = // #01
+          if(neg.currentState() == NegotiationState.Waiting)
+            if(msg.satisfiesConstraints) accepted else rejected
+          else accepted
         respond(response)
     }
   }
+
 
   onProposal <:= {
     implicit ag =>
@@ -338,6 +354,12 @@ class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.DynIs
         case msg if myPriority isLowerThenOf  msg => respondToProposal(msg)
         case msg if myPriority isHigherThenOf msg => respondToProposal(msg)
       }
+  }
+
+  // #01
+  override def whenProposalAccepted(neg: NegotiationId, pid: ProposalId)(implicit ag: Agent) = {
+    super.whenProposalAccepted(neg, pid)
+    ag.sendToAll(ag.get(neg).currentProposal()) // to move those that accepted their sate by error
   }
 
   def rejected(neg: NegotiationId)(implicit ag: Agent) = {

@@ -98,7 +98,7 @@ trait DynamicScopeSupport[Lang <: NegotiationLanguage]
 }
 
 trait ResponseDelay[Lang <: NegotiationLanguage] extends AgentHelpers[Lang] with NegotiatingAgent[Lang] with SpeakingAgent[Lang] {
-  protected def responseDelay: FiniteDuration
+  def responseDelay: FiniteDuration
 
   private def responseDelayHook: (AgentRef, Lang#Msg) => Boolean = {
     case (to, msg) if responseDelay.toMillis != 0 =>

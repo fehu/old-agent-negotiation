@@ -18,6 +18,9 @@ trait AgentSpecification {
 //  protected val agent: Agent
 }
 
+/** Flag for macro */
+trait AgentOverride{ self: AbstractAgent => }
+
 trait AgentSpecificationExt[Ag <: AbstractAgent]{
 
   trait DefExt[T] extends ExtendableDefinition[Ag, T]

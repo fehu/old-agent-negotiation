@@ -182,7 +182,7 @@ trait ValAndDefDefinitions [C <: whitebox.Context]{
 
     def responseDelayArgName = "response-delay"
     def responseDelayArgType = typeOf[FiniteDuration]
-    def responseDelayAgBody = q"""protected lazy val responseDelay = args($responseDelayArgName).asInstanceOf[$responseDelayArgType]"""
+    def responseDelayAgBody = q"""lazy val responseDelay = args($responseDelayArgName).asInstanceOf[$responseDelayArgType]"""
     def responseDelayControllerBody = q"timeouts.`response delay`"
     def addResponseDelayArg(agName: String) = AddAgentArgs(agName, responseDelayArgName, responseDelayArgType, responseDelayControllerBody)
 

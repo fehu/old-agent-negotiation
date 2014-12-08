@@ -7,9 +7,11 @@ import feh.tec.agents.lite._
 import feh.tec.agents.lite.impl.agent.{ChangingIssuesImpl, FailureChecks}
 import feh.tec.agents.lite.impl.spec.{IteratingSpec, PriorityAndProposalBasedAgentSpec}
 import feh.tec.agents.lite.impl.agent
+import feh.tec.agents.lite.spec.AgentOverride
 import feh.tec.agents.lite.spec.macros.AgentsBuildingMacroBase
 import scala.concurrent.duration.FiniteDuration
 import scala.reflect.macros.whitebox
+import feh.util._
 
 /** Contains `MacroSegmentsTransform`s for **Aggregating Parents**
   */
@@ -24,7 +26,8 @@ trait AggregateParents[C <: whitebox.Context]{
     AgentSegmentParentFailedConfigurationsChecks(raw) ::
     AgentSegmentParentChangingIssues(raw) ::
     AgentSegmentParentFailedPartialSolutionsChecks(raw) ::
-    AgentSegmentParentReportingAgent(raw) :: Nil
+    AgentSegmentParentReportingAgent(raw) ::
+    AgentSegmentAgentOverride(raw) :: Nil
 
   /** Adds corresponding parent and definitions if `raw`.spec is a [[PriorityAndProposalBasedAgentSpec]]
     */
@@ -157,7 +160,7 @@ trait AggregateParents[C <: whitebox.Context]{
     }
   }
 
-  protected def agentType(raw: Raw.AgentDef) = {
+  /*protected */def agentType(raw: Raw.AgentDef) = {
     import c.universe._
     raw.spec.actualType.members.find(_.name == TermName("agentTag")).flatMap(
       _.typeSignature.resultType.typeArgs.filter(_ <:< typeOf[AbstractAgent]).ensuring(_.size <= 1).headOption
@@ -309,6 +312,46 @@ trait AggregateParents[C <: whitebox.Context]{
                   AddAgentArgs("report-listener", "confirmAllWaitingDelay", typeOf[FiniteDuration], q"timeouts.`confirm finished`")
                 )
               )
+        }
+      )
+    }
+  }
+
+  /** Adds parents marked with [[feh.tec.agents.lite.spec.AgentOverride]]
+    */
+  def AgentSegmentAgentOverride(raw: NegotiationRaw) = {
+    import c.universe._
+
+    def recSearch(tpe: Type): List[Type] ={
+      val overrideTpes = tpe.baseClasses.map(_.typeSignature).filter(_ <:< typeOf[AgentOverride]).flatMap{
+          case RefinedType(tpes, _) => tpes.filter(_ <:< typeOf[AgentOverride])
+          case ref: TypeRef => ref :: Nil
+        }
+
+      val (impls, toGo) = overrideTpes
+        .zipMap(_.baseClasses.map(_.typeSignature).filter(_ <:< typeOf[AgentOverride]))
+        .partition(_._2.isEmpty)
+
+      impls.unzip._1.toList ::: toGo.flatMap(_._2).distinct.flatMap(recSearch).toList
+
+    }
+
+    val markedOverride = raw.agents.flatMap{
+      ag =>
+        agentType(ag)
+              .map(t => ag -> recSearch(t))
+    }.toMap
+
+    MacroSegmentsTransform{
+      _.append(AgentBuildingStages.AggregateParents,
+        MacroSegment{
+          case tr@Trees(_, ags, _) =>
+            val newAgs = ags.map(transform(markedOverride.keys.toList){
+              (tr, raw) =>
+                tr.append.parents(markedOverride(raw): _*)
+            })
+
+            tr.copy(agents = newAgs)
         }
       )
     }
