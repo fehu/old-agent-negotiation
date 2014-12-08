@@ -40,7 +40,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
       configure(
         timeout.initialize <= 100.millis,
         timeout.start <= 200.millis,
-        timeout.`response delay` <= 200.millis
+        timeout.`response delay` <= 10.millis
       )
 
       when finished {
@@ -57,6 +57,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
             asys.scheduler.scheduleOnce(shutDownIn, () => {
               WebPushServer.tell(SystemMessage.NegotiationFinished(neg, values), controller.self)
               asys.shutdown()
+              asys.awaitTermination()
               sys.exit(0)
             })(asys.dispatcher)
           }
@@ -65,7 +66,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
       when failed {
         controller =>
           (neg, reason) => {
-            controller.log.info(s"negotiation $neg failed: $reason")
+            controller.log.error(s"negotiation $neg failed: $reason")
             asys.shutdown()
             sys.exit(1)
           }

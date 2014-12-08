@@ -293,8 +293,8 @@ class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.DynIs
 
   initialize before {
     ag =>
-//      ag.Reporting.Messages = false
-//      ag.Reporting.States = false
+      ag.Reporting.Messages = false
+      ag.Reporting.States = false
   }
 
   initialize after {

@@ -126,7 +126,7 @@ object  Build extends sbt.Build {
     )
   ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
    .aggregate(GitDependencies: _*)
-   .aggregate(commLite, misc, webFrontend, webBackend)
+   .aggregate(commLite, apps, webFrontend, webBackend)
 
   lazy val commLite = Project("comm-lite", file("comm-lite"),
     settings = buildSettings ++ Seq(
@@ -135,10 +135,10 @@ object  Build extends sbt.Build {
   ) dependsOn feh.util
 
 
-  lazy val misc = Project(
-    id = "misc",
-    base = file("misc"),
-    settings = buildSettings ++ Seq(
+  lazy val apps = Project(
+    id = "apps",
+    base = file("apps"),
+    settings = buildSettings ++ testSettings ++ Seq(
       libraryDependencies ++= Seq(akkaSlf4j, slf4j)
     )
   ) dependsOn (webBackend, commLite)

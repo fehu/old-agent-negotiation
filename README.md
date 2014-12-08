@@ -3,7 +3,7 @@ Negotiating Agents
 A Thesis Project at *Monterrey Institute of Technology and Higher Education* ([ITESM](http:/itesm.mx/))
 
 - [Project API](http://fehu.github.io/agent-negotiation/unidoc/package.html)
-- [Queen Negotiation Scheme](misc/QueenSpec.md)
+- [Queen Negotiation Scheme](apps/QueenSpec.md)
 - [Environment Generation Details](comm-lite/NegotiationEnvironmentGeneration.md)
 
 ##### todo:
@@ -28,7 +28,7 @@ Most of definitions are instances of *MonoDefinition* class and support followin
 Some of the definitions extend also *ExtendableDefinition.BeforeAndAfter* trait, that provides two extra extension points.
   They can be overridden with methods **before** and **after**.
 
-([source](misc/src/main/scala/feh/tec/agents/lite/QueenSpec.scala)):
+([source](apps/src/main/scala/feh/tec/agents/lite/QueenSpec.scala)):
 ```scala
   import feh.tec.agents.lite.impl.agent.create
   import feh.tec.agents.lite.spec.RequiresDistinctPriority
@@ -76,7 +76,7 @@ Some of the definitions extend also *ExtendableDefinition.BeforeAndAfter* trait,
 #### Negotiation Specification  (lite)
 Defines variables and negotiations, references *Agent Specification*, defines the number of agents to create.  
 
-([source](misc/src/main/scala/feh/tec/agents/lite/QueenNegotiationApp.scala)):
+([source](apps/src/main/scala/feh/tec/agents/lite/QueenNegotiationApp.scala)):
 ```scala
 
 import feh.tec.agents.lite.spec.dsl._
@@ -142,7 +142,7 @@ def negController(boardSize: Int) = controller {
 
 in sbt execute:
 ```
-> project misc
+> project apps
 > run
 -- choose the app to run --
 ```
