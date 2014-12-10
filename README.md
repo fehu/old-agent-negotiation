@@ -31,11 +31,8 @@ Some of the definitions extend also *ExtendableDefinition.BeforeAndAfter* trait,
 ([source](apps/src/main/scala/feh/tec/agents/lite/QueenSpec.scala)):
 ```scala
   import feh.tec.agents.lite.impl.agent.create
-  import feh.tec.agents.lite.spec.RequiresDistinctPriority
-  import scala.collection.mutable
-  import scala.concurrent.duration.FiniteDuration
   
-  class QueenSpec extends create.PPI.AllVarsSpec with RequiresDistinctPriority{
+  class SomeSpec extends create.PPI.AllVarsSpec {
   
     initialize after {
       ag => _ => ag.log.info("initialized")
@@ -44,29 +41,17 @@ Some of the definitions extend also *ExtendableDefinition.BeforeAndAfter* trait,
     start andThen {
       ag =>
         overridden =>
-          import ag._
           overridden(ag)
-          negotiations.foreach {
-            neg =>
-              if(neg.currentIterator.raw.isEmpty) neg.currentIterator update ag.newIterator(neg.id)
-              val prop = ag.setNextProposal(neg.id)
-              neg.currentState update NegotiationState.Negotiating
-              sendToAll(prop)
-          }
+          ag.negotiations.foreach { /* do something */ }
     }
     
       onProposal <:= {
         implicit ag =>
           import ag._
           {
-            case msg if(myPriority isLowerThenOf  msg) && !hasState(msg, FallbackState) =>
-              if(!msg.satisfiesConstraints) {
-                get(msg.negotiation).currentState update NegotiationState.Negotiating
-                sendToAll(ag.setNextProposal(msg.negotiation))
-              }
-              respondToProposal(msg)
-            case msg if myPriority isLowerThenOf  msg => respondToProposal(msg)
-            case msg if myPriority isHigherThenOf msg => respondToProposal(msg)
+            case msg if hasState(msg, SomeState)      => /* do something */
+            case msg if myPriority isLowerThenOf  msg => /* do something */
+            case msg if myPriority isHigherThenOf msg => /* do something */
           }
       }
   }
@@ -76,69 +61,9 @@ Some of the definitions extend also *ExtendableDefinition.BeforeAndAfter* trait,
 #### Negotiation Specification  (lite)
 Defines variables and negotiations, references *Agent Specification*, defines the number of agents to create.  
 
-([source](apps/src/main/scala/feh/tec/agents/lite/QueenNegotiationApp.scala)):
-```scala
+[N-Queens Example](apps/QueenNegotiationApp.md)
 
-import feh.tec.agents.lite.spec.dsl._
-import impl.agent._
-import scala.concurrent.duration._
-
-def negController(boardSize: Int) = controller {
-  new Negotiation {
-
-    var x = variable `with` domain(1 to boardSize)
-    var y = variable `with` domain(1 to boardSize)
-
-    def `queen's position` = negotiation over(x, y)
-
-    def Queen = agent withRole "chess queen" definedBy new QueenSpec that (
-      negotiates the `queen's position` `with` the.others reportingTo reporter.default and
-        hasConstraints(
-          "direct-line sight" | {
-            /* Constraints that can be run independently for vars should be separated by && or ||, or defined separately */
-            proposed(x) != valueOf(x) && proposed(y) != valueOf(y)
-          },
-          "diagonal-line sight" | {
-            (proposed(x) - valueOf(x)).abs != (proposed(y) - valueOf(y)).abs
-          }
-        )
-      )
-
-    spawn agents (
-      Queen -> boardSize
-      )
-
-    configure(
-      timeout.initialize <= 100.millis,
-        timeout.start <= 100.millis,
-        timeout.`response delay` <= 0.millis
-    )
-    
-    when finished {
-      controller =>
-        (neg, values) => {
-          controller.log.info(s"negotiation $neg successfully finished: $values")
-          asys.scheduler.scheduleOnce(2 seconds, () => {
-            sys.error("finished")
-            asys.shutdown()
-            sys.exit(0)
-          })(asys.dispatcher)
-        }
-      }
-
-      when failed {
-        controller =>
-          (neg, reason) => {
-            controller.log.info(s"negotiation $neg failed: $reason")
-            asys.shutdown()
-            sys.exit(1)
-          }
-      }
-  }
-}
-```
-
-#### Running the Negotiation
+### Running the Negotiation
 
 in sbt execute:
 ```
