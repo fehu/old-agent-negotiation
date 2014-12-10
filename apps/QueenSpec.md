@@ -4,6 +4,8 @@ QueenSpec
 Source: [QuuenSpec](src/main/scala/feh/tec/agents/lite/QueenSpec.scala)
 with [Fallback](src/main/scala/feh/tec/agents/lite/Fallback.scala)
 
+For usage example see [QueenNegotiationApp](QueenNegotiationApp.md) ([source](src/main/scala/feh/tec/agents/lite/QueenNegotiationApp.scala))
+
 ### Negotiation Scheme
 
 ![Queen's Negotiation Scheme](https://docs.google.com/uc?authuser=0&id=0B9XpukXOfywNUkRHb01JZ3Y4OE0)
