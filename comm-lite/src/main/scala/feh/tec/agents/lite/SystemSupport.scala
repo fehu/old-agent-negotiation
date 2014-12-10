@@ -56,10 +56,10 @@ trait SystemSupport extends AbstractAgent{
     case SystemMessage.Reset      => reset();       sender() ! SystemMessage.Reset
   }
 
-  def initialize()
-  def start()
-  def stop()
-  def reset()
+  protected def initialize()
+  protected def start()
+  protected def stop()
+  protected def reset()
 }
 
 trait SpeakingSystemSupport[Lang <: Language] extends SystemSupport{
@@ -110,4 +110,11 @@ trait ResponseDelay[Lang <: NegotiationLanguage] extends AgentHelpers[Lang] with
   abstract override def process: PartialFunction[Lang#Msg, Any] = {
     case msg if super.process.isDefinedAt(msg) => hooks.OnSend.withHooks(responseDelayHook)(super.process(msg))
   }
+}
+
+trait NegotiationSupport{
+  self: SystemSupport =>
+
+  def finished(negotiation: NegotiationId, result: Solution)
+  def failed(negotiation: NegotiationId, reason: Any)
 }

@@ -27,7 +27,8 @@ trait AggregateParents[C <: whitebox.Context]{
     AgentSegmentParentChangingIssues(raw) ::
     AgentSegmentParentFailedPartialSolutionsChecks(raw) ::
     AgentSegmentParentReportingAgent(raw) ::
-    AgentSegmentAgentOverride(raw) :: Nil
+    AgentSegmentAgentOverride(raw) ::
+    AgentSegmentNegotiationSupport(raw) :: Nil
 
   /** Adds corresponding parent and definitions if `raw`.spec is a [[PriorityAndProposalBasedAgentSpec]]
     */
@@ -355,5 +356,36 @@ trait AggregateParents[C <: whitebox.Context]{
         }
       )
     }
+  }
+
+  /** Adds parents marked with [[NegotiationSupport]]
+    */
+  def AgentSegmentNegotiationSupport(raw: NegotiationRaw) = {
+    import c.universe._
+
+    val negotiationSupport = raw.agents.zipMap(agentType)
+      .withFilter(_._2.isDefined).map(p => p._1 -> p._2.get)
+      .filter(_._2 <:< typeOf[NegotiationSupport])
+      .map(_._1).toList
+
+    MacroSegmentsTransform(
+      _.append(AgentBuildingStages.AggregateParents,
+        MacroSegment{
+          case tr@Trees(_, agents, _) =>
+            val newAgs = agents.map(transform(negotiationSupport){
+              (tr, _) => tr
+                .append.parents(typeOf[impl.agent.NegotiationNotifications])
+                .append.body(q"""protected def controllerRef = args("controller-ref").asInstanceOf[AgentRef]""")
+            })
+
+            tr
+              .copy(agents = newAgs)
+              .addAgentArgs(negotiationSupport.map{
+                raw =>
+                  AddAgentArgs(raw.name, "controller-ref", typeOf[AgentRef], q"this.ref") //q"implicitly[AgentRef]"
+              })
+        }
+      )
+    )
   }
 }

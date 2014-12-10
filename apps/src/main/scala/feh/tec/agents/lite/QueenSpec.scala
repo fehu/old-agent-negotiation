@@ -19,9 +19,16 @@ object QueenSpec{
   def apply() = new QueenSpec
 
   type Lang = create.PPI.Lang with Language.NegotiatesIssues
-  type Agent = create.PPI.Ag[Lang] with FailedConfigurationsChecks[Lang] with FailedPartialSolutionsChecks[Lang] with ResponseDelay[Lang] with SortResending[Lang]{
-    type Negotiation <: Negotiation.HasProposal[Lang] with Negotiation.HasPriority with Negotiation.ChangingIssues with Negotiation.HasIterators
-  }
+  type Agent =
+    create.PPI.Ag[Lang]
+      with FailedConfigurationsChecks[Lang]
+      with FailedPartialSolutionsChecks[Lang]
+      with ResponseDelay[Lang]
+      with SortResending[Lang]
+      with NegotiationSupport
+    {
+      type Negotiation <: Negotiation.HasProposal[Lang] with Negotiation.HasPriority with Negotiation.ChangingIssues with Negotiation.HasIterators
+    }
 }
 
 import feh.tec.agents.lite.QueenSpec._
@@ -98,10 +105,10 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
     from.currentIssues update from.currentIssues().ensuringNot(_.contains(issue)).filterNot(_ == issue)
   }
 
-  def rmLastIssue(from: Agent#Negotiation) = {
+  def rmLastIssue(from: Agent#Negotiation)(implicit ag: Agent) = {
     val varToRemove :: theRest = from.currentIssues()
 
-    if(theRest.isEmpty) sys.error("Negotiation failed")
+    if(theRest.isEmpty) ag.failed(from.id, "theRest.isEmpty")
 
     from.currentIssues update theRest
     varToRemove
@@ -200,8 +207,8 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
           }
         }
         else {
-          clearPartialSolution(neg.id)
-//          unregPartialSolution(req.negotiation, req.sender)
+//          clearPartialSolution(neg.id)
+          unregPartialSolution(req.negotiation, req.sender)
         }
 
 //        assert(, s"psOpt=$psOpt, neg.currentIssues()=${neg.currentIssues()}")
@@ -218,9 +225,14 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
             case ConfirmAllWaiting(neg) =>
               def diff = ag.get(neg).issues diff ag.get(neg).currentIssues().toSet
               val psOpt = currentPartialSolutionOpt(neg)(ag)
-              val f = ag.failedPartialSolutions(neg)
-              if(psOpt.nonEmpty && diff.isEmpty)
-                sys.error(s"Negotiation finished: ${psOpt.get.values.values}\nfails: $f")
+
+              if(psOpt.nonEmpty && diff.isEmpty){
+                val ps = psOpt.getOrThrow("Negotiation finished, but not even partial solution is known")
+                val sol = ps
+                  .ensuring(_.issues == ag.get(neg).issues, "The known solution is only partial: " + ps)
+                  .values.ensuring(_.size == ag.get(neg).scope().size + 1, "The solution isn't known for some agents: " + ps)
+                ag.finished(neg, Solution(sol))
+              }
           }
   }
 

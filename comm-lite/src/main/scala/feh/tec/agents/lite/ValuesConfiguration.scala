@@ -17,4 +17,4 @@ class ValuesConfiguration(configurations: Map[Priority, Map[Var, Any]], negotiat
 
 case class PartialSolution(negotiation: NegotiationId, issues: Set[Var], values: Map[Priority, Map[Var, Any]])
 
-//case class Solution(values: Map[Priority, Map[Var, Any]])
+case class Solution(values: Map[Priority, Map[Var, Any]])

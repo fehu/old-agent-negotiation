@@ -40,13 +40,13 @@ object QueenNegotiationApp extends App with WebsocketConf{
       configure(
         timeout.initialize <= 100.millis,
         timeout.start <= 200.millis,
-        timeout.`response delay` <= 10.millis
+        timeout.`response delay` <= 20.millis
       )
 
       when finished {
         controller =>
           (neg, values) => {
-            controller.log.info(s"negotiation $neg successfully finished: $values;\nShutting Down in $shutDownIn")
+            controller.log.info(s"negotiation $neg successfully finished: ${values.toList}};\nShutting Down in $shutDownIn")
             controller.agents.foreach{
               ag =>
                 ag.ref.tell(
@@ -75,7 +75,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
     }
   }
 
-  def N = 8
+  def N = 12
 
   val shutDownIn = 1 second span
 

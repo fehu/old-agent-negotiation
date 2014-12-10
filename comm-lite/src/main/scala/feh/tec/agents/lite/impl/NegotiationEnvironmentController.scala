@@ -148,11 +148,12 @@ trait NegotiationEnvironmentController extends EnvironmentController with Dynami
     case SystemMessage.Reset                            => reset()
     case req: AgentReport.StateRequest                  => currentAgents.foreach(_.ref forward req)
     case SystemMessage.NegotiationFinished(neg, values) => log.info(s"$neg FINISHED"); negotiationFinished(neg, values)
-    case SystemMessage.NegotiationFailed(n, m)          => log.info(s"$n FAILED: $m"); negotiationFailed(n, m)
+    case SystemMessage.NegotiationFailed(n, m)          => log.info(s"$n FAILED: $m"); negotiationFailed(n, m.toString)
   }
 
   val name = NegotiationEnvironmentController.Name
   val role = NegotiationEnvironmentController.Role
+  lazy val ref = AgentRef(Agent.Id(name, role), self)
 }
 
 object NegotiationEnvironmentController{
