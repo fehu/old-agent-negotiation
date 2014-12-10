@@ -87,10 +87,10 @@ def negController(boardSize: Int) = controller {
 
 ### Examples
 Video: 
-[6 Queens](https://docs.google.com/uc?authuser=0&id=0B9XpukXOfywNRzRCWmFMVHU5TDg) | 
-[8 Queens](https://docs.google.com/uc?authuser=0&id=0B9XpukXOfywNUVc2d0Fzb2VvT0k) | 
-[10 Queens](https://docs.google.com/uc?authuser=0&id=0B9XpukXOfywNVlBpc000OXRZNlE) | 
-[12 Queens](https://docs.google.com/uc?authuser=0&id=0B9XpukXOfywNbXBqSk5ILXdYcm8)
+[6 Queens]( https://drive.google.com/open?authuser=0&id=0B9XpukXOfywNRzRCWmFMVHU5TDg) | 
+[8 Queens]( https://drive.google.com/open?authuser=0&id=0B9XpukXOfywNUVc2d0Fzb2VvT0k) | 
+[10 Queens](https://drive.google.com/open?authuser=0&id=0B9XpukXOfywNVlBpc000OXRZNlE) | 
+[12 Queens](https://drive.google.com/open?authuser=0&id=0B9XpukXOfywNbXBqSk5ILXdYcm8)
 
 ### Code, Generated my Macros
 
