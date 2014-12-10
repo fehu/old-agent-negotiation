@@ -1,7 +1,7 @@
 QueenSpec
 ===
 
-[Spec Source](src/main/scala/feh/tec/agents/lite/QueenSpec.scala)
+Source: [QuuenSpec](src/main/scala/feh/tec/agents/lite/QueenSpec.scala)
 with [Fallback](src/main/scala/feh/tec/agents/lite/Fallback.scala)
 
 ### Negotiation Scheme
