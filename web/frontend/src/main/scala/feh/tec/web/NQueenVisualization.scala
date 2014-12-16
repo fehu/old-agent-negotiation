@@ -1,13 +1,13 @@
 package feh.tec.web
 
 import feh.tec.web.QueenInfo.SelectionDisabled
-import feh.tec.web.common.NQueenMessages.{MessageReport, ChangeReport, Queen}
-import feh.tec.web.common.{NQueenMessages, WebSocketMessages}
-import scala.scalajs.js.Dynamic
-import scalajs.js
+import feh.tec.web.common.NQueenMessages
+import feh.tec.web.common.NQueenMessages.{ChangeReport, MessageReport, Queen}
 import org.scalajs.dom
 import org.scalajs.jquery._
+
 import scala.collection.mutable
+import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import scalatags.Text.short._
 import scalatags.Text.{tags, tags2}
@@ -85,7 +85,7 @@ class ChessBoard(size: Int) {
   protected def selectSquare(x: Int, y: Int) = jQuery(s".chess-board tr:nth-child(${y+1}) td:nth-child(${x+1})")
 
   def updatePositions(msg: NQueenMessages.CanBulk): Any = msg match {
-    case NQueenMessages.ChangeReport(Queen(by), _, posOpt, _) =>
+    case NQueenMessages.ChangeReport(Queen(by), _, posOpt, _, _) =>
       posOpt.map(pos => updatePositions(Map(by -> pos)))
     case NQueenMessages.MessageReport(Queen(by), _, NQueenMessages.Message(_, _, content), _) =>
       updatePositions(Map(by -> content.position))
@@ -193,13 +193,14 @@ object QueenInfo{
 
 class QueenInfo(name: String, val n: Int, selection: QueenInfo.Selection){
 
-  def updatePriority(rep: MessageReport) = {
-    sel.queenInfo(rep.by.n) children ".priority" children "dd" text rep.msg.priority.toString
+  def updatePriority(rep: MessageReport): JQuery = updatePriority(rep.by, rep.msg.priority)
+  def updatePriority(queen: Queen, priority: Int): JQuery = {
+    sel.queenInfo(queen.n) children ".priority" children "dd" text priority.toString
   }
 
   def updateState(rep: ChangeReport) = rep match {
-    case ChangeReport(Queen(q), at, posOpt, stateOpt) =>
-
+    case ChangeReport(queen@Queen(q), at, posOpt, stateOpt, priorityOpt) =>
+      priorityOpt.foreach( updatePriority(queen, _) )
 //      for (pos <- posOpt) sel.queenInfo(q) children ".position" children "dd" text pos.toString
       for (state <- stateOpt) yield {
         val waiting = state != "Waiting"

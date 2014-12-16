@@ -5,7 +5,7 @@ import org.scalajs.dom.WebSocket
 
 import scala.reflect.ClassTag
 import scala.scalajs.js
-import scala.scalajs.js.{Dynamic, JSON}
+import scala.scalajs.js.JSON
 
 trait NQueenSocketListener extends SocketConnections{
 
@@ -58,7 +58,8 @@ trait NQueenSocketListener extends SocketConnections{
             assert(arr.size == 2)
             (arr(0).toInt, arr(1).toInt)
         },
-        state = optional[String](json.state)
+        state = optional[String](json.state),
+        priority = optional[Int](json.priority)
       )
     case "MessageReport" =>
       MessageReport(

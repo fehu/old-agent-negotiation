@@ -1,6 +1,5 @@
 package feh.tec.web
 
-import feh.tec.web.common.NQueenMessages
 import feh.tec.web.common.NQueenMessages._
 import spray.json._
 
@@ -22,7 +21,7 @@ object NQueenProtocol extends DefaultJsonProtocol{
   
   implicit object QueenFormat extends NamedFormat(jsonFormat1(Queen))
   implicit lazy val InitFormat: JsonFormat[Init] = new NamedFormat(jsonFormat1(Init)){}
-  implicit lazy val ChangeReportFormat: JsonFormat[ChangeReport] = new NamedFormat(jsonFormat4(ChangeReport)){}
+  implicit lazy val ChangeReportFormat: JsonFormat[ChangeReport] = new NamedFormat(jsonFormat5(ChangeReport)){}
 
   implicit object CanBulkFormat extends WriteOnlyFormat[CanBulk] ({
     case state: ChangeReport => ChangeReportFormat.write(state)

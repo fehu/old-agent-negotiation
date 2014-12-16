@@ -1,12 +1,11 @@
 package feh.tec.agents
 
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{ActorSystem, Props}
 import feh.tec.agents.lite.Message.ProposalId
 import feh.tec.agents.lite._
-import feh.util._
-import feh.tec.web.{WebSocketPushServerCreation, WebSocketPushServer}
 import feh.tec.web.WebSocketPushServer.Push
-import feh.tec.web.common.{WebSocketMessages, NQueenMessages}
+import feh.tec.web.common.{NQueenMessages, WebSocketMessages}
+import feh.tec.web.{WebSocketPushServer, WebSocketPushServerCreation}
 import spray.json.JsonFormat
 
 import scala.collection.mutable
@@ -47,8 +46,9 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
         val valsOpt = changes.get("values").map(_.asInstanceOf[(Map[Var, Any], Map[Var, Any])])
         val posOpt = valsOpt.map(_._2).map(getPosXY)
         val stateOpt = changes.get("state").map(_.asInstanceOf[(NegotiationState, NegotiationState)]._2.toString)
+        val priorityOpt = changes.get("priority").map(_.asInstanceOf[(Option[Priority], Option[Priority])]._2).flatten.map(_.get)
 
-        val rep = NQueenMessages.ChangeReport(q, timeDiff(time), posOpt, stateOpt)
+        val rep = NQueenMessages.ChangeReport(q, timeDiff(time), posOpt, stateOpt, priorityOpt)
         Some(rep)
       case msg@StateReport(`neg`, vals, "by demand", time) =>
         val ref = msg.sender
@@ -56,7 +56,8 @@ class NQueenWebSocketPushServer(neg: NegotiationId,
 
         val rep = NQueenMessages.ChangeReport(q, timeDiff(time),
           if(vals.contains("values")) Some(getPosXY(vals("values").asInstanceOf[Map[Var, Any]])) else None,
-          Some(vals("state").asInstanceOf[NegotiationState].toString)
+          Some(vals("state").asInstanceOf[NegotiationState].toString),
+          Some(vals("priority").asInstanceOf[Option[Priority]]).flatten.map(_.get)
           )
         Some(rep)
       case rep@MessageReport(msg, _to, extra, time) =>

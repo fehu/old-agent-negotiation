@@ -22,7 +22,8 @@ object NQueenMessages extends WebSocketMessages{
   case class ChangeReport(by: Queen,
                           at: Int, // system time in millis
                           position: Option[(Int, Int)],
-                          state: Option[String]
+                          state: Option[String],
+                          priority: Option[Int]
                           ) extends CanBulk
   {
     def reportsState = true
