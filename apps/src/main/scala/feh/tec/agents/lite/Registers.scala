@@ -16,7 +16,6 @@ trait PrioritiesRegister[Agent <: PriorityAndProposalBasedAgent[Lang], Lang <: L
   def allPrioritiesKnown(neg: NegotiationId) = _priorities(neg).forall(_._2.isDefined)
 
   def maxPriority(neg: NegotiationId)(implicit ag: Agent) ={
-    ag.log.debug("_priorities = " + _priorities)
     val all = _priorities(neg) + (ag.ref -> ag.get(neg).currentPriority.raw)
     if(all.forall(_._2.isDefined)) Some(all.mapValues(_.get).maxBy(_._2.get))
     else None
@@ -26,7 +25,6 @@ trait PrioritiesRegister[Agent <: PriorityAndProposalBasedAgent[Lang], Lang <: L
   beforeEachMessage andThen {
     ag => overridden => msg =>
       overridden(ag)(msg)
-//      ag.log.debug("registering priority for " + msg)
       _priorities
         .getOrElseUpdate(
           msg.negotiation, mutable.HashMap(ag.get(msg.negotiation).scope().toSeq.zipMap(_ => Option.empty[Priority]): _*)

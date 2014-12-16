@@ -6,6 +6,7 @@ import feh.tec.agents.lite._
 import feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent
 import feh.tec.agents.lite.spec.AgentSpecification
 import feh.util._
+
 import scala.collection.mutable
 
   trait PriorityAndProposalBasedAgentSpec[Ag <: PriorityAndProposalBasedAgent[Lang], Lang <: Language.ProposalBased with Language.HasPriority]
@@ -124,7 +125,7 @@ class PriorityNegotiationHandlerSpec[Ag <: PriorityAndProposalBasedAgent[Lang], 
   lazy val process = new DefDS[PartialFunction[Lang#Priority, Any]](
     implicit owner => {
       case req: Lang#PriorityRaiseRequest =>
-        import owner.{log, ref, sendToAll}
+        import owner.{ref, sendToAll}
         owner.get(req.negotiation).currentState update NegotiationState.NegotiatingPriority
         addReqEntry(req)
         if(requests(ref).isEmpty) sendToAll(start.get apply req.negotiation copy(id = req.id))
@@ -133,13 +134,12 @@ class PriorityNegotiationHandlerSpec[Ag <: PriorityAndProposalBasedAgent[Lang], 
           addConfirmEntry(resp)
           sendToAll(resp)
         }
-        else log.debug(s"requests = $requests")
+//        else log.debug(s"requests = $requests")
       case resp: Lang#PriorityRaiseResponse if owner.get(resp.negotiation).currentState() == NegotiationState.NegotiatingPriority =>
-        import owner.log
         addConfirmEntry(resp)
         if(allConfirmations(resp.respondingTo))
           onPriorityUpdate.get apply(resp.negotiation, confirmations.toMap.mapValues(_.get))
-        else log.debug(s"confirmations = $confirmations")
+//        else log.debug(s"confirmations = $confirmations")
     }
   )
   lazy val evidence = new DefDS[NegotiationId => Any](_ => ???)

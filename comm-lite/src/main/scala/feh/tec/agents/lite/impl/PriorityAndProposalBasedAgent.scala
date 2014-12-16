@@ -46,9 +46,7 @@ trait PriorityAndProposalBasedAgent[Lang <: Language.ProposalBased with Language
   protected val delayedMessages = mutable.ListBuffer.empty[Lang#Msg]
   def guardDelayedMessage(msg: Lang#Msg) = delayedMessages += msg
   def resendDelayedMessages() = {
-    log.debug("resendDelayedMessages " + delayedMessages)
-    delayedMessages.map(msg => self.tell(msg, msg.sender.ref))
-//    this.receive
+    delayedMessages.foreach(msg => self.tell(msg, msg.sender.ref))
     delayedMessages.clear()
   }
 

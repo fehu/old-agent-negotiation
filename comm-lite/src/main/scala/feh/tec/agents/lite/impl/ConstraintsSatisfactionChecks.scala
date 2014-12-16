@@ -11,10 +11,7 @@ trait ConstraintsSatisfactionChecks {
   val constraintsByNegotiation: Map[NegotiationId, AgentConstraintsDef]
 
   def satisfiesConstraints(of: NegotiationId, values: Map[Var, Any]): Boolean = constraintsByNegotiation(of).constraints forall {
-    case AgentConstraintDef(cName, parts) =>
-      val res = satisfiesParts(parts, values, get(of).currentValues())
-      log.debug(s"Constraint($cName): $res for values=$values, currentValues=${get(of).currentValues()}")
-      res
+    case AgentConstraintDef(cName, parts) => satisfiesParts(parts, values, get(of).currentValues())
   }
 
   protected def ifConstraintLeafForOtherVars = true

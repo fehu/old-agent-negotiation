@@ -41,7 +41,6 @@ trait FailureChecks[Lang <: Language.ProposalBased with Language.HasPriority]
 
   /** yes / no / None = maybe */
   def repeatingAFailure(acceptance: Lang#Acceptance): Option[Boolean] = {
-//    log.debug("repeatingAFailure?")
     val evidenceOpt = failureCheckEvidences.get(acceptance.negotiation).filter(_._1 == acceptance.respondingTo)
     val evidence = evidenceOpt map{
       case (id, vals) =>
@@ -55,7 +54,6 @@ trait FailureChecks[Lang <: Language.ProposalBased with Language.HasPriority]
     }
 
     val failOpt = failureFuncsFor(acceptance.negotiation, get(acceptance.negotiation).currentValues()).map(_(evidence))
-//    log.debug("repeatingAFailure? " + failOpt)
     if(failOpt.exists(_.contains(true))) Some(true)
     else if (failOpt.exists(_.isEmpty)) None
     else Some(false)
@@ -65,7 +63,6 @@ trait FailureChecks[Lang <: Language.ProposalBased with Language.HasPriority]
   override def process: PartialFunction[Lang#Msg, Any] = ({
     case FailureChecks.GuardFailedConfiguration(conf, _) =>
       guardFailedConfiguration(conf)
-    //      log.debug("Failed Configuration Guarded " + conf)
   }: Actor.Receive) orElse super.process
 
   /** Guards functions for checking the configuration given */
@@ -80,10 +77,7 @@ trait FailureChecks[Lang <: Language.ProposalBased with Language.HasPriority]
         }
         if(satisfies.exists(_.isEmpty)) None
         else if(satisfies.exists(_.contains(false))) Some(false)
-        else {
-//          log.debug(s"failure confirmed: evidence=$evidence,\nmyValues=$myValues, myPriority=$myPriority,\nfailed.configurations=$failed.configurations")
-          Some(true)
-        }
+        else Some(true)
       }
       else Some(false)
     }

@@ -40,7 +40,7 @@ object QueenNegotiationApp extends App with WebsocketConf{
       configure(
         timeout.initialize <= 100.millis,
         timeout.start <= 200.millis,
-        timeout.`response delay` <= 20.millis
+        timeout.`response delay` <= 10.millis
       )
 
       when finished {
@@ -75,9 +75,9 @@ object QueenNegotiationApp extends App with WebsocketConf{
     }
   }
 
-  def N = 6
+  def N = 8
 
-  val shutDownIn = 1 second span
+  val shutDownIn = 200 millis span
 
   implicit val asys = ActorSystem()
 

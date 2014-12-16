@@ -35,10 +35,7 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
 
   protected var pausedByFallbackRequest: Option[UUID] = None // todo: support multiple negotiations
 
-//  private var supervisorValueChanged = Map.empty[NegotiationId, Boolean] withDefaultValue false
   private var supervisorLastValue    = Map.empty[NegotiationId, Map[Var, Any]]
-
-//  protected def resetSupervisorValueChange(negId: NegotiationId) = supervisorValueChanged += negId -> false
 
   protected def supervisorProposalProcessing(msg: Lang#Proposal)(implicit ag: Ag) =
     if(msg.priority.get == ag.get(msg.negotiation).currentPriority().get + 1){
@@ -49,7 +46,6 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
         val neg = ag.get(msg.negotiation)
         neg.currentIterator update neg.currentIterator().relink
       }
-        //supervisorValueChanged += msg.negotiation -> true
       if(changed || lastOpt.isEmpty) supervisorLastValue += msg.negotiation -> msg.get
     }
 
@@ -91,7 +87,6 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
 
   def whenProposalAccepted(msg: Message.ProposalResponse)(implicit ag: Ag): Unit = whenProposalAccepted(msg.negotiation, msg.respondingTo)
   def whenProposalAccepted(neg: NegotiationId, pid: ProposalId)(implicit ag: Ag): Unit = if(allAccepted(neg, pid)){
-    //    ag.log.info("all accepted, setting state to **Waiting** " + proposalAcceptance(neg))
     ag.get(neg).currentState update NegotiationState.Waiting
   }
 
@@ -137,16 +132,7 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
     implicit ag => {
       negId =>
         clearProposalAcceptance(negId)(ag)
-        nothingToProposeIfHasMaxPriority(negId) getOrElse {
-//          if(supervisorValueChanged(negId)) {
-//            resetSupervisorValueChange(negId)
-//            val neg = ag.get(negId)
-//            neg.currentIterator update neg.currentIterator().relink
-//            ag.sendToAll(ag.setNextProposal(negId))
-//          }
-//          else
-            sendFallbackRequest(negId)
-        }
+        nothingToProposeIfHasMaxPriority(negId) getOrElse sendFallbackRequest(negId)
     }
   }
 
