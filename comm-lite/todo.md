@@ -5,7 +5,7 @@
 - [ ] constraints checking function must be build entirely by macro
 - [ ] change DomainIterator > DomainValuesStream 
 - [x] check with JProfiler
-- [ ] partial solution search
+- [x] partial solution search
 - [ ] connect `when failed` controller behaviour definition
 - [x] remove most of debug logs
 - [ ] remove restrictions on valid code in `when finished` and `when failed`
@@ -13,3 +13,4 @@
 - [ ] reduce usage of mutable maps 
 - [x] change report timing from millis to nanos
 - [x] negotiation finished notification broken at ad6f4654f3831f422d9b56c26f5765c47c846afd
+- [ ] add `confirmAllWaitingDelay` to timeouts
