@@ -1,14 +1,12 @@
 package feh.tec.agents.lite
 
-import java.util.UUID
-
-import feh.tec.agents.lite.Fallback
+import feh.tec.agents.lite.DomainIteratorBuilder.LinkedDomainIterator
 import feh.tec.agents.lite.Fallback.{FallbackRequest, FallbackState}
 import feh.tec.agents.lite.Message.ProposalId
 import feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent
 import feh.tec.agents.lite.impl.agent.create
 import feh.tec.agents.lite.impl.agent.create.SpecExt
-import feh.tec.agents.lite.impl.spec.{PriorityAndProposalBasedAgentSpec, ChangingIssuesSpec}
+import feh.tec.agents.lite.impl.spec.{ChangingIssuesSpec, PriorityAndProposalBasedAgentSpec}
 import feh.tec.agents.lite.spec.{AgentOverride, AgentSpecification, RequiresDistinctPriority}
 import feh.util._
 import scala.collection.mutable
@@ -145,7 +143,7 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
         val dit = it.apply(domains).map(i2i)
         val dit2 = it.apply(domains).map(i2i)
         ag.log.debug("dit2 = " + dit2.toList.mkString("\n"))
-        dit
+        new LinkedDomainIterator(dit.toStream)
     }
   }
 

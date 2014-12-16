@@ -148,4 +148,23 @@ object DomainIteratorBuilder{
         }
       }
   }
+
+  abstract class DomainStream[T](protected var togo: Stream[T]) extends Iterator[T]{
+    def hasNext: Boolean = togo.nonEmpty
+    def next(): T = togo.head $${ togo = togo.tail }
+  }
+
+  class LinkedDomainIterator[T](stream: Stream[T]) extends DomainStream(stream){
+    protected var tried: List[T] = Nil
+//    def passed = tried.reverse
+
+    override def next(): T = super.next() $$ { tried ::= _ }
+
+    /** creates a new [[LinkedDomainIterator]], relinking already tried solutions back to the stream */
+    def relink: LinkedDomainIterator[T] = {
+      val triedSnap = tried.reverse
+      new LinkedDomainIterator(togo #::: triedSnap.toStream)
+    }
+  }
+
 }

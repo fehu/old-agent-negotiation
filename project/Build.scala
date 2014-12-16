@@ -1,18 +1,16 @@
-import sbt._
-import Keys._
-import sbtunidoc.Plugin._
 import org.sbtidea.SbtIdeaPlugin._
-import scala.scalajs.sbtplugin._
-import ScalaJSPlugin._
-import UnidocKeys._
+import sbt.Keys._
+import sbt._
+import sbtunidoc.Plugin.UnidocKeys._
+import sbtunidoc.Plugin._
 
 object  Build extends sbt.Build {
 
   val ScalaVersion = "2.11.4"
   val Version = "0.3-SNAPSHOT"
 
-  import Resolvers._
-  import Dependencies._
+  import Build.Dependencies._
+  import Build.Resolvers._
 
   val buildSettings = Defaults.coreDefaultSettings ++ Seq (
     organization  := "feh.agents",
@@ -130,7 +128,8 @@ object  Build extends sbt.Build {
 
   lazy val commLite = Project("comm-lite", file("comm-lite"),
     settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(akka, scala.reflectApi)
+      libraryDependencies ++= Seq(akka, scala.reflectApi),
+      initialCommands += "import feh.tec.agents.lite._"
     )
   ) dependsOn feh.util
 
@@ -139,7 +138,8 @@ object  Build extends sbt.Build {
     id = "apps",
     base = file("apps"),
     settings = buildSettings ++ testSettings ++ Seq(
-      libraryDependencies ++= Seq(akkaSlf4j, slf4j)
+      libraryDependencies ++= Seq(akkaSlf4j, slf4j),
+      initialCommands += "import feh.tec.agents.lite._"
     )
   ) dependsOn (webBackend, commLite)
 

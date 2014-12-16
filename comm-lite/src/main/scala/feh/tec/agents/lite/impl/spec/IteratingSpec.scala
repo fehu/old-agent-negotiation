@@ -1,5 +1,6 @@
 package feh.tec.agents.lite.impl.spec
 
+import feh.tec.agents.lite.DomainIteratorBuilder.LinkedDomainIterator
 import feh.tec.agents.lite.ProposalEngine.DomainIterator
 import feh.tec.agents.lite._
 import feh.tec.agents.lite.impl.{PriorityAndProposalBasedAgent, DomainIterating}
@@ -28,7 +29,7 @@ object IteratingSpec{
           }
           val domains = dItByVar.map(_._1.domain)
           val dit = it.apply(domains).map(i2i)
-          dit
+          new LinkedDomainIterator(dit.toStream)
       })
 
     lazy val nextValues = new DefBADS[NegotiationId => Option[Map[Var, Any]]](

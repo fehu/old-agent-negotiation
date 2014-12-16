@@ -32,7 +32,7 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
   self: PriorityAndProposalBasedAgentSpec[Ag, Lang] with RequiresDistinctPriority with SpecExt[Ag] =>
 
   import Fallback._
-  
+
   def knownConfiguration(neg: NegotiationId, prop: ProposalId)(implicit ag: Ag): PartialValuesConfiguration = {
     val responses = proposalAcceptance.get(neg).filter(_._1 == prop).map(_._2.values.flatten.toList).getOrElse(Nil)
     val n = ag.get(neg)
