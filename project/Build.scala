@@ -1,4 +1,3 @@
-import org.sbtidea.SbtIdeaPlugin._
 import sbt.Keys._
 import sbt._
 import sbtunidoc.Plugin.UnidocKeys._
@@ -21,7 +20,7 @@ object  Build extends sbt.Build {
 //    scalacOptions ++= Seq("-deprecation"),
 //    scalacOptions ++= Seq("-Ydebug"),
 //    scalacOptions ++= Seq("-Xlog-free-terms"),
-    scalacOptions ++= Seq("-Ymacro-debug-lite"),
+//    scalacOptions ++= Seq("-Ymacro-debug-lite"),
     scalacOptions in (Compile, doc) ++= Seq("-diagrams", "-diagrams-max-classes", "50", "-diagrams-max-implicits", "20")
 //     resolvers += Release.spray,
 //     mainClass in Compile := Some("")
@@ -98,7 +97,7 @@ object  Build extends sbt.Build {
     object feh{
       lazy val util = ProjectRef( uri("git://github.com/fehu/util.git"), "util")
 
-//      object utils{
+//      object utils{Q
 //        lazy val compiler = ProjectRef( uri("git://github.com/fehu/util.git"), "scala-compiler-utils")
 //      }
     }
@@ -122,8 +121,7 @@ object  Build extends sbt.Build {
         (unidocScopeFilter in (ScalaUnidoc, unidoc)).value -- ScopeFilter( inProjects(webFrontend), inConfigurations(Compile) )
       }
     )
-  ).settings(ideaExcludeFolders := ".idea" :: ".idea_modules" :: Nil)
-   .aggregate(GitDependencies: _*)
+  ).aggregate(GitDependencies: _*)
    .aggregate(commLite, apps, webFrontend, webBackend)
 
   lazy val commLite = Project("comm-lite", file("comm-lite"),
