@@ -33,6 +33,26 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
 
   import Fallback._
 
+  protected var pausedByFallbackRequest: Option[UUID] = None // todo: support multiple negotiations
+
+//  private var supervisorValueChanged = Map.empty[NegotiationId, Boolean] withDefaultValue false
+  private var supervisorLastValue    = Map.empty[NegotiationId, Map[Var, Any]]
+
+//  protected def resetSupervisorValueChange(negId: NegotiationId) = supervisorValueChanged += negId -> false
+
+  protected def supervisorProposalProcessing(msg: Lang#Proposal)(implicit ag: Ag) =
+    if(msg.priority.get == ag.get(msg.negotiation).currentPriority().get + 1){
+      val lastOpt = supervisorLastValue.get(msg.negotiation)
+      val changed = lastOpt.exists(msg.get !=)
+
+      if(changed) {
+        val neg = ag.get(msg.negotiation)
+        neg.currentIterator update neg.currentIterator().relink
+      }
+        //supervisorValueChanged += msg.negotiation -> true
+      if(changed || lastOpt.isEmpty) supervisorLastValue += msg.negotiation -> msg.get
+    }
+
   def knownConfiguration(neg: NegotiationId, prop: ProposalId)(implicit ag: Ag): PartialValuesConfiguration = {
     val responses = proposalAcceptance.get(neg).filter(_._1 == prop).map(_._2.values.flatten.toList).getOrElse(Nil)
     val n = ag.get(neg)
@@ -82,7 +102,6 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
 
   def hasNothingToProposeWhileTopPriority(negId: NegotiationId)(implicit ag: Ag): Unit = sys.error("Failed to resolve negotiation")
 
-  protected var pausedByFallbackRequest: Option[UUID] = None
 
   moreProcess <:= {
     implicit ag => {
@@ -118,7 +137,16 @@ trait FallbackSpec[Ag <: Fallback.Agent[Lang], Lang <: Language.ProposalBased wi
     implicit ag => {
       negId =>
         clearProposalAcceptance(negId)(ag)
-        nothingToProposeIfHasMaxPriority(negId) getOrElse sendFallbackRequest(negId)
+        nothingToProposeIfHasMaxPriority(negId) getOrElse {
+//          if(supervisorValueChanged(negId)) {
+//            resetSupervisorValueChange(negId)
+//            val neg = ag.get(negId)
+//            neg.currentIterator update neg.currentIterator().relink
+//            ag.sendToAll(ag.setNextProposal(negId))
+//          }
+//          else
+            sendFallbackRequest(negId)
+        }
     }
   }
 
