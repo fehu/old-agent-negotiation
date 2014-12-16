@@ -23,13 +23,14 @@ table.chess-board {
     border:             0px;
     vertical-align:     middle;
     text-align:         center;
+    font-weight:        bold;
     color:              rgb(90, 90, 90);
 }
 
 .chess-board tr:nth-child(2n+2) td:nth-child(2n+2) {
-    background-color:   #7E4D3F;
+    background-color:   #CFCED3; //#7E4D3F;
 }
 
 .chess-board tr:nth-child(2n+3) td:nth-child(2n+3) {
-    background-color:   #7E4D3F;
+    background-color:   #CFCED3; //#7E4D3F;
 }

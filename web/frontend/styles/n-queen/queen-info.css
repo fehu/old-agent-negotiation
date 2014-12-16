@@ -41,8 +41,8 @@
 .queen-info .button{
     text-align:         center;
     color:              rgb(247, 237, 237);
-    background-color:   #7E4D3F;
-    border:             solid 2px #7E4D3F;
+    background-color:   #CFCED3;
+    border:             solid 2px #424242; //7E4D3F;
     border-radius:      7px;
 }
 
