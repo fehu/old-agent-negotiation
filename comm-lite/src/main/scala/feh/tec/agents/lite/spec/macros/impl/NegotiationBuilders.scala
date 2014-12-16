@@ -46,18 +46,18 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
   }
 
 
-  /** Seq( (name, type, domain, domain type) ) */
+  /** Seq( (name, type, domain, domain type, domain => domain size) ) */
   def extractVars(definitions: Seq[(c.TermName, c.Tree)]) = definitions collect {
     case (name, Apply(TypeApply(sel: Select, List(ttree@TypeTree())), arg :: Nil)) if h.selects(sel, "$anon.variable.with") =>
-      val (dom, domTpe) = arg match {
+      val (dom, domTpe, domSizeF) = arg match {
         case Apply(
               Select(This(TypeName("$anon")), TermName("domain")),
               List(domainDef)
         ) =>
-          val dTpe = extractDomainType(domainDef)
-          domainDef -> dTpe
+          val (dTpe, dSizeF) = extractDomainTypeAndSize(domainDef)
+          (domainDef, dTpe, dSizeF)
       }
-      (name, ttree.tpe, dom, domTpe)
+      (name, ttree.tpe, dom, domTpe, domSizeF)
   }
 
   /** Seq(name -> List(var)) */
@@ -189,7 +189,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
     case (Select(Select(This(TypeName("$anon")), TermName("when")), TermName(defName)), tree) => defName -> tree
   }
 
-  protected def extractDomainType(t: c.Tree) = t match {
+  protected def extractDomainTypeAndSize(t: c.Tree) = t match {
     case Apply(
           Select(
             Apply(
@@ -202,7 +202,7 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
             TermName("to")
             ),
           _ //List(_)
-          ) => c.typeOf[Range]
+          ) => c.typeOf[Range] -> c.Expr[Range => Int](q"(r: Range) => r.size")
     case other =>
       c.abort(NoPosition, showRaw(other))
   }
@@ -224,9 +224,9 @@ class NegotiationSpecificationBuilder[C <: whitebox.Context](val c: C) extends N
     val negotiationsAndIssues = b.extractNegotiations(definitions)
     val agentDefs = b.extractAgents(definitions)
 
-    val vars = for ((name, tpe, domain, domainTpe) <- varsAndDomains) yield {
+    val vars = for ((name, tpe, domain, domainTpe, domainSizeF) <- varsAndDomains) yield {
       val nme = name.decodedName.toString.trim
-      Raw.VarDef(nme, Raw.DomainDef(domain, tpe, domainTpe))
+      Raw.VarDef(nme, Raw.DomainDef(domain, tpe, domainTpe, q"$domainSizeF(domain)"))
     }
 
     val negotiations = for ((name, issues) <- negotiationsAndIssues) yield {

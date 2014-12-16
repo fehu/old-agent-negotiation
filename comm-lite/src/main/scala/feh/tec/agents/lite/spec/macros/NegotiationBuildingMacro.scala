@@ -23,7 +23,7 @@ trait NegotiationBuildingMacro[C <: whitebox.Context] extends MacroContext[C]{
     type NegotiationDef = NegotiationSpecification.NegotiationDef
 
     case class VarDef(name: String, domain: DomainDef)
-    case class DomainDef(domain: c.Tree, tpe: c.Type, domTpe: c.Type)
+    case class DomainDef(domain: c.Tree, tpe: c.Type, domTpe: c.Type, domSize: c.Tree)
 
     case class SingleSpawnDef(name: String, count: c.Expr[Int])
     case class SpawnDefs(defs: Seq[SingleSpawnDef])

@@ -7,6 +7,7 @@ abstract class Var(val name: String, testType: Any => Boolean){
   type Tpe
   type Domain
   def domain: Domain
+  def domainSize: Int
 
   def cast(a: Any): Option[Tpe] = if(testType(a)) Some(a.asInstanceOf[Tpe]) else None
 

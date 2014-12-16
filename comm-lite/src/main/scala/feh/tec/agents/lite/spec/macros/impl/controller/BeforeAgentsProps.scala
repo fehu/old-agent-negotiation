@@ -32,12 +32,12 @@ trait BeforeAgentsProps[C <: whitebox.Context]{
           import c.universe._
 
           val (issues, domainIteratorsCreators) = raw.vars.map{
-            case Raw.VarDef(name, Raw.DomainDef(domain, tpe, domTpe)) =>
+            case Raw.VarDef(name, Raw.DomainDef(domain, tpe, domTpe, domSize)) =>
               val (domainMix, iteratorBuilder) = domTpe match {
                 case t if t <:< typeOf[Range]     => tq"Domain.Range"       -> tq"DomainIteratorBuilder.Range"
                 case t if t <:< tq"Set[$tpe]".tpe => tq"Domain.Small[$tpe]" -> tq"DomainIteratorBuilder.Generic"
               }
-              val issue = q"$name -> new Var($name, _.isInstanceOf[$tpe]) with $domainMix { def domain: $domTpe = $domain }"
+              val issue = q"$name -> new Var($name, _.isInstanceOf[$tpe]) with $domainMix { def domain: $domTpe = $domain; def domainSize = $domSize }"
               val domainIteratorsCreator = q"$name -> (new $iteratorBuilder).asInstanceOf[DomainIteratorBuilder[Var#Domain, Var#Tpe]]"
 
               issue -> domainIteratorsCreator

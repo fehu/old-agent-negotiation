@@ -19,7 +19,7 @@ trait HasSimpleConstraintsBuilder[C <: whitebox.Context] extends HasConstraintsB
 
       val constraints = agDef.constraints map xc.extractConstraintsDef map {
         case (cName, xc.Replacement(descr, f)) =>
-          val func = f(raw.vars.map{ case Raw.VarDef(name, Raw.DomainDef(_, tpe, _)) => name -> tpe }.toMap)
+          val func = f(raw.vars.map{ case Raw.VarDef(name, Raw.DomainDef(_, tpe, _, _)) => name -> tpe }.toMap)
           val descriptions = descr map {
             case xc.Description(tpe, varName, arg) =>
               q"""ConstraintParamDescription($tpe, $varName, ${arg.decodedName.toString})"""
@@ -86,7 +86,7 @@ trait HasVarsSeparatingConstraintsBuilder[C <: whitebox.Context] extends HasCons
         _.transform(
         {
           case xc.Replacement(descr, f) =>
-            val func = f(raw.vars.map{ case Raw.VarDef(name, Raw.DomainDef(_, tpe, _)) => name -> tpe }.toMap)
+            val func = f(raw.vars.map{ case Raw.VarDef(name, Raw.DomainDef(_, tpe, _, _)) => name -> tpe }.toMap)
             c.info(NoPosition, "agentVarConstraintDefByName Replacement func" + showCode(func), true)
             val descriptions = descr map {
               case xc.Description(tpe, varName, arg) =>
