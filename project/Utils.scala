@@ -1,6 +1,8 @@
 import sbt._
 import scala.util.matching.Regex
 
+//TODO: repeating functionality from 'gh-repo-plugin'
+
 object FileUtils{
   type FileMapEntry = (File, File)
   private type FileMap = Seq[(File, File)]

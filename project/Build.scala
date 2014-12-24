@@ -15,6 +15,7 @@ object  Build extends sbt.Build {
     organization  := "feh.agents",
     version       := Version,
     scalaVersion  := ScalaVersion,
+    resolvers     += Resolvers.fehu,
 //    javaOptions   += "-Xmx4000M -XX:MaxPermSize=1024 -Xss1M",
 //    scalacOptions ++= Seq("-explaintypes"),
 //    scalacOptions ++= Seq("-deprecation"),
@@ -34,6 +35,8 @@ object  Build extends sbt.Build {
   // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
   object Resolvers{
+    lazy val fehu = "Fehu's github repo" at "http://fehu.github.io/repo"
+
     object Release{
       lazy val sonatype = "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases"
       lazy val spray = "spray" at "http://repo.spray.io/"
@@ -95,19 +98,13 @@ object  Build extends sbt.Build {
 
 
     object feh{
-      lazy val util = ProjectRef( uri("git://github.com/fehu/util.git"), "util")
-
-//      object utils{Q
-//        lazy val compiler = ProjectRef( uri("git://github.com/fehu/util.git"), "scala-compiler-utils")
-//      }
+      lazy val util = "feh.util" %% "util" % "1.0.6-SNAPSHOT"
     }
 
     object js{
       lazy val jquery = "org.webjars" % "jquery" % "2.1.1"
       lazy val bootstrap = "org.webjars" % "bootstrap" % "3.2.0"
     }
-
-    lazy val GitDependencies = feh.util :: Nil //feh.utils.compiler
   }
 
   // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
@@ -121,15 +118,14 @@ object  Build extends sbt.Build {
         (unidocScopeFilter in (ScalaUnidoc, unidoc)).value -- ScopeFilter( inProjects(webFrontend), inConfigurations(Compile) )
       }
     )
-  ).aggregate(GitDependencies: _*)
-   .aggregate(commLite, apps, webFrontend, webBackend)
+  ).aggregate(commLite, apps, webFrontend, webBackend)
 
   lazy val commLite = Project("comm-lite", file("comm-lite"),
     settings = buildSettings ++ Seq(
-      libraryDependencies ++= Seq(akka, scala.reflectApi),
+      libraryDependencies ++= Seq(akka, scala.reflectApi, feh.util),
       initialCommands += "import feh.tec.agents.lite._"
     )
-  ) dependsOn feh.util
+  )
 
 
   lazy val apps = Project(
@@ -152,18 +148,18 @@ object  Build extends sbt.Build {
     base = file("web/frontend"),
     settings = buildSettings ++ Web.frontend ++ Seq(
       Web.packDir := file("web/packed"),
-      libraryDependencies ++= Seq(scala.libAll),
+      libraryDependencies ++= Seq(scala.libAll, feh.util),
       unmanagedSourceDirectories in Compile <+= (sourceDirectory in webCommon)
 
     )
-  ) dependsOn (feh.util, webCommon)
+  ) dependsOn webCommon
 
   lazy val webBackend = Project(
     id = "web-backend",
     base = file("web/backend"),
     settings = buildSettings ++ Web.backend ++ Seq(
       resolvers ++= Seq(Snapshot.spray, Release.spray),
-      libraryDependencies ++= Seq(spray.websocket, spray.json)
+      libraryDependencies ++= Seq(spray.websocket, spray.json, feh.util)
     )
-  ) dependsOn (feh.util, webCommon)
+  ) dependsOn webCommon
 }

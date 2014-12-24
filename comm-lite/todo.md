@@ -14,3 +14,5 @@
 - [x] change report timing from millis to nanos
 - [x] negotiation finished notification broken at ad6f4654f3831f422d9b56c26f5765c47c846afd
 - [ ] add `confirmAllWaitingDelay` to timeouts
+- [ ] `confirmAllWaitingDelay` seems to play a grand role in avoiding wrong solutions: check it
+- [ ] Build project/Utils: repeating functionality from 'gh-repo-plugin'

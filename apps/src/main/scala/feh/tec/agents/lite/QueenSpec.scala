@@ -267,7 +267,7 @@ class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.DynIs
   with RequiresDistinctPriority with PartialSolutionSearchSpec
 {
 
-  def confirmAllWaitingDelay: FiniteDuration = 100 millis span
+  def confirmAllWaitingDelay: FiniteDuration = 200 millis span
 
   initialize before {
     ag =>

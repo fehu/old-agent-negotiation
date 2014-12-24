@@ -14,3 +14,9 @@ project/plugins/project/
 
 # IntelliJ Idea
 .idea
+
+# web-packed
+web/packed/
+
+# logs
+logs/

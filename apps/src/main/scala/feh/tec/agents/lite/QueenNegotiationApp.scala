@@ -75,9 +75,9 @@ object QueenNegotiationApp extends App with WebsocketConf{
     }
   }
 
-  def N = 8
+  def N = 6
 
-  val shutDownIn = 500 millis span
+  val shutDownIn = 1 second span
 
   implicit val asys = ActorSystem()
 
