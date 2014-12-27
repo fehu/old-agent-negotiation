@@ -69,17 +69,20 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
       )
     else None
 
-  def regAggregateReq(req: Message.IssuesRequest)(implicit ag: Agent): Unit = {
-    val neg = ag.get(req.negotiation)
-    if(req.myValues.keySet == neg.currentIssues().toSet){
-      val psForNeg = partialSolutionReg.getOrElseUpdate(
-        req.negotiation,
-        mutable.HashMap(neg.scope().toSeq.zipMap(_ => Option.empty[(Priority, Map[Var, Any])]): _*)
-      )
-      psForNeg += req.sender -> Some(req.priority -> req.myValues)
+  def regAggregateReq(req: Message.IssuesRequest)(implicit ag: Agent): Unit =
+    if(req.req.isAggregation){
+      val neg = ag.get(req.negotiation)
+      if(req.myValues.keySet == neg.currentIssues().toSet){
+        val psForNeg = partialSolutionReg.getOrElseUpdate(
+          req.negotiation,
+          mutable.HashMap(neg.scope().toSeq.zipMap(_ => Option.empty[(Priority, Map[Var, Any])]): _*)
+        )
+        psForNeg += req.sender -> Some(req.priority -> req.myValues)
+      }
     }
-  }
-  def unregPartialSolution(neg: NegotiationId, ag: AgentRef): Unit = partialSolutionReg.get(neg).foreach(_ += ag -> None)
+    else unregPartialSolution(req.negotiation, req.sender)
+
+  def unregPartialSolution(neg: NegotiationId, ag: AgentRef): Unit = partialSolutionReg.get(neg).foreach(_(ag) = None)
   def clearPartialSolution(neg: NegotiationId): Unit = partialSolutionReg -= neg
 
   def updateIteratorOnIssuesChange(neg: Agent#Negotiation)
@@ -179,10 +182,10 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
             }
           }
         }
-        else {
+//        else {
 //          clearPartialSolution(neg.id)
-          unregPartialSolution(req.negotiation, req.sender)
-        }
+//          unregPartialSolution(req.negotiation, req.sender)
+//        }
 
       case _ => // do nothing
     }
@@ -243,6 +246,7 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
 
   override def sendFallbackRequest(negId: NegotiationId)(implicit ag: Agent) = {
     super.sendFallbackRequest(negId)
+    ag.log.info("sendFallbackRequest: requestIssueRemoval")
     requestIssueRemoval(negId)
   }
 
@@ -259,15 +263,18 @@ trait PartialSolutionSearchSpec extends ChangingIssuesSpec[Agent, Lang] with Fal
     }
   }
 
-  override protected def respondIWillMove(req: FallbackRequest, myPriority: Priority)(implicit ag: Agent) =
+  override protected def respondIWillMove(req: FallbackRequest, myPriority: Priority)(implicit ag: Agent) = {
     ag.sendToAll(Fallback.IWillMove(req.negotiation, myPriority, req.id)(ag.ref))
+    requestIssueRemoval(req.negotiation)
+  }
+
 }
 
 class QueenSpec(implicit val agentTag: ClassTag[Agent]) extends create.PPI.DynIssuesSpec[Agent, Lang]
   with RequiresDistinctPriority with PartialSolutionSearchSpec
 {
 
-  def confirmAllWaitingDelay: FiniteDuration = 200 millis span
+  def confirmAllWaitingDelay: FiniteDuration = 20 millis span
 
   initialize before {
     ag =>
