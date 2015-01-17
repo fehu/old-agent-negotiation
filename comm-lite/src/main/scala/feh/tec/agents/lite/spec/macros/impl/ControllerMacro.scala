@@ -12,10 +12,14 @@ class ControllerMacro[C <: whitebox.Context](val c: C)
   with ControllerBuildingMacroImpl[C] with AgentsBuildingMacroImpl[C]
   with HasVarsSeparatingConstraintsBuilder[C]
 {
+  import c.universe._
+
   def cBuilder = new VarsSeparatingConstraintsBuilder
 
+  def BeforeAll: List[c.Tree] = List(q"import feh.tec.agents.lite._")
+
   def AllTransformation(raw: NegotiationRaw) = AgentSegmentsTransformation(raw) ::: ControllerSegmentsTransformation(raw)
-  
+
   implicit lazy val StageOrdering = StagesOrdering(
     AgentStagesOrdering.precedence >> ControllerStagesOrdering.precedence
   )
@@ -24,10 +28,15 @@ class ControllerMacro[C <: whitebox.Context](val c: C)
 
   def controllerPropsExpr(dsl: c.Expr[spec.dsl.Negotiation]): c.Expr[Props] ={
     val negRaw = build(dsl)
-    val segments = Function.chain(AllTransformation(negRaw))(MacroSegments.empty).segments
-    val trees = Function.chain(segments)(Trees.empty(anonControllerName))
+    val segments = scala.Function.chain(AllTransformation(negRaw))(MacroSegments.empty).segments
+    val trees = scala.Function.chain(segments)(Trees.empty(anonControllerName))
     val buildPropsExpr = actorCreatePropsExpr(trees.controller)
-    c.universe.reify(buildPropsExpr.splice(Map()))
+    val propsExpr = reify(buildPropsExpr.splice(Map()))
+
+    c.Expr[Props](q"""
+      ..$BeforeAll
+      $propsExpr
+    """)
   }
 }
 
