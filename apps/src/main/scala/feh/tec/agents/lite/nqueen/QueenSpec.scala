@@ -1,8 +1,9 @@
-package feh.tec.agents.lite
+package feh.tec.agents.lite.nqueen
 
 import feh.tec.agents.lite.DomainIteratorBuilder.LinkedDomainIterator
 import feh.tec.agents.lite.Fallback.{FallbackRequest, FallbackState}
 import feh.tec.agents.lite.Message.ProposalId
+import feh.tec.agents.lite._
 import feh.tec.agents.lite.impl.PriorityAndProposalBasedAgent
 import feh.tec.agents.lite.impl.agent.create
 import feh.tec.agents.lite.impl.agent.create.SpecExt
@@ -29,7 +30,7 @@ object QueenSpec{
     }
 }
 
-import feh.tec.agents.lite.QueenSpec._
+import QueenSpec._
 
 trait SortResending[Lang <: Language.ProposalBased with Language.HasPriority] extends PriorityAndProposalBasedAgent[Lang] with AgentOverride{
   override def resendDelayedMessages() = {

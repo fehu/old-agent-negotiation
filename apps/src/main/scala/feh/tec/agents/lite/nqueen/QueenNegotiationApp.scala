@@ -1,14 +1,15 @@
-package feh.tec.agents.lite
+package feh.tec.agents.lite.nqueen
 
-import feh.tec.agents.NQueenWebSocketPushServerBuilder
+import akka.actor.{ActorRef, ActorSystem}
+import feh.tec.agents.lite.impl.agent.reporter
+import feh.tec.agents.lite.spec.dsl._
+import feh.tec.agents.lite.{AgentReport, NegotiationId, SystemMessage}
 import feh.tec.web.WebSocketPushServer.OnConnection
 import feh.tec.web.common.{NQueenMessages, WebsocketConf}
 import feh.util._
-import akka.actor.{ActorRef, ActorSystem}
-import feh.tec.agents.lite.spec.dsl._
-import impl.agent._
 import spray.can.websocket.frame.TextFrame
 import scala.concurrent.duration._
+import scala.language.{postfixOps, reflectiveCalls}
 
 object QueenNegotiationApp extends App with WebsocketConf{
 
@@ -84,8 +85,8 @@ object QueenNegotiationApp extends App with WebsocketConf{
   def pushServerBuilder = {
     val initMessage = NQueenMessages.Init(for(i <- 1 to N) yield NQueenMessages.Queen(i) -> "Queen")
 
-    import spray.json._
     import feh.tec.web.NQueenProtocol._
+    import spray.json._
 
     new NQueenWebSocketPushServerBuilder(
       wsConf.back.host("n-queen"),

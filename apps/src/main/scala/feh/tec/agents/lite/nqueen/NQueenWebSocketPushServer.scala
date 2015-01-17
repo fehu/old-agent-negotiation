@@ -1,4 +1,4 @@
-package feh.tec.agents
+package feh.tec.agents.lite.nqueen
 
 import akka.actor.{ActorSystem, Props}
 import feh.tec.agents.lite.Message.ProposalId
