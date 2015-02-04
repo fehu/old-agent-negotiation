@@ -7,6 +7,6 @@ Negotiating Agents
 
 | Branch | Description |
 |:--|:--|
-|[lite](https://github.com/fehu/agent-negotiation/tree/lite)| Was intented to be a lightweight version of *heavy* branch, but failed it's initial goal. Provides a working N-Queen negotiaion.|
-|[heavy](https://github.com/fehu/agent-negotiation/tree/heavy)| First intent of agents communication framework. Overcomplicated. Doesn't work well. Just for history|
-|[coloring](https://github.com/fehu/agent-negotiation/tree/coloring)| Graph coloring negotiation. First negotiation done. Reasonably lightweight. Not generic. |
+|[lite](https://github.com/fehu/old-agent-negotiation/tree/lite)| Was intented to be a lightweight version of *heavy* branch, but failed it's initial goal. Provides a working N-Queen negotiaion.|
+|[heavy](https://github.com/fehu/old-agent-negotiation/tree/heavy)| First intent of agents communication framework. Overcomplicated. Doesn't work well. Just for history|
+|[coloring](https://github.com/fehu/old-agent-negotiation/tree/coloring)| Graph coloring negotiation. First negotiation done. Reasonably lightweight. Not generic. |
