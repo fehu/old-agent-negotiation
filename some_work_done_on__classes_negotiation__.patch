@@ -1,0 +1,290 @@
+Index: comm-lite/src/main/scala/feh/tec/agents/lite/spec/NegotiationSpecification.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- comm-lite/src/main/scala/feh/tec/agents/lite/spec/NegotiationSpecification.scala	(revision f3c81b3ce78ad2f5ac9ebde36b78550d37cbe601)
++++ comm-lite/src/main/scala/feh/tec/agents/lite/spec/NegotiationSpecification.scala	(revision )
+@@ -1,7 +1,5 @@
+ package feh.tec.agents.lite.spec
+ 
+-import feh.tec.agents
+-import feh.tec.agents.lite.spec.NegotiationSpecification
+ import scala.concurrent.duration.FiniteDuration
+ 
+ object NegotiationSpecification{
+@@ -91,6 +89,7 @@
+ //  def build(dsl: agents.spec.dsl.NegotiationSpecification): NegotiationSpecification = macro agents.spec.macros.NegotiationSpecificationBuilder.build
+ }
+ 
++/*
+ trait NegotiationSpecification { //extends agents.NegotiationSpecification{
+   type VarDef = NegotiationSpecification.AbstractVarDef[_]
+   type NegotiationDef = NegotiationSpecification.NegotiationDef
+@@ -116,4 +115,4 @@
+ //       |  negotiations: ${negotiations.mkString("\n    ", "\n    ", "")}
+ //       |  agents:       ${agents.mkString("\n    ", "\n    ", "")}
+ //       |}""".stripMargin
+-}
+\ No newline at end of file
++}*/
+Index: comm-lite/src/main/scala/feh/tec/agents/lite/spec/macros/NegotiationBuildingMacro.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- comm-lite/src/main/scala/feh/tec/agents/lite/spec/macros/NegotiationBuildingMacro.scala	(revision f3c81b3ce78ad2f5ac9ebde36b78550d37cbe601)
++++ comm-lite/src/main/scala/feh/tec/agents/lite/spec/macros/NegotiationBuildingMacro.scala	(revision )
+@@ -22,20 +22,25 @@
+   object Raw{
+     type NegotiationDef = NegotiationSpecification.NegotiationDef
+ 
+-    case class VarDef(name: String, domain: DomainDef)
+-    case class DomainDef(domain: c.Tree, tpe: c.Type, domTpe: c.Type, domSize: c.Tree)
++    case class VarDef(name: String, domain: AbstractDomainDef)
+-
++    
++    trait AbstractDomainDef
++    case class DomainDef(domain: c.Tree, tpe: c.Type, domTpe: c.Type, domSize: c.Tree) extends AbstractDomainDef
++    case class DomainUnspecified(tpe: c.Type) extends AbstractDomainDef
++
+     case class SingleSpawnDef(name: String, count: c.Expr[Int])
+     case class SpawnDefs(defs: Seq[SingleSpawnDef])
+ 
+     case class AgentDef(name: String,
+                         role: String,
+                         negotiations: Seq[AgentNegDef],
+-                        spec: c.Expr[AgentSpecification])
++                        spec: c.Expr[AgentSpecification],
++                        reporting: Option[c.Tree])
+ 
+     case class AgentNegDef(negotiation: String,
+                            interlocutors: Interlocutors,
+                            interlocutorsExpr: c.Expr[Interlocutors],
++                          @deprecated("reporting should be for whole agent, not just negotiation", since = "0.3")
+                            reportingToOpt: Option[c.Tree],
+                            constraints: Seq[AgentConstraintsDef])
+     case class AgentConstraintsDef(constraints: Seq[c.Tree])
+Index: apps/src/main/scala/feh/tec/agents/lite/classes/package.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- apps/src/main/scala/feh/tec/agents/lite/classes/package.scala	(revision )
++++ apps/src/main/scala/feh/tec/agents/lite/classes/package.scala	(revision )
+@@ -0,0 +1,10 @@
++package feh.tec.agents.lite
++
++package object classes {
++  type DayOfWeek = DayOfWeek.Value
++
++  implicit class ClassTimeOps(ct: ClassTime){
++    def intersects(ct2: ClassTime): Boolean = ???
++  }
++
++}
+Index: apps/src/main/scala/feh/tec/agents/lite/classes/Entities.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- apps/src/main/scala/feh/tec/agents/lite/classes/Entities.scala	(revision )
++++ apps/src/main/scala/feh/tec/agents/lite/classes/Entities.scala	(revision )
+@@ -0,0 +1,26 @@
++package feh.tec.agents.lite.classes
++
++trait Discipline
++
++object DayOfWeek extends Enumeration{
++  val Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday = Value
++}
++
++case class TimeOfDay(hour: Int, minute: Int){
++  assert(hour >= 0 && hour < 24, s"incorrect hour: $hour")
++  assert(minute >= 0 && minute < 60, s"incorrect minute: $minute")
++
++  def minutesFromMidnight = hour*60 + minute
++}
++
++object TimeOfDay{
++  def fromMinutes(minutes: Int) = TimeOfDay(minutes / 60, minutes % 60)
++}
++
++case class ClassTime(beginning: TimeOfDay, minutesDuration: Int){
++  lazy val end = TimeOfDay.fromMinutes(beginning.minutesFromMidnight + minutesDuration)
++}
++
++trait ClassRoom
++
++trait TimeTable
+\ No newline at end of file
+Index: comm-lite/src/main/scala/feh/tec/agents/lite/spec/dsl/Negotiation.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- comm-lite/src/main/scala/feh/tec/agents/lite/spec/dsl/Negotiation.scala	(revision f3c81b3ce78ad2f5ac9ebde36b78550d37cbe601)
++++ comm-lite/src/main/scala/feh/tec/agents/lite/spec/dsl/Negotiation.scala	(revision )
+@@ -8,8 +8,10 @@
+ 
+   type ChooseVarDomain = {
+     def `with`[T](domain: DomainDef[T]): AbstractVarDef[T]
++    def ofType[T]: AbstractVarDef[T]
+   }
+ 
++  @deprecated("use `reports: ChooseAgentReports` AgentNegPartialDef", since = "0.3")
+   type ChooseReporter = {
+     def reportingTo[R <: ReportListener](r: ReportListenerRef[R]): AgentNegPartialDef // todo
+   }
+@@ -31,7 +33,14 @@
+   }
+   type ChooseAgentNegotiation = {
+     type ChooseWith = {
++      /** Select _scope_ for the negotiation */
+       def `with`[S: SelectsInterlocutors](interlocutors: S*): ChooseReporter
++      def `with`(interlocutors: SelectsInterlocutors[_]): ChooseReporter
++
++      /** Empty scope for the negotiation - can only respond to given `agents` */
++      def whenContactedBy(ag: AgentDef): ChooseReporter
++      /** Empty scope for the negotiation - can only respond to agents of given `role` */
++      def whenContactedBy(role: String): ChooseReporter
+     }
+ 
+     def the(neg: String): ChooseWith
+@@ -39,6 +48,14 @@
+   }
+   sealed trait SelectsInterlocutors[S]
+ 
++  type ChooseAgentShares = {
++    def stateOf(v: AbstractVarDef[_]): AgentNegPartialDef
++  }
++
++  type ChooseAgentReports = {
++    def to[R <: ReportListener](r: ReportListenerRef[R]): AgentNegPartialDef
++  }
++
+   protected trait AgentConstraint
+ 
+   def define = new {
+@@ -48,11 +65,15 @@
+   }
+   def variable          : ChooseVarDomain = stub
+   def negotiation       : ChooseNegotiationOver = stub
++
+   def agent             : ChooseAgentRole = stub
+   def negotiates        : ChooseAgentNegotiation = stub
++  def shares            : ChooseAgentShares = stub
++  def reports           : ChooseAgentReports = stub
+ 
+   def domain[C[_], T](subj: C[T]): DomainDef[T] = stub
+   def domain(r: Range): DomainDef[Int] = stub
++  def domain[E <: Enumeration](enum: E): DomainDef[E] = stub
+ 
+   def hasConstraints(c: AgentConstraint*): AgentNegPartialDef = stub
+ 
+@@ -62,7 +83,16 @@
+     def others: TheOthers.type
+   } = stub
+ 
+-  implicit object StringSelectsInterlocutorsByRole extends SelectsInterlocutors[String]
++  /** Has all of agents with `role` in scope */
++  def allOf(role: String): SelectsInterlocutors[String] = stub
++  /** Has all of given `agents` in scope */
++  def allOf(ag: AgentDef): SelectsInterlocutors[String] = stub
++  /** Has one selected agent of `role` is scope */
++  def selected(role: String): SelectsInterlocutors[String] = stub
++  /** Has one selected agent is scope */
++  def selected(ag: AgentDef): SelectsInterlocutors[String] = stub
++  
++//  implicit object StringSelectsInterlocutorsByRole extends SelectsInterlocutors[String]
+   implicit object NeighboursSelectsInterlocutors extends SelectsInterlocutors[neighbours.type]
+   implicit object TheRestOfSelectsInterlocutors extends SelectsInterlocutors[TheOthers.type]
+ 
+Index: apps/src/main/scala/feh/tec/agents/lite/classes/ClassesNegotiation.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- apps/src/main/scala/feh/tec/agents/lite/classes/ClassesNegotiation.scala	(revision )
++++ apps/src/main/scala/feh/tec/agents/lite/classes/ClassesNegotiation.scala	(revision )
+@@ -0,0 +1,46 @@
++package feh.tec.agents.lite.classes
++
++import feh.tec.agents.lite.spec.NegotiationSpecification.AgentDef
++import feh.tec.agents.lite.spec.dsl._
++import scala.language.{postfixOps, reflectiveCalls}
++
++object ClassesNegotiation extends App{
++
++
++  def negController = controller {
++    new Negotiation {
++      def discipline  = variable.ofType[Discipline]
++      def day         = variable `with` domain( DayOfWeek )
++      def time        = variable.ofType[ClassTime]
++      def classRoom   = variable.ofType[ClassRoom]
++
++      def timeTable   = variable.ofType[TimeTable]
++
++      def `teacher selection`     = negotiation over discipline
++      def `time assignation`      = negotiation over (day, time)
++      def `classroom assignation` = negotiation over classRoom
++
++      def Group: AgentDef = agent withRole "Students Group" definedBy ??? that (
++        negotiates the `teacher selection` `with` allOf(Teacher),
++        negotiates the `time assignation` `with` selected(Teacher),
++        shares stateOf timeTable,
++        reports to ???
++        )
++
++      def Teacher: AgentDef = agent withRole "Teacher" definedBy ??? that (
++        negotiates the `teacher selection` whenContactedBy Group,
++        negotiates the `time assignation` `with` selected(Group),
++        negotiates the `classroom assignation` `with` allOf(`Class Room`),
++        shares stateOf timeTable,
++        reports to ???
++        )
++
++      def `Class Room` = agent withRole "Class Room" definedBy ??? that (
++        negotiates the `classroom assignation` whenContactedBy Teacher,
++        shares stateOf timeTable,
++        reports to ???
++        )
++    }
++  }
++
++}
+Index: project/Build.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- project/Build.scala	(revision f3c81b3ce78ad2f5ac9ebde36b78550d37cbe601)
++++ project/Build.scala	(revision )
+@@ -58,6 +58,8 @@
+ 
+     lazy val shapeless = "com.chuusai" % "shapeless_2.10.2" % "2.0.0-M1"
+ 
++    lazy val nscalaTime = "com.github.nscala-time" %% "nscala-time" % "1.6.0"
++
+     object scala{
+       lazy val compiler = "org.scala-lang" % "scala-compiler" % ScalaVersion
+       lazy val swing = "org.scala-lang" % "scala-swing" % ScalaVersion
+@@ -98,7 +100,7 @@
+ 
+ 
+     object feh{
+-      lazy val util = "feh.util" %% "util" % "1.0.6-SNAPSHOT"
++      lazy val util = "feh.util" %% "util" % "1.0.6"
+     }
+ 
+     object js{
+@@ -132,7 +134,7 @@
+     id = "apps",
+     base = file("apps"),
+     settings = buildSettings ++ testSettings ++ Seq(
+-      libraryDependencies ++= Seq(akkaSlf4j, slf4j),
++      libraryDependencies ++= Seq(akkaSlf4j, slf4j, nscalaTime),
+       initialCommands += "import feh.tec.agents.lite._"
+     )
+   ) dependsOn (webBackend, commLite)
